@@ -1,0 +1,59 @@
+%% ofk 1
+flowchart down
+title: "فلو: استخدام نیروی فروش درصدی — نمونهٔ ساختار واحد (2026-10-29)"
+icons: off
+
+// ساختار واحد cc-flow-run — برچسب هر نقطه عیناً همان برچسب hire-commission-sales.mmd است
+// (در Mermaid خط‌ها با <br> جدا می‌شوند، این‌جا با \n). خط‌های برچسب: عنوان · skill: · out: · after:
+//   after: ask (بپرس) | auto (خودکار) | gate (کاربر تصمیم می‌گیرد) | route (Claude از روی نتیجهٔ skill یال را انتخاب می‌کند)
+//   group = بخش و مرز · tags: var = متغیر · tags: locked = قفل · برچسب = عنوان + skill · desc = out + after (برچسب OFK بعد از ~۴ خط بریده می‌شود)
+// هم‌سانی با Mermaid: python -I check_parity.py flows/hire-commission-sales
+
+group s1 = "1 · تعریف نقش" [blue] {
+  goal = "هدف: استخدام فروشندهٔ درصدی برای {{product}}\nskill: —" [rounded, orange, tags: var, desc: "out: محصول + بازار + تعداد نفر\nafter: ask"]
+  role = "شرح شغل و مدل پورسانت\nskill: first-principles" [desc: "out: وظایف + درصد پورسانت + سقف + دورهٔ پرداخت\nafter: ask"]
+}
+
+group s2 = "2 · جذب" [pink] {
+  ad = "آگهی استخدام\nskill: marketing-skills:copywriting" [desc: "out: متن آگهی + ۳ تیتر\nafter: auto"]
+  post = "انتشار آگهی\nskill: marketing-skills:social" [desc: "out: پیش‌نویس پست در ۲ کانال، بدون انتشار خودکار\nafter: gate"]
+}
+
+group s3 = "3 · غربال" [violet] {
+  screen = "غربال رزومه‌ها\nskill: —" [desc: "out: امتیاز ۰ تا ۱۰ برای هر نفر + دلیل\nafter: auto"]
+  d1 = "کسی امتیاز ۷+ دارد؟\nafter: route" [diamond, yellow]
+  reject = "پیام رد مؤدبانه\nskill: marketing-skills:copywriting" [desc: "out: پیش‌نویس پیام، بدون ارسال خودکار\nafter: gate"]
+}
+
+group s4 = "4 · مصاحبه" [green] {
+  qs = "سؤال‌ها + نقش‌آفرینی فروش\nskill: grilling" [desc: "out: ۱۰ سؤال + یک سناریوی فروش تلفنی\nafter: auto"]
+  iv = "مصاحبه و ثبت نمره\nskill: —" [desc: "out: نمرهٔ هر سؤال از کاربر\nafter: ask"]
+  d2 = "قبول شد؟\nafter: route" [diamond, yellow]
+}
+
+group s5 = "5 · قرارداد 🔒" [red] {
+  offer = "قرارداد درصدی\nskill: anthropic-skills:docx" [tags: locked, desc: "out: قرارداد.docx با درصد و شرایط مرحلهٔ ۱\nafter: gate"]
+  d3 = "پیشنهاد را پذیرفت؟\nafter: gate" [diamond, yellow]
+}
+
+group s6 = "6 · شروع کار" [gray] {
+  kit = "کیت فروش و آموزش\nskill: marketing-skills:sales-enablement" [desc: "out: اسکریپت فروش + پاسخ به اعتراض‌ها\nafter: auto"]
+  kpi = "هدف ۳۰ روز اول\nskill: —" [desc: "out: تعداد فروش + نرخ تبدیل + زمان بازبینی\nafter: ask"]
+}
+
+goal -> role
+role -> ad
+ad -> post
+post -> screen
+screen -> d1
+d1 -> qs : بله
+d1 -> ad : هیچ‌کس [dashed, red]
+qs -> iv
+iv -> d2
+d2 -> offer : قبول
+d2 -> reject : رد [dashed, red]
+reject -> screen : نفر بعدی [dashed]
+offer -> d3
+d3 -> kit : بله
+d3 -> screen : نه [dashed, red]
+kit -> kpi

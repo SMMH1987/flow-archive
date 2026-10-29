@@ -1,0 +1,44 @@
+%% فلو: استخدام نیروی فروش درصدی — نمونهٔ ساختار واحد (۲۰۲۶-۱۰-۲۹)؛ همان نقطه‌ها و idهای hire-commission-sales.ofk
+%% subgraph = بخش و مرز · after: ask | auto | gate | route (Claude از روی نتیجهٔ skill یال را انتخاب می‌کند)
+flowchart TD
+  subgraph s1["1 · تعریف نقش"]
+    goal["هدف: استخدام فروشندهٔ درصدی برای {{product}}<br>skill: —<br>out: محصول + بازار + تعداد نفر<br>after: ask"]:::var
+    role["شرح شغل و مدل پورسانت<br>skill: first-principles<br>out: وظایف + درصد پورسانت + سقف + دورهٔ پرداخت<br>after: ask"]
+  end
+  subgraph s2["2 · جذب"]
+    ad["آگهی استخدام<br>skill: marketing-skills:copywriting<br>out: متن آگهی + ۳ تیتر<br>after: auto"]
+    post["انتشار آگهی<br>skill: marketing-skills:social<br>out: پیش‌نویس پست در ۲ کانال، بدون انتشار خودکار<br>after: gate"]
+  end
+  subgraph s3["3 · غربال"]
+    screen["غربال رزومه‌ها<br>skill: —<br>out: امتیاز ۰ تا ۱۰ برای هر نفر + دلیل<br>after: auto"]
+    d1{"کسی امتیاز ۷+ دارد؟<br>after: route"}
+    reject["پیام رد مؤدبانه<br>skill: marketing-skills:copywriting<br>out: پیش‌نویس پیام، بدون ارسال خودکار<br>after: gate"]
+  end
+  subgraph s4["4 · مصاحبه"]
+    qs["سؤال‌ها + نقش‌آفرینی فروش<br>skill: grilling<br>out: ۱۰ سؤال + یک سناریوی فروش تلفنی<br>after: auto"]
+    iv["مصاحبه و ثبت نمره<br>skill: —<br>out: نمرهٔ هر سؤال از کاربر<br>after: ask"]
+    d2{"قبول شد؟<br>after: route"}
+  end
+  subgraph s5["5 · قرارداد 🔒"]
+    offer["قرارداد درصدی<br>skill: anthropic-skills:docx<br>out: قرارداد.docx با درصد و شرایط مرحلهٔ ۱<br>after: gate"]:::locked
+    d3{"پیشنهاد را پذیرفت؟<br>after: gate"}
+  end
+  subgraph s6["6 · شروع کار"]
+    kit["کیت فروش و آموزش<br>skill: marketing-skills:sales-enablement<br>out: اسکریپت فروش + پاسخ به اعتراض‌ها<br>after: auto"]
+    kpi["هدف ۳۰ روز اول<br>skill: —<br>out: تعداد فروش + نرخ تبدیل + زمان بازبینی<br>after: ask"]
+  end
+
+  goal --> role --> ad --> post --> screen --> d1
+  d1 -- بله --> qs
+  d1 -. هیچ‌کس .-> ad
+  qs --> iv --> d2
+  d2 -- قبول --> offer
+  d2 -. رد .-> reject
+  reject -. نفر بعدی .-> screen
+  offer --> d3
+  d3 -- بله --> kit
+  d3 -. نه .-> screen
+  kit --> kpi
+
+  classDef locked fill:#fee2e2,stroke:#dc2626
+  classDef var fill:#fff7ed,stroke:#f97316,stroke-dasharray:4
