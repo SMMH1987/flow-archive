@@ -1,0 +1,41 @@
+<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>آرشیو فلوها — cc-flow-run</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Vazirmatn,Tahoma,sans-serif;background:#0f172a;color:#e2e8f0}
+header{padding:28px 20px 8px;max-width:1000px;margin:auto}h1{margin:0 0 6px;font-size:22px}
+.sub{color:#94a3b8;font-size:13px;line-height:1.8}.grid{max-width:1000px;margin:auto;padding:12px 20px 40px;display:grid;gap:14px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:16px}
+.kind{font-size:12px;color:#94a3b8}.card h2{font-size:16px;margin:6px 0 12px}
+.btns{display:flex;flex-wrap:wrap;gap:8px}.btns a{text-decoration:none;padding:8px 12px;border-radius:9px;font-size:13px;color:#fff}
+.leaf{background:#059669;font-weight:700}.map{background:#7c3aed}.ofk{background:#2563eb}.mmd{background:#db2777}
+.files{margin-top:10px;font-size:12px;color:#94a3b8;direction:ltr;text-align:left}.files a{color:#93c5fd;margin-right:10px}
+.tip{background:#312e81;border-radius:10px;padding:10px 12px;font-size:13px;margin-top:10px;line-height:1.8}
+</style></head><body>
+<header><h1>🗂 آرشیو فلوها و مدل‌ها</h1>
+<div class="sub">هر کارت = یک فلو یا مدل. <b>🌿 Map جمع‌وبازشو</b> نمای اصلی است: اول فقط بخش‌ها، با کلیک قدم‌ها و جزئیات.
+«🗺 Map اوپن‌فلوکیت» نمای جعبه‌ها؛ «✏️ فلوچارت» برای ویرایش طراحی؛ «🧜 Mermaid» نسخهٔ مرجع.</div>
+<div class="tip">💡 لینک‌های OpenFlowKit هر بار یک سند تازه در مرورگر شما می‌سازند و اول در Canvas باز می‌شوند؛ برای Map یک بار کلید <b>M</b>.</div></header>
+<main class="grid" id="grid"></main>
+<script type="module">
+// لینک‌ها همین‌جا در مرورگر ساخته می‌شوند (همان قالب check_parity.py):
+// OpenFlowKit = deflate خام + base64url · Mermaid Live = zlib(JSON) + base64url (pako)
+const b64url = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const zip = async (text, fmt) => b64url(await new Response(new Blob([text]).stream().pipeThrough(new CompressionStream(fmt))).arrayBuffer());
+const txt = async (p) => (await fetch(p)).text();
+const ofkLink = async (p) => 'https://app.openflowkit.com/#/from/dsl?d=' + await zip(await txt(p), 'deflate-raw');
+const mmdLink = async (p) => 'https://mermaid.live/edit#pako:' + await zip(JSON.stringify({ code: await txt(p), mermaid: JSON.stringify({ theme: 'default' }), autoSync: true, updateDiagram: true }), 'deflate');
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const items = await (await fetch('manifest.json')).json();
+const grid = document.getElementById('grid');
+for (const e of items) {
+  const links = [];
+  if (e.markmap) links.push(['🌿 Map جمع‌وبازشو', 'map.html?md=' + encodeURIComponent(e.markmap), 'leaf']);
+  if (e.map_ofk) links.push(['🗺 Map اوپن‌فلوکیت', await ofkLink(e.map_ofk), 'map']);
+  links.push([e.kind === 'models' ? '🗺 Map اوپن‌فلوکیت' : '✏️ فلوچارت OpenFlowKit', await ofkLink(e.ofk), e.kind === 'models' ? 'map' : 'ofk']);
+  if (e.vertical) links.push(['↕ نسخهٔ عمودی', await ofkLink(e.vertical), 'ofk']);
+  if (e.mmd) links.push(['🧜 Mermaid Live', await mmdLink(e.mmd), 'mmd']);
+  grid.insertAdjacentHTML('beforeend', `<section class="card"><div class="kind">${e.kind === 'models' ? '🏛 مدل معماری' : '🧩 فلوی اجرایی'}</div>
+    <h2>${esc(e.title)}</h2><div class="btns">${links.map(([t, u, c]) => `<a class="${c}" href="${esc(u)}" target="${c === 'leaf' ? '_self' : '_blank'}" rel="noopener">${t}</a>`).join('')}</div>
+    <div class="files">${e.files.map((f) => `<a href="${esc(f)}" target="_blank">${esc(f)}</a>`).join('')}</div></section>`);
+}
+</script></body></html>

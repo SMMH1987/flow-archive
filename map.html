@@ -1,0 +1,21 @@
+<!doctype html><html lang="fa"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Map جمع‌وبازشو</title>
+<style>html,body{margin:0;height:100%;background:#fff;font-family:Vazirmatn,Tahoma,sans-serif}svg{width:100vw;height:100vh}
+.bar{position:fixed;top:10px;right:10px;display:flex;gap:6px;direction:rtl}.bar a,.bar span{background:#0f172a;color:#fff;text-decoration:none;font-size:13px;padding:6px 10px;border-radius:8px}
+.hint{position:fixed;bottom:10px;left:10px;font-size:12px;color:#64748b;background:#f8fafc;padding:4px 8px;border-radius:6px}</style>
+</head><body>
+<div class="bar"><a href="./">🗂 آرشیو</a><span id="t"></span></div>
+<svg id="mm"></svg>
+<div class="hint">کلیک روی دایرهٔ هر شاخه = باز/بسته · Ctrl+کلیک = همهٔ زیرشاخه‌ها</div>
+<script type="module">
+// map.html?md=flows/<نام>.markmap.md — اول فقط بخش‌ها (fold داخل خود فایل md است)
+import { Transformer } from 'https://cdn.jsdelivr.net/npm/markmap-lib@0.18/+esm';
+import { Markmap, deriveOptions } from 'https://cdn.jsdelivr.net/npm/markmap-view@0.18/+esm';
+const src = new URLSearchParams(location.search).get('md');
+const md = await (await fetch(src)).text();
+const { root, frontmatter } = new Transformer().transform(md);
+document.getElementById('t').textContent = frontmatter?.title || src;
+document.title = frontmatter?.title || 'Map';
+window.mm = Markmap.create('#mm', deriveOptions(frontmatter?.markmap), root);
+</script>
+</body></html>

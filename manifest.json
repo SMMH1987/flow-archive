@@ -1,0 +1,52 @@
+[
+ {
+  "kind": "flows",
+  "stem": "brand-launch",
+  "title": "فلو: راه‌اندازی برند — دستورالعمل cc-flow-run (2026-10-24)",
+  "ofk": "flows/brand-launch.ofk",
+  "markmap": "flows/brand-launch.markmap.md",
+  "mmd": "flows/brand-launch.mmd",
+  "files": [
+   "flows/brand-launch.markmap.md",
+   "flows/brand-launch.mmd",
+   "flows/brand-launch.ofk"
+  ]
+ },
+ {
+  "kind": "flows",
+  "stem": "hire-commission-sales",
+  "title": "فلو: استخدام نیروی فروش درصدی — نمونهٔ ساختار واحد (2026-10-29)",
+  "ofk": "flows/hire-commission-sales.ofk",
+  "markmap": "flows/hire-commission-sales.markmap.md",
+  "map_ofk": "flows/hire-commission-sales.map.ofk",
+  "mmd": "flows/hire-commission-sales.mmd",
+  "files": [
+   "flows/hire-commission-sales.map.ofk",
+   "flows/hire-commission-sales.markmap.md",
+   "flows/hire-commission-sales.mmd",
+   "flows/hire-commission-sales.ofk"
+  ]
+ },
+ {
+  "kind": "models",
+  "stem": "cc-flow-run-architecture",
+  "title": "معماری طراح و اجراکنندهٔ مسیر (cc-flow-run)",
+  "ofk": "models/cc-flow-run-architecture.ofk",
+  "files": [
+   "models/cc-flow-run-architecture.ofk"
+  ]
+ },
+ {
+  "kind": "models",
+  "stem": "studenthub-architecture",
+  "title": "StudentHub — معماری سیستم نمونهٔ کتاب Vibe Coding",
+  "ofk": "models/studenthub-architecture.ofk",
+  "vertical": "models/studenthub-architecture-vertical.ofk",
+  "mmd": "models/studenthub-architecture.mmd",
+  "files": [
+   "models/studenthub-architecture-vertical.ofk",
+   "models/studenthub-architecture.mmd",
+   "models/studenthub-architecture.ofk"
+  ]
+ }
+]
