@@ -1,0 +1,34 @@
+%% فلو: راه‌اندازی برند — نمونهٔ اول cc-flow-run (۲۰۲۶-۱۰-۲۴)
+%% قرارداد نود: "عنوان<br>skill: <نام><br>out: <خروجی مورد انتظار><br>after: ask|auto|gate"
+%% skill: — = بدون skill (Claude خودش)  ·  skill: ? = از کاربر پرسیده می‌شود
+%% after: ask = بعد از خروجی بپرس · auto = خودکار ادامه (ابهام را خودش پیدا کند) · gate = توقف برای تأیید
+%% :::var = متغیر ({{کلید}} پیش از اجرا پرسیده می‌شود)  ·  :::locked = قفل  ·  {...} = دروازهٔ تأیید
+flowchart TD
+  goal["هدف: {{goal}}<br>skill: —<br>out: یک جمله هدف + مخاطب<br>after: ask"]:::var
+  bs["طوفان فکری<br>skill: bmad-brainstorming<br>out: ۱۰ ایده + ۳ برگزیده<br>after: auto"]
+  mk["موکاپ قبل از ساخت<br>skill: mental-rules:ui-before-after<br>out: فایل MOCKUP-*.html<br>after: auto"]
+  ok{"موکاپ تأیید شد؟"}
+  goal --> bs --> mk --> ok
+  ok -- نه --> bs
+  ok -- بله --> name
+
+  subgraph common ["🔒 مراحل مشترک"]
+    name["انتخاب نام<br>skill: anthropic-skills:startup-naming<br>out: ۵ نام + دلیل<br>after: ask"]:::locked
+    dom["دامنه<br>skill: —<br>out: فهرست دامنه‌های آزاد، بدون خرید<br>after: ask"]:::locked
+    site["سایت سریع برند<br>skill: ui-brand<br>out: صفحهٔ فرود HTML<br>after: auto"]:::locked
+    cfg["تنظیمات دیفالت سایت<br>skill: —<br>out: چک‌لیست تنظیمات<br>after: auto"]:::locked
+    pub["انتشار محتوا<br>skill: marketing-skills:social<br>out: ۳ پیش‌نویس پست، بدون انتشار<br>after: gate"]:::locked
+    name --> dom --> site --> cfg --> pub
+  end
+
+  pub --> outs
+  subgraph outs ["📦 خروجی‌ها"]
+    o1["جامعه (community)<br>skill: marketing-skills:community-marketing<br>out: برنامهٔ جامعه یک‌صفحه‌ای<br>after: auto"]
+    o2["دستورالعمل ساخت<br>skill: mental-rules:fp-idea-to-spec<br>out: SPEC.md<br>after: auto"]
+    o3["فلوچارت<br>skill: —<br>out: همین فلو با نتیجهٔ هر نود<br>after: auto"]
+    o4["فرایند کسب‌وکار<br>skill: ?<br>out: ?<br>after: ask"]
+    o5["manager motion<br>skill: ?<br>out: ?<br>after: ask"]
+  end
+
+  classDef locked fill:#eef2ff,stroke:#6366f1
+  classDef var fill:#fff7ed,stroke:#f97316,stroke-dasharray:4

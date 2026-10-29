@@ -1,0 +1,36 @@
+%% ofk 1
+architecture
+title: "معماری طراح و اجراکنندهٔ مسیر (cc-flow-run)"
+// مدل معماری C4 خود cc-flow-run (2026-10-24). فلو نیست؛ عمداً بیرون از flows/ است.
+// دیدن: متن را در app.openflowkit.com ← Diagram as code بچسبان، یا create_diagram از MCP اوپن‌فلوکیت.
+model {
+ person "کاربر" [desc: "هدف می‌دهد، به پرسش سریع جواب می‌دهد، تأیید می‌کند"]
+ system "طراح و اجراکنندهٔ مسیر" [desc: "فلوچارت skill‌محور"] {
+  container "Claude Code" [tech: "Claude Opus", desc: "فلو را می‌خواند و نقطه‌ها را اجرا می‌کند"] {
+   component "cc-flow-run" [tech: "SKILL.md", desc: "پرسش سریع، تأیید، اجرا طبق after"]
+  }
+  store "فلوها" [tech: ".ofk / .mmd", desc: "دستورالعمل: skill، out، after، قفل"]
+  container "Skillها" [tech: "mental-rules / marketing-skills", desc: "طوفان فکری، موکاپ، نام، سایت، محتوا"]
+  store "خروجی اجرا" [tech: "flow-runs/*.md", desc: "نتیجهٔ هر نقطه + معیار out"]
+  "Claude Code" -> "فلوها" : می‌خواند [tech: Read]
+  "Claude Code" -> "Skillها" : صدا می‌زند [tech: Skill tool]
+  "Claude Code" -> "خروجی اجرا" : می‌نویسد [tech: Write]
+ }
+ external "OpenFlowKit" [tech: "MCP 0.2.4", desc: "اعتبارسنجی و رسم فلو روی بوم"]
+ "کاربر" -> "Claude Code" : اجرای فلو [tech: چت]
+ "Claude Code" -> "OpenFlowKit" : validate و create_diagram [tech: MCP]
+ "کاربر" -> "OpenFlowKit" : ویرایش روی بوم [tech: مرورگر]
+}
+views {
+ view landscape
+ view context of "طراح و اجراکنندهٔ مسیر"
+ view container of "طراح و اجراکنندهٔ مسیر"
+}
+flow "اجرای فلوی برند" {
+ intro "کاربر می‌گوید: فلوی برند را اجرا کن"
+ step "کاربر" -> "Claude Code" : درخواست اجرا
+ step "Claude Code" -> "فلوها" : خواندن brand-launch.ofk
+ step "Claude Code" -> "Skillها" : اجرای هر نقطه با skill خودش
+ step "Claude Code" -> "خروجی اجرا" : ذخیرهٔ خروجی + معیار out
+ conclusion "همهٔ نقطه‌ها اجرا شد"
+}
