@@ -14,8 +14,10 @@ import { Markmap, deriveOptions } from 'https://cdn.jsdelivr.net/npm/markmap-vie
 const src = new URLSearchParams(location.search).get('md');
 const md = await (await fetch(src)).text();
 const { root, frontmatter } = new Transformer().transform(md);
-document.getElementById('t').textContent = frontmatter?.title || src;
-document.title = frontmatter?.title || 'Map';
-window.mm = Markmap.create('#mm', deriveOptions(frontmatter?.markmap), root);
+const title = new DOMParser().parseFromString(frontmatter?.title || root.content || src, 'text/html').documentElement.textContent;  // root.content = HTML با entity
+document.getElementById('t').textContent = title;
+document.title = title;
+// autoFit: بعد از هر باز/بسته شدن، کل نقشه دوباره در صفحه جا می‌شود (بیرون نمی‌زند)
+window.mm = Markmap.create('#mm', { ...deriveOptions(frontmatter?.markmap), autoFit: true }, root);
 </script>
 </body></html>
