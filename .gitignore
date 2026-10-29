@@ -1,0 +1,10 @@
+# secrets (standard v1, S04)
+.secrets/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# سایت ساخته‌شدهٔ LikeC4 (روی GitHub با Action ساخته و commit می‌شود، نه دستی)
+c4/

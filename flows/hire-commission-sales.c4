@@ -1,0 +1,134 @@
+// فلوی استخدام نیروی فروش درصدی — LikeC4 (۲۰۲۶-۱۰-۲۹)
+// نمای index = Map تودرتو (بخش ← مرحله) · نمای workflow = ورک‌فلوی مرحله‌ای با شاخه‌ها
+specification {
+  element flow
+  // رنگ = نوع رفتار بعد از خروجی؛ مرحله‌های هم‌نوع هم‌رنگ‌اند
+  element section { style { color muted; opacity 15% } }
+  element ask    { notation 'بعد از خروجی: از کاربر بپرس'; style { color sky } }
+  element auto   { notation 'بعد از خروجی: خودکار ادامه'; style { color green } }
+  element gate   { notation 'بعد از خروجی: توقف برای تأیید'; style { color red } }
+  element decision { notation 'تصمیم (route/gate)'; style { color amber; shape queue } }
+}
+
+model {
+  hire = flow 'استخدام فروشندهٔ درصدی' {
+    s1 = section '1 · تعریف نقش' {
+      goal = ask 'هدف' {
+        description 'skill: find-skills ← بهترین skill را پیدا می‌کند · out: محصول + بازار + تعداد نفر · after: ask'
+        metadata { skill '—'; out 'محصول + بازار + تعداد نفر'; after 'ask' }
+      }
+      role = ask 'شرح شغل و پورسانت' {
+        description 'skill: first-principles · out: وظایف + درصد + سقف · after: ask'
+        metadata { skill 'first-principles'; after 'ask' }
+      }
+    }
+    s2 = section '2 · جذب' {
+      ad = auto 'آگهی استخدام' {
+        description 'skill: marketing-skills:copywriting · out: متن + ۳ تیتر · after: auto'
+        metadata { skill 'marketing-skills:copywriting'; after 'auto' }
+      }
+      post = gate 'انتشار آگهی' {
+        description 'skill: marketing-skills:social · out: پیش‌نویس، بدون انتشار · after: gate'
+        metadata { skill 'marketing-skills:social'; after 'gate' }
+      }
+    }
+    s3 = section '3 · غربال' {
+      screen = auto 'غربال رزومه‌ها' {
+        description 'skill: find-skills ← بهترین skill را پیدا می‌کند · out: امتیاز ۰ تا ۱۰ · after: auto'
+      }
+      d1 = decision 'کسی ۷+ دارد؟' {
+        description 'after: route'
+      }
+      reject = gate 'پیام رد' {
+        description 'skill: marketing-skills:copywriting · after: gate'
+      }
+    }
+    s4 = section '4 · مصاحبه' {
+      qs = auto 'سؤال‌ها + نقش‌آفرینی' {
+        description 'skill: grilling · out: ۱۰ سؤال + سناریو · after: auto'
+      }
+      iv = ask 'مصاحبه و نمره' {
+        description 'skill: find-skills ← بهترین skill را پیدا می‌کند · out: نمرهٔ هر سؤال · after: ask'
+      }
+      d2 = decision 'قبول شد؟' {
+        description 'after: route'
+      }
+    }
+    s5 = section '5 · قرارداد 🔒' {
+      offer = gate 'قرارداد درصدی' {
+        description 'skill: anthropic-skills:docx · out: قرارداد.docx · after: gate'
+      }
+      d3 = decision 'پذیرفت؟' {
+        description 'after: gate'
+      }
+    }
+    s6 = section '6 · شروع کار' {
+      kit = auto 'کیت فروش' {
+        description 'skill: marketing-skills:sales-enablement · after: auto'
+      }
+      kpi = ask 'هدف ۳۰ روز' {
+        description 'skill: find-skills ← بهترین skill را پیدا می‌کند · out: فروش + نرخ تبدیل · after: ask'
+      }
+    }
+  }
+
+  hire.s1.goal -> hire.s1.role 'بعد'
+  hire.s1.role -> hire.s2.ad 'بعد'
+  hire.s2.ad -> hire.s2.post 'بعد'
+  hire.s2.post -> hire.s3.screen 'تأیید شد'
+  hire.s3.screen -> hire.s3.d1 'بعد'
+  hire.s3.d1 -> hire.s4.qs 'بله'
+  hire.s3.d1 -> hire.s2.ad 'هیچ‌کس'
+  hire.s4.qs -> hire.s4.iv 'بعد'
+  hire.s4.iv -> hire.s4.d2 'بعد'
+  hire.s4.d2 -> hire.s5.offer 'قبول'
+  hire.s4.d2 -> hire.s3.reject 'رد'
+  hire.s3.reject -> hire.s3.screen 'نفر بعدی'
+  hire.s5.offer -> hire.s5.d3 'بعد'
+  hire.s5.d3 -> hire.s6.kit 'بله'
+  hire.s5.d3 -> hire.s3.screen 'نه'
+  hire.s6.kit -> hire.s6.kpi 'بعد'
+}
+
+views {
+  // Map: کلیک روی هر بخش ← نمای همان بخش (scoped view = پیش‌فرض آن عنصر)
+  view index {
+    title 'Map: استخدام فروشندهٔ درصدی'
+    description """
+      **اول کلیات**: ۶ بخش. روی هر بخش کلیک کن تا مرحله‌هایش باز شود.
+    """
+    include hire, hire.*
+  }
+  view s1 of hire.s1 { title '1 · تعریف نقش'; include *, hire.s1.* }
+  view s2 of hire.s2 { title '2 · جذب'; include *, hire.s2.* }
+  view s3 of hire.s3 { title '3 · غربال'; include *, hire.s3.* }
+  view s4 of hire.s4 { title '4 · مصاحبه'; include *, hire.s4.* }
+  view s5 of hire.s5 { title '5 · قرارداد 🔒'; include *, hire.s5.* }
+  view s6 of hire.s6 { title '6 · شروع کار'; include *, hire.s6.* }
+
+  // ورک‌فلوی مرحله‌ای (dynamic view): گام‌به‌گام، قابل پخش قدم‌به‌قدم
+  dynamic view workflow {
+    title 'ورک‌فلوی مرحله‌ای — مسیر موفق'
+    hire.s1.goal -> hire.s1.role 'بعد'
+    hire.s1.role -> hire.s2.ad 'بعد'
+    hire.s2.ad -> hire.s2.post 'بعد'
+    hire.s2.post -> hire.s3.screen 'تأیید شد'
+    hire.s3.screen -> hire.s3.d1 'امتیازدهی'
+    hire.s3.d1 -> hire.s4.qs 'بله'
+    hire.s4.qs -> hire.s4.iv 'بعد'
+    hire.s4.iv -> hire.s4.d2 'نمره'
+    hire.s4.d2 -> hire.s5.offer 'قبول'
+    hire.s5.offer -> hire.s5.d3 'بعد'
+    hire.s5.d3 -> hire.s6.kit 'بله'
+    hire.s6.kit -> hire.s6.kpi 'بعد'
+    include hire.s1, hire.s2, hire.s3, hire.s4, hire.s5, hire.s6
+  }
+  // شاخهٔ رد (همان مدل، سناریوی دوم)
+  dynamic view reject_path {
+    title 'شاخهٔ رد و نفر بعدی'
+    hire.s4.d2 -> hire.s3.reject 'رد'
+    hire.s3.reject -> hire.s3.screen 'نفر بعدی'
+    hire.s3.screen -> hire.s3.d1 'امتیازدهی'
+    hire.s3.d1 -> hire.s2.ad 'هیچ‌کس'
+  }
+}
