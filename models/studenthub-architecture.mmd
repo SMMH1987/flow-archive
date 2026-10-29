@@ -1,0 +1,46 @@
+%% StudentHub — معماری سیستم نمونهٔ کتاب Vibe Coding (نسخهٔ Mermaid عمودی، از روی studenthub-architecture.ofk)
+flowchart TD
+  student(["👤 دانشجو<br/>یادداشت، تکلیف و ددلاین‌ها"]):::person
+  dev(["👤 توسعه‌دهنده<br/>یک قابلیت در هر بار"]):::person
+
+  subgraph SH["🧩 StudentHub — داشبورد بهره‌وری درسی"]
+    direction TB
+    subgraph UI["Next.js UI · Next.js + TypeScript + Tailwind · بدون منطق دیتابیس"]
+      direction LR
+      dash["Dashboard<br/>نمای کلی"]
+      notes["Notes<br/>ساخت، ویرایش، حذف"]
+      asg["Assignments<br/>تکلیف + علامت انجام"]
+    end
+    subgraph SA["Server Actions · Next.js server · منطق کسب‌وکار"]
+      direction LR
+      svc["services<br/>همهٔ عملیات دیتابیس"]
+      authc["auth check<br/>احراز هویت سمت سرور"]
+    end
+    db[("🗄 PostgreSQL · Supabase<br/>یادداشت‌ها، تکالیف، ددلاین‌ها")]
+  end
+
+  sauth["Supabase Auth<br/>ثبت‌نام، ورود، نشست"]:::ext
+  ai["ابزار کدنویسی AI<br/>Cursor / Claude Code"]:::ext
+  gh["GitHub<br/>مخزن + شاخه‌های feature"]:::ext
+  vercel["Vercel<br/>Preview و Production"]:::ext
+  mon["مانیتورینگ (پیشنهادی)<br/>خطا، آنالیتیکس، uptime، بکاپ"]:::ext
+
+  student -->|"استفاده · HTTPS"| UI
+  UI -->|"ثبت‌نام و ورود"| sauth
+  notes -->|"CRUD · Server Action"| svc
+  asg -->|"CRUD · Server Action"| svc
+  svc -->|"اول بررسی نشست"| authc
+  authc -->|"تأیید نشست"| sauth
+  svc -->|"خواندن/نوشتن · SQL"| db
+
+  dev -->|"پرامپت ساختاریافته + اسناد"| ai
+  ai -->|"کد هر قابلیت · git"| gh
+  gh -->|"استقرار خودکار"| vercel
+  vercel -.->|"میزبانی"| SH
+  SH -.->|"خطا و متریک"| mon
+
+  classDef person fill:#f5f3ff,stroke:#8b5cf6,color:#1e1b4b
+  classDef ext fill:#f8fafc,stroke:#94a3b8,color:#1e293b
+  style SH fill:#eff6ff,stroke:#60a5fa
+  style UI fill:#ffffff,stroke:#93c5fd
+  style SA fill:#ffffff,stroke:#93c5fd

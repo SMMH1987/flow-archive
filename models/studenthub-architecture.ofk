@@ -1,0 +1,59 @@
+%% ofk 1
+architecture
+title: "StudentHub — معماری سیستم نمونهٔ کتاب Vibe Coding"
+// منبع: Vibe Coding: A Complete Beginner to Production Guide (M. S. Khan) — PRD ص۹-۱۰، ARCHITECTURE ص۱۱-۱۲، استقرار ص۲۹-۳۳
+// ساخته‌شده با MCP اوپن‌فلوکیت، 2026-10-24. دیدن: app.openflowkit.com ← Diagram as code
+model {
+ person "دانشجو" [desc: "یادداشت، تکلیف و ددلاین‌هایش را مدیریت می‌کند"]
+ person "توسعه‌دهنده" [desc: "با AI و اسناد پروژه، یک قابلیت در هر بار می‌سازد"]
+ system StudentHub [desc: "داشبورد بهره‌وری درسی"] {
+  container "Next.js UI" [tech: "Next.js + TypeScript + Tailwind", desc: "app/، components/، features/ — بدون منطق دیتابیس"] {
+   component "Dashboard" [desc: "نمای کلی"]
+   component "Notes" [desc: "ساخت، ویرایش، حذف یادداشت"]
+   component "Assignments" [desc: "تکلیف + علامت انجام"]
+  }
+  container "Server Actions" [tech: "Next.js server", desc: "منطق کسب‌وکار، جدا از UI"] {
+   component "services" [desc: "همهٔ عملیات دیتابیس فقط این‌جا"]
+   component "auth check" [desc: "احراز هویت سمت سرور"]
+  }
+  store "PostgreSQL" [tech: "Supabase", desc: "یادداشت‌ها، تکالیف، ددلاین‌ها"]
+  "Notes" -> "services" : CRUD [tech: Server Action]
+  "Assignments" -> "services" : CRUD [tech: Server Action]
+  "services" -> "auth check" : اول بررسی نشست
+  "services" -> "PostgreSQL" : خواندن/نوشتن [tech: SQL]
+ }
+ external "Supabase Auth" [desc: "ثبت‌نام، ورود، نشست"]
+ external "GitHub" [desc: "مخزن کد + شاخه‌های feature"]
+ external "Vercel" [desc: "Preview و Production"]
+ external "ابزار کدنویسی AI" [tech: "Cursor / Claude Code", desc: "با PRD، ARCHITECTURE، RULES، TASKS کد می‌نویسد"]
+ external "مانیتورینگ" [desc: "خطا، آنالیتیکس، uptime، بکاپ (پیشنهادی)"]
+ "دانشجو" -> "Next.js UI" : استفاده [tech: HTTPS]
+ "Next.js UI" -> "Supabase Auth" : ثبت‌نام و ورود
+ "auth check" -> "Supabase Auth" : تأیید نشست
+ "توسعه‌دهنده" -> "ابزار کدنویسی AI" : پرامپت ساختاریافته + اسناد
+ "ابزار کدنویسی AI" -> "GitHub" : کد هر قابلیت [tech: git]
+ "GitHub" -> "Vercel" : استقرار خودکار
+ "Vercel" -> StudentHub : میزبانی
+ StudentHub -> "مانیتورینگ" : خطا و متریک
+}
+views {
+ view landscape
+ view context of StudentHub
+ view container of StudentHub
+ view component of StudentHub."Server Actions"
+}
+flow "ساخت یک یادداشت" {
+ intro "دانشجو یادداشت تازه می‌سازد"
+ step "دانشجو" -> "Next.js UI" : فرم یادداشت
+ step "Notes" -> "services" : ارسال
+ step "services" -> "auth check" : بررسی نشست
+ step "services" -> "PostgreSQL" : ذخیره
+ conclusion "یادداشت در داشبورد دیده می‌شود"
+}
+flow "از کد تا Production" {
+ intro "یک قابلیت تازه آماده است"
+ step "توسعه‌دهنده" -> "ابزار کدنویسی AI" : یک قابلیت کوچک
+ step "ابزار کدنویسی AI" -> "GitHub" : شاخهٔ feature
+ step "GitHub" -> "Vercel" : Preview ← QA ← Production
+ conclusion "تست روی لینک واقعی، بعد مانیتورینگ"
+}
