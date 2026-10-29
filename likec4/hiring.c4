@@ -1,0 +1,201 @@
+// فلوی استخدام نیروی فروش درصدی — نسخهٔ LikeC4 (Map جعبه‌ای، اول کلیات بعد جزئیات) — 2026-10-29
+// همان قدم‌های flows/hire-commission-sales.ofk. هر قدم: technology = skill · description = out
+// رنگ = نوع after (قسمت‌های هم‌نوع هم‌رنگ): ask نارنجی · auto سبز · gate قرمز · route بنفش
+
+specification {
+  element actor {
+    style {
+      shape person
+      color secondary
+    }
+  }
+  element flow {
+    style {
+      color slate
+    }
+  }
+  element section {
+    style {
+      color muted
+    }
+  }
+  element askStep {
+    notation "after: ask — خروجی را نشان بده و نظر بگیر"
+    style {
+      color amber
+    }
+  }
+  element autoStep {
+    notation "after: auto — خودکار برو قدم بعد"
+    style {
+      color green
+    }
+  }
+  element gateStep {
+    notation "after: gate — بایست تا کاربر تأیید کند"
+    style {
+      color red
+    }
+  }
+  element routeStep {
+    notation "after: route — Claude از روی نتیجه، شاخه را انتخاب می‌کند"
+    style {
+      color indigo
+      shape queue
+    }
+  }
+  tag locked
+}
+
+model {
+  employer = actor 'کارفرما' {
+    description 'هدف می‌دهد، در دروازه‌ها تأیید می‌کند'
+  }
+  candidate = actor 'کاندیدا' {
+    description 'رزومه می‌فرستد، مصاحبه می‌دهد'
+  }
+
+  hiring = flow 'استخدام فروشندهٔ درصدی' {
+    description '۶ بخش · هر قدم با skill خودش · find-skills پیشنهاد می‌دهد، کاربر تأیید می‌کند'
+
+    s1 = section '1 · تعریف نقش' {
+      goal = askStep 'هدف: استخدام فروشندهٔ درصدی برای {{product}}' {
+        technology 'skill: —'
+        description 'out: محصول + بازار + تعداد نفر'
+      }
+      role = askStep 'شرح شغل و مدل پورسانت' {
+        technology 'skill: first-principles'
+        description 'out: وظایف + درصد پورسانت + سقف + دورهٔ پرداخت'
+      }
+    }
+
+    s2 = section '2 · جذب' {
+      ad = autoStep 'آگهی استخدام' {
+        technology 'skill: marketing-skills:copywriting'
+        description 'out: متن آگهی + ۳ تیتر'
+      }
+      post = gateStep 'انتشار آگهی' {
+        technology 'skill: marketing-skills:social'
+        description 'out: پیش‌نویس پست در ۲ کانال، بدون انتشار خودکار'
+      }
+    }
+
+    s3 = section '3 · غربال' {
+      screen = autoStep 'غربال رزومه‌ها' {
+        technology 'skill: —'
+        description 'out: امتیاز ۰ تا ۱۰ برای هر نفر + دلیل'
+      }
+      d1 = routeStep 'کسی امتیاز ۷+ دارد؟' {
+        technology 'after: route'
+      }
+      reject = gateStep 'پیام رد مؤدبانه' {
+        technology 'skill: marketing-skills:copywriting'
+        description 'out: پیش‌نویس پیام، بدون ارسال خودکار'
+      }
+    }
+
+    s4 = section '4 · مصاحبه' {
+      qs = autoStep 'سؤال‌ها + نقش‌آفرینی فروش' {
+        technology 'skill: grilling'
+        description 'out: ۱۰ سؤال + یک سناریوی فروش تلفنی'
+      }
+      iv = askStep 'مصاحبه و ثبت نمره' {
+        technology 'skill: —'
+        description 'out: نمرهٔ هر سؤال از کاربر'
+      }
+      d2 = routeStep 'قبول شد؟' {
+        technology 'after: route'
+      }
+    }
+
+    s5 = section '5 · قرارداد 🔒' {
+      #locked
+      offer = gateStep 'قرارداد درصدی' {
+        #locked
+        technology 'skill: anthropic-skills:docx'
+        description 'out: قرارداد.docx با درصد و شرایط مرحلهٔ ۱'
+      }
+      d3 = gateStep 'پیشنهاد را پذیرفت؟' {
+        technology 'after: gate'
+      }
+    }
+
+    s6 = section '6 · شروع کار' {
+      kit = autoStep 'کیت فروش و آموزش' {
+        technology 'skill: marketing-skills:sales-enablement'
+        description 'out: اسکریپت فروش + پاسخ به اعتراض‌ها'
+      }
+      kpi = askStep 'هدف ۳۰ روز اول' {
+        technology 'skill: —'
+        description 'out: تعداد فروش + نرخ تبدیل + زمان بازبینی'
+      }
+    }
+
+    s1.goal -> s1.role 'بعد'
+    s1.role -> s2.ad 'بعد'
+    s2.ad -> s2.post 'بعد'
+    s2.post -> s3.screen 'تأیید شد'
+    s3.screen -> s3.d1 'بعد'
+    s3.d1 -> s4.qs 'بله'
+    s3.d1 -> s2.ad 'هیچ‌کس'
+    s4.qs -> s4.iv 'بعد'
+    s4.iv -> s4.d2 'بعد'
+    s4.d2 -> s5.offer 'قبول'
+    s4.d2 -> s3.reject 'رد'
+    s3.reject -> s3.screen 'نفر بعدی'
+    s5.offer -> s5.d3 'بعد'
+    s5.d3 -> s6.kit 'بله'
+    s5.d3 -> s3.screen 'نه'
+    s6.kit -> s6.kpi 'بعد'
+  }
+
+  employer -> hiring.s1.goal 'هدف و تأییدها'
+  candidate -> hiring.s3.screen 'رزومه'
+  candidate -> hiring.s4.iv 'مصاحبه'
+}
+
+views {
+  view index {
+    title 'استخدام فروشندهٔ درصدی — نمای کلی'
+    description 'اول کلیات: نقش‌ها و فلو. روی جعبهٔ فلو کلیک کنید تا بخش‌ها باز شوند.'
+    include *
+  }
+
+  view hiring of hiring {
+    title 'بخش‌های فلو'
+    description 'هر جعبه یک بخش است؛ روی هر بخش کلیک کنید تا قدم‌هایش باز شود.'
+    include *
+  }
+
+  view all of hiring {
+    title 'همهٔ قدم‌ها'
+    description 'همهٔ ۱۴ قدم با skill (technology) و out (description). رنگ = نوع after.'
+    include hiring.**
+    exclude hiring.s1, hiring.s2, hiring.s3, hiring.s4, hiring.s5, hiring.s6
+  }
+
+  view sec1 of hiring.s1 {
+    title '1 · تعریف نقش'
+    include *
+  }
+  view sec2 of hiring.s2 {
+    title '2 · جذب'
+    include *
+  }
+  view sec3 of hiring.s3 {
+    title '3 · غربال'
+    include *
+  }
+  view sec4 of hiring.s4 {
+    title '4 · مصاحبه'
+    include *
+  }
+  view sec5 of hiring.s5 {
+    title '5 · قرارداد'
+    include *
+  }
+  view sec6 of hiring.s6 {
+    title '6 · شروع کار'
+    include *
+  }
+}
