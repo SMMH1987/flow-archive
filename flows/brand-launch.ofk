@@ -1,0 +1,42 @@
+%% ofk 1
+flowchart down
+title: "فلو: راه‌اندازی برند — دستورالعمل cc-flow-run (2026-10-24)"
+icons: off
+
+// قرارداد cc-flow-run روی هر نقطه:
+//   tech: = نام skill   ("—" = بدون skill، Claude خودش · "?" = از کاربر بپرس)
+//   desc: = خروجی مورد انتظار (معیار تمام شدن)
+//   after: = بعد از خروجی: ask (بپرس) | auto (خودکار ادامه) | gate (توقف برای تأیید)
+//   tags: locked = قفل، Claude عوضش نمی‌کند · tags: var = متغیر، {{کلید}} پیش از اجرا پرسیده می‌شود
+
+goal = "هدف: {{goal}}" [rounded, orange, outline, tech: "—", desc: "یک جمله هدف + مخاطب", tags: var, after: ask]
+bs = "طوفان فکری" [rounded, tech: "bmad-brainstorming", desc: "۱۰ ایده + ۳ برگزیده", after: auto]
+mk = "موکاپ قبل از ساخت" [rounded, tech: "mental-rules:ui-before-after", desc: "فایل MOCKUP-*.html", after: auto]
+ok = "موکاپ تأیید شد؟" [diamond, yellow, after: gate]
+
+group common = "🔒 مراحل مشترک" [violet] {
+  name = "انتخاب نام" [violet, tech: "anthropic-skills:startup-naming", desc: "۵ نام + دلیل", tags: locked, after: ask]
+  dom = "دامنه" [violet, tech: "—", desc: "فهرست دامنه‌های آزاد، بدون خرید", tags: locked, after: ask]
+  site = "سایت سریع برند" [violet, tech: "ui-brand", desc: "صفحهٔ فرود HTML", tags: locked, after: auto]
+  cfg = "تنظیمات دیفالت سایت" [violet, tech: "—", desc: "چک‌لیست تنظیمات", tags: locked, after: auto]
+  pub = "انتشار محتوا" [violet, tech: "marketing-skills:social", desc: "۳ پیش‌نویس پست، بدون انتشار", tags: locked, after: gate]
+}
+
+group outs = "📦 خروجی‌ها" [green] {
+  o1 = "جامعه (community)" [tech: "marketing-skills:community-marketing", desc: "برنامهٔ جامعه یک‌صفحه‌ای", after: auto]
+  o2 = "دستورالعمل ساخت" [tech: "mental-rules:fp-idea-to-spec", desc: "SPEC.md", after: auto]
+  o3 = "فلوچارت" [tech: "—", desc: "همین فلو با نتیجهٔ هر نقطه", after: auto]
+  o4 = "فرایند کسب‌وکار" [tech: "?", desc: "?", after: ask]
+  o5 = "manager motion" [tech: "?", desc: "?", after: ask]
+}
+
+goal -> bs
+bs -> mk
+mk -> ok
+ok -> name : بله
+ok -> bs : نه [dashed, red]
+name -> dom
+dom -> site
+site -> cfg
+cfg -> pub
+pub -> outs
