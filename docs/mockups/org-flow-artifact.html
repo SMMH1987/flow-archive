@@ -1313,7 +1313,28 @@ function focusOn(p){if(!IDX.has(p))return;if(p.split('.')[0]!==rootOfView()){go(
   FOC=p;expandTo(p);NEEDFIT=false;renderDia();if(p.includes('.')&&!lastVis().has(p)){}
   const tgt=lastVis().has(p)?p:null;if(tgt)fitTo(tgt)}
 function setVer(v){VER=v;NEEDFIT=true;renderVers();renderDia();renderInsp()}
-function renderVers(){$('#vers').replaceChildren(...[[1,'نسخه ۱ · عبور'],[2,'نسخه ۲ · بازشدن درجا'],[3,'نسخه ۳ · درخت + کادرها'],[4,'نسخه ۴ · ترکیبی ۲+۳ (انتخاب تو)']].map(([v,l])=>h('button',{class:VER===v?'on':'',onclick:()=>setVer(v)},l)))}
+const APP_VER=11,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
+const VIEW_VERS=[[1,'عبور','نمایش ۱','آرتیفکت v۴','۱۲:۵۹'],[2,'بازشدن درجا','نمایش ۲','آرتیفکت v۴','۱۲:۵۹'],[3,'درخت + کادرها','نمایش ۳','آرتیفکت v۴','۱۲:۵۹'],[4,'ترکیبی ۲+۳','نمایش ۴ (انتخاب تو)','آرتیفکت v۵','۱۳:۰۵']];
+const CHANGELOG=[
+ [11,'تاریخچهٔ نسخه‌ها','نام، شمارهٔ نسخه و تاریخ ساخت در خود نقشه','۱۴:۲۰'],
+ [10,'جابه‌جایی و طراح فرایند','کشیدن و رها کردن، ترتیب خودکار، طراح فرایند با ایجنت متخصص و قید باید/نباید','۱۴:۰۲'],
+ [9,'نقشهٔ کل','کل فرایند یک نود، نود قبل و بعد، تمپلیت شخصی، دستور Claude','۱۳:۴۳'],
+ [8,'فلش خوانا و پیشنهادها','ترتیب و پورت فلش‌ها، ابزار بیرونی، قدم قبل و بعد، تمپلیت، قفل کل قسمت','۱۳:۳۵'],
+ [7,'استاندارد و فلش رنگی','گزارش WBS/BPMN، جای ثابت skill و ورودی و خروجی، قفل، رنگ فلش','۱۳:۲۶'],
+ [6,'باز و بست ثابت','دکمهٔ ثابت با شمارش قدم و زیرقدم، کادر ایجنت‌های دیگر (MCP)','۱۳:۱۹'],
+ [5,'نمایش ترکیبی','بازشدن درجا + درخت + سطح بالا و پایین','۱۳:۰۵'],
+ [4,'سه نمایش','عبور، بازشدن درجا، درخت و کادرها','۱۲:۵۹'],
+ [3,'کادر شفاف','کادر شفاف برای هر بخش با فلوچارت داخلش','—'],
+ [2,'عمودی و استاندارد','فلوچارت عمودی با شکل‌های استاندارد','—'],
+ [1,'نسخهٔ اول','ویرایشگر تعاملی با خروجی کامل recruitment.c4','—']];
+let HISTOPEN=false;
+function histPanel(){return h('div',{class:'panel'},h('h2',{},'📜 تاریخچهٔ نسخه‌ها'),
+  h('small',{},'تاریخ همهٔ نسخه‌ها '+APP_DATE+' ('+APP_GREG+'). ساعت‌ها UTC و از زمان انتشار؛ نسخه‌های ۱ تا ۳ ساعت دقیق ندارند.'),
+  ...CHANGELOG.map(([n,t,d,tm])=>h('div',{class:'sugc'},h('b',{},'نسخهٔ '+toFa(n)+' · '+t),n===APP_VER?h('span',{class:'k'},'همین نسخه'):null,h('div',{},d),h('small',{},APP_DATE+' · '+tm))),
+  h('button',{class:'sm',onclick:()=>{HISTOPEN=false;renderInsp()}},'بستن'))}
+function renderVers(){$('#vers').replaceChildren(
+  ...VIEW_VERS.map(([v,l,tag,av,tm])=>h('button',{class:VER===v?'on':'',title:tag+' · '+av+' · ساخته‌شده '+APP_DATE+' ساعت '+tm+' UTC',onclick:()=>setVer(v)},'نسخه '+toFa(v)+' · '+l+' ',h('small',{style:'opacity:.75'},av+' · '+APP_DATE))),
+  h('button',{class:'sm',title:'نام و تاریخ ساخت همهٔ نسخه‌ها',onclick:()=>{HISTOPEN=true;SEL=null;SELE=null;renderDia();renderInsp()}},'📜 تاریخچه · v'+toFa(APP_VER)+' · '+APP_DATE))}
 function renderTree(){
   const t=$('#tree'),tv=VER===3||VER===4;t.hidden=!tv;$('#p-dia').classList.toggle('v3',tv);if(!tv)return;
   t.replaceChildren(h('h2',{},'ساختار (جایت با رنگ مشخص است)'));
@@ -1720,6 +1741,7 @@ function renderInsp(){
       box.append(h('div',{class:'panel'},h('h2',{},'گزارش استاندارد · '+toFa(tot)+' هشدار'),
         h('small',{},'قاعده‌ها: WBS (قاعدهٔ ۱۰۰٪ و ۷±۲ زیرمجموعه)، هفت رهنمود مدل‌سازی فرایند (Mendling): نام فعل+مفعول و تقسیم مدل بزرگ، BPMN: هر قدم یک کار و یک مجری، تصمیم دست‌کم دو شاخهٔ برچسب‌دار، ISO 5807: ورودی و خروجی هر قدم مشخص.'),
         items.length?h('div',{},...items.slice(0,40).map(([pp,n,w])=>h('button',{class:'lint',onclick:()=>{if(VER===4||VER===2){expandTo(pp);FOC=pp}select(pp);if(VER===4||VER===2)fitTo(pp)}},h('b',{},titleName(n).slice(0,40)),h('small',{},w.join(' · '))))):h('div',{class:'mute'},'همه‌چیز با قاعده‌ها جور است.')))}
+    if(HISTOPEN)box.append(histPanel());
     box.append(archPanel());
     box.append(tplPanel(MACRO?null:(FOC&&FOC!==rootOfView()?FOC:null)));
     box.append(h('div',{class:'panel'},h('h2',{},'راهنمای شکل‌ها'),h('div',{class:'legend'},
