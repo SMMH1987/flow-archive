@@ -119,6 +119,7 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
 #p-dia.v3{grid-template-columns:230px minmax(0,1fr) 340px}
 @media(max-width:1200px){#p-dia.v3{grid-template-columns:minmax(0,1fr) 340px}#p-dia.v3 #tree{grid-column:1/-1;max-height:200px}}
 @media(max-width:960px){#p-dia.v3{grid-template-columns:minmax(0,1fr)}}
+.fh{display:flex;align-items:center;gap:8px}.fh .ft{cursor:pointer;flex:1}.fh .ft:hover{text-decoration:underline}.lanebox.foc{outline:3px solid var(--acc);outline-offset:2px}.node.foc{outline:3px solid var(--acc);outline-offset:2px}.crumbs{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}
 .tree{max-height:calc(100vh - 110px);overflow:auto;padding:8px}.tree h2{font-size:13px}
 .tr{display:flex;gap:2px;align-items:center;font-size:12.5px;line-height:1.5;border-radius:6px;padding:0 2px}
 .tr.cur{background:var(--accbg);font-weight:800}.tr.sel .tl{text-decoration:underline}
@@ -920,7 +921,7 @@ const sv=(t,a={})=>{const e=document.createElementNS('http://www.w3.org/2000/svg
 /* ───────── فلوچارت عمودی (نمای کلی ← جزئیات هر بخش) ───────── */
 /* قراردادها: جریان از بالا به پایین؛ مستطیل = قدم، بیضی = ask، شش‌ضلعی = تصمیم (route)، کادر ضخیم = gate؛
    پرش به قدم‌های دورتر کنار جعبه‌ها می‌رود؛ ارتباط با بخش دیگر = دکمهٔ اتصال‌دهنده (مثل off-page connector) */
-let VIEW={x:10,y:10,k:1},VIEWP='ov:company',CONN=null,SELE=null,NEEDFIT=true,LAST=null,VER=1,EXP=new Set(),TX=new Set(['company']);
+let VIEW={x:10,y:10,k:1},VIEWP='ov:company',CONN=null,SELE=null,NEEDFIT=true,LAST=null,VER=4,FOC=null,EXP=new Set(),TX=new Set(['company']);
 const roots=()=>M.nodes.filter(n=>n.kind!=='actor');
 const laneOf=p=>p.split('.').slice(0,2).join('.');
 function go(vp,sel){if(typeof vp==='string'&&!vp.startsWith('ov:')&&vp.split('.').length===1)vp='ov:'+vp;VIEWP=vp;SEL=sel||null;SELE=null;NEEDFIT=true;setConn(false);TAB='dia';showTab()}
@@ -930,12 +931,26 @@ const rootOfView=()=>VIEWP.startsWith('ov:')?VIEWP.slice(3):VIEWP.split('.')[0];
 function renderNav(){
   const nav=$('#nav');nav.replaceChildren();
   roots().forEach(R=>nav.append(h('button',{class:rootOfView()===R.id?'on':'',onclick:()=>go('ov:'+R.id)},R.title.replace(/\s*\(.*$/,''))));
-  if(VER===2){
+  if(VER===2||VER===4){
     const rid=rootOfView();
+    const rr=()=>{NEEDFIT=false;renderDia()};
+    const allP=()=>{const a=[];IDX.forEach((n,q)=>{if(q.split('.')[0]===rid)a.push(q)});return a};
     nav.append(h('span',{class:'mute'},'|'),
-      h('button',{class:'sm',onclick:()=>{EXP=new Set([rid]);NEEDFIT=true;renderDia()}},'بستن همه'),
-      h('button',{class:'sm',onclick:()=>{EXP=new Set([rid,...IDX.get(rid).children.map(c=>rid+'.'+c.id)]);NEEDFIT=true;renderDia()}},'باز کردن یک سطح'),
-      h('button',{class:'sm',onclick:()=>{EXP=new Set();IDX.forEach((n,p)=>{if(n.children.length&&p.split('.')[0]===rid)EXP.add(p)});NEEDFIT=true;renderDia()}},'باز کردن همه'));
+      h('button',{class:'sm',onclick:()=>{EXP=new Set([rid]);FOC=rid;NEEDFIT=true;renderDia()}},'بستن همه'),
+      h('button',{class:'sm',title:'همه قدم‌ها و کادرهای دیده‌شده یک لایه بازتر شوند',onclick:()=>{const v=lastVis();v.forEach((_,q)=>{const n=IDX.get(q);if(n&&n.children.length)EXP.add(q)});rr()}},'＋ یک سطح بازتر'),
+      h('button',{class:'sm',title:'عمیق‌ترین کادرهای باز بسته شوند',onclick:()=>{const ex=[...EXP].filter(q=>q!==rid);const deep=ex.filter(q=>!ex.some(o=>o.startsWith(q+'.')));deep.forEach(q=>EXP.delete(q));if(FOC&&!EXP.has(FOC)&&FOC!==rid&&!lastVis().has(FOC))FOC=parentPath(FOC);rr()}},'－ یک سطح بسته‌تر'),
+      h('button',{class:'sm',onclick:()=>{EXP=new Set(allP().filter(q=>IDX.get(q).children.length));NEEDFIT=true;renderDia()}},'باز کردن همه'));
+    if(VER===4){
+      const f=FOC&&IDX.has(FOC)&&FOC.split('.')[0]===rid?FOC:rid,segs=f.split('.'),n=IDX.get(f),kids=n.children.length;
+      const cr=h('div',{class:'row crumbs'},h('span',{class:'mute'},'📍 جایت:'));
+      segs.forEach((_,i)=>{const q=segs.slice(0,i+1).join('.'),last=i===segs.length-1;
+        if(i)cr.append(h('span',{class:'mute'},'‹'));
+        cr.append(last?h('b',{},titleName(IDX.get(q))):h('button',{class:'sm',onclick:()=>focusOn(q)},titleName(IDX.get(q)).slice(0,26)))});
+      nav.append(cr,
+        h('button',{class:'sm',disabled:f===rid,onclick:()=>focusOn(parentPath(f))},'↑ سطح بالاتر'),
+        h('button',{class:'sm',disabled:!kids,onclick:()=>{EXP.add(f);focusOn(f+'.'+n.children[0].id)}},'↓ سطح پایین‌تر'),
+        h('button',{class:'sm',disabled:!kids||f===rid,onclick:()=>{if(EXP.has(f))EXP.delete(f);else EXP.add(f);NEEDFIT=false;renderDia()}},EXP.has(f)?'－ بستن این':'＋ باز کردن این'),
+        h('button',{class:'sm',onclick:()=>fitTo(f)},'⌖ نمایش این'))}
     return}
   if(!VIEWP.startsWith('ov:')&&IDX.has(VIEWP)){
     const segs=VIEWP.split('.'),crumbs=h('div',{class:'row'},h('span',{class:'mute'},'📍 جایت:'));
@@ -963,27 +978,36 @@ function nodeEl(n,p,b,full){
     h('div',{class:'nt'},(lk?'🔒 ':'')+n.title),
     n.tech?h('div',{class:'ns'},n.tags.includes('gated')&&n.kind==='tool'?h('span',{class:'nb red'},'تأیید انسانی'):null,n.tags.includes('unknownSkill')?h('span',{class:'nb'},'skill؟'):null,n.tech):null,
     full&&outText(n)?h('div',{class:'no'},outText(n)):null,
-    (full&&VER!==2&&n.children.length&&isStep(n))?h('button',{class:'sm dive','data-dive':p,title:'باز کردن داخل این قدم (فرایند داخلی)'},'⤢ داخل'):null)}
+    (full&&VER!==2&&VER!==4&&n.children.length&&isStep(n))?h('button',{class:'sm dive','data-dive':p,title:'باز کردن داخل این قدم (فرایند داخلی)'},'⤢ داخل'):null)}
 function renderDia(){
   if(!VIEWP.startsWith('ov:')&&!IDX.has(VIEWP))VIEWP='ov:'+roots()[0].id;
   if(VIEWP.startsWith('ov:')&&!IDX.has(VIEWP.slice(3)))VIEWP='ov:'+roots()[0].id;
   renderNav();renderTree();
-  LAST=VER===2?renderNested(rootOfView()):VIEWP.startsWith('ov:')?renderOverview(VIEWP.slice(3)):renderLane(VIEWP);
+  LAST=(VER===2||VER===4)?renderNested(rootOfView()):VIEWP.startsWith('ov:')?renderOverview(VIEWP.slice(3)):renderLane(VIEWP);
   applyView();if(NEEDFIT&&!$('#p-dia').hidden)fit()}
+const lastVis=()=>(LAST&&LAST.vis)||new Map();
+function expandTo(p){const s=p.split('.');for(let i=1;i<s.length;i++)EXP.add(s.slice(0,i).join('.'))}
+function fitTo(p){const v=lastVis().get(p);if(!v)return;const cv=$('#cv'),w=cv.clientWidth,hh=cv.clientHeight;if(!w)return;
+  const k=Math.max(.25,Math.min(1.3,w/(v.w+120),hh/(v.h+120)));VIEW.k=k;VIEW.x=w/2-(v.x+v.w/2)*k;VIEW.y=v.h*k>hh-20?14-(v.y-30)*k:hh/2-(v.y+v.h/2)*k;applyView()}
+function focusOn(p){if(!IDX.has(p))return;if(p.split('.')[0]!==rootOfView()){go('ov:'+p.split('.')[0]);return}
+  FOC=p;expandTo(p);NEEDFIT=false;renderDia();if(p.includes('.')&&!lastVis().has(p)){}
+  const tgt=lastVis().has(p)?p:null;if(tgt)fitTo(tgt)}
 function setVer(v){VER=v;NEEDFIT=true;renderVers();renderDia();renderInsp()}
-function renderVers(){$('#vers').replaceChildren(...[[1,'نسخه ۱ · عبور'],[2,'نسخه ۲ · بازشدن درجا'],[3,'نسخه ۳ · درخت + کادرها']].map(([v,l])=>h('button',{class:VER===v?'on':'',onclick:()=>setVer(v)},l)))}
+function renderVers(){$('#vers').replaceChildren(...[[1,'نسخه ۱ · عبور'],[2,'نسخه ۲ · بازشدن درجا'],[3,'نسخه ۳ · درخت + کادرها'],[4,'نسخه ۴ · ترکیبی ۲+۳ (انتخاب تو)']].map(([v,l])=>h('button',{class:VER===v?'on':'',onclick:()=>setVer(v)},l)))}
 function renderTree(){
-  const t=$('#tree');t.hidden=VER!==3;$('#p-dia').classList.toggle('v3',VER===3);if(VER!==3)return;
+  const t=$('#tree'),tv=VER===3||VER===4;t.hidden=!tv;$('#p-dia').classList.toggle('v3',tv);if(!tv)return;
   t.replaceChildren(h('h2',{},'ساختار (جایت با رنگ مشخص است)'));
-  const segs=VIEWP.startsWith('ov:')?[VIEWP.slice(3)]:VIEWP.split('.');segs.forEach((_,i)=>TX.add(segs.slice(0,i+1).join('.')));
-  const rec=(list,pre,d)=>list.forEach(n=>{const p=pre?pre+'.'+n.id:n.id,kids=n.children.length,open=TX.has(p);
-    const cur=VIEWP===p||VIEWP==='ov:'+p;
+  if(VER===3){const segs=VIEWP.startsWith('ov:')?[VIEWP.slice(3)]:VIEWP.split('.');segs.forEach((_,i)=>TX.add(segs.slice(0,i+1).join('.')))}
+  const four=VER===4,R=rootOfView(),f4=FOC||R;
+  const rec=(list,pre,d)=>list.forEach(n=>{const p=pre?pre+'.'+n.id:n.id,kids=n.children.length,open=four?EXP.has(p):TX.has(p);
+    const cur=four?f4===p:(VIEWP===p||VIEWP==='ov:'+p);
     t.append(h('div',{class:'tr'+(cur?' cur':'')+(SEL===p?' sel':''),style:`padding-inline-start:${d*14}px`},
-      kids?h('button',{class:'tg',onclick:()=>{if(open)TX.delete(p);else TX.add(p);renderTree()}},open?'▾':'▸'):h('span',{class:'tg'},'·'),
-      h('span',{class:'tl',onclick:()=>{if(n.kind==='actor'){select(p);return}
+      kids?h('button',{class:'tg',onclick:()=>{if(four){if(open)EXP.delete(p);else{expandTo(p);EXP.add(p)}NEEDFIT=false;renderDia();return}if(open)TX.delete(p);else TX.add(p);renderTree()}},open?'▾':'▸'):h('span',{class:'tg'},'·'),
+      h('span',{class:'tl',onclick:()=>{if(four){if(n.kind==='actor'){select(p);return}if(d===0&&p!==R){go('ov:'+p);return}if(kids)EXP.add(p);focusOn(p);return}
+        if(n.kind==='actor'){select(p);return}
         if(kids&&!(isStep(n)&&false))go(d===0?'ov:'+p:p);else go(parentPath(p).includes('.')?parentPath(p):'ov:'+parentPath(p),p)}},(lockedN(n)?'🔒 ':'')+titleName(n))));
     if(kids&&open)rec(n.children,p,d+1)});
-  rec(M.nodes,'',0)}
+  rec(four?M.nodes.filter(n=>n.id===R||true):M.nodes,'',0)}
 
 /* چیدمان یک بخش (مشترک بین نمای کلی و جزئیات) */
 function buildLane(lane,lp,o){
@@ -1123,9 +1147,12 @@ function renderNested(rid){
   const W=root.w+140,H=root.h+50;world.style.width=W+'px';world.style.height=H+'px';
   const svg=newSvg(W,H),frames=[...vis.values()].filter(v=>v.frame);
   frames.forEach(f=>{const lk=lockedN(f.n);
-    world.append(h('div',{class:'lanebox'+(lk?' locked':'')+(SEL===f.p?' sel':''),style:`left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px;${f.depth%2?'background:color-mix(in srgb,var(--acc) 4%,transparent)':''}`},
-      h('div',{class:'fh','data-tog':f.p===rid?null:f.p,title:f.p===rid?'':'بستن این کادر'},(f.p===rid?'':'－ ')+(lk?'🔒 ':'')+f.n.title,
-        h('button',{class:'sm ed','data-sel':f.p,title:'ویرایش مشخصات'},'✎'))))});
+    world.append(h('div',{class:'lanebox'+(lk?' locked':'')+(SEL===f.p?' sel':'')+((FOC||rid)===f.p&&VER===4?' foc':''),'data-p0':f.p,style:`left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px;${f.depth%2?'background:color-mix(in srgb,var(--acc) 4%,transparent)':''}`},
+      h('div',{class:'fh'},
+        f.p===rid?null:h('button',{class:'sm','data-tog':f.p,title:'بستن این کادر'},'－'),
+        h('span',{class:'ft','data-foc':f.p,title:'نشان دادن و بزرگ‌نمایی این کادر'},(lk?'🔒 ':'')+f.n.title),
+        h('button',{class:'sm ed','data-sel':f.p,title:'ویرایش مشخصات'},'✎'))));
+    });
   world.append(svg);
   const mapv=p=>{const s=p.split('.');for(let k=s.length;k>=1;k--){const q=s.slice(0,k).join('.');if(vis.has(q))return vis.get(q)}return null};
   const isAnc=(a,b)=>b.p.startsWith(a.p+'.');
@@ -1142,10 +1169,10 @@ function renderNested(rid){
     else{const right=bx>ax,x1=right?a.x+a.w:a.x,x2=right?b.x:b.x+b.w,y1=a.y+a.h/2,y2=b.y+b.h/2,k=Math.abs(x2-x1)/2+20;d=`M${x1} ${y1}C${x1+(right?k:-k)} ${y1} ${x2-(right?k:-k)} ${y2} ${x2} ${y2}`;lx=(x1+x2)/2;ly=(y1+y2)/2}
     drawEdge(svg,d,{...o,lx,ly,anchor:'middle'})});
   vis.forEach((v,p)=>{if(v.frame)return;
-    const el=nodeEl(v.n,p,v,true);
+    const el=nodeEl(v.n,p,v,true);if(VER===4&&FOC===p)el.classList.add('foc');
     if(v.n.children.length)el.append(h('button',{class:'sm tgbtn','data-tog':p,title:'باز کردن داخل'},'＋ '+toFa(v.n.children.length)+(isStep(v.n)?' زیرقدم':' قدم')));
     world.append(el)});
-  return{W,H}}
+  return{W,H,vis}}
 
 /* رویدادهای بوم: کشیدن صفحه، زوم، کلیک */
 (function(){
@@ -1162,7 +1189,8 @@ function renderNested(rid){
     if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;if(d.moved>=5)return;
     const t=d.target;if(!t.closest)return;
     const ed=t.closest('[data-e]');if(ed){SELE=+ed.getAttribute('data-e');SEL=null;renderDia();renderInsp();return}
-    const tg=t.closest('[data-tog]');if(tg&&tg.getAttribute('data-tog')){const q=tg.getAttribute('data-tog');if(EXP.has(q))EXP.delete(q);else EXP.add(q);NEEDFIT=false;renderDia();return}
+    const tg=t.closest('[data-tog]');if(tg&&tg.getAttribute('data-tog')){const q=tg.getAttribute('data-tog');if(EXP.has(q))EXP.delete(q);else{EXP.add(q);if(VER===4)FOC=q}NEEDFIT=false;renderDia();return}
+    const fc=t.closest('[data-foc]');if(fc){focusOn(fc.getAttribute('data-foc'));return}
     const sl=t.closest('[data-sel]');if(sl){select(sl.getAttribute('data-sel'));return}
     const dv=t.closest('[data-dive]');if(dv){go(dv.getAttribute('data-dive'));return}
     const gg=t.closest('[data-go]');if(gg){go(gg.getAttribute('data-go'));return}
@@ -1195,7 +1223,7 @@ async function clickNode(p){
 /* ───────── ویرایش ساختار ───────── */
 const lockedEnd=p=>{const n=IDX.get(p);return n&&lockedN(n)};
 function lca(a,b){const A=a.split('.'),B=b.split('.');const o=[];for(let i=0;i<Math.min(A.length,B.length)-1&&A[i]===B[i];i++)o.push(A[i]);return o}
-function select(p){SEL=p;SELE=null;renderDia();renderInsp()}
+function select(p){if(VER===4&&IDX.has(p)&&p.split('.')[0]===rootOfView())FOC=p;SEL=p;SELE=null;renderDia();renderInsp()}
 function uniqueId(list,base){let i=1;while(list.some(c=>c.id===base+i))i++;return base+i}
 async function addChild(pp){
   const par=IDX.get(pp);if(!par)return;
