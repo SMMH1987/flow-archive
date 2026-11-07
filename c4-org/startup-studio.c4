@@ -1,0 +1,634 @@
+// نمونهٔ «سازمان کامل از یک ایده» — ایده: اتوماسیون کامل استخدام — 2026-11-06
+// هر بخش = یک نقش سازمانی · هر قدم: technology = skill · description = out · آیکون = وضعیت قفل
+// 🔒 = قفل (فقط با تأیید تو) · 🔓 = باز · tag designed = بخش ناشناخته که از ترکیب skillها طراحی شد
+// رنگ قدم = نوع after: ask نارنجی · auto سبز · gate قرمز · route بنفش
+
+specification {
+  element actor {
+    style {
+      shape person
+      color secondary
+    }
+  }
+  element orgBox {
+    style {
+      color slate
+    }
+  }
+  element role {
+    style {
+      color muted
+    }
+  }
+  element askStep {
+    notation "after: ask — خروجی را نشان بده و نظر بگیر"
+    style {
+      color amber
+    }
+  }
+  element autoStep {
+    notation "after: auto — خودکار برو قدم بعد"
+    style {
+      color green
+    }
+  }
+  element gateStep {
+    notation "after: gate — بایست تا کاربر تأیید کند"
+    style {
+      color red
+    }
+  }
+  element routeStep {
+    notation "after: route — شاخه را از روی نتیجه انتخاب کن"
+    style {
+      color indigo
+      shape queue
+    }
+  }
+  element flow {
+    style {
+      color slate
+    }
+  }
+  element section {
+    style {
+      color muted
+    }
+  }
+  element project {
+    notation "پروژهٔ قابل‌فراخوانی — Claude MCP + OpenAI/REST"
+    style {
+      color sky
+      shape component
+    }
+  }
+  element tool {
+    notation "ابزار پروژه — با #gated = پشت تأیید انسانی"
+    style {
+      color secondary
+    }
+  }
+  tag locked
+  tag designed
+  tag unknownSkill
+  tag gated
+}
+
+model {
+  p0 = orgBox 'ورودی و تشخیص نوع' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: ایده یا پروژه و کد؛ اختیار ایجنت و سقف هزینه'
+    metadata {
+      agent 'ایجنت پذیرش'
+      must 'هر پرداخت، امضا، ارسال بیرونی و واگذاری سهام فقط با تأیید انسان؛ هر عدد ارزش‌گذاری با روش و فرض ثبت شود'
+      must_not 'وعدهٔ سود یا بازده به سرمایه‌گذار؛ جذب سرمایه بدون مجوز قانونی؛ ارسال انبوه بدون تأیید؛ نمایش حدس به‌جای واقعیت'
+    }
+    c1 = askStep 'دریافت ایده یا پروژه و کد' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: متن ایده یا آدرس مخزن کد + هدف مالک'
+      metadata {
+        agent 'ایجنت پذیرش'
+      }
+    }
+    c2 = gateStep 'تعیین سقف هزینه، اختیار ایجنت و مسئول انسانی' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: سقف هزینه و فهرست تصمیم‌هایی که فقط انسان می‌گیرد؛ هر دو الان UNKNOWN'
+      metadata {
+        agent 'ایجنت پذیرش'
+      }
+    }
+    c3 = routeStep 'ورودی چیست؟' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      metadata {
+        branches 'ایده|پروژه و کد'
+        agent 'ایجنت پذیرش'
+      }
+    }
+    c4 = askStep 'شفاف‌سازی ایده با پرسش' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: first-principles'
+      description 'out: ایده در یک صفحه: مسئله، مشتری، راه‌حل'
+      metadata {
+        agent 'ایجنت پذیرش'
+      }
+    }
+    c5 = autoStep 'ممیزی پروژه و کد: فنی، لایسنس و مالکیت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: گزارش وضعیت کد، لایسنس‌ها، وابستگی‌ها و مالکیت واقعی'
+      metadata {
+        agent 'ایجنت پذیرش'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'ایده'
+    c3 -> c5 'پروژه و کد'
+  }
+
+  p1 = orgBox 'ارزیابی و اعتبارسنجی' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: بازار، رقبا، مشتری و امتیاز نهایی'
+    metadata {
+      agent 'ایجنت ارزیاب'
+    }
+    c1 = autoStep 'پژوهش بازار و رقبا' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: اندازهٔ بازار، رقبا و خلأها با منبع + مزایا و معایب'
+      metadata {
+        ext_tool 'Firecrawl MCP'
+        ext_kind 'MCP'
+        agent 'ایجنت ارزیاب'
+      }
+    }
+    c2 = askStep 'گفت‌وگو با مشتریان احتمالی' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: خلاصهٔ حداقل ۱۰ مصاحبه'
+      metadata {
+        agent 'ایجنت ارزیاب'
+      }
+    }
+    c3 = autoStep 'امتیازدهی با چارچوب ثابت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: امتیاز ۱۰ معیار (مسئله، بازار، تیم، فناوری، رقابت، درآمد...) با دلیل'
+      metadata {
+        agent 'ایجنت ارزیاب'
+      }
+    }
+    c4 = autoStep 'فهرست ریسک‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ریسک‌های حقوقی، فنی، بازار و مالی با احتمال و اثر'
+      metadata {
+        agent 'ایجنت ارزیاب'
+      }
+    }
+    c5 = gateStep 'تصمیم رفتن یا نرفتن' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ادامه، تغییر مسیر یا توقف؛ فقط انسان تصمیم می‌گیرد'
+      metadata {
+        agent 'ایجنت ارزیاب'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+  }
+
+  p2 = orgBox 'نام‌گذاری، برند و دارایی‌های دیجیتال' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: از نام تا دامنه و حساب‌ها'
+    metadata {
+      agent 'ایجنت نام‌گذاری'
+    }
+    c1 = autoStep 'تولید ۲۰ نام پیشنهادی' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: startup-naming'
+      description 'out: ۲۰ نام با معنی هر کدام'
+      metadata {
+        agent 'ایجنت نام‌گذاری'
+      }
+    }
+    c2 = autoStep 'بررسی دامنه، نشان و نام‌کاربری' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: آزاد بودن دامنه و نام‌کاربری‌ها + برخورد با نشان تجاری'
+      metadata {
+        ext_tool 'RDAP / Namecheap API'
+        ext_kind 'API'
+        agent 'ایجنت نام‌گذاری'
+      }
+    }
+    c3 = gateStep 'انتخاب نهایی نام' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: یک نام برگزیده'
+      metadata {
+        agent 'ایجنت نام‌گذاری'
+      }
+    }
+    c4 = autoStep 'ساخت هویت ساده و حساب‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: لوگو، لحن، دامنه و حساب‌های شبکه‌ها'
+      metadata {
+        agent 'ایجنت نام‌گذاری'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+  }
+
+  p3 = orgBox 'حقوقی و ساختار شرکت' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: ثبت، مالکیت فکری، قرارداد هم‌بنیان‌گذاران'
+    metadata {
+      agent 'ایجنت حقوقی'
+    }
+    c1 = askStep 'انتخاب ساختار حقوقی و کشور ثبت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: گزینه‌ها با هزینه و محدودیت‌ها؛ قوانین ایران و ثبت خارجی UNKNOWN و با مشاور حقوقی بررسی شود'
+      metadata {
+        agent 'ایجنت حقوقی'
+      }
+    }
+    c2 = gateStep 'ثبت شرکت و حساب بانکی' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: شرکت ثبت‌شده + حساب؛ پرداخت و امضا فقط با انسان'
+      metadata {
+        ext_tool 'Stripe Atlas / Carta (برای ثبت خارجی)'
+        ext_kind 'API'
+        agent 'ایجنت حقوقی'
+      }
+    }
+    c3 = gateStep 'واگذاری مالکیت فکری و کد به شرکت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: قرارداد انتقال مالکیت کد، نام و دامنه به شرکت'
+      metadata {
+        agent 'ایجنت حقوقی'
+      }
+    }
+    c4 = gateStep 'قرارداد هم‌بنیان‌گذاران' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: نقش‌ها، تعهد زمانی، خروج و سهام پله‌به‌پله (vesting)'
+      metadata {
+        agent 'ایجنت حقوقی'
+      }
+    }
+    c5 = autoStep 'شرایط استفاده و حریم خصوصی' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: پیش‌نویس متن‌ها برای بازبینی حقوقی'
+      metadata {
+        agent 'ایجنت حقوقی'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+  }
+
+  p4 = orgBox 'ساخت و راه‌اندازی MVP' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: کوچک‌ترین نسخه که ارزش بدهد'
+    metadata {
+      agent 'ایجنت ساخت'
+    }
+    c1 = askStep 'تعریف محدودهٔ MVP' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: فهرست قابلیت‌ها + مرز آنچه نیست'
+      metadata {
+        agent 'ایجنت ساخت'
+      }
+    }
+    c2 = autoStep 'ساخت یا تکمیل محصول' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: نسخهٔ کارا از ایده، یا اصلاح کد موجود'
+      metadata {
+        ext_tool 'Claude Code'
+        ext_kind 'API'
+        agent 'ایجنت ساخت'
+      }
+    }
+    c3 = autoStep 'تست کیفیت و امنیت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: گزارش تست + عیب‌های باز'
+      metadata {
+        agent 'ایجنت ساخت'
+      }
+    }
+    c4 = gateStep 'استقرار و ثبت شاخص‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: نسخهٔ آنلاین + داشبورد شاخص‌ها؛ هزینهٔ سرور با تأیید'
+      metadata {
+        agent 'ایجنت ساخت'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+  }
+
+  p5 = orgBox 'ارزش‌گذاری و ساختار سهام' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: عدد منطقی، جدول سهام و سهام پله‌به‌پله'
+    metadata {
+      agent 'ایجنت مالی'
+      must 'هر عدد با روش و فرض نوشته شود؛ بازه بده، نه یک عدد قطعی'
+    }
+    c1 = autoStep 'ارزش‌گذاری با چند روش' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: بازهٔ ارزش (کم، میانه، زیاد) با روش‌های Berkus، Scorecard و VC method و فرض‌هایشان'
+      metadata {
+        agent 'ایجنت مالی'
+      }
+    }
+    c2 = autoStep 'ساخت جدول سهام اولیه' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: جدول سهام بنیان‌گذاران و استخر سهام کارکنان (ESOP)؛ درصد استخر رایج است و باید بررسی شود'
+      metadata {
+        agent 'ایجنت مالی'
+      }
+    }
+    c3 = autoStep 'طراحی سهام پله‌به‌پله' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: برنامهٔ vesting (مثلا ۴ سال با یک سال cliff یا مرحله‌ای بر اساس نقطه‌عطف‌ها)'
+      metadata {
+        agent 'ایجنت مالی'
+      }
+    }
+    c4 = autoStep 'محاسبهٔ درصد و رقیق‌شدگی هر دور' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: درصد = مبلغ سرمایه ÷ ارزش پس از سرمایه؛ جدول رقیق‌شدگی هر دور'
+      metadata {
+        agent 'ایجنت مالی'
+      }
+    }
+    c5 = gateStep 'تأیید ارزش و سهام' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: تأیید انسان؛ بدون آن به هیچ سرمایه‌گذاری عدد گفته نمی‌شود'
+      metadata {
+        agent 'ایجنت مالی'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+  }
+
+  p6 = orgBox 'سرمایه‌گذار، هم‌بنیان‌گذار و شریک' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: فروش کامل، سرمایه‌گذاری، کوفاندر یا شریک توسعه'
+    metadata {
+      agent 'ایجنت جذب سرمایه'
+      must 'هر پرداخت، امضا، ارسال بیرونی و واگذاری سهام فقط با تأیید انسان؛ هر عدد ارزش‌گذاری با روش و فرض ثبت شود'
+      must_not 'وعدهٔ سود یا بازده به سرمایه‌گذار؛ جذب سرمایه بدون مجوز قانونی؛ ارسال انبوه بدون تأیید؛ نمایش حدس به‌جای واقعیت'
+    }
+    c1 = askStep 'انتخاب هدف' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: فروش کامل، سرمایه‌گذار، کوفاندر یا شریک توسعه؛ با سهم هدف هرکدام'
+      metadata {
+        agent 'ایجنت جذب سرمایه'
+      }
+    }
+    c2 = autoStep 'فهرست‌سازی مخاطبان مناسب' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: فهرست با دلیل تناسب برای هر نوع'
+      metadata {
+        ext_tool 'Firecrawl MCP'
+        ext_kind 'MCP'
+        agent 'ایجنت جذب سرمایه'
+      }
+    }
+    c3 = autoStep 'ساخت معرفی‌نامه و اتاق داده' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: دک ۱۰ اسلاید + یک‌صفحه‌ای + اتاق داده با مدارک'
+      metadata {
+        agent 'ایجنت جذب سرمایه'
+      }
+    }
+    c4 = gateStep 'تأیید و ارسال پیام‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: پیام‌های تأییدشده ارسال شد؛ ارسال بیرونی فقط با انسان'
+      metadata {
+        agent 'ایجنت جذب سرمایه'
+      }
+    }
+    c5 = gateStep 'مذاکره و محاسبهٔ درصد' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: شرایط پیشنهادی با جدول رقیق‌شدگی؛ انسان مذاکره می‌کند'
+      metadata {
+        agent 'ایجنت جذب سرمایه'
+      }
+    }
+    c6 = gateStep 'بستن قرارداد و تحویل سهام پله‌به‌پله' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: قرارداد امضاشده (سهام یا SAFE) + برنامهٔ تحویل مرحله‌ای'
+      metadata {
+        agent 'ایجنت جذب سرمایه'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+    c5 -> c6 'بعد'
+  }
+
+  p7 = orgBox 'تجاری‌سازی و فروش' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: از قیمت تا مشتری اول'
+    metadata {
+      agent 'ایجنت تجاری‌سازی'
+    }
+    c1 = autoStep 'انتخاب مدل درآمد و قیمت' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: pricing-advisor'
+      description 'out: مدل درآمد + جدول قیمت + نردبان جذب مشتری'
+      metadata {
+        agent 'ایجنت تجاری‌سازی'
+      }
+    }
+    c2 = autoStep 'ساخت صفحهٔ فرود و محتوا' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: صفحهٔ فرود + ۱۰ محتوای معرفی'
+      metadata {
+        agent 'ایجنت تجاری‌سازی'
+      }
+    }
+    c3 = gateStep 'تأیید و انتشار کمپین' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: انتشار بیرونی فقط با تأیید انسان'
+      metadata {
+        agent 'ایجنت تجاری‌سازی'
+      }
+    }
+    c4 = askStep 'فروش به مشتریان اول' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ۳ مشتری پرداخت‌کننده'
+      metadata {
+        agent 'ایجنت تجاری‌سازی'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+  }
+
+  p8 = orgBox 'توسعه، رشد و یادگیری' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: حلقهٔ همیشگی تا مقیاس یا خروج'
+    metadata {
+      schedule 'weekly'
+      agent 'ایجنت رشد'
+    }
+    c1 = autoStep 'پایش شاخص‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: گزارش هفتگی: درآمد، هزینه، رشد، رضایت'
+      metadata {
+        agent 'ایجنت رشد'
+      }
+    }
+    c2 = autoStep 'آزمایش‌های رشد' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: فهرست آزمایش‌ها با نتیجه و تصمیم'
+      metadata {
+        agent 'ایجنت رشد'
+      }
+    }
+    c3 = autoStep 'ثبت درس‌ها و به‌روزرسانی معیارها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: درس‌ها در کتابخانهٔ استودیو برای استارتاپ بعدی'
+      metadata {
+        agent 'ایجنت رشد'
+      }
+    }
+    c4 = gateStep 'تصمیم مقیاس، فروش یا توقف' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ادامه، فروش یا خروج؛ فقط انسان تصمیم می‌گیرد'
+      metadata {
+        agent 'ایجنت رشد'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+  }
+
+  p0 -> p1 'بعد'
+  p1 -> p2 'بعد'
+  p2 -> p3 'بعد'
+  p3 -> p4 'بعد'
+  p4 -> p5 'بعد'
+  p5 -> p6 'بعد'
+  p6 -> p7 'بعد'
+  p7 -> p8 'بعد'
+}
+
+views {
+  view index {
+    title 'استودیوی استارتاپ‌ساز: ارزیابی، ساخت، حقوقی، سهام، سرمایه‌گذار و فروش'
+    include *
+  }
+
+  view p0 of p0 {
+    title 'ورودی و تشخیص نوع'
+    include *
+  }
+
+  view p1 of p1 {
+    title 'ارزیابی و اعتبارسنجی'
+    include *
+  }
+
+  view p2 of p2 {
+    title 'نام‌گذاری، برند و دارایی‌های دیجیتال'
+    include *
+  }
+
+  view p3 of p3 {
+    title 'حقوقی و ساختار شرکت'
+    include *
+  }
+
+  view p4 of p4 {
+    title 'ساخت و راه‌اندازی MVP'
+    include *
+  }
+
+  view p5 of p5 {
+    title 'ارزش‌گذاری و ساختار سهام'
+    include *
+  }
+
+  view p6 of p6 {
+    title 'سرمایه‌گذار، هم‌بنیان‌گذار و شریک'
+    include *
+  }
+
+  view p7 of p7 {
+    title 'تجاری‌سازی و فروش'
+    include *
+  }
+
+  view p8 of p8 {
+    title 'توسعه، رشد و یادگیری'
+    include *
+  }
+}

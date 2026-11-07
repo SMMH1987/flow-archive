@@ -893,7 +893,7 @@ function emitC4(M){
   return pre+'model {\n'+lines.join('\n')+'\n}'+M.mid+viewsAdjust(M.views,idx,M)}
 
 /* ───────── حالت برنامه ───────── */
-const KEY=()=>(typeof DOC==='undefined'?'orgStudio.v1':({startup:'orgStudio.startup1',org:'orgStudio.v1'}[DOC]));
+const KEY=()=>(typeof DOC==='undefined'?'orgStudio.v1':({startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1'}[DOC]));
 const BASE=document.getElementById('base-c4').textContent;
 let M,BASEPARSE,BASETEXT,IDX=new Map(),SEL=null,TAB='dia',HIST=[],G={};
 const defaultG=()=>({cats:Object.fromEntries(CATS.map(c=>[c,c!=='read_or_draft'])),expires:24});
@@ -1089,7 +1089,7 @@ const TPLS=[
    {t:'ارسال و ثبت نتیجه',kind:'autoStep',skill:'—',out:'پیام ارسال‌شده + وضعیت',ext:'Gmail MCP',extKind:'MCP'}]}];
 function mkNode(sp,id){const leaf=!sp.kids;
   const n={id,kind:sp.kind||'autoStep',title:sp.t,tags:(leaf&&(sp.skill==='—'||sp.unk))?['unknownSkill']:[],icon:U+'unlock.svg',tech:'skill: '+(sp.skill||'—'),desc:sp.out?'out: '+sp.out:(sp.d?'out: '+sp.d:''),children:[],meta:[]};
-  markNew(n);if(sp.part)n.meta.push(['part',sp.part]);if(sp.ext)n.meta.push(['ext_tool',sp.ext],['ext_kind',sp.extKind||'MCP']);
+  markNew(n);if(sp.part)n.meta.push(['part',sp.part]);if(sp.branches)n.meta.push(['branches',sp.branches]);if(sp.ext)n.meta.push(['ext_tool',sp.ext],['ext_kind',sp.extKind||'MCP']);
   if(sp.sched)n.meta.push(['schedule',sp.sched]);
   if(sp.agent)n.meta.push(['agent',sp.agent]);if(sp.must)n.meta.push(['must',sp.must]);if(sp.not)n.meta.push(['must_not',sp.not]);if(sp.stage)n.meta.push(['stage_status','simple']);
   (sp.kids||[]).forEach((k,i)=>n.children.push(mkNode(k,'c'+(i+1))));
@@ -1261,41 +1261,100 @@ const STARTUP=[
   {t:'پشتیبانی و رسیدگی به درخواست‌ها',kind:'askStep',skill:'—',out:'پاسخ‌ها و درخواست‌های حذف داده'},
   {t:'به‌روزرسانی پرسشنامه‌ها و شایستگی‌ها',kind:'autoStep',skill:'—',out:'فهرست تغییرهای پیشنهادی؛ اعمال با تأیید',ext:'Firecrawl MCP',extKind:'MCP'},
   {t:'تصمیم مقیاس‌دهی',kind:'gateStep',skill:'—',out:'عنوان‌های شغلی تازه، بازار تازه یا توقف'}]}];
+/* سازمان استارتاپ‌ساز: با دادن یک ایده یا یک پروژه و کد، از ارزیابی و نام‌گذاری تا حقوقی، ارزش‌گذاری، سرمایه‌گذار و فروش را خودش پیش می‌برد */
+const STUDIO_TITLE='استودیوی استارتاپ‌ساز: ارزیابی، ساخت، حقوقی، سهام، سرمایه‌گذار و فروش';
+const MUSTS='هر پرداخت، امضا، ارسال بیرونی و واگذاری سهام فقط با تأیید انسان؛ هر عدد ارزش‌گذاری با روش و فرض ثبت شود';
+const NOTS='وعدهٔ سود یا بازده به سرمایه‌گذار؛ جذب سرمایه بدون مجوز قانونی؛ ارسال انبوه بدون تأیید؛ نمایش حدس به‌جای واقعیت';
+const STUDIO=[
+ {id:'p0',t:'ورودی و تشخیص نوع',d:'ایده یا پروژه و کد؛ اختیار ایجنت و سقف هزینه',agent:'ایجنت پذیرش',must:MUSTS,not:NOTS,kids:[
+  {t:'دریافت ایده یا پروژه و کد',kind:'askStep',skill:'—',out:'متن ایده یا آدرس مخزن کد + هدف مالک'},
+  {t:'تعیین سقف هزینه، اختیار ایجنت و مسئول انسانی',kind:'gateStep',skill:'—',out:'سقف هزینه و فهرست تصمیم‌هایی که فقط انسان می‌گیرد؛ هر دو الان UNKNOWN'},
+  {t:'ورودی چیست؟',kind:'routeStep',skill:'—',out:'',branches:'ایده|پروژه و کد'},
+  {t:'شفاف‌سازی ایده با پرسش',kind:'askStep',skill:'first-principles',out:'ایده در یک صفحه: مسئله، مشتری، راه‌حل'},
+  {t:'ممیزی پروژه و کد: فنی، لایسنس و مالکیت',kind:'autoStep',skill:'—',out:'گزارش وضعیت کد، لایسنس‌ها، وابستگی‌ها و مالکیت واقعی'}]},
+ {id:'p1',t:'ارزیابی و اعتبارسنجی',d:'بازار، رقبا، مشتری و امتیاز نهایی',agent:'ایجنت ارزیاب',kids:[
+  {t:'پژوهش بازار و رقبا',kind:'autoStep',skill:'—',out:'اندازهٔ بازار، رقبا و خلأها با منبع + مزایا و معایب',ext:'Firecrawl MCP',extKind:'MCP'},
+  {t:'گفت‌وگو با مشتریان احتمالی',kind:'askStep',skill:'—',out:'خلاصهٔ حداقل ۱۰ مصاحبه'},
+  {t:'امتیازدهی با چارچوب ثابت',kind:'autoStep',skill:'—',out:'امتیاز ۱۰ معیار (مسئله، بازار، تیم، فناوری، رقابت، درآمد...) با دلیل'},
+  {t:'فهرست ریسک‌ها',kind:'autoStep',skill:'—',out:'ریسک‌های حقوقی، فنی، بازار و مالی با احتمال و اثر'},
+  {t:'تصمیم رفتن یا نرفتن',kind:'gateStep',skill:'—',out:'ادامه، تغییر مسیر یا توقف؛ فقط انسان تصمیم می‌گیرد'}]},
+ {id:'p2',t:'نام‌گذاری، برند و دارایی‌های دیجیتال',d:'از نام تا دامنه و حساب‌ها',agent:'ایجنت نام‌گذاری',kids:[
+  {t:'تولید ۲۰ نام پیشنهادی',kind:'autoStep',skill:'startup-naming',out:'۲۰ نام با معنی هر کدام'},
+  {t:'بررسی دامنه، نشان و نام‌کاربری',kind:'autoStep',skill:'—',out:'آزاد بودن دامنه و نام‌کاربری‌ها + برخورد با نشان تجاری',ext:'RDAP / Namecheap API',extKind:'API'},
+  {t:'انتخاب نهایی نام',kind:'gateStep',skill:'—',out:'یک نام برگزیده'},
+  {t:'ساخت هویت ساده و حساب‌ها',kind:'autoStep',skill:'—',out:'لوگو، لحن، دامنه و حساب‌های شبکه‌ها'}]},
+ {id:'p3',t:'حقوقی و ساختار شرکت',d:'ثبت، مالکیت فکری، قرارداد هم‌بنیان‌گذاران',agent:'ایجنت حقوقی',kids:[
+  {t:'انتخاب ساختار حقوقی و کشور ثبت',kind:'askStep',skill:'—',out:'گزینه‌ها با هزینه و محدودیت‌ها؛ قوانین ایران و ثبت خارجی UNKNOWN و با مشاور حقوقی بررسی شود'},
+  {t:'ثبت شرکت و حساب بانکی',kind:'gateStep',skill:'—',out:'شرکت ثبت‌شده + حساب؛ پرداخت و امضا فقط با انسان',ext:'Stripe Atlas / Carta (برای ثبت خارجی)',extKind:'API'},
+  {t:'واگذاری مالکیت فکری و کد به شرکت',kind:'gateStep',skill:'—',out:'قرارداد انتقال مالکیت کد، نام و دامنه به شرکت'},
+  {t:'قرارداد هم‌بنیان‌گذاران',kind:'gateStep',skill:'—',out:'نقش‌ها، تعهد زمانی، خروج و سهام پله‌به‌پله (vesting)'},
+  {t:'شرایط استفاده و حریم خصوصی',kind:'autoStep',skill:'—',out:'پیش‌نویس متن‌ها برای بازبینی حقوقی'}]},
+ {id:'p4',t:'ساخت و راه‌اندازی MVP',d:'کوچک‌ترین نسخه که ارزش بدهد',agent:'ایجنت ساخت',kids:[
+  {t:'تعریف محدودهٔ MVP',kind:'askStep',skill:'—',out:'فهرست قابلیت‌ها + مرز آنچه نیست'},
+  {t:'ساخت یا تکمیل محصول',kind:'autoStep',skill:'—',out:'نسخهٔ کارا از ایده، یا اصلاح کد موجود',ext:'Claude Code',extKind:'API'},
+  {t:'تست کیفیت و امنیت',kind:'autoStep',skill:'—',out:'گزارش تست + عیب‌های باز'},
+  {t:'استقرار و ثبت شاخص‌ها',kind:'gateStep',skill:'—',out:'نسخهٔ آنلاین + داشبورد شاخص‌ها؛ هزینهٔ سرور با تأیید'}]},
+ {id:'p5',t:'ارزش‌گذاری و ساختار سهام',d:'عدد منطقی، جدول سهام و سهام پله‌به‌پله',agent:'ایجنت مالی',must:'هر عدد با روش و فرض نوشته شود؛ بازه بده، نه یک عدد قطعی',kids:[
+  {t:'ارزش‌گذاری با چند روش',kind:'autoStep',skill:'—',out:'بازهٔ ارزش (کم، میانه، زیاد) با روش‌های Berkus، Scorecard و VC method و فرض‌هایشان'},
+  {t:'ساخت جدول سهام اولیه',kind:'autoStep',skill:'—',out:'جدول سهام بنیان‌گذاران و استخر سهام کارکنان (ESOP)؛ درصد استخر رایج است و باید بررسی شود'},
+  {t:'طراحی سهام پله‌به‌پله',kind:'autoStep',skill:'—',out:'برنامهٔ vesting (مثلا ۴ سال با یک سال cliff یا مرحله‌ای بر اساس نقطه‌عطف‌ها)'},
+  {t:'محاسبهٔ درصد و رقیق‌شدگی هر دور',kind:'autoStep',skill:'—',out:'درصد = مبلغ سرمایه ÷ ارزش پس از سرمایه؛ جدول رقیق‌شدگی هر دور'},
+  {t:'تأیید ارزش و سهام',kind:'gateStep',skill:'—',out:'تأیید انسان؛ بدون آن به هیچ سرمایه‌گذاری عدد گفته نمی‌شود'}]},
+ {id:'p6',t:'سرمایه‌گذار، هم‌بنیان‌گذار و شریک',d:'فروش کامل، سرمایه‌گذاری، کوفاندر یا شریک توسعه',agent:'ایجنت جذب سرمایه',must:MUSTS,not:NOTS,kids:[
+  {t:'انتخاب هدف',kind:'askStep',skill:'—',out:'فروش کامل، سرمایه‌گذار، کوفاندر یا شریک توسعه؛ با سهم هدف هرکدام'},
+  {t:'فهرست‌سازی مخاطبان مناسب',kind:'autoStep',skill:'—',out:'فهرست با دلیل تناسب برای هر نوع',ext:'Firecrawl MCP',extKind:'MCP'},
+  {t:'ساخت معرفی‌نامه و اتاق داده',kind:'autoStep',skill:'—',out:'دک ۱۰ اسلاید + یک‌صفحه‌ای + اتاق داده با مدارک'},
+  {t:'تأیید و ارسال پیام‌ها',kind:'gateStep',skill:'—',out:'پیام‌های تأییدشده ارسال شد؛ ارسال بیرونی فقط با انسان'},
+  {t:'مذاکره و محاسبهٔ درصد',kind:'gateStep',skill:'—',out:'شرایط پیشنهادی با جدول رقیق‌شدگی؛ انسان مذاکره می‌کند'},
+  {t:'بستن قرارداد و تحویل سهام پله‌به‌پله',kind:'gateStep',skill:'—',out:'قرارداد امضاشده (سهام یا SAFE) + برنامهٔ تحویل مرحله‌ای'}]},
+ {id:'p7',t:'تجاری‌سازی و فروش',d:'از قیمت تا مشتری اول',agent:'ایجنت تجاری‌سازی',kids:[
+  {t:'انتخاب مدل درآمد و قیمت',kind:'autoStep',skill:'pricing-advisor',out:'مدل درآمد + جدول قیمت + نردبان جذب مشتری'},
+  {t:'ساخت صفحهٔ فرود و محتوا',kind:'autoStep',skill:'—',out:'صفحهٔ فرود + ۱۰ محتوای معرفی'},
+  {t:'تأیید و انتشار کمپین',kind:'gateStep',skill:'—',out:'انتشار بیرونی فقط با تأیید انسان'},
+  {t:'فروش به مشتریان اول',kind:'askStep',skill:'—',out:'۳ مشتری پرداخت‌کننده'}]},
+ {id:'p8',t:'توسعه، رشد و یادگیری',d:'حلقهٔ همیشگی تا مقیاس یا خروج',agent:'ایجنت رشد',sched:'weekly',kids:[
+  {t:'پایش شاخص‌ها',kind:'autoStep',skill:'—',out:'گزارش هفتگی: درآمد، هزینه، رشد، رضایت'},
+  {t:'آزمایش‌های رشد',kind:'autoStep',skill:'—',out:'فهرست آزمایش‌ها با نتیجه و تصمیم'},
+  {t:'ثبت درس‌ها و به‌روزرسانی معیارها',kind:'autoStep',skill:'—',out:'درس‌ها در کتابخانهٔ استودیو برای استارتاپ بعدی'},
+  {t:'تصمیم مقیاس، فروش یا توقف',kind:'gateStep',skill:'—',out:'ادامه، فروش یا خروج؛ فقط انسان تصمیم می‌گیرد'}]}];
 function linkKids(nd,pth,add){
   const ks=nd.children;
   ks.forEach((c,k)=>{
     if(k<ks.length-1){
       const prevRoute=k>0&&ks[k-1].kind==='routeStep',isR=c.kind==='routeStep';
-      if(isR&&ks[k+1]){add(pth+'.'+c.id,pth+'.'+ks[k+1].id,'بله');if(ks[k+2])add(pth+'.'+c.id,pth+'.'+ks[k+2].id,'نه')}
+      const br=(meta(c,'branches')||'بله|نه').split('|');
+      if(isR&&ks[k+1]){add(pth+'.'+c.id,pth+'.'+ks[k+1].id,br[0]);if(ks[k+2])add(pth+'.'+c.id,pth+'.'+ks[k+2].id,br[1]||'نه')}
       else if(!prevRoute&&!(k>1&&ks[k-2].kind==='routeStep'))add(pth+'.'+c.id,pth+'.'+ks[k+1].id)}
     linkKids(c,pth+'.'+c.id,add)})}
-function startupModel(){
+function phaseModel(PH,TITLE){
   const m=parseC4(BASE);m.nodes=[];m.rels=[];m.mid='\n\n';
   const add=(a,b,l)=>m.rels.push({from:a,to:b,label:l||'بعد',c:lca(a,b)});
-  STARTUP.forEach(ph=>{
+  PH.forEach(ph=>{
     const kids=ph.kids||TALENT.map(s=>({...s,kids:s.kids.map(k=>({...k,agent:s.agent}))}));
     const sp={t:ph.t,d:ph.d,kind:'orgBox',skill:'—',sched:ph.sched,kids:kids.map(k=>({...k,agent:k.agent||ph.agent}))};
     const node=mkNode(sp,ph.id);node.kind='orgBox';node.tags=[];node.tech='';node.desc='out: '+ph.d;
     setMeta(node,'agent',ph.agent);
-    if(ph.id==='p3'){setMeta(node,'blueprint','talentbot');setMeta(node,'must','رضایت صریح پیش از هر پرسشنامه؛ تأیید انسان پیش از رد یا استخدام؛ داده‌های روانشناختی فقط برای همین استخدام و قابل حذف');setMeta(node,'must_not','تشخیص بالینی؛ تصمیم نهایی خودکار؛ جمع‌آوری داده بدون رضایت؛ آزمون دارای حق‌نشر بدون مجوز')}
+    if(ph.must)setMeta(node,'must',ph.must);if(ph.not)setMeta(node,'must_not',ph.not);
+    if(ph.kids===null){setMeta(node,'blueprint','talentbot');setMeta(node,'must','رضایت صریح پیش از هر پرسشنامه؛ تأیید انسان پیش از رد یا استخدام؛ داده‌های روانشناختی فقط برای همین استخدام و قابل حذف');setMeta(node,'must_not','تشخیص بالینی؛ تصمیم نهایی خودکار؛ جمع‌آوری داده بدون رضایت؛ آزمون دارای حق‌نشر بدون مجوز')}
     clearNew(node);walk(node.children,'',c=>clearNew(c));
     m.nodes.push(node)});
   m.nodes.forEach((n,i)=>{if(i<m.nodes.length-1)add(n.id,m.nodes[i+1].id);linkKids(n,n.id,add)});
-  m.views='views {\n  view index {\n    title '+q(STARTUP_TITLE)+'\n    include *\n  }\n'+m.nodes.map(n=>'\n  view '+n.id+' of '+n.id+' {\n    title '+q(n.title)+'\n    include *\n  }\n').join('')+'}';
+  m.views='views {\n  view index {\n    title '+q(TITLE)+'\n    include *\n  }\n'+m.nodes.map(n=>'\n  view '+n.id+' of '+n.id+' {\n    title '+q(n.title)+'\n    include *\n  }\n').join('')+'}';
   return m}
-const DOCKEY={startup:'orgStudio.startup1',org:'orgStudio.v1'};
-let DOC='startup';try{DOC=localStorage.getItem('orgStudio.doc')==='org'?'org':'startup'}catch(e){}
-const DOCFILE=()=>DOC==='startup'?'startup-talent.c4':'recruitment.c4';
+const startupModel=()=>phaseModel(STARTUP,STARTUP_TITLE),studioModel=()=>phaseModel(STUDIO,STUDIO_TITLE);
+const DOCKEY={startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1'},BUILD={startup:startupModel,studio:studioModel};
+let DOC='studio';try{const d=localStorage.getItem('orgStudio.doc2');if(d==='org'||d==='startup')DOC=d}catch(e){}
+const DOCFILE=()=>({startup:'startup-talent.c4',studio:'startup-studio.c4',org:'recruitment.c4'}[DOC]);
 function openDoc(d){
-  DOC=d;try{localStorage.setItem('orgStudio.doc',d)}catch(e){}
+  DOC=d;try{localStorage.setItem('orgStudio.doc2',d)}catch(e){}
   let st=null;try{st=JSON.parse(localStorage.getItem(DOCKEY[d]))}catch(e){}
   G={};
   try{
     if(st&&st.cur&&st.base){G=st.G||{};BASETEXT=st.base;BASEPARSE=parseC4(BASETEXT);M=parseC4(st.cur);reindex();deriveG();G=st.G&&st.G.cats?Object.assign(G,{expires:st.G.expires||24}):G;HIST=[st.cur]}
     else if(d==='org')loadText(BASE,true);
-    else{M=startupModel();BASETEXT=emitC4(M);BASEPARSE=parseC4(BASETEXT);reindex();deriveG();HIST=[BASETEXT]}
-  }catch(e){if(d==='org')loadText(BASE,true);else{M=startupModel();BASETEXT=emitC4(M);BASEPARSE=parseC4(BASETEXT);reindex();deriveG();HIST=[BASETEXT]}}
-  SEL=null;SELE=null;FOC=null;EXP=new Set();MACRO=d==='startup';TAB='dia';NEEDFIT=true;
+    else{M=BUILD[d]();BASETEXT=emitC4(M);BASEPARSE=parseC4(BASETEXT);reindex();deriveG();HIST=[BASETEXT]}
+  }catch(e){if(d==='org')loadText(BASE,true);else{M=BUILD[d]();BASETEXT=emitC4(M);BASEPARSE=parseC4(BASETEXT);reindex();deriveG();HIST=[BASETEXT]}}
+  SEL=null;SELE=null;FOC=null;EXP=new Set();MACRO=d!=='org';TAB='dia';NEEDFIT=true;
   VIEWP='ov:'+roots()[0].id;
   save()}
 function switchDoc(d){if(d===DOC)return;save();openDoc(d);renderVers();showTab();$('#doc-name').textContent=DOCFILE()}
@@ -1537,9 +1596,10 @@ function focusOn(p){if(!IDX.has(p))return;if(p.split('.')[0]!==rootOfView()){go(
   FOC=p;expandTo(p);NEEDFIT=false;renderDia();if(p.includes('.')&&!lastVis().has(p)){}
   const tgt=lastVis().has(p)?p:null;if(tgt)fitTo(tgt)}
 function setVer(v){VER=v;NEEDFIT=true;renderVers();renderDia();renderInsp()}
-const APP_VER=16,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
+const APP_VER=17,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
 const VIEW_VERS=[[1,'عبور','نمایش ۱','آرتیفکت v۴','۱۲:۵۹'],[2,'بازشدن درجا','نمایش ۲','آرتیفکت v۴','۱۲:۵۹'],[3,'درخت + کادرها','نمایش ۳','آرتیفکت v۴','۱۲:۵۹'],[4,'ترکیبی ۲+۳','نمایش ۴ (انتخاب تو)','آرتیفکت v۵','۱۳:۰۵']];
 const CHANGELOG=[
+ [17,'استودیوی استارتاپ‌ساز','سازمان تازه: ارزیابی، نام‌گذاری، حقوقی، ارزش‌گذاری و سهام پله‌به‌پله، سرمایه‌گذار و فروش؛ ورودی ایده یا پروژه و کد','۱۷:۵۵'],
  [16,'نقشهٔ تازهٔ استارتاپ از صفر','نقشهٔ جدید و جدا از سازمان قبلی: از پیش‌نیازها و نام‌گذاری تا ساخت، آزمایش و تجاری‌سازی؛ فایل c4 جدا','۱۶:۰۵'],
  [15,'نمونهٔ پختهٔ ربات استعدادیابی','فرایند ربات با ۹ مرحلهٔ جمع‌شده، بخش‌های ثابت و پویا و پیش‌نیازهای شروع','۱۵:۳۰'],
  [14,'ایجنت استخدام و جستجوی skill','تمپلیت ایجنت استخدام با جستجوی ۱۰ skill، انتخاب یا ساخت skill تازه و ورک‌فلو استخدام زیر خود ایجنت؛ فیلد skillهای کاندید و دستور جستجو برای Claude','۱۵:۱۰'],
@@ -1562,7 +1622,8 @@ function histPanel(){return h('div',{class:'panel'},h('h2',{},'📜 تاریخچ
   ...CHANGELOG.map(([n,t,d,tm])=>h('div',{class:'sugc'},h('b',{},'نسخهٔ '+toFa(n)+' · '+t),n===APP_VER?h('span',{class:'k'},'همین نسخه'):null,h('div',{},d),h('small',{},APP_DATE+' · '+tm))),
   h('button',{class:'sm',onclick:()=>{HISTOPEN=false;renderInsp()}},'بستن'))}
 function renderVers(){$('#vers').replaceChildren(
-  h('button',{class:DOC==='startup'?'pri':'',title:'نقشهٔ تازه از صفر: استارتاپ استعدادیابی، غربال، رزومه و استخدام؛ از نام‌گذاری تا تجاری‌سازی',onclick:()=>switchDoc('startup')},'🚀 نقشهٔ استارتاپ تازه'),
+  h('button',{class:DOC==='studio'?'pri':'',title:'سازمان تازه: با دادن ایده یا پروژه و کد، ارزیابی، ساخت، حقوقی، ارزش‌گذاری، سرمایه‌گذار و فروش را پیش می‌برد',onclick:()=>switchDoc('studio')},'🏭 استودیوی استارتاپ‌ساز'),
+  h('button',{class:DOC==='startup'?'pri':'',title:'نقشهٔ تازه از صفر: استارتاپ استعدادیابی، غربال، رزومه و استخدام؛ از نام‌گذاری تا تجاری‌سازی',onclick:()=>switchDoc('startup')},'🚀 استارتاپ استعدادیابی'),
   h('button',{class:DOC==='org'?'pri':'',title:'نقشهٔ قبلی: سازمان اتوماسیون استخدام (recruitment.c4)',onclick:()=>switchDoc('org')},'🏢 نقشهٔ سازمان قبلی'),
 ...VIEW_VERS.map(([v,l,tag,av,tm])=>h('button',{class:VER===v?'on':'',title:tag+' · '+av+' · ساخته‌شده '+APP_DATE+' ساعت '+tm+' UTC',onclick:()=>setVer(v)},'نسخه '+toFa(v)+' · '+l+' ',h('small',{style:'opacity:.75'},av+' · '+APP_DATE))),
   h('button',{class:'sm'+(REVIEW?' pri':''),title:'قسمت‌های اضافه یا تکراری با کادر قرمز مشخص و حذف، ادغام یا ترتیب پیشنهاد می‌شود',onclick:()=>{REVIEW=!REVIEW;NEEDFIT=false;SEL=null;SELE=null;renderVers();renderDia();renderInsp()}},'🔍 بازبینی'+(REVIEW?' · '+toFa(RV.size):'')),
@@ -2179,7 +2240,7 @@ function renderOut(){
   const [name,body]=files[OUTTAB];
   root.append(h('div',{class:'panel'},tabs,h('div',{class:'row',style:'margin:8px 0'},
     h('button',{class:'pri',onclick:async e=>{try{await navigator.clipboard.writeText(body);e.target.textContent='کپی شد ✓'}catch(x){const t=$('#outpre');const r=document.createRange();r.selectNodeContents(t);getSelection().removeAllRanges();getSelection().addRange(r);e.target.textContent='انتخاب شد؛ Ctrl+C'}}},'کپی متن کامل'),
-    h('small',{},OUTTAB==='c4'?(DOC==='startup'?'این متن را به‌عنوان فایل تازهٔ c4-org/startup-talent.c4 ذخیره کن؛ به recruitment.c4 دست نمی‌زند.':'این متن را جایگزین c4-org/recruitment.c4 کن (کل فایل).'):'برای پروژه‌ها؛ در پوشهٔ interop/ یا دفتر مرکزی بگذار.')),
+    h('small',{},OUTTAB==='c4'?(DOC!=='org'?'این متن را به‌عنوان فایل تازهٔ c4-org/'+DOCFILE()+' ذخیره کن؛ به recruitment.c4 دست نمی‌زند.':'این متن را جایگزین c4-org/recruitment.c4 کن (کل فایل).'):'برای پروژه‌ها؛ در پوشهٔ interop/ یا دفتر مرکزی بگذار.')),
     h('pre',{id:'outpre'},body)))}
 
 /* ───────── صفحه‌ها ───────── */
@@ -2191,7 +2252,7 @@ function showTab(){
   if(TAB==='int')renderInt();if(TAB==='out')renderOut()}
 function refresh(){syncAuto();showTab()}
 $('#undo').onclick=undo;
-$('#reset').onclick=async()=>{if(await ask(DOC==='startup'?'همهٔ تغییرات نقشهٔ استارتاپ پاک شود و نمونهٔ اولیه برگردد؟':'همهٔ تغییرات پاک شود و نمونهٔ مخزن برگردد؟')){try{localStorage.removeItem(KEY())}catch(e){}openDoc(DOC);renderVers();refresh()}};
+$('#reset').onclick=async()=>{if(await ask(DOC!=='org'?'همهٔ تغییرات این نقشه پاک شود و نمونهٔ اولیه برگردد؟':'همهٔ تغییرات پاک شود و نمونهٔ مخزن برگردد؟')){try{localStorage.removeItem(KEY())}catch(e){}openDoc(DOC);renderVers();refresh()}};
 $('#load').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{const f=e.target.files[0];if(!f)return;const t=await f.text();
   try{G={};loadText(t,true);save();NEEDFIT=true;refresh()}catch(x){await ask('فایل خوانده نشد: '+x.message,{info:1})}e.target.value=''};
