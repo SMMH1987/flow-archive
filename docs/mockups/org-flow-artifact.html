@@ -58,7 +58,7 @@ input[type=checkbox],input[type=radio]{width:auto}
 .node.gateStep{border-color:var(--gate);background:var(--gatebg);border-radius:3px;border-width:3px;box-shadow:inset 0 0 0 2px var(--card)}
 .node.routeStep{border:0;background:var(--route);clip-path:polygon(9% 0,91% 0,100% 50%,91% 100%,9% 100%,0 50%);align-items:center;text-align:center;padding:5px 26px}
 .node.routeStep::before{content:'';position:absolute;inset:2px;background:var(--routebg);clip-path:polygon(9% 0,91% 0,100% 50%,91% 100%,9% 100%,0 50%)}
-.node.routeStep>*{position:relative}
+.node.routeStep>*:not(.grip):not(.ord):not(.lkb):not(.wb):not(.nwd):not(.dtl):not(.prt):not(.rvt){position:relative}
 .node.tool{border-style:dashed;border-color:var(--proj);border-radius:6px}.node.tool.gated{border-color:var(--gate);background:var(--gatebg)}
 .node.actor{border:2px dashed var(--acc);background:var(--accbg);border-radius:30px;align-items:center}
 .node.locked{background-image:repeating-linear-gradient(135deg,transparent 0 9px,color-mix(in srgb,var(--gate) 13%,transparent) 9px 18px)}
@@ -134,8 +134,9 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
 .sugc{border:1px solid var(--line);border-radius:10px;padding:8px;margin:6px 0;background:var(--card);font-size:12px;line-height:1.5}.sugc b{font-size:13px}.sugc .k{font-size:10px;font-weight:800;border-radius:6px;padding:0 6px;background:var(--accbg);color:var(--acc);margin-inline-start:6px}.sugc .pro{color:var(--e-out)}.sugc .con{color:var(--e-back)}
 .node.proc{border:3px solid var(--acc);background:var(--accbg);border-radius:16px}.node.proc .nt{font-size:15px}
 .mac-note{font-size:11.5px;color:var(--mute)}
-.nwd{position:absolute;bottom:-8px;right:10px;z-index:3;font-size:10px;font-weight:800;color:#fff;background:var(--e-out);border-radius:8px;padding:0 7px;line-height:16px}.dtl{position:absolute;top:4px;right:34px;z-index:3;font-size:11px;cursor:help;letter-spacing:2px}
+.nwd{position:absolute;top:4px;right:76px;z-index:3;font-size:10px;font-weight:800;color:#fff;background:var(--e-out);border-radius:8px;padding:0 7px;line-height:16px}.dtl{position:absolute;top:4px;right:116px;z-index:3;font-size:11px;cursor:help;letter-spacing:2px}
 .node.rv{outline:3px solid #d92d20;outline-offset:3px;box-shadow:0 0 0 6px rgba(217,45,32,.18)}.rvt{position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:5;font-size:10.5px;font-weight:800;color:#fff;background:#d92d20;border-radius:8px;padding:0 8px;line-height:17px;cursor:help;white-space:nowrap}
+.prt{position:absolute;top:4px;right:36px;z-index:3;font-size:10px;font-weight:800;border-radius:8px;padding:0 7px;line-height:16px;color:#fff;cursor:help}.prt.fixed{background:#2563eb}.prt.dynamic{background:#d97706}
 button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover:not(:disabled){background:var(--e-back);color:#fff}.nwchip{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:var(--e-out);border-radius:8px;padding:1px 8px;margin-inline-start:6px}.cr{white-space:pre;font-size:11px;direction:ltr;text-align:left}
 .grip{position:absolute;top:1px;left:50%;transform:translateX(-50%);cursor:grab;color:var(--mute);font-size:14px;line-height:1;z-index:4;padding:0 10px;touch-action:none;user-select:none}.grip:hover{color:var(--acc)}.fh .grip2{cursor:grab;color:var(--mute);padding:0 4px;touch-action:none}
 .dropb{box-shadow:0 -7px 0 0 var(--acc)!important}.dropa{box-shadow:0 7px 0 0 var(--acc)!important}
@@ -1087,7 +1088,7 @@ const TPLS=[
    {t:'ارسال و ثبت نتیجه',kind:'autoStep',skill:'—',out:'پیام ارسال‌شده + وضعیت',ext:'Gmail MCP',extKind:'MCP'}]}];
 function mkNode(sp,id){const leaf=!sp.kids;
   const n={id,kind:sp.kind||'autoStep',title:sp.t,tags:(leaf&&(sp.skill==='—'||sp.unk))?['unknownSkill']:[],icon:U+'unlock.svg',tech:'skill: '+(sp.skill||'—'),desc:sp.out?'out: '+sp.out:(sp.d?'out: '+sp.d:''),children:[],meta:[]};
-  markNew(n);if(sp.ext)n.meta.push(['ext_tool',sp.ext],['ext_kind',sp.extKind||'MCP']);
+  markNew(n);if(sp.part)n.meta.push(['part',sp.part]);if(sp.ext)n.meta.push(['ext_tool',sp.ext],['ext_kind',sp.extKind||'MCP']);
   if(sp.sched)n.meta.push(['schedule',sp.sched]);
   if(sp.agent)n.meta.push(['agent',sp.agent]);if(sp.must)n.meta.push(['must',sp.must]);if(sp.not)n.meta.push(['must_not',sp.not]);if(sp.stage)n.meta.push(['stage_status','simple']);
   (sp.kids||[]).forEach((k,i)=>n.children.push(mkNode(k,'c'+(i+1))));
@@ -1165,6 +1166,67 @@ async function applyBlueprint(bid,goal,must,not){const sp=bpSpec(bid,goal,must,n
   const chain=M.nodes.filter(inChain);
   if(!chain.length){node.id=uniqueId(M.nodes,'g');M.nodes.push(node);reindex();touch(true);return}
   MACRO=true;await spliceStep(chain[chain.length-1].id,'after',node)}
+/* نمونهٔ پخته: ربات هوشمند استعدادیابی، غربال و رزومه. بخش‌ها: part=fixed (برای همه یکی) یا dynamic (بر اساس عنوان شغلی) */
+const TALENT=[
+ {t:'آماده‌سازی و پیش‌نیازها',kind:'askStep',part:'fixed',agent:'ایجنت انطباق و آماده‌سازی',out:'همهٔ پیش‌نیازها کامل و تأییدشده',kids:[
+  {t:'تعیین هدف و دامنهٔ ربات',kind:'askStep',skill:'—',out:'سند یک‌صفحه‌ای: برای چه عناوینی، با چه کانالی'},
+  {t:'تدوین رضایت‌نامه و سیاست حریم خصوصی',kind:'gateStep',skill:'—',out:'متن رضایت + مدت نگهداری + راه حذف داده؛ قوانین داده در ایران UNKNOWN و باید بررسی شود'},
+  {t:'ساخت کتابخانهٔ پرسشنامهٔ ثابت',kind:'autoStep',skill:'questionnaire-builder',part:'fixed',out:'پرسشنامهٔ پایه + پرسشنامهٔ شخصیت استاندارد باز (Big Five از IPIP)'},
+  {t:'انتخاب کانال‌ها و حساب‌ها',kind:'askStep',skill:'—',out:'ربات تلگرام و بله + فرم وب؛ توکن‌ها فقط در env',ext:'Telegram Bot API',extKind:'API'},
+  {t:'تعیین مسئول انسانی و آستانه‌ها',kind:'gateStep',skill:'—',out:'نام مسئول + فهرست تصمیم‌هایی که فقط انسان می‌گیرد'}]},
+ {t:'تعریف عنوان شغلی',kind:'askStep',part:'dynamic',agent:'ایجنت تحلیل شغل',out:'پروفایل شایستگی و پرسشنامهٔ همین عنوان',kids:[
+  {t:'گرفتن عنوان و شرایط از کارفرما',kind:'askStep',skill:'—',out:'عنوان + شرح کار + شرایط + حقوق'},
+  {t:'جستجوی ۱۰ skill و الگوی مرتبط',kind:'autoStep',skill:'find-skills',out:'۱۰ skill یا الگو با دلیل؛ یکی انتخاب یا skill تازه ساخته شود',ext:'Skill registry (SearchSkills)',extKind:'API'},
+  {t:'ساخت پروفایل شایستگی',kind:'autoStep',skill:'—',out:'۵ تا ۸ شایستگی با وزن و نشانهٔ سنجش'},
+  {t:'ساخت پرسشنامهٔ پویای عنوان',kind:'autoStep',skill:'questionnaire-builder',out:'۸ تا ۱۲ پرسش مهارت و سناریو برای همین عنوان'},
+  {t:'تأیید کارفرما',kind:'gateStep',skill:'—',out:'پروفایل و پرسشنامه تأییدشده'}]},
+ {t:'استعدادیابی و دعوت',kind:'autoStep',part:'dynamic',agent:'ایجنت استعدادیاب',out:'دعوت‌نامه‌های تأییدشده ارسال شده',kids:[
+  {t:'پیدا کردن منابع و کانال‌های مناسب',kind:'autoStep',skill:'—',out:'فهرست منابع با نرخ پاسخ تخمینی',ext:'Firecrawl MCP',extKind:'MCP'},
+  {t:'نوشتن پیام دعوت برای هر کانال',kind:'autoStep',skill:'—',out:'متن کوتاه دعوت با لینک ربات'},
+  {t:'تأیید و ارسال دعوت',kind:'gateStep',skill:'—',out:'دعوت تأییدشده ارسال شد؛ ارسال بیرونی فقط با تأیید'}]},
+ {t:'پذیرش داوطلب',kind:'askStep',part:'fixed',agent:'ایجنت پذیرش',out:'داوطلب با رضایت ثبت‌شده وارد شد',kids:[
+  {t:'خوش‌آمد و توضیح شفاف',kind:'autoStep',skill:'—',out:'داوطلب می‌داند چه چیزی جمع می‌شود و چرا'},
+  {t:'گرفتن رضایت صریح',kind:'gateStep',skill:'—',out:'رضایت با زمان ثبت شد؛ بدون آن ادامه نیست'},
+  {t:'ثبت اطلاعات پایه',kind:'autoStep',skill:'—',part:'fixed',out:'نام، تماس، تجربه'}]},
+ {t:'پرسشنامه‌ها',kind:'askStep',part:'fixed',agent:'ایجنت پرسشنامه‌ساز',out:'پاسخ‌های ثابت و پویا ذخیره شد',kids:[
+  {t:'پرسشنامهٔ ثابت: پیشینه و انگیزه',kind:'askStep',skill:'—',part:'fixed',out:'پاسخ‌های استاندارد برای همهٔ عناوین'},
+  {t:'پرسشنامهٔ روانشناختی استاندارد',kind:'askStep',skill:'—',part:'fixed',out:'نمرهٔ پنج بعد شخصیت؛ توصیفی است نه تشخیصی'},
+  {t:'پرسشنامهٔ شایستگی همین عنوان',kind:'askStep',skill:'—',part:'dynamic',out:'پاسخ به پرسش‌های مهارتی عنوان'},
+  {t:'سناریو یا نمونه‌کار کوتاه',kind:'askStep',skill:'—',part:'dynamic',out:'پاسخ سناریو با معیار روشن'},
+  {t:'ذخیرهٔ امن پاسخ‌ها',kind:'autoStep',skill:'—',part:'fixed',out:'پاسخ‌های رمزگذاری‌شده با کد داوطلب'}]},
+ {t:'غربال',kind:'autoStep',part:'dynamic',agent:'ایجنت غربال',out:'فهرست کوتاه یا پیام رد تأییدشده',kids:[
+  {t:'امتیازدهی بر پایهٔ شایستگی‌ها',kind:'autoStep',skill:'—',out:'امتیاز هر شایستگی با دلیل کوتاه'},
+  {t:'مناسب است؟',kind:'routeStep',skill:'—',out:''},
+  {t:'ثبت در فهرست کوتاه',kind:'autoStep',skill:'—',out:'داوطلب + امتیاز در فهرست کوتاه'},
+  {t:'پیش‌نویس پیام رد مؤدبانه',kind:'gateStep',skill:'—',out:'پیام رد با بازخورد کوتاه؛ ارسال فقط با تأیید انسان'}]},
+ {t:'پروفایل و رزومه',kind:'autoStep',part:'fixed',agent:'ایجنت پروفایل و رزومه',out:'رزومه و پروفایل تأییدشدهٔ داوطلب',kids:[
+  {t:'ترکیب پاسخ‌ها و امتیازها',kind:'autoStep',skill:'—',out:'دادهٔ یکپارچهٔ داوطلب'},
+  {t:'ساخت پروفایل شایستگی و شخصیت',kind:'autoStep',skill:'—',out:'پروفایل توصیفی؛ با هشدار: ابزار تشخیص نیست'},
+  {t:'ساخت رزومه با قالب ثابت',kind:'autoStep',skill:'—',part:'fixed',out:'رزومهٔ PDF و DOCX',ext:'Pandoc / DOCX template',extKind:'API'},
+  {t:'بازبینی و تأیید داوطلب',kind:'askStep',skill:'—',out:'داوطلب نسخهٔ نهایی را تأیید یا اصلاح کرد'}]},
+ {t:'گزارش و تصمیم',kind:'askStep',part:'dynamic',agent:'ایجنت گزارش',out:'تصمیم نهایی انسان ثبت شد',kids:[
+  {t:'گزارش یک‌صفحه‌ای برای کارفرما',kind:'autoStep',skill:'—',out:'خلاصه + نقاط قوت + ریسک + پیشنهاد مصاحبه'},
+  {t:'زمان‌بندی مصاحبه',kind:'autoStep',skill:'—',out:'زمان قطعی مصاحبه',ext:'Google Calendar MCP',extKind:'MCP'},
+  {t:'تصمیم نهایی انسان',kind:'gateStep',skill:'—',out:'استخدام، رد یا انتظار؛ فقط انسان تصمیم می‌گیرد'}]},
+ {t:'نگهداری و بهبود',kind:'autoStep',part:'fixed',agent:'ایجنت بهبود',sched:'weekly',out:'داده‌ها طبق سیاست حذف و ابزارها به‌روز شدند',kids:[
+  {t:'حذف یا ناشناس‌سازی داده طبق مدت نگهداری',kind:'autoStep',skill:'—',out:'گزارش حذف + اجرای درخواست‌های داوطلب'},
+  {t:'گرفتن بازخورد کارفرما و داوطلب',kind:'askStep',skill:'—',out:'بازخورد ثبت‌شده'},
+  {t:'به‌روزرسانی پرسشنامه‌ها و شایستگی‌ها',kind:'autoStep',skill:'—',out:'فهرست تغییرهای پیشنهادی؛ اعمال با تأیید'}]}];
+function addTalentBot(){
+  if(IDX.has('talent'))return false;
+  const sp={t:'ربات هوشمند استعدادیابی، غربال و رزومه',d:'پرسشنامه‌های ثابت برای همه + پرسشنامهٔ پویا بر پایهٔ عنوان شغلی؛ رضایت صریح و تأیید انسان',kind:'orgBox',skill:'—',kids:TALENT.map(s=>({...s,kids:s.kids.map(k=>({...k,agent:s.agent}))}))};
+  const node=mkNode(sp,'talent');node.kind='orgBox';node.tags=[];node.tech='';node.desc='out: '+sp.d;
+  setMeta(node,'blueprint','talentbot');
+  setMeta(node,'must','رضایت صریح پیش از هر پرسشنامه؛ تأیید انسان پیش از رد یا استخدام؛ داده‌های روانشناختی فقط برای همین استخدام و قابل حذف');
+  setMeta(node,'must_not','تشخیص بالینی؛ تصمیم نهایی خودکار؛ جمع‌آوری داده بدون رضایت؛ آزمون دارای حق‌نشر بدون مجوز');
+  walk(node.children,'',c=>clearNew(c));
+  let at=-1;M.nodes.forEach((n,i)=>{if(inChain(n))at=i});M.nodes.splice(at+1,0,node);
+  const add=(a,b,l)=>M.rels.push({from:a,to:b,label:l||'بعد',c:lca(a,b)}),P='talent.';
+  node.children.forEach((st,i)=>{
+    if(i<node.children.length-1)add(P+st.id,P+node.children[i+1].id);
+    if(i===5){const k=st.children;add(P+st.id+'.'+k[0].id,P+st.id+'.'+k[1].id);add(P+st.id+'.'+k[1].id,P+st.id+'.'+k[2].id,'بله');add(P+st.id+'.'+k[1].id,P+st.id+'.'+k[3].id,'نه')}
+    else st.children.forEach((c,k)=>{if(k<st.children.length-1)add(P+st.id+'.'+c.id,P+st.id+'.'+st.children[k+1].id)})});
+  reindex();return true}
 function archPrompt(bid,goal,must,not){const b=BLUEPRINTS[bid];
   return `در پروژهٔ flow-archive یک فرایند کامل طراحی کن (طراح فرایند):
 هدف: ${goal||'(بنویس)'}
@@ -1183,10 +1245,10 @@ function archPanel(){
   const ta=h('textarea',{rows:5,class:'ltr',style:'display:none',readonly:true});
   const cp=h('button',{class:'sm',onclick:async()=>{const t=archPrompt(bs.value,goal.value,must.value,not.value);ta.value=t;try{await navigator.clipboard.writeText(t);cp.textContent='کپی شد ✓'}catch(e){ta.style.display='block';ta.select()}}},'📋 کپی دستور طراحی کامل برای Claude');
   return h('div',{class:'panel'},h('h2',{},'🧠 طراح فرایند'),h('small',{},'هدف را بنویس و الگو را انتخاب کن. نودهای ساده روی نقشهٔ کل می‌آیند و هر کدام ایجنت متخصص خودش را دارد؛ بعد هر نود را با Claude تکمیل می‌کنی. قید «باید و نباید» روی همهٔ مرحله‌ها می‌نشیند.'),
-    goal,bs,prev,must,not,h('div',{class:'row',style:'margin-top:6px'},h('button',{class:'sm pri',onclick:()=>applyBlueprint(bs.value,goal.value.trim(),must.value.trim(),not.value.trim())},'＋ ساخت نودهای ساده روی نقشهٔ کل'),cp),ta)}
+    goal,bs,prev,must,not,h('div',{class:'row',style:'margin-top:6px'},h('button',{class:'sm pri',onclick:()=>applyBlueprint(bs.value,goal.value.trim(),must.value.trim(),not.value.trim())},'＋ ساخت نودهای ساده روی نقشهٔ کل'),cp,h('button',{class:'sm',title:'فرایند کامل نمونه با بخش‌های ثابت و پویا',onclick:async()=>{if(addTalentBot()){MACRO=true;NEEDFIT=true;touch(true)}else await ask('نمونهٔ ربات استعدادیابی از قبل روی نقشه هست.',{info:1})}},'🌱 افزودن نمونهٔ پخته: ربات استعدادیابی')),ta)}
 function metaPanel(n,p){const dis=lockedN(n);
   const fld=(lbl,k,ph)=>h('label',{class:'f'},h('span',{},lbl),h('input',{value:meta(n,k),placeholder:ph||'',disabled:dis,oninput:e=>{const v=e.target.value;if(v)setMeta(n,k,v);else n.meta=(n.meta||[]).filter(x=>x[0]!==k);touch()}}));
-  return h('div',{class:'panel'},h('h2',{},'🎯 ایجنت متخصص و قید'),fld('ایجنت یا skill متخصص این نود (role در CrewAI)','agent','مثلا ایجنت پژوهش مداوم'),fld('skillهای کاندید (top 10، با ؛ جدا کن)','skills_top10','نتیجهٔ جستجو؛ یکی انتخاب یا skill تازه ساخته شود'),h('div',{class:'row',style:'margin:-2px 0 6px'},(()=>{const b=h('button',{class:'sm',title:'دستور جستجوی ۱۰ skill مرتبط برای Claude',onclick:async()=>{const t=skillSearchPrompt(p);try{await navigator.clipboard.writeText(t);b.textContent='کپی شد ✓'}catch(e){b.textContent='کپی نشد'}}},'🔎 کپی دستور جستجوی top 10 skill');return b})()),fld('هدف ایجنت (goal)','agent_goal','این ایجنت دقیقا باید به چه چیزی برسد'),fld('پیشینه و تخصص ایجنت (backstory)','agent_backstory','چرا برای این کار مناسب است'),fld('باید (با ؛ جدا کن)','must'),fld('نباید (با ؛ جدا کن)','must_not'),
+  return h('div',{class:'panel'},h('h2',{},'🎯 ایجنت متخصص و قید'),fld('ایجنت یا skill متخصص این نود (role در CrewAI)','agent','مثلا ایجنت پژوهش مداوم'),h('label',{class:'f'},h('span',{},'نوع بخش'),h('select',{disabled:dis,onchange:e=>{const v=e.target.value;if(v)setMeta(n,'part',v);else n.meta=(n.meta||[]).filter(x=>x[0]!=='part');touch(true)}},[['','—'],['fixed','ثابت (برای همهٔ عناوین یکی)'],['dynamic','پویا (بر پایهٔ عنوان شغلی)']].map(([v,l])=>h('option',{value:v,selected:meta(n,'part')===v},l)))),fld('skillهای کاندید (top 10، با ؛ جدا کن)','skills_top10','نتیجهٔ جستجو؛ یکی انتخاب یا skill تازه ساخته شود'),h('div',{class:'row',style:'margin:-2px 0 6px'},(()=>{const b=h('button',{class:'sm',title:'دستور جستجوی ۱۰ skill مرتبط برای Claude',onclick:async()=>{const t=skillSearchPrompt(p);try{await navigator.clipboard.writeText(t);b.textContent='کپی شد ✓'}catch(e){b.textContent='کپی نشد'}}},'🔎 کپی دستور جستجوی top 10 skill');return b})()),fld('هدف ایجنت (goal)','agent_goal','این ایجنت دقیقا باید به چه چیزی برسد'),fld('پیشینه و تخصص ایجنت (backstory)','agent_backstory','چرا برای این کار مناسب است'),fld('باید (با ؛ جدا کن)','must'),fld('نباید (با ؛ جدا کن)','must_not'),
     h('label',{class:'f'},h('span',{},'وضعیت نود'),h('select',{disabled:dis,onchange:e=>{const v=e.target.value;if(v)setMeta(n,'stage_status',v);else n.meta=(n.meta||[]).filter(x=>x[0]!=='stage_status');touch(true)}},[['','—'],['simple','ساده (هنوز تکمیل نشده)'],['done','تکمیل شده']].map(([v,l])=>h('option',{value:v,selected:meta(n,'stage_status')===v},l)))))}
 function skillSearchPrompt(p){const n=IDX.get(p);return `در پروژهٔ flow-archive برای این نود ایجنت متخصص و skill پیدا کن:
 مسیر: ${p}
@@ -1370,6 +1432,7 @@ function nodeEl(n,p,b,full){
   const ex=[nest?h('span',{class:'grip','data-grip':p,title:'بکش تا جابه‌جا شود'},'⠿'):null,ord?h('span',{class:'ord',title:'ترتیب در این فرایند'},toFa(ord)):null,nest?h('button',{class:'lkb','data-lock':p,title:lk?'قفل است؛ برای باز کردن کلیک کن':'قفلش کن تا تغییر نکند'},lk?'🔒':'🔓'):null,
     ws.length?h('span',{class:'wb',title:ws.join('\n')},'⚠ '+toFa(ws.length)):null,
     RV.get(p)?h('span',{class:'rvt',title:RV.get(p).msg},{dup:'تکراری؟',empty:'اضافه؟',order:'ترتیب؟'}[RV.get(p).k]):null,
+    meta(n,'part')?h('span',{class:'prt '+meta(n,'part'),title:meta(n,'part')==='fixed'?'بخش ثابت: برای همهٔ عناوین یکی است':'بخش پویا: بر پایهٔ عنوان شغلی عوض می‌شود'},meta(n,'part')==='fixed'?'ثابت':'پویا'):null,
     isNew(n)?h('span',{class:'nwd',title:'جدید؛ جزئیاتش را در پنل ویرایش ببین'},'جدید'):null,
     (!CARDDET&&nest&&(meta(n,'agent')||extT||meta(n,'must')||meta(n,'must_not')))?h('span',{class:'dtl',title:[meta(n,'agent')&&'ایجنت: '+meta(n,'agent'),extT&&'ابزار: '+extT,meta(n,'must')&&'باید: '+meta(n,'must'),meta(n,'must_not')&&'نباید: '+meta(n,'must_not')].filter(Boolean).join('\n')+'\n(جزئیات در پنل ویرایش)'},(meta(n,'agent')?'🎯':'')+(extT?'🔌':'')+((meta(n,'must')||meta(n,'must_not'))?'⛔':'')):null];
   const mid=slot?h('div',{class:'slots'},
@@ -1402,9 +1465,10 @@ function focusOn(p){if(!IDX.has(p))return;if(p.split('.')[0]!==rootOfView()){go(
   FOC=p;expandTo(p);NEEDFIT=false;renderDia();if(p.includes('.')&&!lastVis().has(p)){}
   const tgt=lastVis().has(p)?p:null;if(tgt)fitTo(tgt)}
 function setVer(v){VER=v;NEEDFIT=true;renderVers();renderDia();renderInsp()}
-const APP_VER=14,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
+const APP_VER=15,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
 const VIEW_VERS=[[1,'عبور','نمایش ۱','آرتیفکت v۴','۱۲:۵۹'],[2,'بازشدن درجا','نمایش ۲','آرتیفکت v۴','۱۲:۵۹'],[3,'درخت + کادرها','نمایش ۳','آرتیفکت v۴','۱۲:۵۹'],[4,'ترکیبی ۲+۳','نمایش ۴ (انتخاب تو)','آرتیفکت v۵','۱۳:۰۵']];
 const CHANGELOG=[
+ [15,'نمونهٔ پخته: ربات استعدادیابی','فرایند کامل ربات استعدادیابی، غربال و رزومه با ۹ مرحلهٔ جمع‌شده، بخش‌های ثابت و پویا و پیش‌نیازهای شروع','۱۵:۳۰'],
  [14,'ایجنت استخدام و جستجوی skill','تمپلیت ایجنت استخدام با جستجوی ۱۰ skill، انتخاب یا ساخت skill تازه و ورک‌فلو استخدام زیر خود ایجنت؛ فیلد skillهای کاندید و دستور جستجو برای Claude','۱۵:۱۰'],
  [13,'بازبینی تکراری و اضافه','کادر قرمز روی قسمت‌های تکراری، خالی یا بی‌ترتیب با پیشنهاد حذف، ادغام و ترتیب خودکار','۱۴:۵۵'],
  [12,'حذف، برچسب جدید و CrewAI','دکمهٔ حذف نود، برچسب «جدید» در ویرایش، کارت خلوت‌تر با جزئیات در ویرایش، فیلدهای goal و backstory و خروجی CrewAI','۱۴:۴۰'],
@@ -2065,6 +2129,7 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&
     if(st&&st.cur&&st.base){G=st.G||{};BASETEXT=st.base;BASEPARSE=parseC4(BASETEXT);M=parseC4(st.cur);reindex();deriveG();G=st.G&&st.G.cats?Object.assign(G,{expires:st.G.expires||24}):G;HIST=[st.cur]}
     else loadText(BASE,true)
   }catch(e){G={};loadText(BASE,true)}
+  try{if(!localStorage.getItem('orgStudio.seed14')){if(addTalentBot()){MACRO=true;NEEDFIT=true;HIST=[emitC4(M)];save()}localStorage.setItem('orgStudio.seed14','1')}}catch(e){if(addTalentBot()){MACRO=true;NEEDFIT=true}}
   $('#cvhint').textContent=HINT;renderVers();showTab()})();
 window.__studio={parseC4,emitC4,get M(){return M},get BASE(){return BASE},cur,diff,addChild,IDX:()=>IDX,select,setLock,loadText};
 </script>
