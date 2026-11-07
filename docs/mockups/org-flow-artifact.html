@@ -1067,6 +1067,16 @@ const TPLS=[
    {t:'استخراج ویژگی و نمونه‌کد',kind:'autoStep',skill:'—',out:'جدول ویژگی‌ها + لینک نمونه‌کد'},
    {t:'نقد: مزایا، معایب، ریسک',kind:'autoStep',skill:'—',out:'برای هر ایده مزایا، معایب و ریسک',unk:1},
    {t:'پیشنهاد به‌روزرسانی ایده',kind:'askStep',skill:'—',out:'فهرست تغییرهای پیشنهادی؛ اعمال فقط با تأیید'}]},
+ {id:'hireagent',t:'ایجنت استخدام با جستجوی skill',d:'ایجنت اول ۱۰ skill مرتبط را جستجو می‌کند، یکی را برمی‌دارد یا skill تازه می‌سازد؛ ورک‌فلو استخدام آن عنوان زیر خود ایجنت می‌آید',kids:[
+   {t:'جستجوی ۱۰ skill مرتبط',kind:'autoStep',skill:'find-skills',agent:'ایجنت استخدام',out:'فهرست ۱۰ skill با دلیل تناسب و عیب هرکدام',ext:'Skill registry (SearchSkills)',extKind:'API'},
+   {t:'انتخاب skill موجود یا ساخت skill تازه',kind:'askStep',skill:'skill-creator',agent:'ایجنت استخدام',out:'یک skill برگزیده یا طرح skill جدید برای این عنوان شغلی'},
+   {t:'ورک‌فلو استخدام این عنوان',kind:'autoStep',skill:'—',agent:'ایجنت استخدام',out:'ورک‌فلو کامل استخدام همین عنوان زیر همین ایجنت',kids:[
+     {t:'تعریف عنوان، شرایط و حقوق',kind:'askStep',skill:'—',out:'شرح شغل + حقوق + شرایط'},
+     {t:'نوشتن و انتشار آگهی',kind:'gateStep',skill:'—',out:'آگهی تأییدشده منتشر شده'},
+     {t:'غربال رزومه‌ها',kind:'autoStep',skill:'—',out:'فهرست کوتاه با دلیل'},
+     {t:'مصاحبه و ثبت نمره',kind:'askStep',skill:'—',out:'نمرهٔ هر داوطلب'},
+     {t:'پیشنهاد و تصمیم نهایی',kind:'gateStep',skill:'—',out:'تصمیم نهایی انسان'}]},
+   {t:'تأیید و ذخیرهٔ skill برای استخدام‌های بعدی',kind:'gateStep',skill:'—',agent:'ایجنت استخدام',out:'skill تأییدشده در کتابخانه'}]},
  {id:'sched',t:'زمان‌بندی مصاحبه',d:'پیدا کردن زمان آزاد، تأیید با داوطلب، ساخت دعوت‌نامه',kids:[
    {t:'پیدا کردن زمان آزاد',kind:'autoStep',skill:'—',out:'۳ زمان پیشنهادی',ext:'Google Calendar MCP',extKind:'MCP'},
    {t:'تأیید زمان با داوطلب',kind:'askStep',skill:'—',out:'زمان قطعی'},
@@ -1176,8 +1186,17 @@ function archPanel(){
     goal,bs,prev,must,not,h('div',{class:'row',style:'margin-top:6px'},h('button',{class:'sm pri',onclick:()=>applyBlueprint(bs.value,goal.value.trim(),must.value.trim(),not.value.trim())},'＋ ساخت نودهای ساده روی نقشهٔ کل'),cp),ta)}
 function metaPanel(n,p){const dis=lockedN(n);
   const fld=(lbl,k,ph)=>h('label',{class:'f'},h('span',{},lbl),h('input',{value:meta(n,k),placeholder:ph||'',disabled:dis,oninput:e=>{const v=e.target.value;if(v)setMeta(n,k,v);else n.meta=(n.meta||[]).filter(x=>x[0]!==k);touch()}}));
-  return h('div',{class:'panel'},h('h2',{},'🎯 ایجنت متخصص و قید'),fld('ایجنت یا skill متخصص این نود (role در CrewAI)','agent','مثلا ایجنت پژوهش مداوم'),fld('هدف ایجنت (goal)','agent_goal','این ایجنت دقیقا باید به چه چیزی برسد'),fld('پیشینه و تخصص ایجنت (backstory)','agent_backstory','چرا برای این کار مناسب است'),fld('باید (با ؛ جدا کن)','must'),fld('نباید (با ؛ جدا کن)','must_not'),
+  return h('div',{class:'panel'},h('h2',{},'🎯 ایجنت متخصص و قید'),fld('ایجنت یا skill متخصص این نود (role در CrewAI)','agent','مثلا ایجنت پژوهش مداوم'),fld('skillهای کاندید (top 10، با ؛ جدا کن)','skills_top10','نتیجهٔ جستجو؛ یکی انتخاب یا skill تازه ساخته شود'),h('div',{class:'row',style:'margin:-2px 0 6px'},(()=>{const b=h('button',{class:'sm',title:'دستور جستجوی ۱۰ skill مرتبط برای Claude',onclick:async()=>{const t=skillSearchPrompt(p);try{await navigator.clipboard.writeText(t);b.textContent='کپی شد ✓'}catch(e){b.textContent='کپی نشد'}}},'🔎 کپی دستور جستجوی top 10 skill');return b})()),fld('هدف ایجنت (goal)','agent_goal','این ایجنت دقیقا باید به چه چیزی برسد'),fld('پیشینه و تخصص ایجنت (backstory)','agent_backstory','چرا برای این کار مناسب است'),fld('باید (با ؛ جدا کن)','must'),fld('نباید (با ؛ جدا کن)','must_not'),
     h('label',{class:'f'},h('span',{},'وضعیت نود'),h('select',{disabled:dis,onchange:e=>{const v=e.target.value;if(v)setMeta(n,'stage_status',v);else n.meta=(n.meta||[]).filter(x=>x[0]!=='stage_status');touch(true)}},[['','—'],['simple','ساده (هنوز تکمیل نشده)'],['done','تکمیل شده']].map(([v,l])=>h('option',{value:v,selected:meta(n,'stage_status')===v},l)))))}
+function skillSearchPrompt(p){const n=IDX.get(p);return `در پروژهٔ flow-archive برای این نود ایجنت متخصص و skill پیدا کن:
+مسیر: ${p}
+عنوان: ${titleName(n)}
+ایجنت فعلی: ${meta(n,'agent')||'—'}
+خروجی مورد انتظار: ${outText(n)||'نامشخص'}
+باید: ${meta(n,'must')||'—'} | نباید: ${meta(n,'must_not')||'—'}
+
+کار تو: ۱) با جستجوی skill (فهرست skillهای موجود و رجیستری) ۱۰ skill مرتبط را پیدا کن؛ برای هرکدام دلیل تناسب، مزیت و عیب بنویس. ۲) بگو کدام را همین‌طور استفاده کنیم، کدام را با تغییر، و اگر هیچ‌کدام کافی نیست طرح یک skill تازه برای این عنوان بده (ورودی، خروجی، قید). ۳) ورک‌فلو کامل این عنوان را زیر همین ایجنت بچین (قدم‌های کوتاه، هر قدم یک skill و یک خروجی). ۴) نتیجهٔ ۱۰ skill را در metadata با کلید skills_top10 بنویس. قسمت‌های #locked را تغییر نده.
+خروجی: فهرست ۱۰ skill با توصیه، و بعد از تأیید من متن کامل recruitment.c4 به‌روز شده.`}
 /* CrewAI: Agent (role, goal, backstory) + Task (description, expected_output, agent, context, human_input) */
 function crewYaml(p){
   const n=IDX.get(p);if(!n)return'';
@@ -1257,7 +1276,7 @@ async function spliceStep(refP,dir,node){
     if(old){const lab=old.label;old.to=newP;old.c=lca(nbP,newP);M.rels.push({from:newP,to:refP,label:lab||'بعد',c:lca(newP,refP)})}
     else M.rels.push({from:newP,to:refP,label:'بعد',c:lca(newP,refP)})}
   if(node._rels){node._rels.forEach(r=>M.rels.push({from:newP+'.'+r.from,to:newP+'.'+r.to,label:r.label||'',c:lca(newP+'.'+r.from,newP+'.'+r.to)}));delete node._rels}
-  else node.children.forEach((c,k)=>{if(k<node.children.length-1)M.rels.push({from:newP+'.'+c.id,to:newP+'.'+node.children[k+1].id,label:'بعد',c:lca(newP+'.'+c.id,newP+'.'+node.children[k+1].id)})});
+  else{const chainKids=(nd,pth)=>nd.children.forEach((c,k)=>{if(k<nd.children.length-1)M.rels.push({from:pth+'.'+c.id,to:pth+'.'+nd.children[k+1].id,label:'بعد',c:lca(pth+'.'+c.id,pth+'.'+nd.children[k+1].id)});chainKids(c,pth+'.'+c.id)});chainKids(node,newP)}
   reindex();FOC=newP;if(node.children.length)EXP.add(newP);expandTo(newP);SEL=null;SELE=null;touch(true);return true}
 async function acceptSug(dir,k){const n=IDX.get(FOC);if(!n)return;const sc=seqSug(n);if(!sc)return;const sp=sc[dir][k];if(!sp)return;await spliceStep(FOC,dir,mkNode(sp,'n'))}
 let USER_TPLS=[];try{USER_TPLS=JSON.parse(localStorage.getItem('orgStudio.tpls')||'[]')}catch(e){}
@@ -1272,7 +1291,7 @@ async function addTplTo(tid,tp){const node=tplNode(tid);const t=tp&&IDX.get(tp);
   if(lockedN(t)){await ask('این قسمت قفل است؛ تمپلیت اضافه نمی‌شود.',{info:1});return}
   if(top){await spliceStep(tp,'after',node);return}
   if(!isStep(node)&&!(node.kind==='role'||node.kind==='section')){await ask('این تمپلیت یک فرایند کامل است؛ آن را فقط در «نقشهٔ کل» اضافه کن.',{info:1});return}
-  if(isStep(t)&&parentPath(tp).includes('.')){await spliceStep(tp,'after',node);return}
+  if(isStep(t)&&parentPath(tp)&&(parentPath(tp).includes('.')||!t.children.length)){await spliceStep(tp,'after',node);return}
   if(t.children.length){const last=tp+'.'+t.children[t.children.length-1].id;await spliceStep(last,'after',node);return}
   node.id=uniqueId(t.children,'n');t.children.push(node);reindex();FOC=tp+'.'+node.id;expandTo(FOC);EXP.add(FOC);touch(true)}
 async function addTplMacro(tid,dir){const chain=M.nodes.filter(inChain);if(!chain.length)return;const node=tplNode(tid);if(!node)return;await spliceStep(dir==='before'?chain[0].id:chain[chain.length-1].id,dir,node)}
@@ -1383,9 +1402,10 @@ function focusOn(p){if(!IDX.has(p))return;if(p.split('.')[0]!==rootOfView()){go(
   FOC=p;expandTo(p);NEEDFIT=false;renderDia();if(p.includes('.')&&!lastVis().has(p)){}
   const tgt=lastVis().has(p)?p:null;if(tgt)fitTo(tgt)}
 function setVer(v){VER=v;NEEDFIT=true;renderVers();renderDia();renderInsp()}
-const APP_VER=13,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
+const APP_VER=14,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
 const VIEW_VERS=[[1,'عبور','نمایش ۱','آرتیفکت v۴','۱۲:۵۹'],[2,'بازشدن درجا','نمایش ۲','آرتیفکت v۴','۱۲:۵۹'],[3,'درخت + کادرها','نمایش ۳','آرتیفکت v۴','۱۲:۵۹'],[4,'ترکیبی ۲+۳','نمایش ۴ (انتخاب تو)','آرتیفکت v۵','۱۳:۰۵']];
 const CHANGELOG=[
+ [14,'ایجنت استخدام و جستجوی skill','تمپلیت ایجنت استخدام با جستجوی ۱۰ skill، انتخاب یا ساخت skill تازه و ورک‌فلو استخدام زیر خود ایجنت؛ فیلد skillهای کاندید و دستور جستجو برای Claude','۱۵:۱۰'],
  [13,'بازبینی تکراری و اضافه','کادر قرمز روی قسمت‌های تکراری، خالی یا بی‌ترتیب با پیشنهاد حذف، ادغام و ترتیب خودکار','۱۴:۵۵'],
  [12,'حذف، برچسب جدید و CrewAI','دکمهٔ حذف نود، برچسب «جدید» در ویرایش، کارت خلوت‌تر با جزئیات در ویرایش، فیلدهای goal و backstory و خروجی CrewAI','۱۴:۴۰'],
  [11,'تاریخچهٔ نسخه‌ها','نام، شمارهٔ نسخه و تاریخ ساخت در خود نقشه','۱۴:۲۰'],
