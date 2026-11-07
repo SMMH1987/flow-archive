@@ -1,0 +1,496 @@
+// نمونهٔ «سازمان کامل از یک ایده» — ایده: اتوماسیون کامل استخدام — 2026-11-06
+// هر بخش = یک نقش سازمانی · هر قدم: technology = skill · description = out · آیکون = وضعیت قفل
+// 🔒 = قفل (فقط با تأیید تو) · 🔓 = باز · tag designed = بخش ناشناخته که از ترکیب skillها طراحی شد
+// رنگ قدم = نوع after: ask نارنجی · auto سبز · gate قرمز · route بنفش
+
+specification {
+  element actor {
+    style {
+      shape person
+      color secondary
+    }
+  }
+  element orgBox {
+    style {
+      color slate
+    }
+  }
+  element role {
+    style {
+      color muted
+    }
+  }
+  element askStep {
+    notation "after: ask — خروجی را نشان بده و نظر بگیر"
+    style {
+      color amber
+    }
+  }
+  element autoStep {
+    notation "after: auto — خودکار برو قدم بعد"
+    style {
+      color green
+    }
+  }
+  element gateStep {
+    notation "after: gate — بایست تا کاربر تأیید کند"
+    style {
+      color red
+    }
+  }
+  element routeStep {
+    notation "after: route — شاخه را از روی نتیجه انتخاب کن"
+    style {
+      color indigo
+      shape queue
+    }
+  }
+  element flow {
+    style {
+      color slate
+    }
+  }
+  element section {
+    style {
+      color muted
+    }
+  }
+  tag locked
+  tag designed
+  tag unknownSkill
+}
+
+model {
+  owner = actor 'مدیر / کارفرما' {
+    description 'ایده می‌دهد · در دروازه‌ها تأیید می‌کند · قفل را او می‌زند'
+  }
+  candidate = actor 'کاندیدا' {
+    description 'آگهی را می‌بیند · پرسشنامه پر می‌کند · مصاحبه می‌دهد'
+  }
+
+  company = orgBox 'سازمان اتوماسیون استخدام' {
+    description '۹ نقش · هر قدم با skill خودش · بخش ناشناخته از skill طراحی شده'
+
+    r1 = role '🔓 1 · استراتژیست استخدام' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/compass.svg
+      goal = askStep 'هدف و نقش' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: identify-assumptions-new'
+        description 'out: نقش + تعداد + بودجه + فرض‌های پرخطر'
+      }
+      spec = askStep 'شرح شغل و معیار موفقیت' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: first-principles'
+        description 'out: وظایف + مهارت‌های ضروری + معیار ۹۰ روز'
+      }
+    }
+
+    r2 = role '🔓 2 · نویسندهٔ آگهی و برند کارفرما' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/pencil-square.svg
+      ad = autoStep 'طراحی آگهی' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: marketing-skills:copywriting'
+        description 'out: متن آگهی + ۳ تیتر + CTA'
+      }
+      brand = autoStep 'لحن و هویت کارفرما' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: ui-brand'
+        description 'out: لحن + ۳ جمله دربارهٔ فرهنگ سازمان'
+      }
+    }
+
+    r3 = role '🔓 3 · مدیر انتشار و جذب' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/megaphone.svg
+      post = gateStep 'انتشار آگهی' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: marketing-skills:social'
+        description 'out: پیش‌نویس برای هر کانال؛ انتشار فقط بعد از تأیید'
+      }
+      track = autoStep 'ردیابی منبع رزومه' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: marketing-skills:analytics'
+        description 'out: هر کانال چند رزومه آورد'
+      }
+    }
+
+    r4 = role '🔓 4 · طراح پرسشنامهٔ پویا (بخش طراحی‌شده)' {
+      #designed
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/ui-checks.svg
+      derive = autoStep 'استخراج سؤال از آگهی' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: grilling + fp-qmark-to-robot (ترکیب)'
+        description 'out: بانک سؤال برای هر مهارتِ آگهی + وزن'
+      }
+      branch = routeStep 'پاسخ ضعیف است؟' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'after: route'
+        description 'ضعیف ← سؤال عمیق‌تر · قوی ← مهارت بعدی'
+      }
+      form = autoStep 'ساخت فرم تعاملی' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: agent-skills:frontend-ui-engineering'
+        description 'out: فرم HTML با منطق شرطی (۴ زیرقدم داخلش)'
+        f1 = autoStep 'ساخت اسکلت فرم' {
+          icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+          technology 'skill: agent-skills:frontend-ui-engineering'
+        }
+        f2 = autoStep 'منطق شرطی سؤال‌ها' {
+          icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+          technology 'skill: fp-qmark-to-robot'
+        }
+        f3 = askStep 'پیش‌نمایش و تأیید' {
+          icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+          technology 'skill: ui-before-after'
+        }
+        f4 = autoStep 'ذخیرهٔ پاسخ‌ها' {
+          icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+          technology 'skill: —'
+        }
+        f1 -> f2 'بعد'
+        f2 -> f3 'بعد'
+        f3 -> f4 'تأیید'
+      }
+    }
+
+    r5 = role '🔓 5 · تحلیل‌گر غربال' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/funnel.svg
+      score = autoStep 'امتیازدهی رزومه + پرسشنامه' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: analytics-office:explore-my-data'
+        description 'out: امتیاز ۰ تا ۱۰ + دلیل برای هر نفر'
+      }
+      d1 = routeStep 'امتیاز ۷+ دارد؟' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'after: route'
+      }
+      reject = gateStep 'پیام رد مؤدبانه' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: marketing-skills:copywriting'
+        description 'out: پیش‌نویس پیام، بدون ارسال خودکار'
+      }
+    }
+
+    r6 = role '🔓 6 · مصاحبه‌گر' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/chat-dots.svg
+      qs = autoStep 'سؤال‌های مصاحبه' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: grilling'
+        description 'out: ۱۰ سؤال + یک سناریوی عملی'
+      }
+      iv = askStep 'مصاحبه و ثبت نمره' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: نمرهٔ هر سؤال از تو'
+      }
+      d2 = routeStep 'قبول شد؟' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'after: route'
+      }
+    }
+
+    r7 = role '🔓 7 · ارزیاب KPI' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/graph-up.svg
+      kpi = askStep 'تعریف KPI نقش' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: analytics-office:kpi-contract'
+        description 'out: ۳ KPI + فرمول + منبع داده + بازهٔ بازبینی'
+      }
+      board = autoStep 'داشبورد ارزیابی' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: analytics-office:review-my-dashboard'
+        description 'out: نمای نمره‌ها + روند ۳۰/۶۰/۹۰ روز'
+      }
+    }
+
+    r8 = role '🔒 8 · حقوقی و آنبوردینگ' {
+      #locked
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/shield-lock.svg
+      offer = gateStep 'قرارداد' {
+        #locked
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/lock-fill.svg
+        technology 'skill: anthropic-skills:docx'
+        description 'out: قرارداد.docx با شرایط مرحلهٔ ۱ (قفل از فلوی قبلی)'
+      }
+      accept = gateStep 'پیشنهاد پذیرفته شد؟' {
+        #locked
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/lock-fill.svg
+        technology 'after: gate'
+      }
+      onboard = askStep 'برنامهٔ ورود (ناشناخته — skill پیشنهادی منتظر «بله»)' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill پیشنهادی: marketing-skills:onboarding'
+        description 'out: چک‌لیست هفتهٔ اول + دسترسی‌ها + معرفی تیم'
+      }
+    }
+
+    r9 = role '🔓 9 · مسیریاب پروژه‌ها (ارجاع به پروژه‌های خودت)' {
+      #designed
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/diagram-3.svg
+      reg = askStep 'دفتر ظرفیت پروژه‌ها' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'فایل: capabilities.yaml — هر پروژه چه کاری می‌کند و از کجا صدا زده می‌شود'
+        description 'out: جدول «کار ← پروژه ← آدرس ← احراز هویت»'
+      }
+      legal = gateStep 'سؤال حقوقی / طراحی قرارداد ← ایجنت وکیل حق‌پرس' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'project: حق‌پرس (آدرس و پروتکل نامشخص — ask)'
+        description 'out: پاسخ حقوقی + پیش‌نویس قرارداد؛ ورود به قرارداد فقط با تأیید تو'
+      }
+      stt = autoStep 'تبدیل گفتار به متن ← API آوانگار (همدبیر)' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'api: api.hamdabir.co-ir.com:8440 · کلید avn_live از .env · callback با امضای whsec_'
+        description 'out: متن مصاحبه/صدا + هزینهٔ کسرشده از کیف پول'
+      }
+      miss = routeStep 'کاری که در دفتر نیست؟' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'after: route'
+        description 'نیست ← find-skills + تحقیق، بعد ثبت در دفتر'
+      }
+    }
+
+    r1.goal -> r1.spec 'بعد'
+    r1.spec -> r2.ad 'بعد'
+    r2.brand -> r2.ad 'لحن'
+    r2.ad -> r3.post 'بعد'
+    r3.post -> r4.derive 'منتشر شد'
+    r3.post -> r3.track 'پایش'
+    r4.derive -> r4.branch 'بعد'
+    r4.branch -> r4.derive 'ضعیف'
+    r4.branch -> r4.form 'کافی'
+    r4.form -> r5.score 'پاسخ‌ها'
+    r5.score -> r5.d1 'بعد'
+    r5.d1 -> r6.qs 'بله'
+    r5.d1 -> r5.reject 'نه'
+    r5.d1 -> r2.ad 'هیچ‌کس'
+    r6.qs -> r6.iv 'بعد'
+    r6.iv -> r6.d2 'بعد'
+    r6.d2 -> r8.offer 'قبول'
+    r6.d2 -> r5.reject 'رد'
+    r8.offer -> r8.accept 'بعد'
+    r8.accept -> r8.onboard 'بله'
+    r8.accept -> r5.score 'نه'
+    r8.onboard -> r7.kpi 'شروع کار'
+    r7.kpi -> r7.board 'بعد'
+    r9.reg -> r9.legal 'کار حقوقی'
+    r9.reg -> r9.stt 'کار صوتی'
+    r9.reg -> r9.miss 'کار تازه'
+    r9.legal -> r8.offer 'پیش‌نویس قرارداد'
+    r6.iv -> r9.stt 'ضبط مصاحبه'
+  }
+
+  hiring = flow 'استخدام فروشندهٔ درصدی' {
+    description '۶ بخش · هر قدم با skill خودش · find-skills پیشنهاد می‌دهد، کاربر تأیید می‌کند'
+
+    s1 = section '1 · تعریف نقش' {
+      goal = askStep 'هدف: استخدام فروشندهٔ درصدی برای {{product}}' {
+        technology 'skill: —'
+        description 'out: محصول + بازار + تعداد نفر'
+      }
+      role = askStep 'شرح شغل و مدل پورسانت' {
+        technology 'skill: first-principles'
+        description 'out: وظایف + درصد پورسانت + سقف + دورهٔ پرداخت'
+      }
+    }
+
+    s2 = section '2 · جذب' {
+      ad = autoStep 'آگهی استخدام' {
+        technology 'skill: marketing-skills:copywriting'
+        description 'out: متن آگهی + ۳ تیتر'
+      }
+      post = gateStep 'انتشار آگهی' {
+        technology 'skill: marketing-skills:social'
+        description 'out: پیش‌نویس پست در ۲ کانال، بدون انتشار خودکار'
+      }
+    }
+
+    s3 = section '3 · غربال' {
+      screen = autoStep 'غربال رزومه‌ها' {
+        technology 'skill: —'
+        description 'out: امتیاز ۰ تا ۱۰ برای هر نفر + دلیل'
+      }
+      d1 = routeStep 'کسی امتیاز ۷+ دارد؟' {
+        technology 'after: route'
+      }
+      reject = gateStep 'پیام رد مؤدبانه' {
+        technology 'skill: marketing-skills:copywriting'
+        description 'out: پیش‌نویس پیام، بدون ارسال خودکار'
+      }
+    }
+
+    s4 = section '4 · مصاحبه' {
+      qs = autoStep 'سؤال‌ها + نقش‌آفرینی فروش' {
+        technology 'skill: grilling'
+        description 'out: ۱۰ سؤال + یک سناریوی فروش تلفنی'
+      }
+      iv = askStep 'مصاحبه و ثبت نمره' {
+        technology 'skill: —'
+        description 'out: نمرهٔ هر سؤال از کاربر'
+      }
+      d2 = routeStep 'قبول شد؟' {
+        technology 'after: route'
+      }
+    }
+
+    s5 = section '5 · قرارداد 🔒' {
+      #locked
+      offer = gateStep 'قرارداد درصدی' {
+        #locked
+        technology 'skill: anthropic-skills:docx'
+        description 'out: قرارداد.docx با درصد و شرایط مرحلهٔ ۱'
+      }
+      d3 = gateStep 'پیشنهاد را پذیرفت؟' {
+        technology 'after: gate'
+      }
+    }
+
+    s6 = section '6 · شروع کار' {
+      kit = autoStep 'کیت فروش و آموزش' {
+        technology 'skill: marketing-skills:sales-enablement'
+        description 'out: اسکریپت فروش + پاسخ به اعتراض‌ها'
+      }
+      kpi = askStep 'هدف ۳۰ روز اول' {
+        technology 'skill: —'
+        description 'out: تعداد فروش + نرخ تبدیل + زمان بازبینی'
+      }
+    }
+
+    s1.goal -> s1.role 'بعد'
+    s1.role -> s2.ad 'بعد'
+    s2.ad -> s2.post 'بعد'
+    s2.post -> s3.screen 'تأیید شد'
+    s3.screen -> s3.d1 'بعد'
+    s3.d1 -> s4.qs 'بله'
+    s3.d1 -> s2.ad 'هیچ‌کس'
+    s4.qs -> s4.iv 'بعد'
+    s4.iv -> s4.d2 'بعد'
+    s4.d2 -> s5.offer 'قبول'
+    s4.d2 -> s3.reject 'رد'
+    s3.reject -> s3.screen 'نفر بعدی'
+    s5.offer -> s5.d3 'بعد'
+    s5.d3 -> s6.kit 'بله'
+    s5.d3 -> s3.screen 'نه'
+    s6.kit -> s6.kpi 'بعد'
+  }
+
+  owner -> hiring.s1.goal 'هدف و تأییدها'
+  candidate -> hiring.s3.screen 'رزومه'
+  candidate -> hiring.s4.iv 'مصاحبه'
+
+  owner -> company.r1.goal 'ایده و تأییدها'
+  candidate -> company.r4.form 'پاسخ'
+  candidate -> company.r6.iv 'مصاحبه'
+}
+
+views {
+  view index {
+    title 'سازمان استخدام — طرح کلی (general schematic)'
+    description 'اول کلیات: دو بازیگر و یک سازمان. روی جعبهٔ سازمان کلیک کنید.'
+    include *
+  }
+
+  view roles of company {
+    title 'نقش‌های سازمان'
+    description '۹ نقش؛ 🔒 قفل · 🔓 باز. روی هر نقش کلیک کنید.'
+    include *
+  }
+
+  view all of company {
+    title 'همهٔ قدم‌ها'
+    description 'skill (technology) + out (description) + آیکون قفل. رنگ = نوع after.'
+    include company.**
+    exclude company.r1, company.r2, company.r3, company.r4, company.r5, company.r6, company.r7, company.r8, company.r9
+  }
+
+  view nested of company.r4 {
+    title 'قدم داخل قدم — پرسشنامهٔ پویا'
+    description 'جعبهٔ «ساخت فرم» شفاف است و ۴ زیرقدمش داخلش دیده می‌شود.'
+    include *, form.*
+    style company.r4.form {
+      opacity 15%
+    }
+  }
+
+  view v1 of company.r1 {
+    title '1 · استراتژیست'
+    include *
+  }
+  view v2 of company.r2 {
+    title '2 · آگهی و برند'
+    include *
+  }
+  view v3 of company.r3 {
+    title '3 · انتشار و جذب'
+    include *
+  }
+  view v4 of company.r4 {
+    title '4 · پرسشنامهٔ پویا'
+    include *
+  }
+  view v5 of company.r5 {
+    title '5 · غربال'
+    include *
+  }
+  view v6 of company.r6 {
+    title '6 · مصاحبه'
+    include *
+  }
+  view v7 of company.r7 {
+    title '7 · KPI'
+    include *
+  }
+  view v9 of company.r9 {
+    title '9 · مسیریاب پروژه‌ها'
+    include *
+  }
+
+  view v8 of company.r8 {
+    title '8 · حقوقی و آنبوردینگ'
+    include *
+  }
+
+  view hiringOverview {
+    title 'استخدام فروشندهٔ درصدی — نمای کلی'
+    description 'اول کلیات: نقش‌ها و فلو. روی جعبهٔ فلو کلیک کنید تا بخش‌ها باز شوند.'
+    include *
+  }
+
+  view hiringRoles of hiring {
+    title 'بخش‌های فلو'
+    description 'هر جعبه یک بخش است؛ روی هر بخش کلیک کنید تا قدم‌هایش باز شود.'
+    include *
+  }
+
+  view hiringAll of hiring {
+    title 'همهٔ قدم‌ها'
+    description 'همهٔ ۱۴ قدم با skill (technology) و out (description). رنگ = نوع after.'
+    include hiring.**
+    exclude hiring.s1, hiring.s2, hiring.s3, hiring.s4, hiring.s5, hiring.s6
+  }
+
+  view hsec1 of hiring.s1 {
+    title '1 · تعریف نقش'
+    include *
+  }
+  view hsec2 of hiring.s2 {
+    title '2 · جذب'
+    include *
+  }
+  view hsec3 of hiring.s3 {
+    title '3 · غربال'
+    include *
+  }
+  view hsec4 of hiring.s4 {
+    title '4 · مصاحبه'
+    include *
+  }
+  view hsec5 of hiring.s5 {
+    title '5 · قرارداد'
+    include *
+  }
+  view hsec6 of hiring.s6 {
+    title '6 · شروع کار'
+    include *
+  }
+}

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ویرایشگر سازمان</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1c2330;--mute:#667085;--line:#e3e6ec;--ask:#f59e0b;--auto:#16a34a;--gate:#dc2626;--route:#6366f1;--acc:#2563eb}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#15181e;--card:#1e232c;--ink:#e8ebf0;--mute:#9aa4b2;--line:#2f3642}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 Tahoma,system-ui,sans-serif}
+header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;flex:1}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:5px 10px}
+button.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
+.layout{display:grid;grid-template-columns:1fr 320px;gap:14px;padding:14px;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.roles{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.role{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+.role.locked{border-color:var(--gate)}
+.rh{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.rh input{flex:1;font-weight:700}
+input,textarea,select{font:inherit;color:var(--ink);background:transparent;border:1px solid transparent;border-radius:6px;padding:3px 6px;width:100%}
+input:hover,textarea:hover{border-color:var(--line)}input:focus,textarea:focus{outline:2px solid var(--acc)}
+input:disabled,select:disabled{opacity:.6;cursor:not-allowed}
+.step{border:1px solid var(--line);border-inline-start:5px solid var(--auto);border-radius:8px;padding:6px;margin-top:8px}
+.step.t-ask{border-inline-start-color:var(--ask)}.step.t-gate{border-inline-start-color:var(--gate)}.step.t-route{border-inline-start-color:var(--route)}
+.step.locked{background:repeating-linear-gradient(135deg,transparent 0 8px,rgba(220,38,38,.06) 8px 16px)}
+.sub{margin-inline-start:14px}
+.sr{display:flex;gap:4px;align-items:center}.sr select{width:auto}
+small{color:var(--mute)}
+.side{display:flex;flex-direction:column;gap:12px;position:sticky;top:8px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+.panel h2{font-size:14px;margin:0 0 6px}
+textarea{border-color:var(--line);min-height:60px}
+.req{border-top:1px dashed var(--line);padding:4px 0;font-size:13px}
+dialog{width:min(820px,94vw);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px}
+pre{direction:ltr;text-align:left;max-height:55vh;overflow:auto;background:var(--bg);padding:8px;border-radius:8px;font-size:12px}
+.legend span{display:inline-block;margin-inline-end:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🧩 ویرایشگر سازمان — موکاپ زنده <small>(هرچه بخواهی همین‌جا عوض کن؛ در پایان «تبدیل به نهایی»)</small></h1>
+  <span class="legend"><span style="color:var(--ask)">■ ask</span><span style="color:var(--auto)">■ auto</span><span style="color:var(--gate)">■ gate</span><span style="color:var(--route)">■ route</span></span>
+  <button id="addRole">+ نقش</button>
+  <button id="reset">بازنشانی نمونه</button>
+  <button class="pri" id="final">تبدیل به نهایی (.c4)</button>
+</header>
+<div class="layout">
+  <main id="roles" class="roles"></main>
+  <aside class="side">
+    <div class="panel">
+      <h2>✍️ درخواست تغییر (بگو چه می‌خواهی)</h2>
+      <textarea id="reqText" placeholder="مثلاً: قدم حقوقی را به حق‌پرس وصل کن و قفلش کن"></textarea>
+      <button id="reqAdd">ثبت درخواست</button>
+      <div id="reqs"></div>
+      <small>درخواست‌ها فهرست می‌شوند؛ Claude آن‌ها را اعمال می‌کند یا خودت مستقیم روی کارت‌ها ویرایش کن.</small>
+    </div>
+    <div class="panel">
+      <h2>💡 پیشنهاد Claude</h2>
+      <div id="sugg" style="font-size:13px"></div>
+    </div>
+  </aside>
+</div>
+<dialog id="dlg"><h2>خروجی نهایی: recruitment.c4</h2><pre id="out"></pre>
+  <button id="copy" class="pri">کپی</button> <button id="dl">دانلود .c4</button> <button id="close">بستن</button></dialog>
+<script>
+const TYPES=['ask','auto','gate','route'];
+const SAMPLE=()=>({roles:[
+ {n:'استراتژیست استخدام',l:0,steps:[
+  {n:'هدف و نقش',t:'ask',s:'identify-assumptions-new',o:'نقش + تعداد + بودجه',l:0,sub:[]},
+  {n:'شرح شغل و معیار موفقیت',t:'ask',s:'first-principles',o:'وظایف + معیار ۹۰ روز',l:0,sub:[]}]},
+ {n:'نویسندهٔ آگهی و برند',l:0,steps:[
+  {n:'طراحی آگهی',t:'auto',s:'marketing-skills:copywriting',o:'متن آگهی + ۳ تیتر',l:0,sub:[]},
+  {n:'لحن و هویت کارفرما',t:'auto',s:'ui-brand',o:'لحن + ۳ جمله فرهنگ',l:0,sub:[]}]},
+ {n:'مدیر انتشار و جذب',l:0,steps:[
+  {n:'انتشار آگهی',t:'gate',s:'marketing-skills:social',o:'پیش‌نویس هر کانال؛ انتشار با تأیید',l:0,sub:[]},
+  {n:'ردیابی منبع رزومه',t:'auto',s:'marketing-skills:analytics',o:'هر کانال چند رزومه',l:0,sub:[]}]},
+ {n:'طراح پرسشنامهٔ پویا',l:0,steps:[
+  {n:'استخراج سؤال از آگهی',t:'auto',s:'grilling + fp-qmark-to-robot',o:'بانک سؤال + وزن',l:0,sub:[]},
+  {n:'پاسخ ضعیف است؟',t:'route',s:'after: route',o:'ضعیف ← سؤال عمیق‌تر',l:0,sub:[]},
+  {n:'ساخت فرم تعاملی',t:'auto',s:'frontend-ui-engineering',o:'فرم HTML با منطق شرطی',l:0,sub:[
+    {n:'اسکلت فرم',t:'auto',s:'frontend-ui-engineering',o:'',l:0},
+    {n:'منطق شرطی سؤال‌ها',t:'auto',s:'fp-qmark-to-robot',o:'',l:0},
+    {n:'پیش‌نمایش و تأیید',t:'ask',s:'ui-before-after',o:'',l:0},
+    {n:'ذخیرهٔ پاسخ‌ها',t:'auto',s:'—',o:'',l:0}]}]},
+ {n:'تحلیل‌گر غربال',l:0,steps:[
+  {n:'امتیازدهی رزومه + پرسشنامه',t:'auto',s:'analytics-office:explore-my-data',o:'امتیاز ۰ تا ۱۰ + دلیل',l:0,sub:[]},
+  {n:'امتیاز ۷+ دارد؟',t:'route',s:'after: route',o:'',l:0,sub:[]},
+  {n:'پیام رد مؤدبانه',t:'gate',s:'marketing-skills:copywriting',o:'پیش‌نویس بدون ارسال',l:0,sub:[]}]},
+ {n:'مصاحبه‌گر',l:0,steps:[
+  {n:'سؤال‌های مصاحبه',t:'auto',s:'grilling',o:'۱۰ سؤال + سناریو',l:0,sub:[]},
+  {n:'مصاحبه و ثبت نمره',t:'ask',s:'—',o:'نمرهٔ هر سؤال',l:0,sub:[]},
+  {n:'قبول شد؟',t:'route',s:'after: route',o:'',l:0,sub:[]}]},
+ {n:'ارزیاب KPI',l:0,steps:[
+  {n:'تعریف KPI نقش',t:'ask',s:'analytics-office:kpi-contract',o:'۳ KPI + فرمول + منبع',l:0,sub:[]},
+  {n:'داشبورد ارزیابی',t:'auto',s:'analytics-office:review-my-dashboard',o:'روند ۳۰/۶۰/۹۰ روز',l:0,sub:[]}]},
+ {n:'حقوقی و آنبوردینگ',l:1,steps:[
+  {n:'قرارداد',t:'gate',s:'anthropic-skills:docx',o:'قرارداد.docx',l:1,sub:[]},
+  {n:'پیشنهاد پذیرفته شد؟',t:'gate',s:'after: gate',o:'',l:1,sub:[]},
+  {n:'برنامهٔ ورود',t:'ask',s:'marketing-skills:onboarding (پیشنهادی)',o:'چک‌لیست هفتهٔ اول',l:0,sub:[]}]},
+ {n:'مسیریاب پروژه‌ها',l:0,steps:[
+  {n:'دفتر ظرفیت پروژه‌ها',t:'ask',s:'capabilities.yaml',o:'کار ← پروژه ← آدرس ← احراز',l:0,sub:[]},
+  {n:'سؤال حقوقی/قرارداد ← ایجنت وکیل حق‌پرس',t:'gate',s:'project: حق‌پرس (آدرس نامشخص)',o:'پاسخ + پیش‌نویس؛ با تأیید تو',l:0,sub:[]},
+  {n:'گفتار به متن ← API آوانگار',t:'auto',s:'api.hamdabir.co-ir.com:8440',o:'متن + هزینهٔ کسرشده',l:0,sub:[]},
+  {n:'کاری که در دفتر نیست؟',t:'route',s:'after: route',o:'find-skills + تحقیق، بعد ثبت',l:0,sub:[]}]}
+],reqs:[]});
+let S; try{S=JSON.parse(localStorage.getItem('orgEditor'))}catch(e){}
+if(!S||!S.roles)S=SAMPLE();
+const save=()=>{try{localStorage.setItem('orgEditor',JSON.stringify(S))}catch(e){}};
+const E=(t,a={},...c)=>{const e=document.createElement(t);Object.entries(a).forEach(([k,v])=>k.startsWith('on')?e.addEventListener(k.slice(2),v):v===true?e.setAttribute(k,''):v!==false&&e.setAttribute(k,v));c.flat().forEach(x=>e.append(x));return e};
+function stepEl(st,list,i,isSub){
+  const L=!!st.l;
+  const f=(k,ph,w)=>{const x=E('input',{value:st[k]||'',placeholder:ph,disabled:L,oninput:ev=>{st[k]=ev.target.value;save()}});return x};
+  const sel=E('select',{disabled:L,onchange:ev=>{st.t=ev.target.value;save();render()}},...TYPES.map(t=>E('option',{value:t,selected:t===st.t},t)));
+  const lock=E('button',{title:'قفل/باز (قفل = غیرقابل‌ویرایش)',onclick:()=>{st.l=st.l?0:1;save();render()}},L?'🔒':'🔓');
+  const del=E('button',{disabled:L,title:'حذف',onclick:()=>{list.splice(i,1);save();render()}},'✕');
+  const kids=[E('div',{class:'sr'},lock,f('n','نام قدم'),sel,del),f('s','skill / پروژه'),f('o','out: خروجی مورد انتظار')];
+  if(!isSub){
+    (st.sub||[]).forEach((c,j)=>kids.push(E('div',{class:'sub'},stepEl(c,st.sub,j,true))));
+    kids.push(E('button',{disabled:L,onclick:()=>{(st.sub=st.sub||[]).push({n:'زیرقدم تازه',t:'auto',s:'—',o:'',l:0});save();render()}},'+ زیرقدم'));
+  }
+  return E('div',{class:'step t-'+st.t+(L?' locked':'')},...kids);
+}
+function render(){
+  const root=document.getElementById('roles');root.replaceChildren();
+  S.roles.forEach((r,ri)=>{
+    const L=!!r.l;
+    const head=E('div',{class:'rh'},
+      E('button',{onclick:()=>{r.l=r.l?0:1;r.steps.forEach(s=>s.l=r.l);save();render()},title:'قفل کل نقش'},L?'🔒':'🔓'),
+      E('input',{value:r.n,disabled:L,oninput:ev=>{r.n=ev.target.value;save()}}),
+      E('button',{disabled:L,onclick:()=>{S.roles.splice(ri,1);save();render()}},'✕'));
+    const body=r.steps.map((s,i)=>stepEl(s,r.steps,i,false));
+    const add=E('button',{disabled:L,style:'margin-top:8px',onclick:()=>{r.steps.push({n:'قدم تازه',t:'ask',s:'—',o:'',l:0,sub:[]});save();render()}},'+ قدم');
+    root.append(E('div',{class:'role'+(L?' locked':'')},head,...body,add));
+  });
+  const rq=document.getElementById('reqs');rq.replaceChildren();
+  S.reqs.forEach((q,i)=>rq.append(E('div',{class:'req'},(q.done?'✅ ':'⏳ ')+q.t+' ',E('button',{onclick:()=>{q.done=!q.done;save();render()}},'تغییر وضعیت'))));
+}
+const q=s=>"'"+String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"'";
+const KIND={ask:'askStep',auto:'autoStep',gate:'gateStep',route:'routeStep'};
+function toC4(){
+  const sp=`specification {
+  element actor { style { shape person
+      color secondary } }
+  element orgBox { style { color slate } }
+  element role { style { color muted } }
+  element askStep { style { color amber } }
+  element autoStep { style { color green } }
+  element gateStep { style { color red } }
+  element routeStep { style {
+      color indigo
+      shape queue } }
+  tag locked
+}
+`;
+  const U='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/';
+  const ic=l=>`icon ${U}${l?'lock-fill':'unlock'}.svg`;
+  let m="model {\n  owner = actor 'مدیر / کارفرما'\n  candidate = actor 'کاندیدا'\n\n  company = orgBox 'سازمان' {\n";
+  S.roles.forEach((r,i)=>{
+    m+=`    r${i+1} = role ${q((r.l?'🔒 ':'🔓 ')+(i+1)+' · '+r.n)} {\n${r.l?'      #locked\n':''}`;
+    r.steps.forEach((s,j)=>{
+      m+=`      s${j+1} = ${KIND[s.t]} ${q(s.n)} {\n${s.l?'        #locked\n':''}        ${ic(s.l)}\n        technology ${q(s.s||'—')}\n${s.o?`        description ${q('out: '+s.o)}\n`:''}`;
+      (s.sub||[]).forEach((c,k)=>{m+=`        c${k+1} = ${KIND[c.t]} ${q(c.n)} {\n          ${ic(c.l)}\n          technology ${q(c.s||'—')}\n        }\n`});
+      (s.sub||[]).slice(1).forEach((c,k)=>{m+=`        c${k+1} -> c${k+2}\n`});
+      m+='      }\n';
+    });
+    for(let j=1;j<r.steps.length;j++)m+=`      s${j} -> s${j+1}\n`;
+    m+='    }\n';
+  });
+  for(let i=1;i<S.roles.length;i++)m+=`    r${i}.s${S.roles[i-1].steps.length} -> r${i+1}.s1\n`;
+  m+="  }\n  owner -> company.r1.s1\n}\n";
+  let v="views {\n  view index {\n    title 'طرح کلی'\n    include *\n  }\n  view roles of company {\n    title 'نقش‌ها'\n    include *\n  }\n";
+  S.roles.forEach((r,i)=>{v+=`  view v${i+1} of company.r${i+1} {\n    title ${q((i+1)+' · '+r.n)}\n    include *\n  }\n`});
+  return '// خروجی ویرایشگر سازمان — '+new Date().toISOString().slice(0,10)+'\n'+sp+'\n'+m+'\n'+v+'}\n';
+}
+const SUG=['این موکاپ را «منبع حقیقت» کن: ویرایش اینجا ← خروجی .c4 ← سایت LikeC4 خودکار ساخته شود.',
+ 'قفل را نگه‌دار: قدم قفل‌شده در موکاپ غیرقابل‌ویرایش است و در خروجی هم #locked می‌خورد.',
+ 'درخواست‌ها را به Claude بده؛ او اعمال می‌کند و تیک ✅ می‌خورد.',
+ 'قدم بعدی بعد از امتحان تو: اتصال دکمهٔ «تبدیل به نهایی» به ساخت خودکار سایت.'];
+document.getElementById('sugg').append(...SUG.map(t=>E('div',{class:'req'},'• '+t)));
+document.getElementById('addRole').onclick=()=>{S.roles.push({n:'نقش تازه',l:0,steps:[]});save();render()};
+document.getElementById('reset').onclick=()=>{if(confirm('همهٔ تغییرات پاک و نمونه برگردد؟')){S=SAMPLE();save();render()}};
+document.getElementById('reqAdd').onclick=()=>{const t=document.getElementById('reqText');if(t.value.trim()){S.reqs.unshift({t:t.value.trim(),done:0});t.value='';save();render()}};
+const dlg=document.getElementById('dlg');
+document.getElementById('final').onclick=()=>{document.getElementById('out').textContent=toC4();dlg.showModal()};
+document.getElementById('close').onclick=()=>dlg.close();
+document.getElementById('copy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(toC4())};
+document.getElementById('dl').onclick=()=>{const a=E('a',{href:URL.createObjectURL(new Blob([toC4()],{type:'text/plain'})),download:'recruitment.c4'});a.click()};
+render();
+</script>
+</body>
+</html>
