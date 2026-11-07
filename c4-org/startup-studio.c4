@@ -488,6 +488,43 @@ model {
     c6 -> c7 'بعد'
   }
 
+  fin = orgBox 'مالی، مالیات و حسابداری' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: مدل مالی، سامانه‌های مالیاتی، حسابداری و بیمه'
+    metadata {
+      agent 'ایجنت مالی'
+    }
+    c1 = autoStep 'مدل مالی و اقتصاد واحد' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: هزینهٔ جذب مشتری، ارزش طول عمر، سوخت ماهانه و مدت دوام پول؛ هر عدد با فرضش'
+      metadata {
+        agent 'ایجنت مالی'
+      }
+    }
+    c2 = gateStep 'راه‌اندازی حسابداری و مالیات' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: حسابدار، دفتر حساب، سامانهٔ مؤدیان و ارزش افزوده؛ رویه UNKNOWN تا تأیید از tax.gov.ir؛ هر اظهارنامه و پرداخت با انسان'
+      metadata {
+        agent 'ایجنت مالی'
+      }
+    }
+    c3 = askStep 'بیمه کسب‌وکار و مسئولیت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: کدام بیمه‌ها لازم است؛ هزینه UNKNOWN تا استعلام'
+      metadata {
+        agent 'ایجنت مالی'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+  }
+
   p4 = orgBox 'ساخت و راه‌اندازی MVP' {
     icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
     description 'out: کوچک‌ترین نسخه که ارزش بدهد'
@@ -594,6 +631,90 @@ model {
     c4 -> c5 'بعد'
   }
 
+  sec = orgBox 'امنیت و حریم خصوصی' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: حفاظت از داده و دسترسی‌ها پس از ساخت'
+    metadata {
+      agent 'ایجنت امنیت'
+    }
+    c1 = autoStep 'کنترل دسترسی و پشتیبان‌گیری' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: فهرست دسترسی‌ها، رمزها، پشتیبان و بازیابی آزمایش‌شده'
+      metadata {
+        agent 'ایجنت امنیت'
+      }
+    }
+    c2 = autoStep 'آزمون نفوذ و فهرست وابستگی‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: گزارش آسیب‌پذیری‌ها + فهرست کتابخانه‌ها و لایسنس‌ها'
+      metadata {
+        agent 'ایجنت امنیت'
+      }
+    }
+    c3 = gateStep 'سیاست حریم خصوصی و نگهداری داده' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: متن سیاست و مدت نگهداری؛ قانون حاکم UNKNOWN تا مشاور حقوقی؛ امضا با انسان'
+      metadata {
+        agent 'ایجنت امنیت'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+  }
+
+  team = orgBox 'استخدام و حاکمیت شرکت' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: قرارداد کار، حقوق، سهام کارکنان و تصمیم‌های هیئت'
+    metadata {
+      agent 'ایجنت منابع انسانی'
+    }
+    c1 = gateStep 'جدول سهام و استخر سهام کارکنان' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: دفتر سهام و درصد استخر؛ هر تغییر سهام با تأیید انسان و وکیل'
+      metadata {
+        agent 'ایجنت منابع انسانی'
+      }
+    }
+    c2 = gateStep 'استخدام و قرارداد کار' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: آگهی، مصاحبه، قرارداد کار؛ امضا فقط با انسان'
+      metadata {
+        agent 'ایجنت منابع انسانی'
+      }
+    }
+    c3 = gateStep 'حقوق، بیمه و کد کارگاهی' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: لیست ماهانهٔ بیمه و مالیات حقوق؛ رویه UNKNOWN تا تأیید از tamin.ir و tax.gov.ir؛ پرداخت با انسان'
+      metadata {
+        agent 'ایجنت منابع انسانی'
+      }
+    }
+    c4 = autoStep 'صورتجلسه‌ها و تصمیم‌های هیئت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: پیش‌نویس صورتجلسه و آگهی تغییرات برای بازبینی حقوقی'
+      metadata {
+        agent 'ایجنت منابع انسانی'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+  }
+
   p5 = orgBox 'ارزش‌گذاری و ساختار سهام' {
     icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
     description 'out: عدد منطقی، جدول سهام و سهام پله‌به‌پله'
@@ -652,6 +773,81 @@ model {
     c4 -> c5 'بعد'
   }
 
+  pitch = orgBox 'ارائه به سرمایه‌گذار' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: از دک و اتاق داده تا ترم‌شیت و پیگیری'
+    metadata {
+      agent 'ایجنت ارائه به سرمایه‌گذار'
+      must 'فقط واقعیت‌های مستند؛ وعدهٔ بازده ممنوع؛ ارسال، امضا و پذیرش ترم‌شیت فقط با انسان'
+      must_not 'اغراق در ترکشن؛ ارسال انبوه؛ عدد بدون منبع'
+    }
+    c1 = autoStep 'آمادگی سنجی: ترکشن و شاخص‌ها' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: investor-pitch'
+      description 'out: کاربر، درآمد، رشد و حفظ مشتری با منبع؛ اگر ضعیف است، برگشت به ساخت'
+      metadata {
+        agent 'ایجنت ارائه به سرمایه‌گذار'
+      }
+    }
+    c2 = autoStep 'ساخت دک و روایت' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: investor-pitch'
+      description 'out: مسئله، راه‌حل، محصول، ترکشن، بازار، مدل درآمد، رقابت، تیم، مالی و درخواست (ask)'
+      metadata {
+        agent 'ایجنت ارائه به سرمایه‌گذار'
+      }
+    }
+    c3 = autoStep 'ساخت اتاق داده' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: investor-pitch'
+      description 'out: پوشه‌ها: محصول و فروش، مالی، اسناد شرکت و جدول سهام، کارکنان، مالکیت فکری، حریم خصوصی، قراردادها، دعاوی، فناوری و امنیت'
+      metadata {
+        agent 'ایجنت ارائه به سرمایه‌گذار'
+      }
+    }
+    c4 = autoStep 'پرسش‌وپاسخ احتمالی' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: investor-pitch'
+      description 'out: ۲۰ سؤال سخت سرمایه‌گذار با پاسخ مستند و ضعف‌های صادقانه'
+      metadata {
+        agent 'ایجنت ارائه به سرمایه‌گذار'
+      }
+    }
+    c5 = gateStep 'تأیید و ارسال به سرمایه‌گذار' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ارسال بیرونی فقط با انسان'
+      metadata {
+        agent 'ایجنت ارائه به سرمایه‌گذار'
+      }
+    }
+    c6 = gateStep 'بررسی ترم‌شیت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ارزش، مبلغ، رقیق‌شدگی، حق‌ها؛ SAFE یا سهام؛ مذاکره و امضا با انسان و وکیل'
+      metadata {
+        agent 'ایجنت ارائه به سرمایه‌گذار'
+      }
+    }
+    c7 = autoStep 'پیگیری و بسته‌شدن دور' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: جدول پیگیری سرمایه‌گذارها و مهلت‌ها'
+      metadata {
+        agent 'ایجنت ارائه به سرمایه‌گذار'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+    c5 -> c6 'بعد'
+    c6 -> c7 'بعد'
+  }
+
   p6 = orgBox 'سرمایه‌گذار، هم‌بنیان‌گذار و شریک' {
     icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
     description 'out: فروش کامل، سرمایه‌گذاری، کوفاندر یا شریک توسعه'
@@ -680,16 +876,7 @@ model {
         agent 'ایجنت جذب سرمایه'
       }
     }
-    c3 = autoStep 'ساخت معرفی‌نامه و اتاق داده' {
-      #unknownSkill
-      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
-      technology 'skill: —'
-      description 'out: دک ۱۰ اسلاید + یک‌صفحه‌ای + اتاق داده با مدارک'
-      metadata {
-        agent 'ایجنت جذب سرمایه'
-      }
-    }
-    c4 = gateStep 'تأیید و ارسال پیام‌ها' {
+    c3 = gateStep 'تأیید و ارسال پیام‌ها' {
       #unknownSkill
       icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
       technology 'skill: —'
@@ -698,7 +885,7 @@ model {
         agent 'ایجنت جذب سرمایه'
       }
     }
-    c5 = gateStep 'مذاکره و محاسبهٔ درصد' {
+    c4 = gateStep 'مذاکره و محاسبهٔ درصد' {
       #unknownSkill
       icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
       technology 'skill: —'
@@ -707,7 +894,7 @@ model {
         agent 'ایجنت جذب سرمایه'
       }
     }
-    c6 = gateStep 'بستن قرارداد و تحویل سهام پله‌به‌پله' {
+    c5 = gateStep 'بستن قرارداد و تحویل سهام پله‌به‌پله' {
       #unknownSkill
       icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
       technology 'skill: —'
@@ -720,7 +907,6 @@ model {
     c2 -> c3 'بعد'
     c3 -> c4 'بعد'
     c4 -> c5 'بعد'
-    c5 -> c6 'بعد'
   }
 
   p7 = orgBox 'تجاری‌سازی و فروش' {
@@ -803,11 +989,20 @@ model {
         agent 'ایجنت رشد'
       }
     }
-    c4 = gateStep 'تصمیم مقیاس، فروش یا توقف' {
+    c4 = autoStep 'هدف‌ها و شاخص‌های فصلی (OKR)' {
       #unknownSkill
       icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
       technology 'skill: —'
-      description 'out: ادامه، فروش یا خروج؛ فقط انسان تصمیم می‌گیرد'
+      description 'out: هدف‌های فصل بعد با شاخص قابل اندازه‌گیری'
+      metadata {
+        agent 'ایجنت رشد'
+      }
+    }
+    c5 = gateStep 'تصمیم مقیاس، فروش یا خروج' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ادامه، فروش شرکت یا بورس؛ مسیر خروج UNKNOWN تا مشاور؛ فقط انسان تصمیم می‌گیرد'
       metadata {
         agent 'ایجنت رشد'
       }
@@ -815,6 +1010,7 @@ model {
     c1 -> c2 'بعد'
     c2 -> c3 'بعد'
     c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
   }
 
   p0 -> p1 'بعد'
@@ -823,10 +1019,14 @@ model {
   reg -> tm 'بعد'
   tm -> legal 'بعد'
   legal -> ip 'بعد'
-  ip -> p4 'بعد'
+  ip -> fin 'بعد'
+  fin -> p4 'بعد'
   p4 -> train 'بعد'
-  train -> p5 'بعد'
-  p5 -> p6 'بعد'
+  train -> sec 'بعد'
+  sec -> team 'بعد'
+  team -> p5 'بعد'
+  p5 -> pitch 'بعد'
+  pitch -> p6 'بعد'
   p6 -> p7 'بعد'
   p7 -> p8 'بعد'
 }
@@ -872,6 +1072,11 @@ views {
     include *
   }
 
+  view fin of fin {
+    title 'مالی، مالیات و حسابداری'
+    include *
+  }
+
   view p4 of p4 {
     title 'ساخت و راه‌اندازی MVP'
     include *
@@ -882,8 +1087,23 @@ views {
     include *
   }
 
+  view sec of sec {
+    title 'امنیت و حریم خصوصی'
+    include *
+  }
+
+  view team of team {
+    title 'استخدام و حاکمیت شرکت'
+    include *
+  }
+
   view p5 of p5 {
     title 'ارزش‌گذاری و ساختار سهام'
+    include *
+  }
+
+  view pitch of pitch {
+    title 'ارائه به سرمایه‌گذار'
     include *
   }
 
