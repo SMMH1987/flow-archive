@@ -115,17 +115,37 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
 .lanebox{position:absolute;border:2px solid var(--edge);border-radius:16px;background:transparent}.lanebox.locked{border-color:var(--gate);border-style:dashed}
 .lt2{position:absolute;top:8px;left:0;right:0;text-align:center;direction:rtl;display:flex;flex-direction:column;align-items:center;pointer-events:none}.lt2 b{font-size:16px;font-weight:800}.lt2 small{font-size:11.5px}
 .node[style*='height:36px'] .ns,.node[style*='height:28px'] .ns{display:none}.node[style*='height:36px'] .nt,.node[style*='height:28px'] .nt{font-size:11.5px;-webkit-line-clamp:1}.node[style*='height:36px'],.node[style*='height:28px']{padding:1px 8px}.node.routeStep[style*='height:36px']{padding:1px 18px}
+.vers{display:flex;gap:4px;flex-wrap:wrap}.vers button.on{background:var(--ask);border-color:var(--ask);color:var(--card);font-weight:600}
+#p-dia.v3{grid-template-columns:230px minmax(0,1fr) 340px}
+@media(max-width:1200px){#p-dia.v3{grid-template-columns:minmax(0,1fr) 340px}#p-dia.v3 #tree{grid-column:1/-1;max-height:200px}}
+@media(max-width:960px){#p-dia.v3{grid-template-columns:minmax(0,1fr)}}
+.tree{max-height:calc(100vh - 110px);overflow:auto;padding:8px}.tree h2{font-size:13px}
+.tr{display:flex;gap:2px;align-items:center;font-size:12.5px;line-height:1.5;border-radius:6px;padding:0 2px}
+.tr.cur{background:var(--accbg);font-weight:800}.tr.sel .tl{text-decoration:underline}
+.tr .tg{width:18px;padding:0;border:0;background:transparent;text-align:center;color:var(--mute);flex:0 0 18px}
+.tr .tl{cursor:pointer;flex:1;min-width:0}
+.dive{position:absolute;top:2px;left:4px;padding:0 6px;font-size:11px;z-index:2}
+.tgbtn{position:absolute;bottom:3px;left:6px;padding:0 8px;font-size:11.5px;z-index:2}
+.fh{position:absolute;top:0;left:0;right:0;height:36px;display:flex;align-items:center;gap:8px;padding:0 14px;direction:rtl;font-weight:800;font-size:13.5px;cursor:pointer}
+.fh:hover{background:color-mix(in srgb,var(--acc) 7%,transparent);border-radius:14px 14px 0 0}
+.fh .ed{margin-inline-start:auto}
+.lanebox .anct{position:absolute;top:6px;right:14px;direction:rtl;font-size:12px;font-weight:700;color:var(--mute);cursor:pointer}
+.lanebox.anc{border-color:var(--line)}
+.node.role,.node.section,.node.project,.node.orgBox{background:transparent;border:2px solid var(--edge);border-radius:12px}
+.node.project{border-color:var(--proj)}
 </style>
 <div id="app">
   <div class="top">
     <h1>استودیوی سازمان <small>— فلوچارت زنده؛ ویرایش کن، خروجی = متن کامل <span class="ltr">recruitment.c4</span></small></h1>
     <nav class="tabs" id="tabs"></nav>
+    <span class="vers" id="vers"></span>
     <button id="undo" title="برگشت (Ctrl+Z)">↶ برگشت</button>
     <button id="load">بارگذاری .c4</button>
     <button id="reset">بازنشانی به نمونه</button>
     <input type="file" id="file" accept=".c4,.txt,text/plain" hidden>
   </div>
   <div id="p-dia" class="flowwrap">
+    <aside id="tree" class="panel tree" hidden></aside>
     <div style="min-width:0"><div id="nav" class="nav"></div>
     <div id="cv">
       <div id="world"></div>
@@ -900,22 +920,33 @@ const sv=(t,a={})=>{const e=document.createElementNS('http://www.w3.org/2000/svg
 /* ───────── فلوچارت عمودی (نمای کلی ← جزئیات هر بخش) ───────── */
 /* قراردادها: جریان از بالا به پایین؛ مستطیل = قدم، بیضی = ask، شش‌ضلعی = تصمیم (route)، کادر ضخیم = gate؛
    پرش به قدم‌های دورتر کنار جعبه‌ها می‌رود؛ ارتباط با بخش دیگر = دکمهٔ اتصال‌دهنده (مثل off-page connector) */
-let VIEW={x:10,y:10,k:1},VIEWP='ov:company',CONN=null,SELE=null,NEEDFIT=true,LAST=null;
+let VIEW={x:10,y:10,k:1},VIEWP='ov:company',CONN=null,SELE=null,NEEDFIT=true,LAST=null,VER=1,EXP=new Set(),TX=new Set(['company']);
 const roots=()=>M.nodes.filter(n=>n.kind!=='actor');
 const laneOf=p=>p.split('.').slice(0,2).join('.');
-function go(vp,sel){VIEWP=vp;SEL=sel||null;SELE=null;NEEDFIT=true;setConn(false);TAB='dia';showTab()}
+function go(vp,sel){if(typeof vp==='string'&&!vp.startsWith('ov:')&&vp.split('.').length===1)vp='ov:'+vp;VIEWP=vp;SEL=sel||null;SELE=null;NEEDFIT=true;setConn(false);TAB='dia';showTab()}
 function jump(p){const s=p.split('.');if(s.length===1){select(p)}else go(laneOf(p),p)}
 const outText=n=>(n.desc||'').replace(/^out:\s*/,'');
+const rootOfView=()=>VIEWP.startsWith('ov:')?VIEWP.slice(3):VIEWP.split('.')[0];
 function renderNav(){
   const nav=$('#nav');nav.replaceChildren();
-  roots().forEach(R=>nav.append(h('button',{class:VIEWP==='ov:'+R.id?'on':'',onclick:()=>go('ov:'+R.id)},R.title.replace(/\s*\(.*$/,''))));
+  roots().forEach(R=>nav.append(h('button',{class:rootOfView()===R.id?'on':'',onclick:()=>go('ov:'+R.id)},R.title.replace(/\s*\(.*$/,''))));
+  if(VER===2){
+    const rid=rootOfView();
+    nav.append(h('span',{class:'mute'},'|'),
+      h('button',{class:'sm',onclick:()=>{EXP=new Set([rid]);NEEDFIT=true;renderDia()}},'بستن همه'),
+      h('button',{class:'sm',onclick:()=>{EXP=new Set([rid,...IDX.get(rid).children.map(c=>rid+'.'+c.id)]);NEEDFIT=true;renderDia()}},'باز کردن یک سطح'),
+      h('button',{class:'sm',onclick:()=>{EXP=new Set();IDX.forEach((n,p)=>{if(n.children.length&&p.split('.')[0]===rid)EXP.add(p)});NEEDFIT=true;renderDia()}},'باز کردن همه'));
+    return}
   if(!VIEWP.startsWith('ov:')&&IDX.has(VIEWP)){
-    const ln=IDX.get(VIEWP),par=IDX.get(parentPath(VIEWP)),sib=par.children,i=sib.findIndex(c=>c.id===ln.id);
-    nav.append(h('span',{class:'mute'},'›'),h('b',{},ln.title),
-      h('button',{class:'sm',disabled:i<=0,onclick:()=>go(par.id+'.'+sib[i-1].id)},'› قبلی'),
-      h('button',{class:'sm',disabled:i>=sib.length-1,onclick:()=>go(par.id+'.'+sib[i+1].id)},'بعدی ‹'),
-      h('button',{class:'sm',onclick:()=>select(VIEWP)},'✎ ویرایش این بخش'),
-      h('button',{class:'sm',onclick:()=>go('ov:'+par.id)},'↑ نمای کلی'))}}
+    const segs=VIEWP.split('.'),crumbs=h('div',{class:'row'},h('span',{class:'mute'},'📍 جایت:'));
+    segs.forEach((_,i)=>{const p=segs.slice(0,i+1).join('.'),n=IDX.get(p),last=i===segs.length-1;
+      if(i)crumbs.append(h('span',{class:'mute'},'‹'));crumbs.append(last?h('b',{},titleName(n)):h('button',{class:'sm',onclick:()=>go(i===0?'ov:'+p:p)},titleName(n).slice(0,30)))});
+    nav.append(crumbs);
+    const par=IDX.get(parentPath(VIEWP)),ln=IDX.get(VIEWP),sib=par.children,i=sib.findIndex(c=>c.id===ln.id);
+    nav.append(h('button',{class:'sm',disabled:i<=0,onclick:()=>go(parentPath(VIEWP)+'.'+sib[i-1].id)},'› قبلی'),
+      h('button',{class:'sm',disabled:i>=sib.length-1,onclick:()=>go(parentPath(VIEWP)+'.'+sib[i+1].id)},'بعدی ‹'),
+      h('button',{class:'sm',onclick:()=>select(VIEWP)},'✎ ویرایش'),
+      h('button',{class:'sm',onclick:()=>go(parentPath(VIEWP).includes('.')?parentPath(VIEWP):'ov:'+parentPath(VIEWP))},'↑ یک سطح بالا'))}}
 function applyView(){$('#world').style.transform=`translate(${VIEW.x}px,${VIEW.y}px) scale(${VIEW.k})`}
 function fit(all){if(!LAST)return;const cv=$('#cv'),w=cv.clientWidth,hh=cv.clientHeight;if(!w)return;
   const kw=w/(LAST.W+30),k=all===true?Math.min(kw,hh/(LAST.H+30)):all==='ov'?Math.max(Math.min(kw,hh/(LAST.H+30)),.62):Math.min(kw,1.05);VIEW.k=Math.max(.2,k);VIEW.x=(w-LAST.W*VIEW.k)/2;VIEW.y=8;applyView();NEEDFIT=false}
@@ -931,13 +962,28 @@ function nodeEl(n,p,b,full){
   return h('div',{class:`node ${kind}${lk?' locked':''}${SEL===p?' sel':''}${CONN&&CONN.from===p?' src':''}`,'data-p':p,style:`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`},
     h('div',{class:'nt'},(lk?'🔒 ':'')+n.title),
     n.tech?h('div',{class:'ns'},n.tags.includes('gated')&&n.kind==='tool'?h('span',{class:'nb red'},'تأیید انسانی'):null,n.tags.includes('unknownSkill')?h('span',{class:'nb'},'skill؟'):null,n.tech):null,
-    full&&outText(n)?h('div',{class:'no'},outText(n)):null)}
+    full&&outText(n)?h('div',{class:'no'},outText(n)):null,
+    (full&&VER!==2&&n.children.length&&isStep(n))?h('button',{class:'sm dive','data-dive':p,title:'باز کردن داخل این قدم (فرایند داخلی)'},'⤢ داخل'):null)}
 function renderDia(){
-  renderNav();
   if(!VIEWP.startsWith('ov:')&&!IDX.has(VIEWP))VIEWP='ov:'+roots()[0].id;
   if(VIEWP.startsWith('ov:')&&!IDX.has(VIEWP.slice(3)))VIEWP='ov:'+roots()[0].id;
-  LAST=VIEWP.startsWith('ov:')?renderOverview(VIEWP.slice(3)):renderLane(VIEWP);
+  renderNav();renderTree();
+  LAST=VER===2?renderNested(rootOfView()):VIEWP.startsWith('ov:')?renderOverview(VIEWP.slice(3)):renderLane(VIEWP);
   applyView();if(NEEDFIT&&!$('#p-dia').hidden)fit()}
+function setVer(v){VER=v;NEEDFIT=true;renderVers();renderDia();renderInsp()}
+function renderVers(){$('#vers').replaceChildren(...[[1,'نسخه ۱ · عبور'],[2,'نسخه ۲ · بازشدن درجا'],[3,'نسخه ۳ · درخت + کادرها']].map(([v,l])=>h('button',{class:VER===v?'on':'',onclick:()=>setVer(v)},l)))}
+function renderTree(){
+  const t=$('#tree');t.hidden=VER!==3;$('#p-dia').classList.toggle('v3',VER===3);if(VER!==3)return;
+  t.replaceChildren(h('h2',{},'ساختار (جایت با رنگ مشخص است)'));
+  const segs=VIEWP.startsWith('ov:')?[VIEWP.slice(3)]:VIEWP.split('.');segs.forEach((_,i)=>TX.add(segs.slice(0,i+1).join('.')));
+  const rec=(list,pre,d)=>list.forEach(n=>{const p=pre?pre+'.'+n.id:n.id,kids=n.children.length,open=TX.has(p);
+    const cur=VIEWP===p||VIEWP==='ov:'+p;
+    t.append(h('div',{class:'tr'+(cur?' cur':'')+(SEL===p?' sel':''),style:`padding-inline-start:${d*14}px`},
+      kids?h('button',{class:'tg',onclick:()=>{if(open)TX.delete(p);else TX.add(p);renderTree()}},open?'▾':'▸'):h('span',{class:'tg'},'·'),
+      h('span',{class:'tl',onclick:()=>{if(n.kind==='actor'){select(p);return}
+        if(kids&&!(isStep(n)&&false))go(d===0?'ov:'+p:p);else go(parentPath(p).includes('.')?parentPath(p):'ov:'+parentPath(p),p)}},(lockedN(n)?'🔒 ':'')+titleName(n))));
+    if(kids&&open)rec(n.children,p,d+1)});
+  rec(M.nodes,'',0)}
 
 /* چیدمان یک بخش (مشترک بین نمای کلی و جزئیات) */
 function buildLane(lane,lp,o){
@@ -950,14 +996,16 @@ function buildLane(lane,lp,o){
     y=by+o.VG});
   return{boxes,order,frames,bottom:y-o.VG}}
 function drawInternal(svg,boxes,order,compact){
+  const list=[];M.rels.forEach((r,i)=>{const a=boxes.get(r.from),b=boxes.get(r.to);if(a&&b&&a!==b)list.push({r,i,a,b})});
+  routeList(svg,list,order,compact?{base:12,stp:8,compact:1}:{base:62,stp:16})}
+function routeList(svg,list,order,cfg){
   const hasSel=SEL||SELE!=null,R=[],Lf=[];
-  M.rels.forEach((r,i)=>{
-    const a=boxes.get(r.from),b=boxes.get(r.to);if(!a||!b||a===b)return;
-    const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=hasSel&&!on,o={on,dim,idx:i,label:(compact&&!on)?'':r.label};
+  list.forEach(({r,i,a,b})=>{
+    const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=hasSel&&!on,o={on,dim,idx:i,label:(cfg.compact&&!on)?'':r.label};
     const between=order.some(x=>x!==a&&x!==b&&x.y>=a.outY&&x.y<b.y);
     if(b.y>=a.outY-1&&!between){const xa=(a.x+a.w/2+b.x+b.w/2)/2;drawEdge(svg,polyD([[xa,a.outY],[xa,b.y]]),{...o,lx:xa+8,ly:(a.outY+b.y)/2+4,anchor:'start'})}
     else if(b.y>a.y)R.push({r,a,b,o,span:b.y-a.y});else Lf.push({r,a,b,o,span:a.y-b.y})});
-  const base=compact?12:62,stp=compact?8:16;
+  const base=cfg.base,stp=cfg.stp;
   R.sort((p,q)=>p.span-q.span).forEach((e,k)=>{const off=base+stp*k,x1=e.a.x+e.a.w,x2=e.b.x+e.b.w,xm=Math.max(x1,x2)+off,y1=e.a.y+e.a.h/2,y2=e.b.y+e.b.h/2;
     drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{...e.o,lx:xm+6,ly:(y1+y2)/2,anchor:'start'})});
   Lf.sort((p,q)=>p.span-q.span).forEach((e,k)=>{const off=base+stp*k,x1=e.a.x,x2=e.b.x,xm=Math.min(x1,x2)-off,y1=e.a.y+e.a.h/2,y2=e.b.y+e.b.h/2;
@@ -967,11 +1015,16 @@ function drawInternal(svg,boxes,order,compact){
 function renderLane(lp){
   const lane=IDX.get(lp),world=$('#world');world.replaceChildren();
   const CW=330,CX=500,W=1100;
-  const L=buildLane(lane,lp,{CX,CW,NHH:88,CHH:60,VG:46,y:92,fg:24,cg:30,ind:70});
-  const H=Math.max(L.bottom+90,260),svg=newSvg(W,H);
+  const segs=lp.split('.'),anc=VER===3?segs.slice(0,-1).map((_,i)=>segs.slice(0,i+1).join('.')):[],nA=anc.length;
+  const L=buildLane(lane,lp,{CX,CW,NHH:88,CHH:60,VG:46,y:92+nA*34,fg:24,cg:30,ind:70});
+  const H=Math.max(L.bottom+90+nA*22,260),svg=newSvg(W,H);
   world.style.width=W+'px';world.style.height=H+'px';
   const lk=lockedN(lane);
-  world.append(h('div',{class:'lanebox'+(lk?' locked':''),style:`left:${CX-CW/2-26}px;top:10px;width:${CW+52}px;height:${L.bottom-10+50}px`},
+  const lbTop=10+nA*34,lbBot=L.bottom+50;
+  anc.forEach((ap,j)=>{const grow=(nA-j)*22,an=IDX.get(ap);
+    world.append(h('div',{class:'lanebox anc',style:`left:${CX-CW/2-26-grow}px;top:${10+j*34}px;width:${CW+52+2*grow}px;height:${lbBot+grow-(10+j*34)}px`},
+      h('div',{class:'anct','data-go':j===0?'ov:'+ap:ap,title:'برگرد به این سطح'},'↑ '+titleName(an))))});
+  world.append(h('div',{class:'lanebox'+(lk?' locked':''),style:`left:${CX-CW/2-26}px;top:${lbTop}px;width:${CW+52}px;height:${lbBot-lbTop}px`},
     h('div',{class:'lt2'},h('b',{},lane.title),h('small',{},lane.desc||''))));
   L.frames.forEach(f=>world.append(h('div',{class:'frame',style:`left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px`})));
   world.append(svg);
@@ -1052,6 +1105,48 @@ function renderOverview(rid){
     L.boxes.forEach((bx,p)=>world.append(nodeEl(bx.n,p,bx,false)))});
   return{W,H}}
 
+/* نسخهٔ ۲: بازشدن درجا — کادرهای تو در تو در همان بوم باز و بسته می‌شوند */
+function renderNested(rid){
+  const world=$('#world');world.replaceChildren();
+  if(!EXP.size)EXP.add(rid);if(![...EXP].some(p=>p.split('.')[0]===rid))EXP.add(rid);
+  const PADX=46,HEADH=38,GAP=32,LEAFW=268;
+  const lay=(n,p)=>{
+    const kids=n.children;
+    if(!(EXP.has(p)&&kids.length)){const lane=['role','section','project','orgBox','flow'].includes(n.kind);return{n,p,w:LEAFW,h:lane?64:(n.kind==='tool'?64:84),frame:false}}
+    const ch=kids.map(k=>lay(k,p+'.'+k.id)),cw=Math.max(...ch.map(c=>c.w));
+    let hh=HEADH+14;ch.forEach(c=>hh+=c.h+GAP);hh+=-GAP+18;
+    return{n,p,w:cw+PADX*2,h:hh,frame:true,ch,cw}};
+  const vis=new Map(),groups=new Map();
+  const put=(Lx,x,y,par,depth)=>{Lx.x=x;Lx.y=y;Lx.outY=y+Lx.h;Lx.par=par;Lx.depth=depth;vis.set(Lx.p,Lx);
+    if(Lx.frame){let cy=y+HEADH+14;Lx.ch.forEach(c=>{put(c,x+PADX+(Lx.cw-c.w)/2,cy,Lx.p,depth+1);cy+=c.h+GAP});groups.set(Lx.p,Lx.ch)}};
+  const root=lay(IDX.get(rid),rid);put(root,70,16,null,0);
+  const W=root.w+140,H=root.h+50;world.style.width=W+'px';world.style.height=H+'px';
+  const svg=newSvg(W,H),frames=[...vis.values()].filter(v=>v.frame);
+  frames.forEach(f=>{const lk=lockedN(f.n);
+    world.append(h('div',{class:'lanebox'+(lk?' locked':'')+(SEL===f.p?' sel':''),style:`left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px;${f.depth%2?'background:color-mix(in srgb,var(--acc) 4%,transparent)':''}`},
+      h('div',{class:'fh','data-tog':f.p===rid?null:f.p,title:f.p===rid?'':'بستن این کادر'},(f.p===rid?'':'－ ')+(lk?'🔒 ':'')+f.n.title,
+        h('button',{class:'sm ed','data-sel':f.p,title:'ویرایش مشخصات'},'✎'))))});
+  world.append(svg);
+  const mapv=p=>{const s=p.split('.');for(let k=s.length;k>=1;k--){const q=s.slice(0,k).join('.');if(vis.has(q))return vis.get(q)}return null};
+  const isAnc=(a,b)=>b.p.startsWith(a.p+'.');
+  const seen=new Set(),sib=new Map(),cross=[];
+  M.rels.forEach((r,i)=>{const a=mapv(r.from),b=mapv(r.to);if(!a||!b||a===b||isAnc(a,b)||isAnc(b,a))return;
+    const key=a.p+'>'+b.p+'|'+(r.label||'');if(seen.has(key))return;seen.add(key);
+    if(a.par&&a.par===b.par){if(!sib.has(a.par))sib.set(a.par,[]);sib.get(a.par).push({r,i,a,b})}else cross.push({r,i,a,b})});
+  sib.forEach((list,par)=>routeList(svg,list,groups.get(par),{base:12,stp:10}));
+  const hasSel=SEL||SELE!=null;
+  cross.forEach(({r,i,a,b})=>{const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=hasSel&&!on,o={on,dim,idx:i,label:r.label,dash:1};
+    const ax=a.x+a.w/2,bx=b.x+b.w/2;let d,lx,ly;
+    if(b.y>a.y+a.h-2){const y1=a.y+a.h,y2=b.y,k=Math.max((y2-y1)/2,30);d=`M${ax} ${y1}C${ax} ${y1+k} ${bx} ${y2-k} ${bx} ${y2}`;lx=(ax+bx)/2;ly=(y1+y2)/2}
+    else if(b.y+b.h<a.y+2){const y1=a.y,y2=b.y+b.h,k=Math.max((y1-y2)/2,30);d=`M${ax} ${y1}C${ax} ${y1-k} ${bx} ${y2+k} ${bx} ${y2}`;lx=(ax+bx)/2;ly=(y1+y2)/2}
+    else{const right=bx>ax,x1=right?a.x+a.w:a.x,x2=right?b.x:b.x+b.w,y1=a.y+a.h/2,y2=b.y+b.h/2,k=Math.abs(x2-x1)/2+20;d=`M${x1} ${y1}C${x1+(right?k:-k)} ${y1} ${x2-(right?k:-k)} ${y2} ${x2} ${y2}`;lx=(x1+x2)/2;ly=(y1+y2)/2}
+    drawEdge(svg,d,{...o,lx,ly,anchor:'middle'})});
+  vis.forEach((v,p)=>{if(v.frame)return;
+    const el=nodeEl(v.n,p,v,true);
+    if(v.n.children.length)el.append(h('button',{class:'sm tgbtn','data-tog':p,title:'باز کردن داخل'},'＋ '+toFa(v.n.children.length)+(isStep(v.n)?' زیرقدم':' قدم')));
+    world.append(el)});
+  return{W,H}}
+
 /* رویدادهای بوم: کشیدن صفحه، زوم، کلیک */
 (function(){
   const cv=$('#cv');let drag=null;
@@ -1067,6 +1162,10 @@ function renderOverview(rid){
     if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;if(d.moved>=5)return;
     const t=d.target;if(!t.closest)return;
     const ed=t.closest('[data-e]');if(ed){SELE=+ed.getAttribute('data-e');SEL=null;renderDia();renderInsp();return}
+    const tg=t.closest('[data-tog]');if(tg&&tg.getAttribute('data-tog')){const q=tg.getAttribute('data-tog');if(EXP.has(q))EXP.delete(q);else EXP.add(q);NEEDFIT=false;renderDia();return}
+    const sl=t.closest('[data-sel]');if(sl){select(sl.getAttribute('data-sel'));return}
+    const dv=t.closest('[data-dive]');if(dv){go(dv.getAttribute('data-dive'));return}
+    const gg=t.closest('[data-go]');if(gg){go(gg.getAttribute('data-go'));return}
     const ch=t.closest('[data-chip]');if(ch){jump(ch.getAttribute('data-chip'));return}
     const nd=t.closest('.node');if(nd){clickNode(nd.dataset.p);return}
     const cd=t.closest('.card2');if(cd){if(t.closest('.edit'))select(cd.dataset.p);else go(cd.dataset.p);return}
@@ -1338,6 +1437,6 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&
     if(st&&st.cur&&st.base){G=st.G||{};BASETEXT=st.base;BASEPARSE=parseC4(BASETEXT);M=parseC4(st.cur);reindex();deriveG();G=st.G&&st.G.cats?Object.assign(G,{expires:st.G.expires||24}):G;HIST=[st.cur]}
     else loadText(BASE,true)
   }catch(e){G={};loadText(BASE,true)}
-  $('#cvhint').textContent=HINT;showTab()})();
+  $('#cvhint').textContent=HINT;renderVers();showTab()})();
 window.__studio={parseC4,emitC4,get M(){return M},get BASE(){return BASE},cur,diff,addChild,IDX:()=>IDX,select,setLock,loadText};
 </script>
