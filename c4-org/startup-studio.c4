@@ -240,51 +240,154 @@ model {
     c3 -> c4 'بعد'
   }
 
-  p3 = orgBox 'حقوقی و ساختار شرکت' {
+  reg = orgBox 'ثبت شرکت' {
     icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
-    description 'out: ثبت، مالکیت فکری، قرارداد هم‌بنیان‌گذاران'
+    description 'out: از انتخاب نوع شرکت تا شناسه‌ها و حساب بانکی'
+    metadata {
+      agent 'ایجنت ثبت شرکت'
+    }
+    c1 = askStep 'انتخاب کشور و نوع شرکت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: گزینه‌ها با هزینه و محدودیت: ثبت در ایران (مثلا مسئولیت محدود یا سهامی خاص) یا ثبت خارجی؛ قوانین و هزینه‌ها UNKNOWN تا بررسی منبع رسمی'
+      metadata {
+        agent 'ایجنت ثبت شرکت'
+      }
+    }
+    c2 = autoStep 'بررسی و رزرو نام شرکت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: نام شرکت آزاد و مجاز + نام جایگزین'
+      metadata {
+        agent 'ایجنت ثبت شرکت'
+      }
+    }
+    c3 = gateStep 'تدوین اساسنامه و صورتجلسه‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: پیش‌نویس اساسنامه، سهام و سرمایه؛ تأیید وکیل یا مشاور حقوقی'
+      metadata {
+        agent 'ایجنت ثبت شرکت'
+      }
+    }
+    c4 = gateStep 'ثبت شرکت و دریافت شناسه‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: شرکت ثبت‌شده + شناسه‌های لازم (مثلا کد اقتصادی و مالیاتی)؛ پرداخت و امضا فقط با انسان'
+      metadata {
+        agent 'ایجنت ثبت شرکت'
+      }
+    }
+    c5 = gateStep 'باز کردن حساب بانکی و درگاه' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: حساب شرکت + درگاه پرداخت؛ هر مرحلهٔ مالی با انسان'
+      metadata {
+        agent 'ایجنت ثبت شرکت'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+  }
+
+  tm = orgBox 'نام و علامت تجاری (برند)' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: ثبت نام و نشان برند برای جلوگیری از اختلاف'
+    metadata {
+      agent 'ایجنت علامت تجاری'
+    }
+    c1 = autoStep 'جستجوی نام‌ها و نشان‌های مشابه' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: فهرست برندهای مشابه ثبت‌شده در همان حوزه + خطر تشابه'
+      metadata {
+        agent 'ایجنت علامت تجاری'
+      }
+    }
+    c2 = askStep 'تعیین طبقهٔ کالا و خدمات' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: طبقه‌های لازم برای ثبت علامت'
+      metadata {
+        agent 'ایجنت علامت تجاری'
+      }
+    }
+    c3 = gateStep 'تأیید و ارسال درخواست ثبت علامت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: درخواست ثبت علامت تجاری؛ ارسال رسمی و پرداخت با انسان'
+      metadata {
+        agent 'ایجنت علامت تجاری'
+      }
+    }
+    c4 = autoStep 'پیگیری ایرادها و اعتراض‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: یادآوری مهلت‌ها + پیش‌نویس پاسخ به ایرادها'
+      metadata {
+        agent 'ایجنت علامت تجاری'
+      }
+    }
+    c5 = askStep 'تصمیم دربارهٔ ثبت بین‌المللی' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: لازم است یا نه؛ در کدام کشورها؛ هزینه UNKNOWN'
+      metadata {
+        agent 'ایجنت علامت تجاری'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+  }
+
+  legal = orgBox 'کارهای حقوقی' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: مالکیت، قراردادها و انطباق'
     metadata {
       agent 'ایجنت حقوقی'
     }
-    c1 = askStep 'انتخاب ساختار حقوقی و کشور ثبت' {
+    c1 = gateStep 'واگذاری مالکیت فکری، کد و دامنه به شرکت' {
       #unknownSkill
       icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
       technology 'skill: —'
-      description 'out: گزینه‌ها با هزینه و محدودیت‌ها؛ قوانین ایران و ثبت خارجی UNKNOWN و با مشاور حقوقی بررسی شود'
+      description 'out: قرارداد انتقال مالکیت از افراد به شرکت'
       metadata {
         agent 'ایجنت حقوقی'
       }
     }
-    c2 = gateStep 'ثبت شرکت و حساب بانکی' {
+    c2 = gateStep 'قرارداد هم‌بنیان‌گذاران' {
       #unknownSkill
       icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
       technology 'skill: —'
-      description 'out: شرکت ثبت‌شده + حساب؛ پرداخت و امضا فقط با انسان'
-      metadata {
-        ext_tool 'Stripe Atlas / Carta (برای ثبت خارجی)'
-        ext_kind 'API'
-        agent 'ایجنت حقوقی'
-      }
-    }
-    c3 = gateStep 'واگذاری مالکیت فکری و کد به شرکت' {
-      #unknownSkill
-      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
-      technology 'skill: —'
-      description 'out: قرارداد انتقال مالکیت کد، نام و دامنه به شرکت'
+      description 'out: نقش‌ها، تعهد زمانی، خروج و سهام پله‌به‌پله'
       metadata {
         agent 'ایجنت حقوقی'
       }
     }
-    c4 = gateStep 'قرارداد هم‌بنیان‌گذاران' {
+    c3 = autoStep 'قرارداد کارکنان و محرمانگی' {
       #unknownSkill
       icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
       technology 'skill: —'
-      description 'out: نقش‌ها، تعهد زمانی، خروج و سهام پله‌به‌پله (vesting)'
+      description 'out: قالب قرارداد کار و تعهد محرمانگی برای بازبینی حقوقی'
       metadata {
         agent 'ایجنت حقوقی'
       }
     }
-    c5 = autoStep 'شرایط استفاده و حریم خصوصی' {
+    c4 = autoStep 'شرایط استفاده و حریم خصوصی' {
       #unknownSkill
       icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
       technology 'skill: —'
@@ -293,10 +396,96 @@ model {
         agent 'ایجنت حقوقی'
       }
     }
+    c5 = askStep 'بررسی مجوزها و انطباق حوزهٔ کار' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: فهرست مجوزهای لازم این کسب‌وکار؛ UNKNOWN تا بررسی با مشاور حقوقی'
+      metadata {
+        agent 'ایجنت حقوقی'
+      }
+    }
     c1 -> c2 'بعد'
     c2 -> c3 'بعد'
     c3 -> c4 'بعد'
     c4 -> c5 'بعد'
+  }
+
+  ip = orgBox 'دانش‌بنیان و ثبت اختراع' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: حفاظت از نوآوری و بررسی مزایای شرکت دانش‌بنیان'
+    metadata {
+      agent 'ایجنت مالکیت فکری'
+    }
+    c1 = askStep 'بررسی قابلیت ثبت اختراع' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: آیا نوآوری جدید، ابتکاری و صنعتی است؛ نرم‌افزار و روش کسب‌وکار ممکن است ثبت‌شدنی نباشد و باید با مشاور بررسی شود'
+      metadata {
+        agent 'ایجنت مالکیت فکری'
+      }
+    }
+    c2 = autoStep 'جستجوی پیشینه' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: اختراع‌ها و مقاله‌های مشابه با فاصلهٔ آن‌ها از ایدهٔ ما'
+      metadata {
+        agent 'ایجنت مالکیت فکری'
+      }
+    }
+    c3 = gateStep 'تدوین شرح و ادعاها با متخصص' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: پیش‌نویس شرح اختراع و ادعاها؛ نهایی‌سازی با وکیل یا مشاور اختراع'
+      metadata {
+        agent 'ایجنت مالکیت فکری'
+      }
+    }
+    c4 = gateStep 'ثبت درخواست اختراع' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: درخواست ثبت‌شده با شمارهٔ پیگیری؛ پرداخت و ارسال با انسان'
+      metadata {
+        agent 'ایجنت مالکیت فکری'
+      }
+    }
+    c5 = autoStep 'بررسی شرایط شرکت دانش‌بنیان' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: مقایسهٔ شرکت ما با شرایط ارزیابی دانش‌بنیان؛ شرایط و مزایا UNKNOWN تا تأیید از منبع رسمی'
+      metadata {
+        agent 'ایجنت مالکیت فکری'
+      }
+    }
+    c6 = gateStep 'آماده‌سازی و ارسال درخواست دانش‌بنیان' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: مدارک و درخواست ارزیابی؛ ارسال با انسان'
+      metadata {
+        agent 'ایجنت مالکیت فکری'
+      }
+    }
+    c7 = askStep 'برنامهٔ استفاده از مزایا' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: کدام مزایا (مالی، مالیاتی، تسهیلات) و چه زمانی؛ UNKNOWN تا تأیید'
+      metadata {
+        agent 'ایجنت مالکیت فکری'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+    c5 -> c6 'بعد'
+    c6 -> c7 'بعد'
   }
 
   p4 = orgBox 'ساخت و راه‌اندازی MVP' {
@@ -630,8 +819,11 @@ model {
 
   p0 -> p1 'بعد'
   p1 -> p2 'بعد'
-  p2 -> p3 'بعد'
-  p3 -> p4 'بعد'
+  p2 -> reg 'بعد'
+  reg -> tm 'بعد'
+  tm -> legal 'بعد'
+  legal -> ip 'بعد'
+  ip -> p4 'بعد'
   p4 -> train 'بعد'
   train -> p5 'بعد'
   p5 -> p6 'بعد'
@@ -660,8 +852,23 @@ views {
     include *
   }
 
-  view p3 of p3 {
-    title 'حقوقی و ساختار شرکت'
+  view reg of reg {
+    title 'ثبت شرکت'
+    include *
+  }
+
+  view tm of tm {
+    title 'نام و علامت تجاری (برند)'
+    include *
+  }
+
+  view legal of legal {
+    title 'کارهای حقوقی'
+    include *
+  }
+
+  view ip of ip {
+    title 'دانش‌بنیان و ثبت اختراع'
     include *
   }
 
