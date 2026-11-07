@@ -44,6 +44,29 @@ TOOLS = [
 ```
 نمونهٔ قالب OpenAI از همان ورودی: `{"type":"function","function":{"name":…,"description":…,"parameters":<input>}}`.
 
+## ۲.۱ فهرست پیش‌فرض نیازمند تأیید انسانی (قابل تغییر)
+فهرست در `interop/gates.yaml` است و هر پروژه می‌تواند بعداً ویرایشش کند؛ کد فقط این فایل را می‌خواند، پس تغییر فهرست به تغییر کد نیاز ندارد.
+```yaml
+# interop/gates.yaml  (نسخه 1) — پیش‌فرض‌ها، قابل ویرایش
+version: 1
+default_policy: require_approval        # ابزار ناشناخته/بدون دسته = پشت تأیید
+categories:
+  money:        {gate: true,  examples: [payment, refund, transfer]}
+  legal:        {gate: true,  examples: [sign, enter_contract, file_complaint]}
+  outbound:     {gate: true,  examples: [publish_post, publish_ad, message_customer]}
+  destructive:  {gate: true,  examples: [delete_data, delete_repo]}
+  read_or_draft:{gate: false, examples: [lookup, search, draft, advice]}
+tools:                                   # نگاشت ابزار ← دسته (اینجا پر می‌شود)
+  vakil_case_start:  read_or_draft
+  vakil_case_answer: read_or_draft
+  vakil_case_result: read_or_draft
+approval:
+  channel: out_of_band                   # لینک/پیام برای انسان، نه جواب مدل
+  expires_hours: 24
+overrides: []                            # استثنای موقت: {tool, until, reason, approved_by}
+```
+قاعده‌ها: ۱) ابزار بدون ردیف = پشت تأیید (ایمن‌به‌صورت‌پیش‌فرض). ۲) هر ویرایش فهرست در HISTORY.md با تاریخ و دلیل ثبت شود. ۳) تغییر `gate: true` به `false` فقط با گفتهٔ صریح صاحب پروژه. ۴) تست `test_gates.py` باید ابزار ردیف‌نشده را رد کند.
+
 ## ۳. بلوک آمادهٔ چسباندن در AGENTS.md
 ```
 ## قانون توسعه: آمادهٔ اتصال (مرجع: flow-archive/docs/STANDARD-DEV-RULE.md)
@@ -51,7 +74,7 @@ TOOLS = [
 1. ابزارش را فقط در interop/tools.py تعریف کن؛ REST، MCP، openai_tools.json و openapi.yaml را از آن تولید کن، دستی ویرایش نکن.
 2. منطق در interop/service.py بماند؛ لایه‌های HTTP/MCP فقط صدا بزنند.
 3. پیش‌فرض: همیشه دو مصرف‌کننده (Claude/MCP و OpenAI-قالب/REST) و دو حالت اجرا (لوکال 127.0.0.1 و عمومی HTTPS با کلید)؛ نپرس.
-4. فقط یک چیز را بپرس: پرخطر بودن. پرخطر ⇒ در gates.yaml ثبت و تأیید انسانی خارج از مدل. شکل کار (ساده/چندمرحله‌ای/طولانی) پرسیده نمی‌شود: هر ابزار پاکت {status: done|needs_input|processing, request_id,…} برمی‌گرداند و سرویس هر بار خودش حالت را تعیین می‌کند.
+4. فقط یک چیز را بپرس: پرخطر بودن. پرخطر (پول، حقوقی/امضا، انتشار و پیام بیرونی، حذف) ⇒ در gates.yaml ثبت (فهرست پیش‌فرض قابل ویرایش است؛ ابزار بدون ردیف = پشت تأیید) و تأیید انسانی خارج از مدل. شکل کار (ساده/چندمرحله‌ای/طولانی) پرسیده نمی‌شود: هر ابزار پاکت {status: done|needs_input|processing, request_id,…} برمی‌گرداند و سرویس هر بار خودش حالت را تعیین می‌کند.
 5. خروجی از مدل خروجی صریح؛ بدون score/via/نام مدل/شناسهٔ سند/stack trace؛ خطا {code, message_fa, request_id}.
 6. خواندنی و نوشتنی جدا؛ سقف نرخ؛ لاگ با request_id؛ خروجی سقف‌دار و صفحه‌بندی‌شده.
 7. «تمام شد» یعنی: چهار تست interop/tests سبز + چک‌لیست پذیرش STANDARD-MCP §۴ + یک کار واقعی از Claude Code با ابزارها تا آخر + capabilities.entry.yaml پر.
