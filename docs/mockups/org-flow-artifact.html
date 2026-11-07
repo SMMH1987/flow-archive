@@ -135,6 +135,7 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
 .node.proc{border:3px solid var(--acc);background:var(--accbg);border-radius:16px}.node.proc .nt{font-size:15px}
 .mac-note{font-size:11.5px;color:var(--mute)}
 .nwd{position:absolute;bottom:-8px;right:10px;z-index:3;font-size:10px;font-weight:800;color:#fff;background:var(--e-out);border-radius:8px;padding:0 7px;line-height:16px}.dtl{position:absolute;top:4px;right:34px;z-index:3;font-size:11px;cursor:help;letter-spacing:2px}
+.node.rv{outline:3px solid #d92d20;outline-offset:3px;box-shadow:0 0 0 6px rgba(217,45,32,.18)}.rvt{position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:5;font-size:10.5px;font-weight:800;color:#fff;background:#d92d20;border-radius:8px;padding:0 8px;line-height:17px;cursor:help;white-space:nowrap}
 button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover:not(:disabled){background:var(--e-back);color:#fff}.nwchip{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:var(--e-out);border-radius:8px;padding:1px 8px;margin-inline-start:6px}.cr{white-space:pre;font-size:11px;direction:ltr;text-align:left}
 .grip{position:absolute;top:1px;left:50%;transform:translateX(-50%);cursor:grab;color:var(--mute);font-size:14px;line-height:1;z-index:4;padding:0 10px;touch-action:none;user-select:none}.grip:hover{color:var(--acc)}.fh .grip2{cursor:grab;color:var(--mute);padding:0 4px;touch-action:none}
 .dropb{box-shadow:0 -7px 0 0 var(--acc)!important}.dropa{box-shadow:0 7px 0 0 var(--acc)!important}
@@ -1193,6 +1194,50 @@ function crewYaml(p){
   return `# Crew: ${titleName(IDX.get(base)||n)}\n# process: ${hasRoute?'Flow با @router (چون تصمیم دارد)':'Process.sequential'}\n\n# ── config/agents.yaml ──\n${agents}\n\n# ── config/tasks.yaml ──\n${tasks}\n`}
 function crewPanel(n,p){const ta=h('textarea',{rows:8,class:'cr',readonly:true,style:'display:none'}),btn=h('button',{class:'sm',onclick:async()=>{const t=crewYaml(p);ta.value=t;ta.style.display='block';try{await navigator.clipboard.writeText(t);btn.textContent='کپی شد ✓'}catch(e){ta.select()}}},'📋 ساخت agents.yaml و tasks.yaml');
   return h('div',{class:'panel'},h('h2',{},'🧑‍✈️ خروجی CrewAI'),h('small',{},'ایجنت همان Agent (role، goal، backstory) است و هر قدم یک Task (description، expected_output، context از فلش‌های ورودی، human_input برای قدم‌های ask و gate). تصمیم route در CrewAI با Flow پیاده می‌شود. این فقط فایل پیکربندی می‌سازد و چیزی اجرا نمی‌کند.'),h('div',{class:'row',style:'margin-top:6px'},btn),ta)}
+/* بازبینی: قسمت‌های اضافه یا تکراری با کادر قرمز + پیشنهاد حذف، ادغام یا ترتیب */
+let REVIEW=false,RV=new Map();const DISM=new Set();
+const normT=s=>String(s||'').toLowerCase().replace(/[\d۰-۹\s.·:\-—_،؛()«»]+/g,'').replace(/[ًٌٍَُِّْ‌]/g,'');
+function reviewFind(){
+  const out=new Map(),rid=MACRO?null:rootOfView(),seenT=new Map(),seenS=new Map();
+  walk(M.nodes,'',(n,p)=>{
+    if(rid&&p.split('.')[0]!==rid)return;
+    if(!(isStep(n)||isProc(n))||DISM.has(p))return;
+    const t=normT(titleName(n));
+    if(t){const o=seenT.get(t);if(o)out.set(p,{k:'dup',other:o,msg:'نامش با «'+titleName(IDX.get(o))+'» یکی است؛ احتمالا تکراری'});else seenT.set(t,p)}
+    if(isStep(n)&&!n.children.length&&n.kind!=='routeStep'){
+      const sk=(n.tech||'').replace(/^skill:\s*/,'').trim(),ot=outText(n);
+      if(sk&&sk!=='—'&&ot&&!out.has(p)){const key=normT(sk)+'|'+normT(ot),o=seenS.get(key);if(o&&o!==p)out.set(p,{k:'dup',other:o,msg:'skill و خروجی‌اش با «'+titleName(IDX.get(o))+'» یکی است؛ احتمالا تکراری'});else seenS.set(key,p)}
+      if(!out.has(p)&&(!sk||sk==='—')&&!ot&&!M.rels.some(r=>r.from===p||r.to===p))out.set(p,{k:'empty',msg:'خالی است: skill، خروجی و اتصال ندارد؛ اضافه به نظر می‌رسد'})}
+    if(isStep(n)&&parentPath(p)){const par=IDX.get(parentPath(p)),i=par.children.findIndex(c=>c.id===n.id);
+      M.rels.forEach(r=>{if(r.to!==p||(r.label&&r.label!=='بعد'))return;const f=r.from,j=par.children.findIndex(c=>parentPath(f)===parentPath(p)&&c.id===f.split('.').pop());if(j>i&&!out.has(p))out.set(p,{k:'order',other:f,msg:'فلش عادی از «'+titleName(IDX.get(f))+'» که بعد از آن آمده به این می‌رسد؛ ترتیب زمانی به هم خورده'})})}
+  });return out}
+async function mergeInto(p,o){const n=IDX.get(p),t=IDX.get(o);if(!n||!t)return;
+  if(n.children.length){await ask('این نود زیرمجموعه دارد؛ ادغام خودکار ممکن نیست. اول زیرمجموعه‌ها را جابه‌جا کن یا حذف کن.',{info:1});return}
+  if(lockedN(n)||lockedN(t)){await ask('یکی از این دو قفل است؛ تغییر ممنوع تا خودت صریحاً باز کنی.',{info:1});return}
+  if(!(await ask(`«${titleName(n)}» حذف شود و فلش‌هایش به «${titleName(t)}» وصل شوند؟`)))return;
+  const seen=new Set();const rw=s=>s===p?o:s;
+  M.rels=M.rels.map(r=>({...r,from:rw(r.from),to:rw(r.to)})).filter(r=>{if(r.from===r.to)return false;const k=r.from+'>'+r.to;if(seen.has(k))return false;seen.add(k);return true}).map(r=>({...r,c:lca(r.from,r.to)}));
+  const par=IDX.get(parentPath(p)),list=par?par.children:M.nodes;list.splice(list.indexOf(n),1);
+  reindex();SEL=null;SELE=null;touch(true)}
+function reviewActs(p,f){const n=IDX.get(p),row=h('div',{class:'row',style:'margin-top:4px'});
+  row.append(h('button',{class:'sm danger',onclick:()=>delNode(p)},'🗑 حذف'));
+  if(f.k==='dup')row.append(h('button',{class:'sm',onclick:()=>mergeInto(p,f.other)},'⇢ ادغام در اولی'));
+  if(f.k==='order')row.append(h('button',{class:'sm pri',onclick:()=>autoOrder(parentPath(p))},'↧ ترتیب خودکار'));
+  if(f.other)row.append(h('button',{class:'sm',onclick:()=>{if(VER===4||VER===2){expandTo(f.other);FOC=f.other}select(f.other);if(VER===4||VER===2)fitTo(f.other)}},'نشانش بده'));
+  row.append(h('button',{class:'sm',onclick:()=>{DISM.add(p);renderDia();renderInsp()}},'نگه‌دار'));return row}
+function reviewPrompt(){const items=[...RV].map(([p,f])=>`- ${p} «${titleName(IDX.get(p))}»: ${f.msg}`).join('\n')||'- (موردی پیدا نشد)';
+  return `در پروژهٔ flow-archive این فرایند را بازبینی کن و قسمت‌های اضافه یا تکراری را پیدا کن:
+موارد پیشنهادی ابزار (قاعده‌محور):
+${items}
+
+کار تو: برای هر مورد بگو حذف، ادغام یا جابه‌جایی؛ مورد دیگری که ابزار نگرفته (مثلا دو قدم با یک کار ولی نام متفاوت) هم بگو. قسمت‌های #locked را تغییر نده.
+خروجی: فهرست پیشنهادها با دلیل، و بعد از تأیید من متن کامل recruitment.c4 به‌روز شده.`}
+function reviewPanel(){const P=h('div',{class:'panel'},h('h2',{},'🔍 بازبینی قسمت‌های اضافه یا تکراری'));
+  if(!REVIEW){P.append(h('small',{},'قسمت‌های تکراری، خالی و بی‌اتصال، یا بی‌ترتیب با کادر قرمز روی نقشه مشخص می‌شوند و برای هر کدام حذف، ادغام یا ترتیب پیشنهاد می‌شود. این بازبینی قاعده‌محور است؛ داوری عمیق‌تر را با دکمهٔ کپی دستور به Claude بده.'),h('button',{class:'sm pri',style:'margin-top:6px',onclick:()=>{REVIEW=true;NEEDFIT=false;renderVers();renderDia();renderInsp()}},'روشن کردن بازبینی'));return P}
+  P.append(h('div',{class:'row'},h('small',{class:'grow'},RV.size?toFa(RV.size)+' مورد با کادر قرمز روی نقشه':'موردی پیدا نشد؛ همه‌چیز یکتا و متصل است.'),h('button',{class:'sm',onclick:()=>{REVIEW=false;renderVers();renderDia();renderInsp()}},'خاموش')));
+  [...RV].slice(0,30).forEach(([p,f])=>P.append(h('div',{class:'sugc',style:'border-color:var(--e-back)'},h('b',{style:'cursor:pointer',onclick:()=>{if(VER===4||VER===2){expandTo(p);FOC=p}select(p);if(VER===4||VER===2)fitTo(p)}},titleName(IDX.get(p))),h('span',{class:'k',style:'background:var(--e-back);color:#fff'},{dup:'تکراری؟',empty:'اضافه؟',order:'ترتیب'}[f.k]),h('div',{},f.msg),reviewActs(p,f))));
+  const ta=h('textarea',{rows:6,class:'ltr',style:'display:none',readonly:true}),btn=h('button',{class:'sm pri',onclick:async()=>{const t=reviewPrompt();ta.value=t;try{await navigator.clipboard.writeText(t);btn.textContent='کپی شد ✓'}catch(e){ta.style.display='block';ta.select()}}},'📋 کپی دستور بازبینی برای Claude');
+  P.append(h('div',{class:'row',style:'margin-top:6px'},btn),ta);return P}
 const isProc=n=>(n.kind==='orgBox'||n.kind==='flow')&&n.children.length>0&&!n.children.some(c=>c.kind==='project'||c.kind==='tool');
 const inChain=n=>isStep(n)||isProc(n);
 async function spliceStep(refP,dir,node){
@@ -1305,6 +1350,7 @@ function nodeEl(n,p,b,full){
   const par0=IDX.get(parentPath(p)),ord=nest&&par0?par0.children.findIndex(c=>c.id===n.id)+1:0,extT=meta(n,'ext_tool');
   const ex=[nest?h('span',{class:'grip','data-grip':p,title:'بکش تا جابه‌جا شود'},'⠿'):null,ord?h('span',{class:'ord',title:'ترتیب در این فرایند'},toFa(ord)):null,nest?h('button',{class:'lkb','data-lock':p,title:lk?'قفل است؛ برای باز کردن کلیک کن':'قفلش کن تا تغییر نکند'},lk?'🔒':'🔓'):null,
     ws.length?h('span',{class:'wb',title:ws.join('\n')},'⚠ '+toFa(ws.length)):null,
+    RV.get(p)?h('span',{class:'rvt',title:RV.get(p).msg},{dup:'تکراری؟',empty:'اضافه؟',order:'ترتیب؟'}[RV.get(p).k]):null,
     isNew(n)?h('span',{class:'nwd',title:'جدید؛ جزئیاتش را در پنل ویرایش ببین'},'جدید'):null,
     (!CARDDET&&nest&&(meta(n,'agent')||extT||meta(n,'must')||meta(n,'must_not')))?h('span',{class:'dtl',title:[meta(n,'agent')&&'ایجنت: '+meta(n,'agent'),extT&&'ابزار: '+extT,meta(n,'must')&&'باید: '+meta(n,'must'),meta(n,'must_not')&&'نباید: '+meta(n,'must_not')].filter(Boolean).join('\n')+'\n(جزئیات در پنل ویرایش)'},(meta(n,'agent')?'🎯':'')+(extT?'🔌':'')+((meta(n,'must')||meta(n,'must_not'))?'⛔':'')):null];
   const mid=slot?h('div',{class:'slots'},
@@ -1316,15 +1362,17 @@ function nodeEl(n,p,b,full){
       h('div',{class:'slot out'+(outText(n)?'':' none') },h('b',{},'خروجی'),h('span',{},outText(n)||'نامشخص')))
     :[n.tech?h('div',{class:'ns'},n.tags.includes('gated')&&n.kind==='tool'?h('span',{class:'nb red'},'تأیید انسانی'):null,n.tags.includes('unknownSkill')?h('span',{class:'nb'},'skill؟'):null,n.tech):null,
       full&&outText(n)?h('div',{class:'no'},outText(n)):null];
-  return h('div',{class:`node ${kind}${lk?' locked':''}${SEL===p?' sel':''}${CONN&&CONN.from===p?' src':''}`,'data-p':p,style:`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`},
+  const rvf=RV.get(p);
+  return h('div',{class:`node ${kind}${rvf?' rv':''}${lk?' locked':''}${SEL===p?' sel':''}${CONN&&CONN.from===p?' src':''}`,'data-p':p,style:`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`},
     h('div',{class:'nt'},(lk&&!nest?'🔒 ':'')+n.title),mid,...ex,
     (full&&VER!==2&&VER!==4&&n.children.length&&isStep(n))?h('button',{class:'sm dive','data-dive':p,title:'باز کردن داخل این قدم (فرایند داخلی)'},'⤢ داخل'):null)}
 function renderDia(){
   if(!VIEWP.startsWith('ov:')&&!IDX.has(VIEWP))VIEWP='ov:'+roots()[0].id;
   if(VIEWP.startsWith('ov:')&&!IDX.has(VIEWP.slice(3)))VIEWP='ov:'+roots()[0].id;
+  RV=REVIEW?reviewFind():new Map();
   renderNav();renderTree();
   LAST=MACRO?renderMacro():(VER===2||VER===4)?renderNested(rootOfView()):VIEWP.startsWith('ov:')?renderOverview(VIEWP.slice(3)):renderLane(VIEWP);
-  applyView();if(NEEDFIT&&!$('#p-dia').hidden)fit()}
+  applyView();if(NEEDFIT&&!$('#p-dia').hidden)fit();if(REVIEW)renderVers()}
 const lastVis=()=>(LAST&&LAST.vis)||new Map();
 function expandTo(p){const s=p.split('.');for(let i=1;i<s.length;i++)EXP.add(s.slice(0,i).join('.'))}
 function fitTo(p){const v0=lastVis().get(p);if(!v0)return;const cv=$('#cv'),w=cv.clientWidth,hh=cv.clientHeight;if(!w)return;
@@ -1335,9 +1383,10 @@ function focusOn(p){if(!IDX.has(p))return;if(p.split('.')[0]!==rootOfView()){go(
   FOC=p;expandTo(p);NEEDFIT=false;renderDia();if(p.includes('.')&&!lastVis().has(p)){}
   const tgt=lastVis().has(p)?p:null;if(tgt)fitTo(tgt)}
 function setVer(v){VER=v;NEEDFIT=true;renderVers();renderDia();renderInsp()}
-const APP_VER=12,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
+const APP_VER=13,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
 const VIEW_VERS=[[1,'عبور','نمایش ۱','آرتیفکت v۴','۱۲:۵۹'],[2,'بازشدن درجا','نمایش ۲','آرتیفکت v۴','۱۲:۵۹'],[3,'درخت + کادرها','نمایش ۳','آرتیفکت v۴','۱۲:۵۹'],[4,'ترکیبی ۲+۳','نمایش ۴ (انتخاب تو)','آرتیفکت v۵','۱۳:۰۵']];
 const CHANGELOG=[
+ [13,'بازبینی تکراری و اضافه','کادر قرمز روی قسمت‌های تکراری، خالی یا بی‌ترتیب با پیشنهاد حذف، ادغام و ترتیب خودکار','۱۴:۵۵'],
  [12,'حذف، برچسب جدید و CrewAI','دکمهٔ حذف نود، برچسب «جدید» در ویرایش، کارت خلوت‌تر با جزئیات در ویرایش، فیلدهای goal و backstory و خروجی CrewAI','۱۴:۴۰'],
  [11,'تاریخچهٔ نسخه‌ها','نام، شمارهٔ نسخه و تاریخ ساخت در خود نقشه','۱۴:۲۰'],
  [10,'جابه‌جایی و طراح فرایند','کشیدن و رها کردن، ترتیب خودکار، طراح فرایند با ایجنت متخصص و قید باید/نباید','۱۴:۰۲'],
@@ -1357,6 +1406,7 @@ function histPanel(){return h('div',{class:'panel'},h('h2',{},'📜 تاریخچ
   h('button',{class:'sm',onclick:()=>{HISTOPEN=false;renderInsp()}},'بستن'))}
 function renderVers(){$('#vers').replaceChildren(
   ...VIEW_VERS.map(([v,l,tag,av,tm])=>h('button',{class:VER===v?'on':'',title:tag+' · '+av+' · ساخته‌شده '+APP_DATE+' ساعت '+tm+' UTC',onclick:()=>setVer(v)},'نسخه '+toFa(v)+' · '+l+' ',h('small',{style:'opacity:.75'},av+' · '+APP_DATE))),
+  h('button',{class:'sm'+(REVIEW?' pri':''),title:'قسمت‌های اضافه یا تکراری با کادر قرمز مشخص و حذف، ادغام یا ترتیب پیشنهاد می‌شود',onclick:()=>{REVIEW=!REVIEW;NEEDFIT=false;SEL=null;SELE=null;renderVers();renderDia();renderInsp()}},'🔍 بازبینی'+(REVIEW?' · '+toFa(RV.size):'')),
   h('button',{class:'sm',title:'کم: روی کارت فقط skill، ورودی و خروجی؛ ایجنت، ابزار و قید فقط در پنل ویرایش. زیاد: همه روی کارت.',onclick:()=>{CARDDET=!CARDDET;NEEDFIT=true;renderVers();renderDia()}},'🧩 جزئیات روی کارت: '+(CARDDET?'زیاد':'کم')),
   h('button',{class:'sm',title:'نام و تاریخ ساخت همهٔ نسخه‌ها',onclick:()=>{HISTOPEN=true;SEL=null;SELE=null;renderDia();renderInsp()}},'📜 تاریخچه · v'+toFa(APP_VER)+' · '+APP_DATE))}
 function renderTree(){
@@ -1765,6 +1815,7 @@ function renderInsp(){
       box.append(h('div',{class:'panel'},h('h2',{},'گزارش استاندارد · '+toFa(tot)+' هشدار'),
         h('small',{},'قاعده‌ها: WBS (قاعدهٔ ۱۰۰٪ و ۷±۲ زیرمجموعه)، هفت رهنمود مدل‌سازی فرایند (Mendling): نام فعل+مفعول و تقسیم مدل بزرگ، BPMN: هر قدم یک کار و یک مجری، تصمیم دست‌کم دو شاخهٔ برچسب‌دار، ISO 5807: ورودی و خروجی هر قدم مشخص.'),
         items.length?h('div',{},...items.slice(0,40).map(([pp,n,w])=>h('button',{class:'lint',onclick:()=>{if(VER===4||VER===2){expandTo(pp);FOC=pp}select(pp);if(VER===4||VER===2)fitTo(pp)}},h('b',{},titleName(n).slice(0,40)),h('small',{},w.join(' · '))))):h('div',{class:'mute'},'همه‌چیز با قاعده‌ها جور است.')))}
+    if(REVIEW)box.prepend(reviewPanel());else box.append(reviewPanel());
     if(HISTOPEN)box.append(histPanel());
     box.append(archPanel());
     box.append(tplPanel(MACRO?null:(FOC&&FOC!==rootOfView()?FOC:null)));
@@ -1788,6 +1839,7 @@ function renderInsp(){
   const f=(lbl,val,set,o={})=>h('label',{class:'f'},h('span',{},lbl),h(o.area?'textarea':'input',{value:o.area?null:val,disabled:dis||o.dis,class:o.ltr?'ltr':'',list:o.list,rows:o.area?3:null,oninput:e=>{set(e.target.value);touch()}},o.area?val:null));
   const P=h('div',{class:'panel'});
   P.append(h('h2',{},'ویرایش ',h('span',{class:'ltr mute'},SEL),isNew(n)?h('span',{class:'nwchip',title:'تازه اضافه شده'},'جدید'):null));
+  if(RV.has(SEL))P.append(h('div',{class:'warn',style:'border-color:#d92d20'},h('b',{},'بازبینی: '),RV.get(SEL).msg,reviewActs(SEL,RV.get(SEL))));
   if(isNew(n))P.append(h('div',{class:'row',style:'margin-bottom:6px'},h('small',{class:'grow'},'این نود تازه اضافه شده و هنوز بازبینی نشده؛ جزئیاتش را همین‌جا کامل کن.'),h('button',{class:'sm',disabled:dis,onclick:()=>{clearNew(n);touch(true)}},'✓ دیدم، برچسب جدید برداشته شود')));
   if(L)P.append(h('div',{class:'lockbox'},'🔒 قفل است؛ تغییر ممنوع تا خودت صریحاً باز کنی. ',
     h('button',{class:'sm',onclick:async()=>{if(await ask(`قفل «${n.title}» با گفتهٔ صریح خودت باز شود؟`)){setLock(n,false);touch(true)}}},'باز کردن قفل')));
