@@ -134,6 +134,7 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
 .sugc{border:1px solid var(--line);border-radius:10px;padding:8px;margin:6px 0;background:var(--card);font-size:12px;line-height:1.5}.sugc b{font-size:13px}.sugc .k{font-size:10px;font-weight:800;border-radius:6px;padding:0 6px;background:var(--accbg);color:var(--acc);margin-inline-start:6px}.sugc .pro{color:var(--e-out)}.sugc .con{color:var(--e-back)}
 .node.proc{border:3px solid var(--acc);background:var(--accbg);border-radius:16px}.node.proc .nt{font-size:15px}
 .mac-note{font-size:11.5px;color:var(--mute)}
+#insp,#insp .panel{direction:rtl;text-align:right}#insp input:not(.ltr),#insp textarea:not(.ltr),#insp select{direction:rtl;text-align:right}#insp .ltr{direction:ltr;text-align:left}
 .nwd{position:absolute;top:4px;right:76px;z-index:3;font-size:10px;font-weight:800;color:#fff;background:var(--e-out);border-radius:8px;padding:0 7px;line-height:16px}.dtl{position:absolute;top:4px;right:116px;z-index:3;font-size:11px;cursor:help;letter-spacing:2px}
 .node.rv{outline:3px solid #d92d20;outline-offset:3px;box-shadow:0 0 0 6px rgba(217,45,32,.18)}.rvt{position:absolute;top:-10px;left:50%;transform:translateX(-50%);z-index:5;font-size:10.5px;font-weight:800;color:#fff;background:#d92d20;border-radius:8px;padding:0 8px;line-height:17px;cursor:help;white-space:nowrap}
 .prt{position:absolute;top:4px;right:36px;z-index:3;font-size:10px;font-weight:800;border-radius:8px;padding:0 7px;line-height:16px;color:#fff;cursor:help}.prt.fixed{background:#2563eb}.prt.dynamic{background:#d97706}
@@ -161,7 +162,7 @@ button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover
 </style>
 <div id="app">
   <div class="top">
-    <h1>استودیوی سازمان <small>— فلوچارت زنده؛ ویرایش کن، خروجی = متن کامل <span class="ltr">recruitment.c4</span></small></h1>
+    <h1>استودیوی سازمان <small>— فلوچارت زنده؛ ویرایش کن، خروجی = متن کامل <span class="ltr" id="doc-name">recruitment.c4</span></small></h1>
     <nav class="tabs" id="tabs"></nav>
     <span class="vers" id="vers"></span>
     <button id="undo" title="برگشت (Ctrl+Z)">↶ برگشت</button>
@@ -892,7 +893,7 @@ function emitC4(M){
   return pre+'model {\n'+lines.join('\n')+'\n}'+M.mid+viewsAdjust(M.views,idx,M)}
 
 /* ───────── حالت برنامه ───────── */
-const KEY='orgStudio.v1';
+const KEY=()=>(typeof DOC==='undefined'?'orgStudio.v1':({startup:'orgStudio.startup1',org:'orgStudio.v1'}[DOC]));
 const BASE=document.getElementById('base-c4').textContent;
 let M,BASEPARSE,BASETEXT,IDX=new Map(),SEL=null,TAB='dia',HIST=[],G={};
 const defaultG=()=>({cats:Object.fromEntries(CATS.map(c=>[c,c!=='read_or_draft'])),expires:24});
@@ -912,7 +913,7 @@ function syncAuto(){ // سازگاری‌های خودکار پیش از ساخ�
     if(n.kind==='tool'){const c=toolInfo(n).cat;setTag(n,'gated',c?!!G.cats[c]:true)}
     if(n.kind==='project'){n.tech=`${meta(n,'protocol')||'?'} · ${meta(n,'status')||'?'}`}});
 }
-function save(){try{localStorage.setItem(KEY,JSON.stringify({base:BASETEXT,cur:cur(),G}))}catch(e){}}
+function save(){try{localStorage.setItem(KEY(),JSON.stringify({base:BASETEXT,cur:cur(),G}))}catch(e){}}
 function cur(){syncAuto();return emitC4(M)}
 let hT;function touch(full){syncAuto();save();clearTimeout(hT);hT=setTimeout(()=>{const t=emitC4(M);if(HIST[HIST.length-1]!==t){HIST.push(t);if(HIST.length>80)HIST.shift()}},500);
   if(full)refresh();else{renderDia();if(TAB==='out')renderOut()}}
@@ -1212,21 +1213,92 @@ const TALENT=[
   {t:'حذف یا ناشناس‌سازی داده طبق مدت نگهداری',kind:'autoStep',skill:'—',out:'گزارش حذف + اجرای درخواست‌های داوطلب'},
   {t:'گرفتن بازخورد کارفرما و داوطلب',kind:'askStep',skill:'—',out:'بازخورد ثبت‌شده'},
   {t:'به‌روزرسانی پرسشنامه‌ها و شایستگی‌ها',kind:'autoStep',skill:'—',out:'فهرست تغییرهای پیشنهادی؛ اعمال با تأیید'}]}];
-function addTalentBot(){
-  if(IDX.has('talent'))return false;
-  const sp={t:'ربات هوشمند استعدادیابی، غربال و رزومه',d:'پرسشنامه‌های ثابت برای همه + پرسشنامهٔ پویا بر پایهٔ عنوان شغلی؛ رضایت صریح و تأیید انسان',kind:'orgBox',skill:'—',kids:TALENT.map(s=>({...s,kids:s.kids.map(k=>({...k,agent:s.agent}))}))};
-  const node=mkNode(sp,'talent');node.kind='orgBox';node.tags=[];node.tech='';node.desc='out: '+sp.d;
-  setMeta(node,'blueprint','talentbot');
-  setMeta(node,'must','رضایت صریح پیش از هر پرسشنامه؛ تأیید انسان پیش از رد یا استخدام؛ داده‌های روانشناختی فقط برای همین استخدام و قابل حذف');
-  setMeta(node,'must_not','تشخیص بالینی؛ تصمیم نهایی خودکار؛ جمع‌آوری داده بدون رضایت؛ آزمون دارای حق‌نشر بدون مجوز');
-  walk(node.children,'',c=>clearNew(c));
-  let at=-1;M.nodes.forEach((n,i)=>{if(inChain(n))at=i});M.nodes.splice(at+1,0,node);
-  const add=(a,b,l)=>M.rels.push({from:a,to:b,label:l||'بعد',c:lca(a,b)}),P='talent.';
-  node.children.forEach((st,i)=>{
-    if(i<node.children.length-1)add(P+st.id,P+node.children[i+1].id);
-    if(i===5){const k=st.children;add(P+st.id+'.'+k[0].id,P+st.id+'.'+k[1].id);add(P+st.id+'.'+k[1].id,P+st.id+'.'+k[2].id,'بله');add(P+st.id+'.'+k[1].id,P+st.id+'.'+k[3].id,'نه')}
-    else st.children.forEach((c,k)=>{if(k<st.children.length-1)add(P+st.id+'.'+c.id,P+st.id+'.'+st.children[k+1].id)})});
-  reindex();return true}
+/* نقشهٔ تازه از صفر: استارتاپ ایجنت هوشمند استعدادیابی، غربال، رزومه و استخدام (از نام‌گذاری تا تجاری‌سازی) */
+const STARTUP_TITLE='استارتاپ ایجنت هوشمند استعدادیابی، غربال، رزومه و استخدام';
+const STARTUP=[
+ {id:'p0',t:'پیش‌نیازهای شروع',d:'چه چیزهایی از ابتدا لازم است',agent:'ایجنت راه‌انداز',kids:[
+  {t:'تعیین بودجه، زمان و هدف شش‌ماههٔ اول',kind:'askStep',skill:'—',out:'بودجه و مهلت؛ هر دو الان UNKNOWN و باید تعیین شوند'},
+  {t:'تعیین مسئول انسانی و تیم',kind:'askStep',skill:'—',out:'نام مسئول تصمیم‌ها + نقش‌های لازم (فنی، فروش، حقوقی)'},
+  {t:'فراهم کردن دسترسی‌ها و حساب‌ها',kind:'askStep',skill:'—',out:'کلید API مدل زبانی، ربات تلگرام و بله، دامنه، درگاه پرداخت'},
+  {t:'تعیین مرز بازار و محدودیت‌ها',kind:'askStep',skill:'—',out:'بازار ایران، زبان فارسی، فقط استخدام‌های غیرحساس در ابتدا'},
+  {t:'تأیید شروع پروژه',kind:'gateStep',skill:'—',out:'تأیید انسان؛ بدون آن هزینه‌ای انجام نمی‌شود'}]},
+ {id:'p1',t:'ایده و اعتبارسنجی',d:'قبل از ساخت، مطمئن شو مشکل واقعی است',agent:'ایجنت پژوهش',kids:[
+  {t:'تعریف مسئله و مشتری هدف',kind:'askStep',skill:'first-principles',out:'مسئله در یک جمله + دو گروه مشتری (کارفرمای کوچک و متوسط، کارجو)'},
+  {t:'پژوهش بازار و رقبا در ایران',kind:'autoStep',skill:'—',out:'جدول رقبا و خلأها با منبع + مزایا و معایب',ext:'Firecrawl MCP',extKind:'MCP'},
+  {t:'مصاحبه با کارفرما و کارجو',kind:'askStep',skill:'—',out:'خلاصهٔ ۱۰ مصاحبه با کارفرما و ۱۰ مصاحبه با کارجو'},
+  {t:'تصمیم ادامه یا توقف',kind:'gateStep',skill:'—',out:'ادامه، تغییر مسیر یا توقف؛ فقط انسان تصمیم می‌گیرد'}]},
+ {id:'p2',t:'نام‌گذاری و برند',d:'از نام تا هویت ساده',agent:'ایجنت نام‌گذاری',kids:[
+  {t:'گرفتن حس برند و محدودیت‌ها',kind:'askStep',skill:'—',out:'حس برند + زبان + محدودیت‌ها'},
+  {t:'تولید ۲۰ نام پیشنهادی',kind:'autoStep',skill:'startup-naming',out:'۲۰ نام با معنی هر کدام'},
+  {t:'بررسی دامنه، نشان و نام‌کاربری',kind:'autoStep',skill:'—',out:'دامنه و نام‌کاربری تلگرام و بله آزاد است؟ + برخورد با نشان تجاری',ext:'RDAP / Namecheap API',extKind:'API'},
+  {t:'انتخاب نهایی نام',kind:'gateStep',skill:'—',out:'یک نام برگزیده'},
+  {t:'ساخت هویت ساده: لوگو و لحن',kind:'autoStep',skill:'—',out:'لوگو، رنگ و لحن پیام‌ها'}]},
+ {id:'p3',t:'طراحی فرایند محصول',d:'ربات هوشمند استعدادیابی، غربال و رزومه: ثابت برای همه + پویا بر پایهٔ عنوان شغلی',agent:'ایجنت محصول',kids:null},
+ {id:'p4',t:'حقوقی، حریم خصوصی و انطباق',d:'قبل از جمع‌کردن هر دادهٔ شخصی',agent:'ایجنت انطباق',kids:[
+  {t:'بررسی قوانین داده و کار در ایران',kind:'askStep',skill:'—',out:'گزارش حقوقی؛ قوانین حفاظت داده UNKNOWN و باید با مشاور حقوقی بررسی شود'},
+  {t:'ثبت شرکت و مجوزهای فروش آنلاین',kind:'askStep',skill:'—',out:'فهرست مجوزهای لازم (مثلا نماد اعتماد)؛ UNKNOWN تا بررسی شود'},
+  {t:'نوشتن شرایط استفاده و رضایت‌نامه',kind:'gateStep',skill:'—',out:'متن تأییدشدهٔ حقوقی'},
+  {t:'انتخاب آزمون‌های روانشناختی مجاز',kind:'gateStep',skill:'—',out:'فقط آزمون‌های باز یا دارای مجوز (Big Five از IPIP)؛ نه MBTI و DISC بدون مجوز'}]},
+ {id:'p5',t:'ساخت MVP',d:'کوچک‌ترین نسخه که ارزش بدهد',agent:'ایجنت ساخت',kids:[
+  {t:'انتخاب معماری و مدل زبانی',kind:'askStep',skill:'—',out:'معماری یک‌صفحه‌ای + هزینهٔ تخمینی هر داوطلب',ext:'Claude API',extKind:'API'},
+  {t:'ساخت ربات تلگرام و بله',kind:'autoStep',skill:'—',out:'ربات پرسشنامه و پذیرش داوطلب',ext:'Telegram Bot API',extKind:'API'},
+  {t:'ساخت پنل کارفرما',kind:'autoStep',skill:'—',out:'ثبت عنوان شغلی و دیدن فهرست کوتاه و گزارش'},
+  {t:'راه‌اندازی پرداخت',kind:'gateStep',skill:'—',out:'کارت‌به‌کارت یا درگاه؛ هر مرحلهٔ مالی فقط با تأیید انسان'},
+  {t:'تست کیفیت، امنیت و بازیابی',kind:'autoStep',skill:'—',out:'گزارش تست + عیب‌های باز'}]},
+ {id:'p6',t:'آزمایش با کاربران واقعی',d:'پایلوت کوچک پیش از فروش',agent:'ایجنت آزمایش',kids:[
+  {t:'انتخاب ۵ کارفرمای پایلوت',kind:'askStep',skill:'—',out:'۵ کارفرما با رضایت کتبی'},
+  {t:'اجرای ۲۰ داوطلب از ابتدا تا رزومه',kind:'autoStep',skill:'—',out:'۲۰ رزومه و پروفایل ساخته‌شده'},
+  {t:'اندازه‌گیری شاخص‌ها',kind:'autoStep',skill:'—',out:'زمان غربال، رضایت کارفرما و داوطلب، دقت'},
+  {t:'تصمیم تغییر یا ادامه',kind:'gateStep',skill:'—',out:'فهرست اصلاح‌ها یا تأیید شروع فروش'}]},
+ {id:'p7',t:'قیمت‌گذاری و تجاری‌سازی',d:'از مدل درآمد تا مشتری اول',agent:'ایجنت تجاری‌سازی',kids:[
+  {t:'انتخاب مدل درآمد',kind:'askStep',skill:'—',out:'اشتراک ماهانه، کارمزد هر استخدام موفق یا ترکیبی؛ با مزایا و معایب'},
+  {t:'قیمت‌گذاری و بستهٔ جذب مشتری',kind:'autoStep',skill:'pricing-advisor',out:'جدول قیمت + نردبان جذب مشتری'},
+  {t:'ساخت صفحهٔ فرود و محتوا',kind:'autoStep',skill:'—',out:'صفحهٔ فرود + ۱۰ محتوای معرفی'},
+  {t:'تأیید و انتشار کمپین',kind:'gateStep',skill:'—',out:'انتشار بیرونی فقط با تأیید انسان'},
+  {t:'فروش به ۳ مشتری اول',kind:'askStep',skill:'—',out:'۳ قرارداد یا پیش‌پرداخت'}]},
+ {id:'p8',t:'رشد، پشتیبانی و بهبود',d:'حلقهٔ همیشگی بعد از شروع فروش',agent:'ایجنت بهبود',sched:'weekly',kids:[
+  {t:'پایش شاخص‌ها',kind:'autoStep',skill:'—',out:'گزارش هفتگی: کاربر فعال، هزینه، رضایت'},
+  {t:'پشتیبانی و رسیدگی به درخواست‌ها',kind:'askStep',skill:'—',out:'پاسخ‌ها و درخواست‌های حذف داده'},
+  {t:'به‌روزرسانی پرسشنامه‌ها و شایستگی‌ها',kind:'autoStep',skill:'—',out:'فهرست تغییرهای پیشنهادی؛ اعمال با تأیید',ext:'Firecrawl MCP',extKind:'MCP'},
+  {t:'تصمیم مقیاس‌دهی',kind:'gateStep',skill:'—',out:'عنوان‌های شغلی تازه، بازار تازه یا توقف'}]}];
+function linkKids(nd,pth,add){
+  const ks=nd.children;
+  ks.forEach((c,k)=>{
+    if(k<ks.length-1){
+      const prevRoute=k>0&&ks[k-1].kind==='routeStep',isR=c.kind==='routeStep';
+      if(isR&&ks[k+1]){add(pth+'.'+c.id,pth+'.'+ks[k+1].id,'بله');if(ks[k+2])add(pth+'.'+c.id,pth+'.'+ks[k+2].id,'نه')}
+      else if(!prevRoute&&!(k>1&&ks[k-2].kind==='routeStep'))add(pth+'.'+c.id,pth+'.'+ks[k+1].id)}
+    linkKids(c,pth+'.'+c.id,add)})}
+function startupModel(){
+  const m=parseC4(BASE);m.nodes=[];m.rels=[];m.mid='\n\n';
+  const add=(a,b,l)=>m.rels.push({from:a,to:b,label:l||'بعد',c:lca(a,b)});
+  STARTUP.forEach(ph=>{
+    const kids=ph.kids||TALENT.map(s=>({...s,kids:s.kids.map(k=>({...k,agent:s.agent}))}));
+    const sp={t:ph.t,d:ph.d,kind:'orgBox',skill:'—',sched:ph.sched,kids:kids.map(k=>({...k,agent:k.agent||ph.agent}))};
+    const node=mkNode(sp,ph.id);node.kind='orgBox';node.tags=[];node.tech='';node.desc='out: '+ph.d;
+    setMeta(node,'agent',ph.agent);
+    if(ph.id==='p3'){setMeta(node,'blueprint','talentbot');setMeta(node,'must','رضایت صریح پیش از هر پرسشنامه؛ تأیید انسان پیش از رد یا استخدام؛ داده‌های روانشناختی فقط برای همین استخدام و قابل حذف');setMeta(node,'must_not','تشخیص بالینی؛ تصمیم نهایی خودکار؛ جمع‌آوری داده بدون رضایت؛ آزمون دارای حق‌نشر بدون مجوز')}
+    clearNew(node);walk(node.children,'',c=>clearNew(c));
+    m.nodes.push(node)});
+  m.nodes.forEach((n,i)=>{if(i<m.nodes.length-1)add(n.id,m.nodes[i+1].id);linkKids(n,n.id,add)});
+  m.views='views {\n  view index {\n    title '+q(STARTUP_TITLE)+'\n    include *\n  }\n'+m.nodes.map(n=>'\n  view '+n.id+' of '+n.id+' {\n    title '+q(n.title)+'\n    include *\n  }\n').join('')+'}';
+  return m}
+const DOCKEY={startup:'orgStudio.startup1',org:'orgStudio.v1'};
+let DOC='startup';try{DOC=localStorage.getItem('orgStudio.doc')==='org'?'org':'startup'}catch(e){}
+const DOCFILE=()=>DOC==='startup'?'startup-talent.c4':'recruitment.c4';
+function openDoc(d){
+  DOC=d;try{localStorage.setItem('orgStudio.doc',d)}catch(e){}
+  let st=null;try{st=JSON.parse(localStorage.getItem(DOCKEY[d]))}catch(e){}
+  G={};
+  try{
+    if(st&&st.cur&&st.base){G=st.G||{};BASETEXT=st.base;BASEPARSE=parseC4(BASETEXT);M=parseC4(st.cur);reindex();deriveG();G=st.G&&st.G.cats?Object.assign(G,{expires:st.G.expires||24}):G;HIST=[st.cur]}
+    else if(d==='org')loadText(BASE,true);
+    else{M=startupModel();BASETEXT=emitC4(M);BASEPARSE=parseC4(BASETEXT);reindex();deriveG();HIST=[BASETEXT]}
+  }catch(e){if(d==='org')loadText(BASE,true);else{M=startupModel();BASETEXT=emitC4(M);BASEPARSE=parseC4(BASETEXT);reindex();deriveG();HIST=[BASETEXT]}}
+  SEL=null;SELE=null;FOC=null;EXP=new Set();MACRO=d==='startup';TAB='dia';NEEDFIT=true;
+  VIEWP='ov:'+roots()[0].id;
+  save()}
+function switchDoc(d){if(d===DOC)return;save();openDoc(d);renderVers();showTab();$('#doc-name').textContent=DOCFILE()}
 function archPrompt(bid,goal,must,not){const b=BLUEPRINTS[bid];
   return `در پروژهٔ flow-archive یک فرایند کامل طراحی کن (طراح فرایند):
 هدف: ${goal||'(بنویس)'}
@@ -1245,7 +1317,7 @@ function archPanel(){
   const ta=h('textarea',{rows:5,class:'ltr',style:'display:none',readonly:true});
   const cp=h('button',{class:'sm',onclick:async()=>{const t=archPrompt(bs.value,goal.value,must.value,not.value);ta.value=t;try{await navigator.clipboard.writeText(t);cp.textContent='کپی شد ✓'}catch(e){ta.style.display='block';ta.select()}}},'📋 کپی دستور طراحی کامل برای Claude');
   return h('div',{class:'panel'},h('h2',{},'🧠 طراح فرایند'),h('small',{},'هدف را بنویس و الگو را انتخاب کن. نودهای ساده روی نقشهٔ کل می‌آیند و هر کدام ایجنت متخصص خودش را دارد؛ بعد هر نود را با Claude تکمیل می‌کنی. قید «باید و نباید» روی همهٔ مرحله‌ها می‌نشیند.'),
-    goal,bs,prev,must,not,h('div',{class:'row',style:'margin-top:6px'},h('button',{class:'sm pri',onclick:()=>applyBlueprint(bs.value,goal.value.trim(),must.value.trim(),not.value.trim())},'＋ ساخت نودهای ساده روی نقشهٔ کل'),cp,h('button',{class:'sm',title:'فرایند کامل نمونه با بخش‌های ثابت و پویا',onclick:async()=>{if(addTalentBot()){MACRO=true;NEEDFIT=true;touch(true)}else await ask('نمونهٔ ربات استعدادیابی از قبل روی نقشه هست.',{info:1})}},'🌱 افزودن نمونهٔ پخته: ربات استعدادیابی')),ta)}
+    goal,bs,prev,must,not,h('div',{class:'row',style:'margin-top:6px'},h('button',{class:'sm pri',onclick:()=>applyBlueprint(bs.value,goal.value.trim(),must.value.trim(),not.value.trim())},'＋ ساخت نودهای ساده روی نقشهٔ کل'),cp),ta)}
 function metaPanel(n,p){const dis=lockedN(n);
   const fld=(lbl,k,ph)=>h('label',{class:'f'},h('span',{},lbl),h('input',{value:meta(n,k),placeholder:ph||'',disabled:dis,oninput:e=>{const v=e.target.value;if(v)setMeta(n,k,v);else n.meta=(n.meta||[]).filter(x=>x[0]!==k);touch()}}));
   return h('div',{class:'panel'},h('h2',{},'🎯 ایجنت متخصص و قید'),fld('ایجنت یا skill متخصص این نود (role در CrewAI)','agent','مثلا ایجنت پژوهش مداوم'),h('label',{class:'f'},h('span',{},'نوع بخش'),h('select',{disabled:dis,onchange:e=>{const v=e.target.value;if(v)setMeta(n,'part',v);else n.meta=(n.meta||[]).filter(x=>x[0]!=='part');touch(true)}},[['','—'],['fixed','ثابت (برای همهٔ عناوین یکی)'],['dynamic','پویا (بر پایهٔ عنوان شغلی)']].map(([v,l])=>h('option',{value:v,selected:meta(n,'part')===v},l)))),fld('skillهای کاندید (top 10، با ؛ جدا کن)','skills_top10','نتیجهٔ جستجو؛ یکی انتخاب یا skill تازه ساخته شود'),h('div',{class:'row',style:'margin:-2px 0 6px'},(()=>{const b=h('button',{class:'sm',title:'دستور جستجوی ۱۰ skill مرتبط برای Claude',onclick:async()=>{const t=skillSearchPrompt(p);try{await navigator.clipboard.writeText(t);b.textContent='کپی شد ✓'}catch(e){b.textContent='کپی نشد'}}},'🔎 کپی دستور جستجوی top 10 skill');return b})()),fld('هدف ایجنت (goal)','agent_goal','این ایجنت دقیقا باید به چه چیزی برسد'),fld('پیشینه و تخصص ایجنت (backstory)','agent_backstory','چرا برای این کار مناسب است'),fld('باید (با ؛ جدا کن)','must'),fld('نباید (با ؛ جدا کن)','must_not'),
@@ -1465,10 +1537,11 @@ function focusOn(p){if(!IDX.has(p))return;if(p.split('.')[0]!==rootOfView()){go(
   FOC=p;expandTo(p);NEEDFIT=false;renderDia();if(p.includes('.')&&!lastVis().has(p)){}
   const tgt=lastVis().has(p)?p:null;if(tgt)fitTo(tgt)}
 function setVer(v){VER=v;NEEDFIT=true;renderVers();renderDia();renderInsp()}
-const APP_VER=15,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
+const APP_VER=16,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
 const VIEW_VERS=[[1,'عبور','نمایش ۱','آرتیفکت v۴','۱۲:۵۹'],[2,'بازشدن درجا','نمایش ۲','آرتیفکت v۴','۱۲:۵۹'],[3,'درخت + کادرها','نمایش ۳','آرتیفکت v۴','۱۲:۵۹'],[4,'ترکیبی ۲+۳','نمایش ۴ (انتخاب تو)','آرتیفکت v۵','۱۳:۰۵']];
 const CHANGELOG=[
- [15,'نمونهٔ پخته: ربات استعدادیابی','فرایند کامل ربات استعدادیابی، غربال و رزومه با ۹ مرحلهٔ جمع‌شده، بخش‌های ثابت و پویا و پیش‌نیازهای شروع','۱۵:۳۰'],
+ [16,'نقشهٔ تازهٔ استارتاپ از صفر','نقشهٔ جدید و جدا از سازمان قبلی: از پیش‌نیازها و نام‌گذاری تا ساخت، آزمایش و تجاری‌سازی؛ فایل c4 جدا','۱۶:۰۵'],
+ [15,'نمونهٔ پختهٔ ربات استعدادیابی','فرایند ربات با ۹ مرحلهٔ جمع‌شده، بخش‌های ثابت و پویا و پیش‌نیازهای شروع','۱۵:۳۰'],
  [14,'ایجنت استخدام و جستجوی skill','تمپلیت ایجنت استخدام با جستجوی ۱۰ skill، انتخاب یا ساخت skill تازه و ورک‌فلو استخدام زیر خود ایجنت؛ فیلد skillهای کاندید و دستور جستجو برای Claude','۱۵:۱۰'],
  [13,'بازبینی تکراری و اضافه','کادر قرمز روی قسمت‌های تکراری، خالی یا بی‌ترتیب با پیشنهاد حذف، ادغام و ترتیب خودکار','۱۴:۵۵'],
  [12,'حذف، برچسب جدید و CrewAI','دکمهٔ حذف نود، برچسب «جدید» در ویرایش، کارت خلوت‌تر با جزئیات در ویرایش، فیلدهای goal و backstory و خروجی CrewAI','۱۴:۴۰'],
@@ -1489,7 +1562,9 @@ function histPanel(){return h('div',{class:'panel'},h('h2',{},'📜 تاریخچ
   ...CHANGELOG.map(([n,t,d,tm])=>h('div',{class:'sugc'},h('b',{},'نسخهٔ '+toFa(n)+' · '+t),n===APP_VER?h('span',{class:'k'},'همین نسخه'):null,h('div',{},d),h('small',{},APP_DATE+' · '+tm))),
   h('button',{class:'sm',onclick:()=>{HISTOPEN=false;renderInsp()}},'بستن'))}
 function renderVers(){$('#vers').replaceChildren(
-  ...VIEW_VERS.map(([v,l,tag,av,tm])=>h('button',{class:VER===v?'on':'',title:tag+' · '+av+' · ساخته‌شده '+APP_DATE+' ساعت '+tm+' UTC',onclick:()=>setVer(v)},'نسخه '+toFa(v)+' · '+l+' ',h('small',{style:'opacity:.75'},av+' · '+APP_DATE))),
+  h('button',{class:DOC==='startup'?'pri':'',title:'نقشهٔ تازه از صفر: استارتاپ استعدادیابی، غربال، رزومه و استخدام؛ از نام‌گذاری تا تجاری‌سازی',onclick:()=>switchDoc('startup')},'🚀 نقشهٔ استارتاپ تازه'),
+  h('button',{class:DOC==='org'?'pri':'',title:'نقشهٔ قبلی: سازمان اتوماسیون استخدام (recruitment.c4)',onclick:()=>switchDoc('org')},'🏢 نقشهٔ سازمان قبلی'),
+...VIEW_VERS.map(([v,l,tag,av,tm])=>h('button',{class:VER===v?'on':'',title:tag+' · '+av+' · ساخته‌شده '+APP_DATE+' ساعت '+tm+' UTC',onclick:()=>setVer(v)},'نسخه '+toFa(v)+' · '+l+' ',h('small',{style:'opacity:.75'},av+' · '+APP_DATE))),
   h('button',{class:'sm'+(REVIEW?' pri':''),title:'قسمت‌های اضافه یا تکراری با کادر قرمز مشخص و حذف، ادغام یا ترتیب پیشنهاد می‌شود',onclick:()=>{REVIEW=!REVIEW;NEEDFIT=false;SEL=null;SELE=null;renderVers();renderDia();renderInsp()}},'🔍 بازبینی'+(REVIEW?' · '+toFa(RV.size):'')),
   h('button',{class:'sm',title:'کم: روی کارت فقط skill، ورودی و خروجی؛ ایجنت، ابزار و قید فقط در پنل ویرایش. زیاد: همه روی کارت.',onclick:()=>{CARDDET=!CARDDET;NEEDFIT=true;renderVers();renderDia()}},'🧩 جزئیات روی کارت: '+(CARDDET?'زیاد':'کم')),
   h('button',{class:'sm',title:'نام و تاریخ ساخت همهٔ نسخه‌ها',onclick:()=>{HISTOPEN=true;SEL=null;SELE=null;renderDia();renderInsp()}},'📜 تاریخچه · v'+toFa(APP_VER)+' · '+APP_DATE))}
@@ -2099,12 +2174,12 @@ function renderOut(){
     (d.add.length+d.mod.length+d.del.length+d.radd.length+d.rdel.length)?null:h('small',{},'بدون تغییر — خروجی با نسخهٔ پایه یکی است.'),
     h('div',{class:'row',style:'margin-top:6px'},h('span',{class:'badge '+(rt?'ok':'red')},rt?'خودآزمون: خروجی دوباره تجزیه می‌شود و یکسان است ✓':'خودآزمون ناموفق ✗'),
       h('span',{class:'badge '+(brt?'ok':'red')},brt?'فایل پایه بی‌تغییر بازتولید می‌شود ✓':'فایل پایه عیناً بازتولید نمی‌شود (قالب خاص/کامنت داخل model؟) — خروجی را با diff بررسی کن'))));
-  const files={c4:['recruitment.c4',text],caps:['capabilities.yaml',capsYaml()],gates:['gates.yaml',gatesYaml()]};
-  const tabs=h('div',{class:'row'},Object.entries({c4:'recruitment.c4 (کامل)',caps:'capabilities.yaml',gates:'interop/gates.yaml'}).map(([k,l])=>h('button',{class:OUTTAB===k?'pri':'',onclick:()=>{OUTTAB=k;renderOut()}},l)));
+  const files={c4:[DOCFILE(),text],caps:['capabilities.yaml',capsYaml()],gates:['gates.yaml',gatesYaml()]};
+  const tabs=h('div',{class:'row'},Object.entries({c4:DOCFILE()+' (کامل)',caps:'capabilities.yaml',gates:'interop/gates.yaml'}).map(([k,l])=>h('button',{class:OUTTAB===k?'pri':'',onclick:()=>{OUTTAB=k;renderOut()}},l)));
   const [name,body]=files[OUTTAB];
   root.append(h('div',{class:'panel'},tabs,h('div',{class:'row',style:'margin:8px 0'},
     h('button',{class:'pri',onclick:async e=>{try{await navigator.clipboard.writeText(body);e.target.textContent='کپی شد ✓'}catch(x){const t=$('#outpre');const r=document.createRange();r.selectNodeContents(t);getSelection().removeAllRanges();getSelection().addRange(r);e.target.textContent='انتخاب شد؛ Ctrl+C'}}},'کپی متن کامل'),
-    h('small',{},OUTTAB==='c4'?'این متن را جایگزین c4-org/recruitment.c4 کن (کل فایل).':'برای پروژه‌ها؛ در پوشهٔ interop/ یا دفتر مرکزی بگذار.')),
+    h('small',{},OUTTAB==='c4'?(DOC==='startup'?'این متن را به‌عنوان فایل تازهٔ c4-org/startup-talent.c4 ذخیره کن؛ به recruitment.c4 دست نمی‌زند.':'این متن را جایگزین c4-org/recruitment.c4 کن (کل فایل).'):'برای پروژه‌ها؛ در پوشهٔ interop/ یا دفتر مرکزی بگذار.')),
     h('pre',{id:'outpre'},body)))}
 
 /* ───────── صفحه‌ها ───────── */
@@ -2116,7 +2191,7 @@ function showTab(){
   if(TAB==='int')renderInt();if(TAB==='out')renderOut()}
 function refresh(){syncAuto();showTab()}
 $('#undo').onclick=undo;
-$('#reset').onclick=async()=>{if(await ask('همهٔ تغییرات پاک شود و نمونهٔ مخزن برگردد؟')){G={};loadText(BASE,true);save();NEEDFIT=true;refresh()}};
+$('#reset').onclick=async()=>{if(await ask(DOC==='startup'?'همهٔ تغییرات نقشهٔ استارتاپ پاک شود و نمونهٔ اولیه برگردد؟':'همهٔ تغییرات پاک شود و نمونهٔ مخزن برگردد؟')){try{localStorage.removeItem(KEY())}catch(e){}openDoc(DOC);renderVers();refresh()}};
 $('#load').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{const f=e.target.files[0];if(!f)return;const t=await f.text();
   try{G={};loadText(t,true);save();NEEDFIT=true;refresh()}catch(x){await ask('فایل خوانده نشد: '+x.message,{info:1})}e.target.value=''};
@@ -2124,12 +2199,7 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&
 
 /* ───────── شروع ───────── */
 (function init(){
-  let st=null;try{st=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-  try{
-    if(st&&st.cur&&st.base){G=st.G||{};BASETEXT=st.base;BASEPARSE=parseC4(BASETEXT);M=parseC4(st.cur);reindex();deriveG();G=st.G&&st.G.cats?Object.assign(G,{expires:st.G.expires||24}):G;HIST=[st.cur]}
-    else loadText(BASE,true)
-  }catch(e){G={};loadText(BASE,true)}
-  try{if(!localStorage.getItem('orgStudio.seed14')){if(addTalentBot()){MACRO=true;NEEDFIT=true;HIST=[emitC4(M)];save()}localStorage.setItem('orgStudio.seed14','1')}}catch(e){if(addTalentBot()){MACRO=true;NEEDFIT=true}}
+  openDoc(DOC);$('#doc-name').textContent=DOCFILE();
   $('#cvhint').textContent=HINT;renderVers();showTab()})();
 window.__studio={parseC4,emitC4,get M(){return M},get BASE(){return BASE},cur,diff,addChild,IDX:()=>IDX,select,setLock,loadText};
 </script>
