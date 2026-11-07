@@ -126,6 +126,12 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
 .lkb{position:absolute;top:3px;left:5px;z-index:3;border:0;background:transparent;font-size:14px;cursor:pointer;padding:0 3px;line-height:1.2}.lkb:hover{background:var(--accbg);border-radius:6px}.wb{position:absolute;top:4px;left:30px;z-index:3;font-size:10.5px;font-weight:800;color:#fff;background:var(--e-back);border-radius:8px;padding:0 6px;cursor:help}
 .lint{display:block;width:100%;text-align:right;margin:3px 0;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);cursor:pointer;font:inherit;font-size:12px;color:var(--ink)}.lint:hover{border-color:var(--e-back)}.lint small{display:block;color:var(--mute)}
 .lg2{height:0!important;border:0!important;border-top:3px solid;margin-top:8px;border-radius:0!important;background:none!important}
+.node.nin::after{content:'مبدأ'}.node.nout::after{content:'مقصد'}.node.nin::after,.node.nout::after{top:auto;bottom:0;right:0;border-radius:8px 0 0 0}
+.ord{position:absolute;top:4px;right:9px;width:20px;height:20px;border-radius:50%;background:var(--accbg);color:var(--acc);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:3}
+.slot.ext b{color:var(--e-x)}.slot.ext span{font-weight:700}
+.lanebox.ghost{border-style:dashed;border-color:var(--e-x);background:color-mix(in srgb,var(--e-x) 5%,transparent)}.lanebox.ghost .fh{cursor:default;color:var(--e-x)}
+.ghostn{position:absolute;direction:rtl;text-align:right;padding:6px 10px;border:2px dashed var(--e-x);border-radius:10px;background:color-mix(in srgb,var(--e-x) 7%,var(--card));font-size:12px;line-height:1.4;overflow:hidden}.ghostn b{font-size:12.5px;display:block}.ghostn small{display:block;color:var(--mute)}.ghostn .tg2{font-size:10px;font-weight:800;color:var(--e-x)}.ghostn button{position:absolute;bottom:4px;left:8px}
+.sugc{border:1px solid var(--line);border-radius:10px;padding:8px;margin:6px 0;background:var(--card);font-size:12px;line-height:1.5}.sugc b{font-size:13px}.sugc .k{font-size:10px;font-weight:800;border-radius:6px;padding:0 6px;background:var(--accbg);color:var(--acc);margin-inline-start:6px}.sugc .pro{color:var(--e-out)}.sugc .con{color:var(--e-back)}
 .tree{max-height:calc(100vh - 110px);overflow:auto;padding:8px}.tree h2{font-size:13px}
 .tr{display:flex;gap:2px;align-items:center;font-size:12.5px;line-height:1.5;border-radius:6px;padding:0 2px}
 .tr.cur{background:var(--accbg);font-weight:800}.tr.sel .tl{text-decoration:underline}
@@ -987,10 +993,117 @@ function drawEdge(svg,d,o){
   const mid='mk'+col.replace(/-/g,'');
   svg.append(sv('path',{d,fill:'none',style:`stroke:var(${col})`,'stroke-width':thick?3.2:2,'stroke-opacity':dim?.22:1,'stroke-dasharray':dash?'7 5':'none','stroke-linejoin':'round','marker-end':`url(#${mid})`}));
   const m0=/^M\s*([-\d.]+)[ ,]([-\d.]+)/.exec(d);if(m0)svg.append(sv('circle',{cx:m0[1],cy:m0[2],r:thick?5:4,style:`fill:var(${col})`,'fill-opacity':dim?.22:1}));
-  svg.append(sv('path',{d,fill:'none',stroke:'transparent','stroke-width':16,class:'hit','data-e':idx}));
+  const hit=sv('path',{d,fill:'none',stroke:'transparent','stroke-width':16,class:'hit','data-e':idx});
+  if(idx!=null&&M.rels[idx]){const r0=M.rels[idx],tt=sv('title');tt.textContent='از «'+nodeLabel(r0.from)+'» به «'+nodeLabel(r0.to)+'»'+(r0.label?' — '+r0.label:'');hit.append(tt)}
+  svg.append(hit);
   if(label){const t=sv('text',{x:lx,y:ly,'font-size':12.5,'text-anchor':anchor||'middle',style:`fill:var(${col});paint-order:stroke;stroke:var(--bg);stroke-width:5px;font-family:var(--font);font-weight:600;opacity:${dim?.4:1}`});t.textContent=label;svg.append(t)}}
 function newSvg(W,H){const svg=sv('svg',{id:'edges',width:W,height:H});const defs=sv('defs');
   ['--edge','--acc','--proj','--e-seq','--e-in','--e-out','--e-back','--e-route','--e-x'].map(v=>['mk'+v.replace(/-/g,''),`var(${v})`]).forEach(([id,c])=>{const m=sv('marker',{id,viewBox:'0 0 10 10',refX:8.5,refY:5,markerWidth:8,markerHeight:8,orient:'auto'});m.append(sv('path',{d:'M0 0L10 5L0 10z',style:'fill:'+c}));defs.append(m)});svg.append(defs);return svg}
+
+/* ───────── پیشنهاد ابزار بیرونی، قدم قبل/بعد، تمپلیت (پیشنهادند؛ بدون تأیید چیزی نوشته نمی‌شود) ───────── */
+const EXT_CAT=[
+ {re:/رزومه|غربال|امتیاز/,items:[
+  {n:'Affinda Resume Parser',k:'API',why:'خواندن رزومه و تبدیلش به JSON ساخت‌یافته',pro:'سریع و چندزبانه',con:'هزینهٔ هر سند؛ داده‌های شخصی به سرویس بیرونی می‌رود'},
+  {n:'Supabase MCP',k:'MCP',why:'نگهداری امتیازها و رزومه‌های خوانده‌شده',pro:'جست‌وجو و فیلتر آسان',con:'نیاز به کلید جدا و سیاست دسترسی'}]},
+ {re:/آگهی|انتشار|کانال/,items:[
+  {n:'Zapier MCP',k:'MCP',why:'انتشار روی چند کانال با یک اتصال',pro:'بدون کدنویسی و با هزاران برنامه',con:'هزینهٔ هر اجرا',gate:1},
+  {n:'Telegram Bot API',k:'API',why:'انتشار در کانال تلگرام',pro:'رایگان و ساده',con:'فقط یک کانال',gate:1}]},
+ {re:/مصاحبه|زمان‌بندی|جلسه/,items:[
+  {n:'Google Calendar MCP',k:'MCP',why:'پیدا کردن زمان آزاد و ساخت دعوت‌نامه',pro:'خودکار و بدون رفت‌وبرگشت',con:'دعوت‌نامه یعنی ارسال بیرونی',gate:1},
+  {n:'Cal.com API',k:'API',why:'لینک رزرو برای داوطلب',pro:'منبع‌باز',con:'نیاز به میزبانی یا حساب'}]},
+ {re:/پیام|ایمیل|ارسال|مؤدبانه/,items:[
+  {n:'Gmail MCP',k:'MCP',why:'پیش‌نویس و ارسال ایمیل',pro:'ردیابی پاسخ',con:'ارسال بیرونی؛ فقط بعد از تأیید',gate:1},
+  {n:'Telegram Bot API',k:'API',why:'پیام کوتاه به داوطلب',pro:'سریع',con:'نیاز به رضایت داوطلب',gate:1}]},
+ {re:/تحقیق|بازار|رقیب|نمونه|کرال|خزش/,items:[
+  {n:'Firecrawl MCP',k:'MCP',why:'اول map سپس scrape فقط صفحات مرتبط = کمترین توکن',pro:'خروجی تمیز Markdown',con:'هزینهٔ اعتبار؛ رعایت robots.txt'},
+  {n:'Exa Search API',k:'API',why:'جست‌وجوی معنایی نمونه‌های مشابه',pro:'نتایج نزدیک به ایده',con:'پوشش فارسی محدود'}]},
+ {re:/گفتار|صوت|ضبط/,items:[
+  {n:'آوانگار (همدبیر)',k:'پروژهٔ خودی',why:'همین الان در فهرست پروژه‌ها هست',pro:'بدون ابزار تازه',con:'نشانی عمومی و احراز هویتش هنوز نامشخص'},
+  {n:'Whisper API',k:'API',why:'گفتار به متن عمومی',pro:'ارزان',con:'دقت فارسی کمتر'}]},
+ {re:/قرارداد|حقوق|بند/,items:[
+  {n:'حق‌پرس (ایجنت وکیل)',k:'پروژهٔ خودی',why:'همین الان در فهرست پروژه‌ها هست',pro:'تخصصی حقوقی ایران',con:'خروجی باید توسط انسان بازبینی شود'}]},
+ {re:/فرم|پرسشنامه|پاسخ/,items:[
+  {n:'Tally API',k:'API',why:'ساخت و جمع‌آوری فرم بیرونی',pro:'رایگان',con:'داده روی سرویس دیگر'},
+  {n:'Supabase MCP',k:'MCP',why:'ذخیرهٔ ساخت‌یافتهٔ پاسخ‌ها',pro:'پرس‌وجو آسان',con:'نیاز به کلید جدا'}]},
+ {re:/KPI|داشبورد|ارزیاب/,items:[
+  {n:'Google Analytics MCP',k:'MCP',why:'خواندن اعداد واقعی',pro:'داده زنده',con:'نیاز به دسترسی'},
+  {n:'Metabase API',k:'API',why:'داشبورد برای مدیر',pro:'منبع‌باز',con:'نیاز به میزبانی'}]}];
+const EXT_DEF=[{n:'Zapier MCP',k:'MCP',why:'اتصال یک قدم به هزاران برنامه',pro:'سریع برای نمونهٔ اولیه',con:'هزینهٔ هر اجرا؛ هر خروجی بیرونی باید تأیید شود',gate:1},
+  {n:'n8n (خودمیزبان) + webhook',k:'API',why:'ورک‌فلو بیرونی که این قدم صدا می‌زند',pro:'کنترل کامل و داده در دست خودت',con:'نگهداری سرور'}];
+const extSug=n=>{const t=[titleName(n),n.tech||'',n.desc||''].join(' ');const hit=EXT_CAT.filter(c=>c.re.test(t)).flatMap(c=>c.items);return hit.length?hit.slice(0,4):EXT_DEF};
+const SEQ_CAT=[
+ {re:/آگهی|انتشار/,before:[{t:'تعریف مخاطب و کانال‌ها',kind:'askStep',skill:'identify-assumptions-new',out:'مخاطب هدف + کانال‌ها'}],after:[{t:'ردیابی نتیجهٔ آگهی',kind:'autoStep',skill:'—',out:'تعداد رزومه به‌ازای هر کانال'}]},
+ {re:/رزومه|غربال/,before:[{t:'یکدست‌سازی رزومه‌ها',kind:'autoStep',skill:'—',out:'رزومه‌ها در قالب یکسان'}],after:[{t:'تأیید فهرست کوتاه',kind:'askStep',skill:'—',out:'فهرست کوتاه + دلیل انتخاب'}]},
+ {re:/مصاحبه/,before:[{t:'زمان‌بندی مصاحبه',kind:'autoStep',skill:'—',out:'زمان قطعی هر مصاحبه',ext:'Google Calendar MCP'}],after:[{t:'مقایسهٔ مصاحبه‌ها',kind:'autoStep',skill:'—',out:'جدول مقایسهٔ داوطلبان'}]},
+ {re:/قرارداد|حقوق/,before:[{t:'بررسی شرایط و بودجه',kind:'askStep',skill:'—',out:'شرایط تأییدشده'}],after:[{t:'بایگانی نسخهٔ امضاشده',kind:'autoStep',skill:'—',out:'فایل امضاشده + تاریخ'}]},
+ {re:/.*/,before:[{t:'اعتبارسنجی ورودی',kind:'autoStep',skill:'—',out:'ورودی کامل و درست'}],after:[{t:'ثبت خروجی و گزارش کوتاه',kind:'autoStep',skill:'—',out:'گزارش یک‌خطی + نتیجه'}]}];
+const seqSug=n=>{const t=[titleName(n),n.tech||'',n.desc||''].join(' ');return SEQ_CAT.find(c=>c.re.test(t))};
+const TPLS=[
+ {id:'name',t:'پیدا کردن نام استارتاپ',d:'از هدف برند تا نام برگزیده با بررسی دامنه',kids:[
+   {t:'گرفتن هدف و حس برند',kind:'askStep',skill:'—',out:'حس برند + زبان + محدودیت‌ها'},
+   {t:'تولید ۲۰ نام پیشنهادی',kind:'autoStep',skill:'startup-naming',out:'۲۰ نام + معنی هر کدام'},
+   {t:'بررسی دامنه و نشان تجاری',kind:'autoStep',skill:'—',out:'دامنهٔ آزاد؟ + برخورد با نشان',ext:'RDAP / Namecheap API',extKind:'API'},
+   {t:'انتخاب نهایی',kind:'askStep',skill:'—',out:'نام برگزیده'}]},
+ {id:'research',t:'ایجنت پژوهش مداوم (نمونه‌های مشابه)',d:'خزش کم‌توکن، نقد با مزایا و معایب، پیشنهاد به‌روزرسانی ایده؛ تکرار هفتگی',sched:'weekly',kids:[
+   {t:'تعریف پرسش و منابع',kind:'askStep',skill:'first-principles',out:'پرسش‌ها + فهرست منابع'},
+   {t:'خزش کم‌هزینه',kind:'autoStep',skill:'—',out:'فقط صفحات مرتبط؛ خلاصهٔ ۵ خطی هر صفحه (اول map، بعد scrape)',ext:'Firecrawl MCP',extKind:'MCP'},
+   {t:'استخراج ویژگی و نمونه‌کد',kind:'autoStep',skill:'—',out:'جدول ویژگی‌ها + لینک نمونه‌کد'},
+   {t:'نقد: مزایا، معایب، ریسک',kind:'autoStep',skill:'—',out:'برای هر ایده مزایا، معایب و ریسک',unk:1},
+   {t:'پیشنهاد به‌روزرسانی ایده',kind:'askStep',skill:'—',out:'فهرست تغییرهای پیشنهادی؛ اعمال فقط با تأیید'}]},
+ {id:'sched',t:'زمان‌بندی مصاحبه',d:'پیدا کردن زمان آزاد، تأیید با داوطلب، ساخت دعوت‌نامه',kids:[
+   {t:'پیدا کردن زمان آزاد',kind:'autoStep',skill:'—',out:'۳ زمان پیشنهادی',ext:'Google Calendar MCP',extKind:'MCP'},
+   {t:'تأیید زمان با داوطلب',kind:'askStep',skill:'—',out:'زمان قطعی'},
+   {t:'ساخت دعوت‌نامه',kind:'autoStep',skill:'—',out:'دعوت‌نامه با لینک جلسه',ext:'Google Calendar MCP',extKind:'MCP'}]},
+ {id:'msg',t:'پیام‌رسانی با تأیید انسانی',d:'پیش‌نویس، تأیید ارسال، ارسال و ثبت نتیجه',kids:[
+   {t:'نوشتن پیش‌نویس پیام',kind:'autoStep',skill:'—',out:'پیش‌نویس، بدون ارسال'},
+   {t:'تأیید ارسال',kind:'gateStep',skill:'—',out:'تأیید یا اصلاح انسان'},
+   {t:'ارسال و ثبت نتیجه',kind:'autoStep',skill:'—',out:'پیام ارسال‌شده + وضعیت',ext:'Gmail MCP',extKind:'MCP'}]}];
+function mkNode(sp,id){const leaf=!sp.kids;
+  const n={id,kind:sp.kind||'autoStep',title:sp.t,tags:(leaf&&(sp.skill==='—'||sp.unk))?['unknownSkill']:[],icon:U+'unlock.svg',tech:'skill: '+(sp.skill||'—'),desc:sp.out?'out: '+sp.out:(sp.d?'out: '+sp.d:''),children:[],meta:[]};
+  if(sp.ext)n.meta.push(['ext_tool',sp.ext],['ext_kind',sp.extKind||'MCP']);
+  if(sp.sched)n.meta.push(['schedule',sp.sched]);
+  (sp.kids||[]).forEach((k,i)=>n.children.push(mkNode(k,'c'+(i+1))));
+  return n}
+async function spliceStep(refP,dir,node){
+  const par=IDX.get(parentPath(refP)),ref=IDX.get(refP);
+  if(!par||!ref)return false;
+  if(lockedN(par)||lockedN(ref)){await ask('این قسمت قفل است؛ پیشنهاد روی آن اعمال نمی‌شود.',{info:1});return false}
+  const sib=par.children,i=sib.findIndex(c=>c.id===ref.id);
+  node.id=uniqueId(sib,'n');const newP=parentPath(refP)+'.'+node.id;
+  const nbI=dir==='after'?i+1:i-1,nb=sib[nbI],nbP=nb?parentPath(refP)+'.'+nb.id:null;
+  sib.splice(dir==='after'?i+1:i,0,node);
+  const nbOk=nb&&!lockedN(nb);
+  const old=nbOk?M.rels.find(r=>dir==='after'?(r.from===refP&&r.to===nbP):(r.from===nbP&&r.to===refP)):null;
+  if(dir==='after'){
+    if(old){const lab=old.label;old.to=newP;old.c=lca(refP,newP);M.rels.push({from:newP,to:nbP,label:lab||'بعد',c:lca(newP,nbP)})}
+    else M.rels.push({from:refP,to:newP,label:'بعد',c:lca(refP,newP)})}
+  else{
+    if(old){const lab=old.label;old.to=newP;old.c=lca(nbP,newP);M.rels.push({from:newP,to:refP,label:lab||'بعد',c:lca(newP,refP)})}
+    else M.rels.push({from:newP,to:refP,label:'بعد',c:lca(newP,refP)})}
+  node.children.forEach((c,k)=>{if(k<node.children.length-1)M.rels.push({from:newP+'.'+c.id,to:newP+'.'+node.children[k+1].id,label:'بعد',c:lca(newP+'.'+c.id,newP+'.'+node.children[k+1].id)})});
+  reindex();FOC=newP;if(node.children.length)EXP.add(newP);expandTo(newP);SEL=null;SELE=null;touch(true);return true}
+async function acceptSug(dir,k){const n=IDX.get(FOC);if(!n)return;const sc=seqSug(n);if(!sc)return;const sp=sc[dir][k];if(!sp)return;await spliceStep(FOC,dir,mkNode(sp,'n'))}
+async function addTplTo(tid,tp){const tpl=TPLS.find(x=>x.id===tid);const t=tp&&IDX.get(tp);if(!tpl||!t)return;
+  if(!(t.kind==='role'||t.kind==='section'||isStep(t))){await ask('تمپلیت را روی یک قدم، بخش یا نقش اضافه کن.',{info:1});return}
+  if(lockedN(t)){await ask('این قسمت قفل است؛ تمپلیت اضافه نمی‌شود.',{info:1});return}
+  const node=mkNode({t:tpl.t,d:tpl.d,kind:'autoStep',skill:'—',kids:tpl.kids,sched:tpl.sched},'n');
+  if(isStep(t)&&tp.includes('.')&&parentPath(tp).includes('.')){await spliceStep(tp,'after',node);return}
+  if(t.children.length){const last=tp+'.'+t.children[t.children.length-1].id;await spliceStep(last,'after',node);return}
+  node.id=uniqueId(t.children,'n');t.children.push(node);reindex();FOC=tp+'.'+node.id;expandTo(FOC);EXP.add(FOC);touch(true)}
+async function lockTree(p){const n=IDX.get(p);if(!n)return;
+  if(!await ask(`«${titleName(n)}» با همهٔ زیرمجموعه‌هایش تمام‌شده، تأیید و قفل شود؟ بعد از قفل هیچ تغییری (حتی پیشنهاد خودکار) داخلش انجام نمی‌شود.`))return;
+  setLock(n,true);walk(n.children,p,c=>setLock(c,true));touch(true)}
+function tplPanel(tp){const sel=h('select',{},...TPLS.map(x=>h('option',{value:x.id},x.t)));const dsc=h('small',{},TPLS[0].d);sel.onchange=()=>{dsc.textContent=TPLS.find(x=>x.id===sel.value).d};
+  const tn=tp&&IDX.get(tp);
+  return h('div',{class:'panel'},h('h2',{},'📚 تمپلیت‌های آماده'),h('small',{},'یک قسمت کلی آماده (با زیرقدم، skill، ورودی و خروجی) بعد از قسمت انتخاب‌شده اضافه می‌شود و خودش وصل می‌شود. مثل element template در Camunda یا subflow در Node-RED.'),
+    sel,dsc,h('button',{class:'sm pri',style:'margin-top:6px',disabled:!tn,onclick:()=>addTplTo(sel.value,tp)},tn?'＋ بعد از «'+titleName(tn).slice(0,24)+'» اضافه کن':'اول یک قسمت را انتخاب کن'))}
+function extPanel(n,p){const dis=lockedN(n),cur=meta(n,'ext_tool');
+  const box=h('div',{class:'panel'},h('h2',{},'💡 پیشنهاد ابزار بیرونی'),h('small',{},'علاوه بر skill: MCP، پلاگین یا API. همه پیشنهادند و قبل از استفاده باید بررسی شوند.'));
+  if(cur)box.append(h('div',{class:'sugc'},'انتخاب‌شده: ',h('b',{},cur),h('span',{class:'k'},meta(n,'ext_kind')),h('button',{class:'sm',disabled:dis,style:'margin-inline-start:8px',onclick:()=>{n.meta=(n.meta||[]).filter(x=>x[0]!=='ext_tool'&&x[0]!=='ext_kind');touch(true)}},'برداشتن')));
+  extSug(n).forEach(x=>box.append(h('div',{class:'sugc'},h('b',{},x.n),h('span',{class:'k'},x.k),x.gate?h('span',{class:'k',style:'background:var(--gate);color:var(--card)'},'پشت تأیید انسانی'):null,
+    h('div',{},x.why),h('div',{class:'pro'},'＋ '+x.pro),h('div',{class:'con'},'－ '+x.con),
+    h('button',{class:'sm',disabled:dis||cur===x.n,style:'margin-top:4px',onclick:()=>{setMeta(n,'ext_tool',x.n);setMeta(n,'ext_kind',x.k);touch(true)}},cur===x.n?'✓ انتخاب شده':'＋ استفاده در این قدم'))));
+  return box}
 function inputOf(p,n){const v=meta(n,'input');if(v)return{t:v,derived:false};
   const inc=M.rels.filter(r=>r.to===p);
   if(inc.length)return{t:inc.slice(0,2).map(r=>(r.label?'«'+r.label+'» ':'')+'از '+titleName(IDX.get(r.from)||{title:r.from,kind:''})).join('، '),derived:true};
@@ -1015,10 +1128,12 @@ function nodeEl(n,p,b,full){
   const lk=lockedN(n),kind=n.kind==='actor'?'actor':n.kind==='tool'?'tool'+(n.tags.includes('gated')?' gated':''):n.kind;
   const nest=full&&(VER===2||VER===4)&&isStep(n),slot=nest&&n.kind!=='routeStep';
   const ws=nest?lintNode(n,p):[];
-  const ex=[nest?h('button',{class:'lkb','data-lock':p,title:lk?'قفل است؛ برای باز کردن کلیک کن':'قفلش کن تا تغییر نکند'},lk?'🔒':'🔓'):null,
+  const par0=IDX.get(parentPath(p)),ord=nest&&par0?par0.children.findIndex(c=>c.id===n.id)+1:0,extT=meta(n,'ext_tool');
+  const ex=[ord?h('span',{class:'ord',title:'ترتیب در این فرایند'},toFa(ord)):null,nest?h('button',{class:'lkb','data-lock':p,title:lk?'قفل است؛ برای باز کردن کلیک کن':'قفلش کن تا تغییر نکند'},lk?'🔒':'🔓'):null,
     ws.length?h('span',{class:'wb',title:ws.join('\n')},'⚠ '+toFa(ws.length)):null];
   const mid=slot?h('div',{class:'slots'},
       h('div',{class:'slot sk'},h('b',{},'skill'),h('span',{class:'ltr'},(n.tech||'').replace(/^skill:\s*/,'')||'—')),
+      extT?h('div',{class:'slot ext'},h('b',{},'ابزار'),h('span',{},extT+(meta(n,'ext_kind')&&!extT.includes(meta(n,'ext_kind'))?' · '+meta(n,'ext_kind'):''))):null,
       (()=>{const o=inputOf(p,n);return h('div',{class:'slot in'+(o.none?' none':'')},h('b',{},'ورودی'),h('span',{},o.derived?h('i',{},o.t):o.t))})(),
       h('div',{class:'slot out'+(outText(n)?'':' none') },h('b',{},'خروجی'),h('span',{},outText(n)||'نامشخص')))
     :[n.tech?h('div',{class:'ns'},n.tags.includes('gated')&&n.kind==='tool'?h('span',{class:'nb red'},'تأیید انسانی'):null,n.tags.includes('unknownSkill')?h('span',{class:'nb'},'skill؟'):null,n.tech):null,
@@ -1034,7 +1149,9 @@ function renderDia(){
   applyView();if(NEEDFIT&&!$('#p-dia').hidden)fit()}
 const lastVis=()=>(LAST&&LAST.vis)||new Map();
 function expandTo(p){const s=p.split('.');for(let i=1;i<s.length;i++)EXP.add(s.slice(0,i).join('.'))}
-function fitTo(p){const v=lastVis().get(p);if(!v)return;const cv=$('#cv'),w=cv.clientWidth,hh=cv.clientHeight;if(!w)return;
+function fitTo(p){const v0=lastVis().get(p);if(!v0)return;const cv=$('#cv'),w=cv.clientWidth,hh=cv.clientHeight;if(!w)return;
+  const g=(LAST&&LAST.ghBox&&p===FOC)?LAST.ghBox:null;
+  const v=g?{x:g.x,y:Math.min(v0.y,g.y),w:v0.x+v0.w-g.x,h:Math.max(v0.y+v0.h,g.b)-Math.min(v0.y,g.y)}:v0;
   const k=Math.max(.25,Math.min(1.3,w/(v.w+120),hh/(v.h+120)));VIEW.k=k;VIEW.x=w/2-(v.x+v.w/2)*k;VIEW.y=v.h*k>hh-20?14-(v.y-30)*k:hh/2-(v.y+v.h/2)*k;applyView()}
 function focusOn(p){if(!IDX.has(p))return;if(p.split('.')[0]!==rootOfView()){go('ov:'+p.split('.')[0]);return}
   FOC=p;expandTo(p);NEEDFIT=false;renderDia();if(p.includes('.')&&!lastVis().has(p)){}
@@ -1070,17 +1187,21 @@ function drawInternal(svg,boxes,order,compact){
   const list=[];M.rels.forEach((r,i)=>{const a=boxes.get(r.from),b=boxes.get(r.to);if(a&&b&&a!==b)list.push({r,i,a,b})});
   routeList(svg,list,order,compact?{base:12,stp:8,compact:1}:{base:62,stp:16})}
 function routeList(svg,list,order,cfg){
-  const hasSel=SEL||SELE!=null,R=[],Lf=[];
+  const R=[],Lf=[];
+  const lab=(r,i)=>r.label&&(relStyle(r,i,false).thick||(IDX.get(r.from)||{}).kind==='routeStep');
   list.forEach(({r,i,a,b})=>{
-    const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=hasSel&&!on,o={on,dim,idx:i,label:(cfg.compact&&!on)?'':r.label};
     const between=order.some(x=>x!==a&&x!==b&&x.y>=a.outY&&x.y<b.y);
-    if(b.y>=a.outY-1&&!between){const xa=(a.x+a.w/2+b.x+b.w/2)/2;drawEdge(svg,polyD([[xa,a.outY],[xa,b.y]]),{...o,lx:xa+8,ly:(a.outY+b.y)/2+4,anchor:'start'})}
-    else if(b.y>a.y)R.push({r,a,b,o,span:b.y-a.y});else Lf.push({r,a,b,o,span:a.y-b.y})});
+    if(b.y>=a.outY-1&&!between){const xa=(a.x+a.w/2+b.x+b.w/2)/2;drawEdge(svg,polyD([[xa,a.outY],[xa,b.y]]),{idx:i,label:r.label,lx:xa+8,ly:(a.outY+b.y)/2+4,anchor:'start'})}
+    else if(b.y>a.y)R.push({r,i,a,b,span:b.y-a.y});else Lf.push({r,i,a,b,span:a.y-b.y})});
   const base=cfg.base,stp=cfg.stp;
-  R.sort((p,q)=>p.span-q.span).forEach((e,k)=>{const off=base+stp*k,x1=e.a.x+e.a.w,x2=e.b.x+e.b.w,xm=Math.max(x1,x2)+off,y1=e.a.y+e.a.h/2,y2=e.b.y+e.b.h/2;
-    drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{...e.o,lx:xm+6,ly:(y1+y2)/2,anchor:'start'})});
-  Lf.sort((p,q)=>p.span-q.span).forEach((e,k)=>{const off=base+stp*k,x1=e.a.x,x2=e.b.x,xm=Math.min(x1,x2)-off,y1=e.a.y+e.a.h/2,y2=e.b.y+e.b.h/2;
-    drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{...e.o,dash:1,back:1,lx:xm-6,ly:(y1+y2)/2,anchor:'end'})})}
+  const assign=arr=>{arr.sort((p,q)=>p.span-q.span);const go=new Map(),gi=new Map();
+    arr.forEach(e=>{if(!go.has(e.a))go.set(e.a,[]);go.get(e.a).push(e);if(!gi.has(e.b))gi.set(e.b,[]);gi.get(e.b).push(e)});
+    go.forEach(l=>l.forEach((e,k)=>e.so=(k-(l.length-1)/2)*10));gi.forEach(l=>l.forEach((e,k)=>e.si=(k-(l.length-1)/2)*10))};
+  assign(R);assign(Lf);
+  R.forEach((e,k)=>{const off=base+stp*k,x1=e.a.x+e.a.w,x2=e.b.x+e.b.w,xm=Math.max(x1,x2)+off,y1=e.a.y+e.a.h/2+(e.so||0),y2=e.b.y+e.b.h/2+(e.si||0);
+    drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{idx:e.i,label:lab(e.r,e.i)?e.r.label:'',lx:x1+8,ly:y1-6,anchor:'start'})});
+  Lf.forEach((e,k)=>{const off=base+stp*k,x1=e.a.x,x2=e.b.x,xm=Math.min(x1,x2)-off,y1=e.a.y+e.a.h/2+(e.so||0),y2=e.b.y+e.b.h/2+(e.si||0);
+    drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{idx:e.i,dash:1,back:1,label:lab(e.r,e.i)?e.r.label:'',lx:x1-8,ly:y1-6,anchor:'end'})})}
 
 /* نمای جزئیات: یک بخش، عمودی، داخل کادر شفاف خودش */
 function renderLane(lp){
@@ -1183,16 +1304,21 @@ function renderNested(rid){
   const PADX=46,HEADH=38,GAP=32,LEAFW=268;
   const deepN=n=>n.children.reduce((a,c)=>a+1+deepN(c),0);
   const cntTxt=n=>{const d=n.children.length,t=deepN(n),sub=t-d,st=isStep(n);return toFa(d)+' '+(st?'زیرقدم':'قدم')+(sub>0?' · '+toFa(sub)+' زیرقدم':'')};
+  const corr=(p,kids)=>{let nR=0,nL=0;const ids=kids.map(k=>p+'.'+k.id);
+    const seg=q=>{if(!q.startsWith(p+'.'))return -1;return ids.indexOf(p+'.'+q.slice(p.length+1).split('.')[0])};
+    M.rels.forEach(r=>{const a=seg(r.from),b=seg(r.to);if(a<0||b<0||a===b||b===a+1)return;if(b>a)nR++;else nL++});return{nR,nL}};
   const lay=(n,p)=>{
     const kids=n.children;
-    if(!(EXP.has(p)&&kids.length)){const lane=['role','section','project','orgBox','flow'].includes(n.kind);return{n,p,w:LEAFW,h:(lane?64:(n.kind==='tool'?64:(isStep(n)&&n.kind!=='routeStep'?136:84)))+(kids.length?26:0),frame:false}}
+    if(!(EXP.has(p)&&kids.length)){const lane=['role','section','project','orgBox','flow'].includes(n.kind);return{n,p,w:LEAFW,h:(lane?64:(n.kind==='tool'?64:(isStep(n)&&n.kind!=='routeStep'?136+(meta(n,'ext_tool')?22:0):84)))+(kids.length?26:0),frame:false}}
     const ch=kids.map(k=>lay(k,p+'.'+k.id)),cw=Math.max(...ch.map(c=>c.w));
     let hh=HEADH+14;ch.forEach(c=>hh+=c.h+GAP);hh+=-GAP+40;
-    return{n,p,w:cw+PADX*2,h:hh,frame:true,ch,cw}};
+    const cc=corr(p,kids),padL=34+13*Math.min(cc.nL,8),padR=34+13*Math.min(cc.nR,8);
+    return{n,p,w:cw+padL+padR,h:hh,frame:true,ch,cw,padL,padR}};
   const vis=new Map(),groups=new Map();
   const put=(Lx,x,y,par,depth)=>{Lx.x=x;Lx.y=y;Lx.outY=y+Lx.h;Lx.par=par;Lx.depth=depth;vis.set(Lx.p,Lx);
-    if(Lx.frame){let cy=y+HEADH+14;Lx.ch.forEach(c=>{put(c,x+PADX+(Lx.cw-c.w)/2,cy,Lx.p,depth+1);cy+=c.h+GAP});groups.set(Lx.p,Lx.ch)}};
-  const root=lay(IDX.get(rid),rid);put(root,70,16,null,0);
+    if(Lx.frame){let cy=y+HEADH+14;Lx.ch.forEach(c=>{put(c,x+Lx.padL+(Lx.cw-c.w)/2,cy,Lx.p,depth+1);cy+=c.h+GAP});groups.set(Lx.p,Lx.ch)}};
+  const sugN=(VER===4&&FOC&&FOC!==rid&&IDX.has(FOC)&&FOC.split('.')[0]===rid&&isStep(IDX.get(FOC)))?IDX.get(FOC):null,GW=270,LX=sugN?GW+70:0;
+  const root=lay(IDX.get(rid),rid);put(root,70+LX,16,null,0);
   const EXTW=300,EXGAP=120;
   const projOf=q=>{const sg=q.split('.');for(let i=1;i<=sg.length;i++){const k=sg.slice(0,i).join('.');const nn=IDX.get(k);if(nn&&nn.kind==='project')return k}return null};
   const extR=[],extMap=new Map();
@@ -1200,7 +1326,7 @@ function renderNested(rid){
     const inP=fi?r.from:r.to,outP=fi?r.to:r.from,pj=projOf(outP);if(!pj||!IDX.has(inP))return;
     if(!extMap.has(pj))extMap.set(pj,{p:pj,n:IDX.get(pj),w:LEAFW,h:104,callers:[]});extR.push({r,i,pj,fi,inP,outP})});
   const hasExt=extR.length>0;
-  const W=root.w+140+(hasExt?EXGAP+EXTW:0),H=root.h+50;world.style.width=W+'px';world.style.height=H+'px';
+  const W=root.w+140+LX+(hasExt?EXGAP+EXTW:0),H=Math.max(root.h+50,(sugN&&seqSug(sugN)&&vis.get(FOC))?vis.get(FOC).y+(seqSug(sugN).after.length+1)*106+90:0);world.style.width=W+'px';world.style.height=H+'px';
   const svg=newSvg(W,H),frames=[...vis.values()].filter(v=>v.frame);
   frames.forEach(f=>{const lk=lockedN(f.n);
     world.append(h('div',{class:'lanebox'+(lk?' locked':'')+(SEL===f.p?' sel':'')+((FOC||rid)===f.p&&VER===4?' foc':''),'data-p0':f.p,style:`left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px;${f.depth%2?'background:color-mix(in srgb,var(--acc) 4%,transparent)':''}`},
@@ -1217,7 +1343,7 @@ function renderNested(rid){
   if(hasExt){
     extR.forEach(e=>{const a=mapv0(e.inP);if(a)extMap.get(e.pj).callers.push(a.y+a.h/2)});
     const list=[...extMap.values()].map(x=>({...x,cy:x.callers.length?x.callers.reduce((a,b)=>a+b,0)/x.callers.length:100})).sort((a,b)=>a.cy-b.cy);
-    const px=70+root.w+EXGAP,nx=px+(EXTW-LEAFW)/2;let ny=16+HEADH+16;
+    const px=70+LX+root.w+EXGAP,nx=px+(EXTW-LEAFW)/2;let ny=16+HEADH+16;
     list.forEach(x=>{x.x=nx;x.y=Math.max(ny,x.cy-x.h/2);ny=x.y+x.h+24;extMap.set(x.p,x)});
     const top=list[0].y-HEADH-12,bot=ny-24+22;
     world.append(h('div',{class:'lanebox ext',style:`left:${px}px;top:${top}px;width:${EXTW}px;height:${bot-top}px`},
@@ -1230,7 +1356,7 @@ function renderNested(rid){
   M.rels.forEach((r,i)=>{const a=mapv(r.from),b=mapv(r.to);if(!a||!b||a===b||isAnc(a,b)||isAnc(b,a))return;
     const key=a.p+'>'+b.p+'|'+(r.label||'');if(seen.has(key))return;seen.add(key);
     if(a.par&&a.par===b.par){if(!sib.has(a.par))sib.set(a.par,[]);sib.get(a.par).push({r,i,a,b})}else cross.push({r,i,a,b})});
-  sib.forEach((list,par)=>routeList(svg,list,groups.get(par),{base:12,stp:10}));
+  sib.forEach((list,par)=>routeList(svg,list,groups.get(par),{base:16,stp:13}));
   const hasSel=SEL||SELE!=null;
   cross.forEach(({r,i,a,b})=>{const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=hasSel&&!on,o={on,dim,idx:i,label:r.label,dash:1};
     const ax=a.x+a.w/2,bx=b.x+b.w/2;let d,lx,ly;
@@ -1246,6 +1372,18 @@ function renderNested(rid){
     extMap.forEach(x=>{if(x.x==null)return;const pr=meta(x.n,'protocol')||'';
       const el=nodeEl(x.n,x.p,{x:x.x,y:x.y,w:x.w,h:x.h},false);el.classList.add('ext');if(VER===4&&FOC===x.p)el.classList.add('foc');
       el.prepend(h('div',{class:'xb'},'ایجنت دیگر · '+(pr||'mcp').replace('+',' + ').toUpperCase()));world.append(el)})}
+  let gh=0,ghBox=null;
+  if(sugN){const fv=vis.get(FOC),sc=seqSug(sugN),par=IDX.get(parentPath(FOC)),lk=lockedN(sugN)||(par&&lockedN(par));
+    if(fv&&sc){const CH=92,CG=14,items=[...sc.before.map((x,k)=>({x,k,d:'before'})),...sc.after.map((x,k)=>({x,k,d:'after'}))];
+      const nb=sc.before.length,top=Math.max(16,fv.y-nb*(CH+CG)-HEADH-10),H2=HEADH+14+items.length*(CH+CG)+6;gh=top+H2;ghBox={x:20,y:top,b:top+H2};
+      world.append(h('div',{class:'lanebox ghost',style:`left:20px;top:${top}px;width:${GW+40}px;height:${H2}px`},h('div',{class:'fh'},h('span',{class:'ft'},'💡 پیشنهاد قدم قبل و بعد'),h('span',{class:'cnt'},lk?'قفل است':'فقط پیشنهاد'))));
+      items.forEach((it,j)=>{const cy=top+HEADH+14+j*(CH+CG),cx=40;
+        world.append(h('div',{class:'ghostn',style:`left:${cx}px;top:${cy}px;width:${GW}px;height:${CH}px`},
+          h('span',{class:'tg2'},it.d==='before'?'قدم قبل':'قدم بعد'),h('b',{},it.x.t),h('small',{},'skill: '+(it.x.skill||'—')+(it.x.ext?' · '+it.x.ext:'')),h('small',{},it.x.out),
+          h('button',{class:'sm pri',disabled:lk,'data-sug':it.d+':'+it.k},'＋ افزودن')));
+        const y1=cy+CH/2,y2=fv.y+fv.h/2,x1=cx+GW,x2=fv.x,k2=Math.max((x2-x1)/2,40);
+        const d=it.d==='after'?`M${x2} ${y2}C${x2-k2} ${y2} ${x1+k2} ${y1} ${x1} ${y1}`:`M${x1} ${y1}C${x1+k2} ${y1} ${x2-k2} ${y2} ${x2} ${y2}`;
+        drawEdge(svg,d,{col:'--e-x',dash:1,dim:1,label:'',lx:0,ly:0})})}}
   vis.forEach((v,p)=>{if(v.frame)return;
     const el=nodeEl(v.n,p,v,true);if(VER===4&&FOC===p)el.classList.add('foc');
     if(v.n.children.length)el.append(h('button',{class:'sm tgbtn','data-tog':p,title:'باز کردن داخل'},'＋ '+cntTxt(v.n)));
@@ -1254,7 +1392,7 @@ function renderNested(rid){
     const mark=(pp,c)=>{if(!pp)return;const el=world.querySelector(`.node[data-p="${pp}"]`)||world.querySelector(`.lanebox[data-p0="${pp}"]`);if(el)el.classList.add(c)};
     M.rels.forEach(r=>{const fi=inS(r.from),ti=inS(r.to);if(fi===ti)return;
       if(ti){const a=mapv0(r.from);mark(a?a.p:projOf(r.from),'nin')}else{const b2=mapv0(r.to);mark(b2?b2.p:projOf(r.to),'nout')}})}
-  return{W,H,vis}}
+  return{W,H,vis,ghBox}}
 
 /* رویدادهای بوم: کشیدن صفحه، زوم، کلیک */
 (function(){
@@ -1272,6 +1410,7 @@ function renderNested(rid){
     const t=d.target;if(!t.closest)return;
     const ed=t.closest('[data-e]');if(ed){SELE=+ed.getAttribute('data-e');SEL=null;renderDia();renderInsp();return}
     const tg=t.closest('[data-tog]');if(tg&&tg.getAttribute('data-tog')){const q=tg.getAttribute('data-tog');if(EXP.has(q))EXP.delete(q);else{EXP.add(q);if(VER===4)FOC=q}NEEDFIT=false;renderDia();return}
+    const sg=t.closest('[data-sug]');if(sg){if(!sg.disabled){const[dd,kk]=sg.getAttribute('data-sug').split(':');acceptSug(dd,+kk)}return}
     const lkb=t.closest('[data-lock]');if(lkb){toggleLock(lkb.getAttribute('data-lock'));return}
     const fc=t.closest('[data-foc]');if(fc){focusOn(fc.getAttribute('data-foc'));return}
     const sl=t.closest('[data-sel]');if(sl){select(sl.getAttribute('data-sel'));return}
@@ -1346,6 +1485,7 @@ function renderInsp(){
       box.append(h('div',{class:'panel'},h('h2',{},'گزارش استاندارد · '+toFa(tot)+' هشدار'),
         h('small',{},'قاعده‌ها: WBS (قاعدهٔ ۱۰۰٪ و ۷±۲ زیرمجموعه)، هفت رهنمود مدل‌سازی فرایند (Mendling): نام فعل+مفعول و تقسیم مدل بزرگ، BPMN: هر قدم یک کار و یک مجری، تصمیم دست‌کم دو شاخهٔ برچسب‌دار، ISO 5807: ورودی و خروجی هر قدم مشخص.'),
         items.length?h('div',{},...items.slice(0,40).map(([pp,n,w])=>h('button',{class:'lint',onclick:()=>{if(VER===4||VER===2){expandTo(pp);FOC=pp}select(pp);if(VER===4||VER===2)fitTo(pp)}},h('b',{},titleName(n).slice(0,40)),h('small',{},w.join(' · '))))):h('div',{class:'mute'},'همه‌چیز با قاعده‌ها جور است.')))}
+    box.append(tplPanel(FOC&&FOC!==rootOfView()?FOC:null));
     box.append(h('div',{class:'panel'},h('h2',{},'راهنمای شکل‌ها'),h('div',{class:'legend'},
       h('i',{style:'border-color:var(--ask);background:var(--askbg);border-radius:12px'}),h('span',{},'ask — خروجی را نشان بده و نظر بگیر'),
       h('i',{style:'border-color:var(--auto);background:var(--autobg);border-radius:4px'}),h('span',{},'auto — خودکار برو قدم بعد'),
@@ -1397,7 +1537,10 @@ function renderInsp(){
   if(n.kind!=='actor'&&n.kind!=='tool')act.append(h('button',{class:'sm',disabled:dis,onclick:()=>addChild(SEL)},n.kind==='role'||n.kind==='section'?'＋ قدم':n.kind==='project'?'＋ ابزار':isStep(n)?'＋ زیرقدم':'＋ زیرمجموعه'));
   if(n.kind!=='actor'&&SEL.includes('.'))act.append(h('button',{class:'sm',onclick:()=>moveNode(SEL,-1)},'↑ بالا'),h('button',{class:'sm',onclick:()=>moveNode(SEL,1)},'↓ پایین'),h('button',{class:'sm',disabled:dis,onclick:()=>delNode(SEL)},'✕ حذف'));
   if(SEL.split('.').length===2&&(n.kind==='role'||n.kind==='section'||n.kind==='project'))act.append(h('button',{class:'sm pri',onclick:()=>go(SEL)},'فلوچارت این بخش ←'));
+  if(n.kind!=='actor'&&!L&&(n.children.length||isStep(n)||n.kind==='section'||n.kind==='role'))P.append(h('button',{class:'sm pri',style:'margin-top:6px',onclick:()=>lockTree(SEL)},'✓ تمام شد؛ تأیید و قفل همهٔ این قسمت'));
   P.append(act);box.append(P);
+  if(isStep(n)&&n.kind!=='routeStep')box.append(extPanel(n,SEL));
+  if(n.kind==='role'||n.kind==='section'||isStep(n))box.append(tplPanel(SEL));
   const E=h('div',{class:'panel'},h('h2',{},'فلش‌های این جعبه'));
   const mine=M.rels.map((r,i)=>[r,i]).filter(([r])=>r.from===SEL||r.to===SEL);
   if(!mine.length)E.append(h('small',{},'فلشی نیست. از پایین یا دکمهٔ «↔ فلش» بساز.'));
