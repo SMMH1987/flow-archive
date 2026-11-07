@@ -909,6 +909,240 @@ model {
     c4 -> c5 'بعد'
   }
 
+  web = orgBox 'سایت و صفحهٔ فرود' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: از جمله ارزش تا اعتماد و اندازه‌گیری'
+    metadata {
+      agent 'ایجنت سایت'
+    }
+    c1 = autoStep 'جملهٔ ارزش و جایگاه‌یابی' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: مسئله، مشتری و وعدهٔ محصول در یک جمله؛ ادعای محصول با تأیید انسان'
+      metadata {
+        part 'dynamic'
+        agent 'ایجنت سایت'
+      }
+    }
+    c2 = autoStep 'ساخت صفحهٔ فرود از قالب' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: قالب ثابت: ارزش، فرم ثبت‌نام، دمو؛ فقط متن و تصویر عوض می‌شود'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت سایت'
+      }
+    }
+    c3 = autoStep 'آنالیتیکس و سئوی پایه' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: چک‌لیست ثابت: ردیابی ثبت‌نام، یک کلیدواژهٔ اصلی، عنوان و توضیح، سرعت و موبایل، نقشهٔ سایت'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت سایت'
+      }
+    }
+    c4 = gateStep 'صفحهٔ قیمت و سیاست بازگشت وجه' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: pricing-advisor'
+      description 'out: ۲ تا ۳ پلن از نتیجهٔ قیمت‌گذاری؛ تأیید انسان'
+      metadata {
+        part 'dynamic'
+        agent 'ایجنت سایت'
+      }
+    }
+    c5 = gateStep 'اعتماد: قوانین، حریم خصوصی و اینماد' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: متن‌ها از بخش حقوقی؛ نماد اعتماد نیاز به هویت، پرداخت و تعهدنامه دارد و فقط با انسان؛ شرایط و هزینه تاریخ‌دار و باید دوباره تأیید شود'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت سایت'
+      }
+    }
+    c6 = gateStep 'تأیید و انتشار سایت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: انتشار بیرونی فقط با انسان'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت سایت'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+    c5 -> c6 'بعد'
+  }
+
+  ads = orgBox 'تبلیغات' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: انتخاب کانال، آزمون بودجهٔ کم، اندازه‌گیری و بهینه‌سازی'
+    metadata {
+      agent 'ایجنت تبلیغات'
+      must 'هر هزینه، تغییر بودجه و ادعای تبلیغ فقط با تأیید انسان؛ قوانین هر پلتفرم بررسی شود'
+      must_not 'ادعای تضمین نتیجه یا بازده؛ رأی و نظر جعلی؛ ارسال انبوه ناخواسته'
+    }
+    c1 = askStep 'انتخاب کانال‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: کانال‌های مناسب مخاطب (جستجو، شبکه‌های اجتماعی، پیام‌رسان‌های ایرانی، تبلیغات بومی)؛ سهم و قیمت هر کانال ایران UNKNOWN تا بررسی'
+      metadata {
+        part 'dynamic'
+        agent 'ایجنت تبلیغات'
+      }
+    }
+    c2 = gateStep 'تعیین بودجه و سقف آزمون' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: بودجهٔ کم برای هر کانال و سقف روزانه؛ تأیید پول با انسان'
+      metadata {
+        part 'dynamic'
+        agent 'ایجنت تبلیغات'
+      }
+    }
+    c3 = autoStep 'ردیابی و اتریبیوشن' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: لینک‌های ردیابی (UTM)، هدف تبدیل و جدول هزینهٔ جذب مشتری'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت تبلیغات'
+      }
+    }
+    c4 = autoStep 'ساخت پیش‌نویس کمپین و متن‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: چند نسخهٔ متن و تصویر برای آزمون A/B؛ بررسی با قوانین پلتفرم'
+      metadata {
+        part 'dynamic'
+        agent 'ایجنت تبلیغات'
+      }
+    }
+    c5 = gateStep 'تأیید و راه‌اندازی کمپین' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: هزینه و انتشار فقط با انسان'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت تبلیغات'
+      }
+    }
+    c6 = autoStep 'گزارش و بهینه‌سازی هفتگی' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: گزارش هزینه، تبدیل و هزینهٔ جذب؛ پیشنهاد قطع یا افزایش بودجه با تأیید انسان'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت تبلیغات'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+    c5 -> c6 'بعد'
+  }
+
+  content = orgBox 'محتوا و انتشار' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: استراتژی، ساخت، تأیید، زمان‌بندی و بازتولید'
+    metadata {
+      schedule 'weekly'
+      agent 'ایجنت محتوا'
+      must 'هر نقل‌قول و ادعا راستی‌آزمایی شود؛ انتشار بیرونی فقط با تأیید انسان'
+      must_not 'محتوای جعلی یا نظر ساختگی؛ ادعای بی‌منبع؛ هرزنامه'
+    }
+    c1 = askStep 'لحن برند و ستون‌های محتوا' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: لحن، موضوع‌های اصلی و مخاطب هر کانال'
+      metadata {
+        part 'dynamic'
+        agent 'ایجنت محتوا'
+      }
+    }
+    c2 = autoStep 'تقویم محتوا' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: تقویم هفتگی و ماهانه با قالب ثابت'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت محتوا'
+      }
+    }
+    c3 = autoStep 'ساخت محتوا: نوشته، تصویر و ویدئو کوتاه' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: پیش‌نویس هر قطعه با منبع ادعاها'
+      metadata {
+        part 'dynamic'
+        agent 'ایجنت محتوا'
+      }
+    }
+    c4 = autoStep 'بازتولید برای کانال‌های دیگر' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: یک محتوای اصلی به چند قالب (کوتاه، اسلاید، خبرنامه)'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت محتوا'
+      }
+    }
+    c5 = gateStep 'بازبینی و تأیید' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: انسان وضعیت «تأییدشده» را می‌دهد'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت محتوا'
+      }
+    }
+    c6 = autoStep 'زمان‌بندی و انتشار' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: انتشار فقط پس از تأیید؛ قوانین هر پلتفرم UNKNOWN برای ایران تا بررسی'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت محتوا'
+      }
+    }
+    c7 = autoStep 'پایش و یادگیری' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: کدام محتوا مشتری آورد؛ ورودی تقویم بعد'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت محتوا'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+    c5 -> c6 'بعد'
+    c6 -> c7 'بعد'
+  }
+
   p7 = orgBox 'تجاری‌سازی و فروش' {
     icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
     description 'out: از قیمت تا مشتری اول'
@@ -923,25 +1157,7 @@ model {
         agent 'ایجنت تجاری‌سازی'
       }
     }
-    c2 = autoStep 'ساخت صفحهٔ فرود و محتوا' {
-      #unknownSkill
-      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
-      technology 'skill: —'
-      description 'out: صفحهٔ فرود + ۱۰ محتوای معرفی'
-      metadata {
-        agent 'ایجنت تجاری‌سازی'
-      }
-    }
-    c3 = gateStep 'تأیید و انتشار کمپین' {
-      #unknownSkill
-      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
-      technology 'skill: —'
-      description 'out: انتشار بیرونی فقط با تأیید انسان'
-      metadata {
-        agent 'ایجنت تجاری‌سازی'
-      }
-    }
-    c4 = askStep 'فروش به مشتریان اول' {
+    c2 = askStep 'فروش به مشتریان اول' {
       #unknownSkill
       icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
       technology 'skill: —'
@@ -951,8 +1167,6 @@ model {
       }
     }
     c1 -> c2 'بعد'
-    c2 -> c3 'بعد'
-    c3 -> c4 'بعد'
   }
 
   p8 = orgBox 'توسعه، رشد و یادگیری' {
@@ -1027,7 +1241,10 @@ model {
   team -> p5 'بعد'
   p5 -> pitch 'بعد'
   pitch -> p6 'بعد'
-  p6 -> p7 'بعد'
+  p6 -> web 'بعد'
+  web -> ads 'بعد'
+  ads -> content 'بعد'
+  content -> p7 'بعد'
   p7 -> p8 'بعد'
 }
 
@@ -1109,6 +1326,21 @@ views {
 
   view p6 of p6 {
     title 'سرمایه‌گذار، هم‌بنیان‌گذار و شریک'
+    include *
+  }
+
+  view web of web {
+    title 'سایت و صفحهٔ فرود'
+    include *
+  }
+
+  view ads of ads {
+    title 'تبلیغات'
+    include *
+  }
+
+  view content of content {
+    title 'محتوا و انتشار'
     include *
   }
 
