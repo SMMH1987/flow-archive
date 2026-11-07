@@ -134,6 +134,10 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
 .sugc{border:1px solid var(--line);border-radius:10px;padding:8px;margin:6px 0;background:var(--card);font-size:12px;line-height:1.5}.sugc b{font-size:13px}.sugc .k{font-size:10px;font-weight:800;border-radius:6px;padding:0 6px;background:var(--accbg);color:var(--acc);margin-inline-start:6px}.sugc .pro{color:var(--e-out)}.sugc .con{color:var(--e-back)}
 .node.proc{border:3px solid var(--acc);background:var(--accbg);border-radius:16px}.node.proc .nt{font-size:15px}
 .mac-note{font-size:11.5px;color:var(--mute)}
+.grip{position:absolute;top:1px;left:50%;transform:translateX(-50%);cursor:grab;color:var(--mute);font-size:14px;line-height:1;z-index:4;padding:0 10px;touch-action:none;user-select:none}.grip:hover{color:var(--acc)}.fh .grip2{cursor:grab;color:var(--mute);padding:0 4px;touch-action:none}
+.dropb{box-shadow:0 -7px 0 0 var(--acc)!important}.dropa{box-shadow:0 7px 0 0 var(--acc)!important}
+.dndg{position:fixed;z-index:60;pointer-events:none;opacity:.85;background:var(--card);border:2px solid var(--acc);border-radius:10px;padding:6px 14px;font-weight:700;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.slot.ag b{color:var(--acc)}.slot.mu b{color:var(--e-out)}.slot.mu span{font-size:11px}
 .node.proc>.ns,.node.proc>.no{display:none}
 .tree{max-height:calc(100vh - 110px);overflow:auto;padding:8px}.tree h2{font-size:13px}
 .tr{display:flex;gap:2px;align-items:center;font-size:12.5px;line-height:1.5;border-radius:6px;padding:0 2px}
@@ -950,7 +954,7 @@ function renderNav(){
   const nav=$('#nav');nav.replaceChildren();
   nav.append(h('button',{class:MACRO?'on':'',title:'کل فرایندها هر کدام یک نود',onclick:goMacro},'🗺 نقشهٔ کل'));
   roots().filter(R=>!isStep(R)).forEach(R=>nav.append(h('button',{class:(!MACRO&&rootOfView()===R.id)?'on':'',onclick:()=>go('ov:'+R.id)},R.title.replace(/\s*\(.*$/,''))));
-  if(MACRO){nav.append(h('span',{class:'mac-note'},'  نقشهٔ کل: هر فرایند بزرگ یک نود است. قبل و بعدش نود تازه اضافه کن، با «＋ باز کردن» واردش شو.'));return}
+  if(MACRO){nav.append(h('button',{class:'sm',onclick:()=>autoOrder('')},'↧ ترتیب خودکار بر اساس فلش‌ها'),h('span',{class:'mac-note'},'  نقشهٔ کل: هر فرایند بزرگ یک نود است. قبل و بعدش نود تازه اضافه کن، با «＋ باز کردن» واردش شو.'));return}
   if(VER===2||VER===4){
     const rid=rootOfView();
     const rr=()=>{NEEDFIT=false;renderDia()};
@@ -960,7 +964,7 @@ function renderNav(){
       h('button',{class:'sm',title:'همه قدم‌ها و کادرهای دیده‌شده یک لایه بازتر شوند',onclick:()=>{const v=lastVis();v.forEach((_,q)=>{const n=IDX.get(q);if(n&&n.children.length)EXP.add(q)});rr()}},'＋ یک سطح بازتر'),
       h('button',{class:'sm',title:'عمیق‌ترین کادرهای باز بسته شوند',onclick:()=>{const ex=[...EXP].filter(q=>q!==rid);const deep=ex.filter(q=>!ex.some(o=>o.startsWith(q+'.')));deep.forEach(q=>EXP.delete(q));if(FOC&&!EXP.has(FOC)&&FOC!==rid&&!lastVis().has(FOC))FOC=parentPath(FOC);rr()}},'－ یک سطح بسته‌تر'),
       h('button',{class:'sm',onclick:()=>{EXP=new Set(allP().filter(q=>IDX.get(q).children.length));NEEDFIT=true;renderDia()}},'باز کردن همه'));
-    nav.append(h('button',{class:'sm',title:'کل این فرایند را به یک نود تبدیل کن تا نقشه خلوت شود',onclick:goMacro},'⇱ جمع کردن کل فرایند به یک نود'));
+    nav.append(h('button',{class:'sm',title:'زیرمجموعه‌های کادر انتخاب‌شده بر اساس فلش‌ها زمانی چیده شوند',onclick:()=>{const f=FOC&&IDX.has(FOC)?FOC:rid,n=IDX.get(f);autoOrder(n.children.length?f:parentPath(f))}},'↧ ترتیب خودکار بر اساس فلش‌ها'),h('button',{class:'sm',title:'کل این فرایند را به یک نود تبدیل کن تا نقشه خلوت شود',onclick:goMacro},'⇱ جمع کردن کل فرایند به یک نود'));
     if(VER===4){
       const f=FOC&&IDX.has(FOC)&&FOC.split('.')[0]===rid?FOC:rid,segs=f.split('.'),n=IDX.get(f),kids=n.children.length;
       const cr=h('div',{class:'row crumbs'},h('span',{class:'mute'},'📍 جایت:'));
@@ -1070,8 +1074,105 @@ function mkNode(sp,id){const leaf=!sp.kids;
   const n={id,kind:sp.kind||'autoStep',title:sp.t,tags:(leaf&&(sp.skill==='—'||sp.unk))?['unknownSkill']:[],icon:U+'unlock.svg',tech:'skill: '+(sp.skill||'—'),desc:sp.out?'out: '+sp.out:(sp.d?'out: '+sp.d:''),children:[],meta:[]};
   if(sp.ext)n.meta.push(['ext_tool',sp.ext],['ext_kind',sp.extKind||'MCP']);
   if(sp.sched)n.meta.push(['schedule',sp.sched]);
+  if(sp.agent)n.meta.push(['agent',sp.agent]);if(sp.must)n.meta.push(['must',sp.must]);if(sp.not)n.meta.push(['must_not',sp.not]);if(sp.stage)n.meta.push(['stage_status','simple']);
   (sp.kids||[]).forEach((k,i)=>n.children.push(mkNode(k,'c'+(i+1))));
   return n}
+
+async function reorderStep(p,refP,dir){
+  if(p===refP)return;
+  const pp=parentPath(p),top=!pp,par=top?null:IDX.get(pp),n=IDX.get(p),ref=IDX.get(refP);
+  if(!n||!ref||parentPath(refP)!==pp)return;
+  if((!top&&lockedN(par))||lockedN(n)||lockedN(ref)){await ask('این قسمت قفل است؛ جابه‌جایی ممکن نیست.',{info:1});return}
+  const sib=top?M.nodes:par.children,pre=top?'':pp+'.';
+  const chainOf=()=>top?sib.filter(inChain):sib;
+  const isSeq=r=>r&&(!r.label||r.label==='بعد'),relOf=(a,b)=>M.rels.find(r=>r.from===pre+a.id&&r.to===pre+b.id&&isSeq(r));
+  let ch=chainOf(),ci=ch.indexOf(n);const prev=ch[ci-1],next=ch[ci+1];
+  const r1=prev?relOf(prev,n):null,r2=next?relOf(n,next):null;
+  if(r1&&r2){M.rels=M.rels.filter(r=>r!==r1);r2.from=pre+prev.id;r2.c=lca(r2.from,r2.to)}
+  else if(r1)M.rels=M.rels.filter(r=>r!==r1);else if(r2)M.rels=M.rels.filter(r=>r!==r2);
+  sib.splice(sib.indexOf(n),1);const ri=sib.indexOf(ref);sib.splice(dir==='after'?ri+1:ri,0,n);
+  ch=chainOf();const ri2=ch.indexOf(ref),nb=ch[dir==='after'?ri2+1:ri2-1]==n?ch[dir==='after'?ri2+2:ri2-2]:ch[dir==='after'?ri2+1:ri2-1];
+  const nbOk=nb&&nb!==n&&!lockedN(nb);
+  if(dir==='after'){const old=nbOk?relOf(ref,nb):null;
+    if(old){const lab=old.label;old.to=p;old.c=lca(old.from,p);M.rels.push({from:p,to:pre+nb.id,label:lab||'بعد',c:lca(p,pre+nb.id)})}
+    else M.rels.push({from:refP,to:p,label:'بعد',c:lca(refP,p)})}
+  else{const old=nbOk?relOf(nb,ref):null;
+    if(old){const lab=old.label;old.to=p;old.c=lca(old.from,p);M.rels.push({from:p,to:refP,label:lab||'بعد',c:lca(p,refP)})}
+    else M.rels.push({from:p,to:refP,label:'بعد',c:lca(p,refP)})}
+  reindex();FOC=p;touch(true)}
+async function autoOrder(cp){
+  const top=!cp,par=top?null:IDX.get(cp);if(!top&&!par)return;
+  if(!top&&lockedN(par)){await ask('این قسمت قفل است؛ ترتیبش تغییر نمی‌کند.',{info:1});return}
+  const sib=top?M.nodes:par.children,pre=top?'':cp+'.',list=top?sib.filter(inChain):sib.slice();
+  if(list.some(lockedN)){await ask('بعضی از این قسمت‌ها قفل‌اند؛ ترتیب خودکار اعمال نمی‌شود.',{info:1});return}
+  const idxOf=new Map(list.map((n,i)=>[n.id,i])),adj=list.map(()=>[]);
+  const seg=q=>{if(!q.startsWith(pre))return -1;const id=q.slice(pre.length).split('.')[0];return idxOf.has(id)?idxOf.get(id):-1};
+  M.rels.forEach(r=>{const a=seg(r.from),b=seg(r.to);if(a>=0&&b>=0&&a!==b&&!adj[a].includes(b))adj[a].push(b)});
+  adj.forEach(l=>l.sort((x,y)=>x-y));
+  const st=list.map(()=>0),post=[];
+  const dfs=u=>{st[u]=1;adj[u].forEach(v=>{if(st[v]===0)dfs(v)});st[u]=2;post.push(u)};
+  list.forEach((_,i)=>{if(st[i]===0)dfs(i)});
+  const order=post.reverse().map(i=>list[i]);
+  if(order.every((n,i)=>n===list[i])){await ask('ترتیب فعلی با فلش‌ها جور است؛ چیزی تغییر نکرد.',{info:1});return}
+  if(top){const slots=[];M.nodes.forEach((n,i)=>{if(inChain(n))slots.push(i)});slots.forEach((si,k)=>{M.nodes[si]=order[k]})}
+  else order.forEach((n,i)=>{par.children[i]=n});
+  reindex();touch(true)}
+function orderPrompt(cp){const top=!cp,par=top?null:IDX.get(cp),pre=top?'':cp+'.',list=top?M.nodes.filter(inChain):par.children;
+  const rows=list.map((n,i)=>{const id=pre+n.id;const ins=M.rels.filter(r=>r.to===id||r.to.startsWith(id+'.')).map(r=>'«'+(r.label||'بعد')+'» از '+r.from).slice(0,3).join('، ')||'—';return `${i+1}. ${titleName(n)} (${id}) — ورودی: ${ins}`}).join('\n');
+  return `در پروژهٔ flow-archive ترتیب این قسمت‌ها را زمانی (کرونولوژیک) درست کن:
+قسمت: ${cp||'نقشهٔ کل'}
+ترتیب فعلی:
+${rows}
+
+قواعد: بر اساس وابستگی‌ها (هر قدم بعد از قدمی که ورودی‌اش را می‌سازد)؛ فلش‌های «بعد» را بین قدم‌های همسایه دوباره بچین؛ قسمت‌های #locked را جابه‌جا نکن؛ دلیل هر جابه‌جایی را کوتاه بنویس.
+خروجی: متن کامل recruitment.c4 به‌روز شده.`}
+const BLUEPRINTS={
+ service:{t:'ساخت یک سرویس جدید با هوش مصنوعی',stages:[
+  {t:'نام استارتاپ',kind:'askStep',skill:'startup-naming',agent:'اسکیل نام‌گذاری استارتاپ',out:'نام برگزیده + دامنهٔ آزاد'},
+  {t:'تعریف پروسهٔ سرویس',kind:'askStep',skill:'first-principles',agent:'ایجنت تحلیل فرایند',out:'نقشهٔ فرایند سرویس + فرض‌های پرخطر'},
+  {t:'تحقیق ساختار و قوانین ایران',kind:'autoStep',skill:'—',agent:'ایجنت پژوهش مداوم',out:'گزارش قوانین و رقبا با منبع + مزایا و معایب',ext:'Firecrawl MCP',extKind:'MCP'},
+  {t:'پرسش و شفاف‌سازی',kind:'askStep',skill:'—',agent:'ایجنت پرسشگر',out:'پاسخ‌های تأییدشده؛ ابهام‌ها صفر یا ثبت‌شده'},
+  {t:'تعریف نسخهٔ MVP',kind:'askStep',skill:'—',agent:'ایجنت محصول',out:'فهرست قابلیت‌های MVP + مرز آنچه نیست'},
+  {t:'ساخت MVP (ربات‌ها و پرداخت)',kind:'autoStep',skill:'—',agent:'ایجنت ساخت',out:'ربات تلگرام و بله + شارژ کارت‌به‌کارت',ext:'Telegram Bot API',extKind:'API'},
+  {t:'ساخت سایت',kind:'autoStep',skill:'—',agent:'ایجنت وب',out:'سایت معرفی + ورود به سرویس'},
+  {t:'تست بازیابی و کیفیت',kind:'autoStep',skill:'—',agent:'ایجنت آزمون',out:'گزارش تست + عیب‌های باز'},
+  {t:'تولید محتوا و تحویل به انتشار',kind:'gateStep',skill:'—',agent:'ایجنت محتوا و انتشار',out:'محتوای تأییدشده برای انتشار'}]},
+ hire:{t:'استخدام یک عنوان شغلی',stages:[
+  {t:'تعریف عنوان و شرایط',kind:'askStep',skill:'identify-assumptions-new',agent:'ایجنت استخدام',out:'عنوان + شرایط + بودجه'},
+  {t:'سفارشی‌سازی فرایند برای این عنوان',kind:'autoStep',skill:'—',agent:'ایجنت استخدام',out:'نسخهٔ فرایند با همین عنوان (از فرایند آمادهٔ سازمان)'},
+  {t:'اجرا و پیگیری',kind:'autoStep',skill:'—',agent:'ایجنت استخدام',out:'گزارش هفتگی از جریان استخدام'},
+  {t:'تأیید نهایی انسان',kind:'gateStep',skill:'—',agent:'ایجنت استخدام',out:'تصمیم نهایی'}]}};
+function bpSpec(bid,goal,must,not){const b=BLUEPRINTS[bid];
+  return{t:goal||b.t,d:b.t,kind:'orgBox',skill:'—',meta:[['blueprint',bid],...(must?[['must',must]]:[]),...(not?[['must_not',not]]:[])],kids:b.stages.map(x=>({...x,stage:1,must:must,not:not}))}}
+async function applyBlueprint(bid,goal,must,not){const sp=bpSpec(bid,goal,must,not);
+  const node=mkNode(sp,'g');node.kind='orgBox';node.tags=[];node.tech='';node.desc='out: '+sp.d;
+  (sp.meta||[]).forEach(([k,v])=>setMeta(node,k,v));
+  const chain=M.nodes.filter(inChain);
+  if(!chain.length){node.id=uniqueId(M.nodes,'g');M.nodes.push(node);reindex();touch(true);return}
+  MACRO=true;await spliceStep(chain[chain.length-1].id,'after',node)}
+function archPrompt(bid,goal,must,not){const b=BLUEPRINTS[bid];
+  return `در پروژهٔ flow-archive یک فرایند کامل طراحی کن (طراح فرایند):
+هدف: ${goal||'(بنویس)'}
+الگو: ${b.t}
+مرحله‌های پیشنهادی با ایجنت یا skill متخصص:
+${b.stages.map((x,i)=>`${i+1}. ${x.t} — ${x.agent}${x.ext?' — ابزار: '+x.ext:''}`).join('\n')}
+باید: ${must||'—'}
+نباید: ${not||'—'}
+
+روش: اول فقط نودهای ساده بده و از من سؤال بپرس تا ابهام‌ها شفاف شود؛ بعد هر نود را با ایجنت یا skill متخصص خودش تکمیل کن (زیرقدم، skill، ورودی، خروجی، ابزار بیرونی). ترتیب را زمانی بچین. قید «باید و نباید» روی همهٔ مرحله‌ها اعمال شود. قسمت‌های #locked را تغییر نده.
+خروجی: متن کامل recruitment.c4 به‌روز شده.`}
+function archPanel(){
+  const bs=h('select',{},...Object.entries(BLUEPRINTS).map(([k,v])=>h('option',{value:k},v.t)));
+  const goal=h('input',{placeholder:'مثلا: سرویس مشاورهٔ حقوقی با هوش مصنوعی'}),must=h('textarea',{rows:2,placeholder:'باید: هر مورد را با ؛ جدا کن'}),not=h('textarea',{rows:2,placeholder:'نباید: هر مورد را با ؛ جدا کن'});
+  const prev=h('div',{class:'mac-note'});const upd=()=>{prev.textContent=BLUEPRINTS[bs.value].stages.map((x,i)=>(i+1)+'. '+x.t+' ← '+x.agent).join('\n');prev.style.whiteSpace='pre-line'};bs.onchange=upd;upd();
+  const ta=h('textarea',{rows:5,class:'ltr',style:'display:none',readonly:true});
+  const cp=h('button',{class:'sm',onclick:async()=>{const t=archPrompt(bs.value,goal.value,must.value,not.value);ta.value=t;try{await navigator.clipboard.writeText(t);cp.textContent='کپی شد ✓'}catch(e){ta.style.display='block';ta.select()}}},'📋 کپی دستور طراحی کامل برای Claude');
+  return h('div',{class:'panel'},h('h2',{},'🧠 طراح فرایند'),h('small',{},'هدف را بنویس و الگو را انتخاب کن. نودهای ساده روی نقشهٔ کل می‌آیند و هر کدام ایجنت متخصص خودش را دارد؛ بعد هر نود را با Claude تکمیل می‌کنی. قید «باید و نباید» روی همهٔ مرحله‌ها می‌نشیند.'),
+    goal,bs,prev,must,not,h('div',{class:'row',style:'margin-top:6px'},h('button',{class:'sm pri',onclick:()=>applyBlueprint(bs.value,goal.value.trim(),must.value.trim(),not.value.trim())},'＋ ساخت نودهای ساده روی نقشهٔ کل'),cp),ta)}
+function metaPanel(n,p){const dis=lockedN(n);
+  const fld=(lbl,k,ph)=>h('label',{class:'f'},h('span',{},lbl),h('input',{value:meta(n,k),placeholder:ph||'',disabled:dis,oninput:e=>{const v=e.target.value;if(v)setMeta(n,k,v);else n.meta=(n.meta||[]).filter(x=>x[0]!==k);touch()}}));
+  return h('div',{class:'panel'},h('h2',{},'🎯 ایجنت متخصص و قید'),fld('ایجنت یا skill متخصص این نود','agent','مثلا ایجنت پژوهش مداوم'),fld('باید (با ؛ جدا کن)','must'),fld('نباید (با ؛ جدا کن)','must_not'),
+    h('label',{class:'f'},h('span',{},'وضعیت نود'),h('select',{disabled:dis,onchange:e=>{const v=e.target.value;if(v)setMeta(n,'stage_status',v);else n.meta=(n.meta||[]).filter(x=>x[0]!=='stage_status');touch(true)}},[['','—'],['simple','ساده (هنوز تکمیل نشده)'],['done','تکمیل شده']].map(([v,l])=>h('option',{value:v,selected:meta(n,'stage_status')===v},l)))))}
 const isProc=n=>(n.kind==='orgBox'||n.kind==='flow')&&n.children.length>0&&!n.children.some(c=>c.kind==='project'||c.kind==='tool');
 const inChain=n=>isStep(n)||isProc(n);
 async function spliceStep(refP,dir,node){
@@ -1135,9 +1236,10 @@ ${kids}
 
 قواعد: هر قدم یک مجری، یک skill و یک خروجی قابل تحویل؛ نام فعل + مفعول؛ حدود ۷ تا ۹ زیرمجموعه؛ تصمیم حداقل دو شاخهٔ برچسب‌دار؛ ورودی و خروجی هر قدم مشخص؛ برای هر قدم ابزار بیرونی (MCP/API) پیشنهاد بده؛ قسمت‌های #locked را تغییر نده.
 خروجی: متن کامل recruitment.c4 به‌روز شده برای جایگزینی فایل.`}
-function claudePanel(p){const ta=h('textarea',{rows:6,class:'ltr',style:'display:none',readonly:true}),btn=h('button',{class:'sm pri',onclick:async()=>{const t=claudePrompt(p);ta.value=t;try{await navigator.clipboard.writeText(t);btn.textContent='کپی شد ✓'}catch(e){ta.style.display='block';ta.select();btn.textContent='متن را دستی کپی کن'}}},'📋 کپی دستور برای Claude (توسعهٔ داخل این نود)');
+function claudePanel(p){const n0=IDX.get(p),ta=h('textarea',{rows:6,class:'ltr',style:'display:none',readonly:true}),btn=h('button',{class:'sm pri',onclick:async()=>{const t=claudePrompt(p);ta.value=t;try{await navigator.clipboard.writeText(t);btn.textContent='کپی شد ✓'}catch(e){ta.style.display='block';ta.select();btn.textContent='متن را دستی کپی کن'}}},'📋 کپی دستور برای Claude (توسعهٔ داخل این نود)');
   const sv2=h('button',{class:'sm',style:'margin-inline-start:6px',title:'این قسمت با زیرقدم‌هایش تمپلیت شخصی می‌شود',onclick:()=>{saveAsTpl(p);sv2.textContent='ذخیره شد ✓'}},'💾 ذخیره به‌عنوان تمپلیت');
-  return h('div',{class:'panel'},h('h2',{},'🤝 توسعه با Claude'),h('small',{},'این دستور را در همین گفتگو بفرست تا داخل این نود را با زیرقدم‌ها، skill و ابزار بیرونی گسترش بدهم.'),h('div',{class:'row',style:'margin-top:6px'},btn,sv2),ta)}
+  const ob=h('button',{class:'sm',style:'margin-inline-start:6px',title:'ترتیب زمانی زیرمجموعه‌ها را از Claude بخواه',onclick:async()=>{const t=orderPrompt(n0.children.length?p:parentPath(p));ta.value=t;try{await navigator.clipboard.writeText(t);ob.textContent='کپی شد ✓'}catch(e){ta.style.display='block';ta.select()}}},'🕒 دستور ترتیب زمانی');
+  return h('div',{class:'panel'},h('h2',{},'🤝 توسعه با Claude'),h('small',{},'این دستور را در همین گفتگو بفرست تا داخل این نود را با زیرقدم‌ها، skill و ابزار بیرونی گسترش بدهم.'),h('div',{class:'row',style:'margin-top:6px'},btn,sv2,ob),ta)}
 async function lockTree(p){const n=IDX.get(p);if(!n)return;
   if(!await ask(`«${titleName(n)}» با همهٔ زیرمجموعه‌هایش تمام‌شده، تأیید و قفل شود؟ بعد از قفل هیچ تغییری (حتی پیشنهاد خودکار) داخلش انجام نمی‌شود.`))return;
   setLock(n,true);walk(n.children,p,c=>setLock(c,true));touch(true)}
@@ -1154,6 +1256,7 @@ function extPanel(n,p){const dis=lockedN(n),cur=meta(n,'ext_tool');
     h('div',{},x.why),h('div',{class:'pro'},'＋ '+x.pro),h('div',{class:'con'},'－ '+x.con),
     h('button',{class:'sm',disabled:dis||cur===x.n,style:'margin-top:4px',onclick:()=>{setMeta(n,'ext_tool',x.n);setMeta(n,'ext_kind',x.k);touch(true)}},cur===x.n?'✓ انتخاب شده':'＋ استفاده در این قدم'))));
   return box}
+const extraH=n=>(meta(n,'ext_tool')?22:0)+(meta(n,'agent')?22:0)+((meta(n,'must')||meta(n,'must_not'))?22:0);
 function inputOf(p,n){const v=meta(n,'input');if(v)return{t:v,derived:false};
   const inc=M.rels.filter(r=>r.to===p);
   if(inc.length)return{t:inc.slice(0,2).map(r=>(r.label?'«'+r.label+'» ':'')+'از '+titleName(IDX.get(r.from)||{title:r.from,kind:''})).join('، '),derived:true};
@@ -1164,6 +1267,7 @@ function lintNode(n,p){const m=[],kids=n.children,st=isStep(n),ttl=titleName(n);
   if(kids.length>9&&!['orgBox','project'].includes(n.kind))m.push('بیش از ۹ زیرمجموعه؛ گروه‌بندی کن (قاعدهٔ ۷±۲)');
   if(kids.length===1&&(st||n.kind==='section'))m.push('فقط یک زیرمجموعه؛ ادغام کن یا یکی دیگر اضافه کن (WBS)');
   if(p.split('.').length>5)m.push('عمق بیش از ۴ سطح؛ ساده‌تر کن');
+  if(meta(n,'stage_status')==='simple')m.push('هنوز نود ساده است؛ به ایجنت متخصصش بده تا تکمیل شود');
   if(st&&!kids.length){
     if(n.kind==='routeStep'){const outs=M.rels.filter(r=>r.from===p);if(outs.length<2)m.push('تصمیم (route) باید حداقل ۲ شاخه داشته باشد');if(outs.some(r=>!r.label))m.push('شاخه‌ای بدون برچسب')}
     else{if(!/skill:\s*[^—\s]/.test(n.tech||''))m.push('skill مشخص نیست');
@@ -1179,11 +1283,13 @@ function nodeEl(n,p,b,full){
   const nest=full&&(VER===2||VER===4)&&isStep(n),slot=nest&&n.kind!=='routeStep';
   const ws=nest?lintNode(n,p):[];
   const par0=IDX.get(parentPath(p)),ord=nest&&par0?par0.children.findIndex(c=>c.id===n.id)+1:0,extT=meta(n,'ext_tool');
-  const ex=[ord?h('span',{class:'ord',title:'ترتیب در این فرایند'},toFa(ord)):null,nest?h('button',{class:'lkb','data-lock':p,title:lk?'قفل است؛ برای باز کردن کلیک کن':'قفلش کن تا تغییر نکند'},lk?'🔒':'🔓'):null,
+  const ex=[nest?h('span',{class:'grip','data-grip':p,title:'بکش تا جابه‌جا شود'},'⠿'):null,ord?h('span',{class:'ord',title:'ترتیب در این فرایند'},toFa(ord)):null,nest?h('button',{class:'lkb','data-lock':p,title:lk?'قفل است؛ برای باز کردن کلیک کن':'قفلش کن تا تغییر نکند'},lk?'🔒':'🔓'):null,
     ws.length?h('span',{class:'wb',title:ws.join('\n')},'⚠ '+toFa(ws.length)):null];
   const mid=slot?h('div',{class:'slots'},
       h('div',{class:'slot sk'},h('b',{},'skill'),h('span',{class:'ltr'},(n.tech||'').replace(/^skill:\s*/,'')||'—')),
+      meta(n,'agent')?h('div',{class:'slot ag'},h('b',{},'ایجنت'),h('span',{},meta(n,'agent')+(meta(n,'stage_status')==='simple'?' · ساده':''))):null,
       extT?h('div',{class:'slot ext'},h('b',{},'ابزار'),h('span',{},extT+(meta(n,'ext_kind')&&!extT.includes(meta(n,'ext_kind'))?' · '+meta(n,'ext_kind'):''))):null,
+      (meta(n,'must')||meta(n,'must_not'))?h('div',{class:'slot mu'},h('b',{},'قید'),h('span',{},(meta(n,'must')?'✓ '+meta(n,'must'):'')+(meta(n,'must_not')?'  ✗ '+meta(n,'must_not'):''))):null,
       (()=>{const o=inputOf(p,n);return h('div',{class:'slot in'+(o.none?' none':'')},h('b',{},'ورودی'),h('span',{},o.derived?h('i',{},o.t):o.t))})(),
       h('div',{class:'slot out'+(outText(n)?'':' none') },h('b',{},'خروجی'),h('span',{},outText(n)||'نامشخص')))
     :[n.tech?h('div',{class:'ns'},n.tags.includes('gated')&&n.kind==='tool'?h('span',{class:'nb red'},'تأیید انسانی'):null,n.tags.includes('unknownSkill')?h('span',{class:'nb'},'skill؟'):null,n.tech):null,
@@ -1352,7 +1458,7 @@ function renderMacro(){
   const world=$('#world');world.replaceChildren();
   const chain=M.nodes.filter(inChain),CW=330,X0=400,HEADH=38;
   const nsteps=n=>n.children.reduce((a,c)=>a+(isStep(c)?1:0)+nsteps(c),0);
-  const hOf=n=>isProc(n)?190:(isStep(n)?136+(meta(n,'ext_tool')?22:0)+(n.children.length?26:0):90);
+  const hOf=n=>isProc(n)?190:(isStep(n)?136+extraH(n)+(n.children.length?26:0):90);
   const grp=(dir)=>{const it=MACRO_SUG[dir];const rows=Math.ceil(it.length/2);return{it,rows,h:HEADH+12+rows*94+8}};
   const gB=grp('before'),gA=grp('after');
   let y=16;const gBy=y;y+=gB.h+56;
@@ -1404,6 +1510,7 @@ function renderMacro(){
         h('div',{class:'slot out'},h('b',{},'خروجی'),h('span',{},h('i',{},outs.join('، ')||'نامشخص')))),
         h('button',{class:'tgbtn','data-open':n.id,title:'باز کردن داخل این فرایند'},'＋ باز کردن · '+toFa(nsteps(n))+' قدم'))}
     else if(n.children.length)el.append(h('button',{class:'tgbtn','data-open':n.id,title:'باز کردن داخل این نود'},'＋ باز کردن · '+toFa(n.children.length)+' زیرقدم'));
+    el.append(h('span',{class:'grip','data-grip':n.id,title:'بکش تا جابه‌جا شود'},'⠿'));
     world.append(el)});
   return{W,H,vis}}
 function renderNested(rid){
@@ -1417,7 +1524,7 @@ function renderNested(rid){
     M.rels.forEach(r=>{const a=seg(r.from),b=seg(r.to);if(a<0||b<0||a===b||b===a+1)return;if(b>a)nR++;else nL++});return{nR,nL}};
   const lay=(n,p)=>{
     const kids=n.children;
-    if(!(EXP.has(p)&&kids.length)){const lane=['role','section','project','orgBox','flow'].includes(n.kind);return{n,p,w:LEAFW,h:(lane?64:(n.kind==='tool'?64:(isStep(n)&&n.kind!=='routeStep'?136+(meta(n,'ext_tool')?22:0):84)))+(kids.length?26:0),frame:false}}
+    if(!(EXP.has(p)&&kids.length)){const lane=['role','section','project','orgBox','flow'].includes(n.kind);return{n,p,w:LEAFW,h:(lane?64:(n.kind==='tool'?64:(isStep(n)&&n.kind!=='routeStep'?136+extraH(n):84)))+(kids.length?26:0),frame:false}}
     const ch=kids.map(k=>lay(k,p+'.'+k.id)),cw=Math.max(...ch.map(c=>c.w));
     let hh=HEADH+14;ch.forEach(c=>hh+=c.h+GAP);hh+=-GAP+40;
     const cc=corr(p,kids),padL=34+13*Math.min(cc.nL,8),padR=34+13*Math.min(cc.nR,8);
@@ -1439,6 +1546,7 @@ function renderNested(rid){
   frames.forEach(f=>{const lk=lockedN(f.n);
     world.append(h('div',{class:'lanebox'+(lk?' locked':'')+(SEL===f.p?' sel':'')+((FOC||rid)===f.p&&VER===4?' foc':''),'data-p0':f.p,style:`left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px;${f.depth%2?'background:color-mix(in srgb,var(--acc) 4%,transparent)':''}`},
       h('div',{class:'fh'},
+        f.p!==rid&&f.n.kind!=='actor'?h('span',{class:'grip2','data-grip':f.p,title:'بکش تا جابه‌جا شود'},'⠿'):null,
         f.p===rid?h('button',{class:'sm','data-macro':'1',title:'کل این فرایند را به یک نود تبدیل کن'},'⇱'):h('button',{class:'sm','data-tog':f.p,title:'بستن این کادر'},'－'),
         h('span',{class:'ft','data-foc':f.p,title:'نشان دادن و بزرگ‌نمایی این کادر'},(lk?'🔒 ':'')+f.n.title,h('span',{class:'cnt'},'  ·  '+cntTxt(f.n))),
         h('button',{class:'sm ed','data-sel':f.p,title:'ویرایش مشخصات'},'✎'),
@@ -1504,16 +1612,32 @@ function renderNested(rid){
 
 /* رویدادهای بوم: کشیدن صفحه، زوم، کلیک */
 (function(){
-  const cv=$('#cv');let drag=null;
+  const cv=$('#cv');let drag=null,dnd=null;
+  const dndClear=()=>{document.querySelectorAll('.dropb,.dropa').forEach(x=>x.classList.remove('dropb','dropa'));if(dnd&&dnd.g)dnd.g.remove()};
+  const candOf=(el,p)=>{const pp=parentPath(p);const t=el&&el.closest?el.closest('[data-p],[data-p0]'):null;if(!t)return null;let q=t.getAttribute('data-p')||t.getAttribute('data-p0');
+    while(q){if(q!==p&&parentPath(q)===pp&&IDX.has(q)&&(pp||inChain(IDX.get(q))))break;q=q.includes('.')?q.slice(0,q.lastIndexOf('.')):''}
+    if(!q)return null;return document.querySelector(`.node[data-p="${q}"],.lanebox[data-p0="${q}"]`)}
   cv.addEventListener('pointerdown',e=>{
     if(e.target.closest('.cvtools'))return;
+    const gp=e.target.closest('[data-grip]');
+    if(gp){const q=gp.getAttribute('data-grip');cv.setPointerCapture(e.pointerId);dnd={id:e.pointerId,p:q,moved:0,x:e.clientX,y:e.clientY,g:null,cand:null,dir:'after'};e.preventDefault();return}
     cv.setPointerCapture(e.pointerId);
     drag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:0,target:e.target,vx:VIEW.x,vy:VIEW.y}});
   cv.addEventListener('pointermove',e=>{
+    if(dnd&&e.pointerId===dnd.id){dnd.moved=Math.max(dnd.moved,Math.abs(e.clientX-dnd.x)+Math.abs(e.clientY-dnd.y));if(dnd.moved<6)return;
+      if(!dnd.g){dnd.g=h('div',{class:'dndg'},titleName(IDX.get(dnd.p)||{title:dnd.p,kind:''}));document.body.append(dnd.g)}
+      dnd.g.style.left=(e.clientX+14)+'px';dnd.g.style.top=(e.clientY+10)+'px';
+      document.querySelectorAll('.dropb,.dropa').forEach(x=>x.classList.remove('dropb','dropa'));
+      const el=document.elementsFromPoint(e.clientX,e.clientY).find(x=>x!==dnd.g&&candOf(x,dnd.p));const c=el?candOf(el,dnd.p):null;
+      dnd.cand=c;if(c){const r=c.getBoundingClientRect();dnd.dir=e.clientY<r.top+r.height/2?'before':'after';c.classList.add(dnd.dir==='before'?'dropb':'dropa')}
+      return}
     if(!drag||e.pointerId!==drag.id)return;
     const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.moved=Math.max(drag.moved,Math.abs(dx)+Math.abs(dy));
     if(drag.moved<5)return;VIEW.x=drag.vx+dx;VIEW.y=drag.vy+dy;applyView()});
   cv.addEventListener('pointerup',e=>{
+    if(dnd&&e.pointerId===dnd.id){const d=dnd;dndClear();dnd=null;
+      if(d.moved>=6&&d.cand){const q=d.cand.getAttribute('data-p')||d.cand.getAttribute('data-p0');reorderStep(d.p,q,d.dir)}
+      return}
     if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;if(d.moved>=5)return;
     const t=d.target;if(!t.closest)return;
     const ed=t.closest('[data-e]');if(ed){SELE=+ed.getAttribute('data-e');SEL=null;renderDia();renderInsp();return}
@@ -1532,7 +1656,7 @@ function renderNested(rid){
     const cd=t.closest('.card2');if(cd){if(t.closest('.edit'))select(cd.dataset.p);else go(cd.dataset.p);return}
     if(t.closest('button,.addrow'))return;
     SEL=null;SELE=null;renderDia();renderInsp()});
-  cv.addEventListener('pointercancel',()=>{drag=null});
+  cv.addEventListener('pointercancel',()=>{drag=null;if(dnd){dndClear();dnd=null}});
   cv.addEventListener('wheel',e=>{e.preventDefault();
     if(e.ctrlKey||e.metaKey){const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,k0=VIEW.k,k1=Math.min(2.5,Math.max(.2,k0*Math.exp(-e.deltaY*.01)));VIEW.x=mx-(mx-VIEW.x)*(k1/k0);VIEW.y=my-(my-VIEW.y)*(k1/k0);VIEW.k=k1}
     else{VIEW.y-=e.deltaY;VIEW.x-=e.deltaX}applyView()},{passive:false});
@@ -1596,6 +1720,7 @@ function renderInsp(){
       box.append(h('div',{class:'panel'},h('h2',{},'گزارش استاندارد · '+toFa(tot)+' هشدار'),
         h('small',{},'قاعده‌ها: WBS (قاعدهٔ ۱۰۰٪ و ۷±۲ زیرمجموعه)، هفت رهنمود مدل‌سازی فرایند (Mendling): نام فعل+مفعول و تقسیم مدل بزرگ، BPMN: هر قدم یک کار و یک مجری، تصمیم دست‌کم دو شاخهٔ برچسب‌دار، ISO 5807: ورودی و خروجی هر قدم مشخص.'),
         items.length?h('div',{},...items.slice(0,40).map(([pp,n,w])=>h('button',{class:'lint',onclick:()=>{if(VER===4||VER===2){expandTo(pp);FOC=pp}select(pp);if(VER===4||VER===2)fitTo(pp)}},h('b',{},titleName(n).slice(0,40)),h('small',{},w.join(' · '))))):h('div',{class:'mute'},'همه‌چیز با قاعده‌ها جور است.')))}
+    box.append(archPanel());
     box.append(tplPanel(MACRO?null:(FOC&&FOC!==rootOfView()?FOC:null)));
     box.append(h('div',{class:'panel'},h('h2',{},'راهنمای شکل‌ها'),h('div',{class:'legend'},
       h('i',{style:'border-color:var(--ask);background:var(--askbg);border-radius:12px'}),h('span',{},'ask — خروجی را نشان بده و نظر بگیر'),
@@ -1650,6 +1775,7 @@ function renderInsp(){
   if(SEL.split('.').length===2&&(n.kind==='role'||n.kind==='section'||n.kind==='project'))act.append(h('button',{class:'sm pri',onclick:()=>go(SEL)},'فلوچارت این بخش ←'));
   if(n.kind!=='actor'&&!L&&(n.children.length||isStep(n)||n.kind==='section'||n.kind==='role'))P.append(h('button',{class:'sm pri',style:'margin-top:6px',onclick:()=>lockTree(SEL)},'✓ تمام شد؛ تأیید و قفل همهٔ این قسمت'));
   P.append(act);box.append(P);
+  if(n.kind!=='actor'&&n.kind!=='tool'&&n.kind!=='project')box.append(metaPanel(n,SEL));
   if(isStep(n)&&n.kind!=='routeStep')box.append(extPanel(n,SEL));
   if(n.kind==='role'||n.kind==='section'||isStep(n)||isProc(n))box.append(tplPanel(SEL));
   if(n.kind!=='actor'&&n.kind!=='tool')box.append(claudePanel(SEL));
