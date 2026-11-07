@@ -134,6 +134,8 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
 .sugc{border:1px solid var(--line);border-radius:10px;padding:8px;margin:6px 0;background:var(--card);font-size:12px;line-height:1.5}.sugc b{font-size:13px}.sugc .k{font-size:10px;font-weight:800;border-radius:6px;padding:0 6px;background:var(--accbg);color:var(--acc);margin-inline-start:6px}.sugc .pro{color:var(--e-out)}.sugc .con{color:var(--e-back)}
 .node.proc{border:3px solid var(--acc);background:var(--accbg);border-radius:16px}.node.proc .nt{font-size:15px}
 .mac-note{font-size:11.5px;color:var(--mute)}
+.nwd{position:absolute;bottom:-8px;right:10px;z-index:3;font-size:10px;font-weight:800;color:#fff;background:var(--e-out);border-radius:8px;padding:0 7px;line-height:16px}.dtl{position:absolute;top:4px;right:34px;z-index:3;font-size:11px;cursor:help;letter-spacing:2px}
+button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover:not(:disabled){background:var(--e-back);color:#fff}.nwchip{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:var(--e-out);border-radius:8px;padding:1px 8px;margin-inline-start:6px}.cr{white-space:pre;font-size:11px;direction:ltr;text-align:left}
 .grip{position:absolute;top:1px;left:50%;transform:translateX(-50%);cursor:grab;color:var(--mute);font-size:14px;line-height:1;z-index:4;padding:0 10px;touch-action:none;user-select:none}.grip:hover{color:var(--acc)}.fh .grip2{cursor:grab;color:var(--mute);padding:0 4px;touch-action:none}
 .dropb{box-shadow:0 -7px 0 0 var(--acc)!important}.dropa{box-shadow:0 7px 0 0 var(--acc)!important}
 .dndg{position:fixed;z-index:60;pointer-events:none;opacity:.85;background:var(--card);border:2px solid var(--acc);border-radius:10px;padding:6px 14px;font-weight:700;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
@@ -915,6 +917,8 @@ let hT;function touch(full){syncAuto();save();clearTimeout(hT);hT=setTimeout(()=
 function undo(){if(HIST.length>1){HIST.pop();const t=HIST[HIST.length-1];M=parseC4(t);reindex();if(!IDX.has(SEL))SEL=null;save();refresh()}}
 const meta=(n,k)=>{const e=(n.meta||[]).find(x=>x[0]===k);return e?e[1]:''};
 function setMeta(n,k,v){n.meta=n.meta||[];const e=n.meta.find(x=>x[0]===k);if(e)e[1]=v;else n.meta.push([k,v])}
+const isNew=n=>!!meta(n,'is_new'),markNew=n=>setMeta(n,'is_new','true'),clearNew=n=>{n.meta=(n.meta||[]).filter(x=>x[0]!=='is_new')};
+let CARDDET=false;
 function toolInfo(n){const [a,c]=(n.tech||'').split(' · ');return{acc:a==='read'?'read':'write',cat:c||''}}
 function setTool(n,acc,cat){n.tech=acc+(cat?' · '+cat:'')}
 const rolePart=n=>{const m=n.title.match(/^(🔒|🔓) (\d+) · (.*)$/);return m?{em:m[1],num:m[2],name:m[3]}:null};
@@ -1072,7 +1076,7 @@ const TPLS=[
    {t:'ارسال و ثبت نتیجه',kind:'autoStep',skill:'—',out:'پیام ارسال‌شده + وضعیت',ext:'Gmail MCP',extKind:'MCP'}]}];
 function mkNode(sp,id){const leaf=!sp.kids;
   const n={id,kind:sp.kind||'autoStep',title:sp.t,tags:(leaf&&(sp.skill==='—'||sp.unk))?['unknownSkill']:[],icon:U+'unlock.svg',tech:'skill: '+(sp.skill||'—'),desc:sp.out?'out: '+sp.out:(sp.d?'out: '+sp.d:''),children:[],meta:[]};
-  if(sp.ext)n.meta.push(['ext_tool',sp.ext],['ext_kind',sp.extKind||'MCP']);
+  markNew(n);if(sp.ext)n.meta.push(['ext_tool',sp.ext],['ext_kind',sp.extKind||'MCP']);
   if(sp.sched)n.meta.push(['schedule',sp.sched]);
   if(sp.agent)n.meta.push(['agent',sp.agent]);if(sp.must)n.meta.push(['must',sp.must]);if(sp.not)n.meta.push(['must_not',sp.not]);if(sp.stage)n.meta.push(['stage_status','simple']);
   (sp.kids||[]).forEach((k,i)=>n.children.push(mkNode(k,'c'+(i+1))));
@@ -1171,8 +1175,24 @@ function archPanel(){
     goal,bs,prev,must,not,h('div',{class:'row',style:'margin-top:6px'},h('button',{class:'sm pri',onclick:()=>applyBlueprint(bs.value,goal.value.trim(),must.value.trim(),not.value.trim())},'＋ ساخت نودهای ساده روی نقشهٔ کل'),cp),ta)}
 function metaPanel(n,p){const dis=lockedN(n);
   const fld=(lbl,k,ph)=>h('label',{class:'f'},h('span',{},lbl),h('input',{value:meta(n,k),placeholder:ph||'',disabled:dis,oninput:e=>{const v=e.target.value;if(v)setMeta(n,k,v);else n.meta=(n.meta||[]).filter(x=>x[0]!==k);touch()}}));
-  return h('div',{class:'panel'},h('h2',{},'🎯 ایجنت متخصص و قید'),fld('ایجنت یا skill متخصص این نود','agent','مثلا ایجنت پژوهش مداوم'),fld('باید (با ؛ جدا کن)','must'),fld('نباید (با ؛ جدا کن)','must_not'),
+  return h('div',{class:'panel'},h('h2',{},'🎯 ایجنت متخصص و قید'),fld('ایجنت یا skill متخصص این نود (role در CrewAI)','agent','مثلا ایجنت پژوهش مداوم'),fld('هدف ایجنت (goal)','agent_goal','این ایجنت دقیقا باید به چه چیزی برسد'),fld('پیشینه و تخصص ایجنت (backstory)','agent_backstory','چرا برای این کار مناسب است'),fld('باید (با ؛ جدا کن)','must'),fld('نباید (با ؛ جدا کن)','must_not'),
     h('label',{class:'f'},h('span',{},'وضعیت نود'),h('select',{disabled:dis,onchange:e=>{const v=e.target.value;if(v)setMeta(n,'stage_status',v);else n.meta=(n.meta||[]).filter(x=>x[0]!=='stage_status');touch(true)}},[['','—'],['simple','ساده (هنوز تکمیل نشده)'],['done','تکمیل شده']].map(([v,l])=>h('option',{value:v,selected:meta(n,'stage_status')===v},l)))))}
+/* CrewAI: Agent (role, goal, backstory) + Task (description, expected_output, agent, context, human_input) */
+function crewYaml(p){
+  const n=IDX.get(p);if(!n)return'';
+  let base=p,steps=n.children.filter(isStep);
+  if(!steps.length){const pp=parentPath(p),par=pp&&IDX.get(pp);if(par&&isStep(n)){base=pp;steps=par.children.filter(isStep)}else{steps=isStep(n)?[n]:[]}}
+  if(!steps.length)return'# این قسمت قدمی ندارد؛ یک نود با چند قدم انتخاب کن.';
+  const pre=(base?base+'.':''),q=s=>JSON.stringify(String(s||'')).replace(/\\u([0-9a-f]{4})/gi,(m,c)=>String.fromCharCode(parseInt(c,16)));
+  const ag=new Map(),agOf=s=>{const k=meta(s,'agent')||'عمومی';if(!ag.has(k))ag.set(k,{key:'agent_'+(ag.size+1),role:k,goal:meta(s,'agent_goal'),back:meta(s,'agent_backstory'),tools:new Set()});const a=ag.get(k);if(!a.goal)a.goal=meta(s,'agent_goal');if(!a.back)a.back=meta(s,'agent_backstory');if(meta(s,'ext_tool'))a.tools.add(meta(s,'ext_tool'));return a};
+  const tk=new Map();steps.forEach(s=>tk.set(pre+s.id,'task_'+s.id));
+  const tasks=steps.map(s=>{const a=agOf(s),sp=pre+s.id,ctx=M.rels.filter(r=>r.to===sp&&tk.has(r.from)).map(r=>tk.get(r.from)),must=meta(s,'must'),not=meta(s,'must_not');
+    return `task_${s.id}:\n  description: ${q(titleName(s)+(must?' | باید: '+must:'')+(not?' | نباید: '+not:''))}\n  expected_output: ${q(outText(s)||'نامشخص')}\n  agent: ${a.key}`+(ctx.length?`\n  context: [${ctx.join(', ')}]`:'')+(s.kind==='gateStep'||s.kind==='askStep'?'\n  human_input: true':'')+(s.kind==='routeStep'?'\n  # تصمیم (route): در CrewAI با Flow و @router پیاده می‌شود':'')}).join('\n\n');
+  const agents=[...ag.values()].map(a=>`${a.key}:\n  role: ${q(a.role)}\n  goal: ${q(a.goal||'(پر کن)')}\n  backstory: ${q(a.back||'(پر کن)')}`+(a.tools.size?`\n  # ابزار پیشنهادی: ${[...a.tools].join(', ')}`:'')).join('\n\n');
+  const hasRoute=steps.some(s=>s.kind==='routeStep');
+  return `# Crew: ${titleName(IDX.get(base)||n)}\n# process: ${hasRoute?'Flow با @router (چون تصمیم دارد)':'Process.sequential'}\n\n# ── config/agents.yaml ──\n${agents}\n\n# ── config/tasks.yaml ──\n${tasks}\n`}
+function crewPanel(n,p){const ta=h('textarea',{rows:8,class:'cr',readonly:true,style:'display:none'}),btn=h('button',{class:'sm',onclick:async()=>{const t=crewYaml(p);ta.value=t;ta.style.display='block';try{await navigator.clipboard.writeText(t);btn.textContent='کپی شد ✓'}catch(e){ta.select()}}},'📋 ساخت agents.yaml و tasks.yaml');
+  return h('div',{class:'panel'},h('h2',{},'🧑‍✈️ خروجی CrewAI'),h('small',{},'ایجنت همان Agent (role، goal، backstory) است و هر قدم یک Task (description، expected_output، context از فلش‌های ورودی، human_input برای قدم‌های ask و gate). تصمیم route در CrewAI با Flow پیاده می‌شود. این فقط فایل پیکربندی می‌سازد و چیزی اجرا نمی‌کند.'),h('div',{class:'row',style:'margin-top:6px'},btn),ta)}
 const isProc=n=>(n.kind==='orgBox'||n.kind==='flow')&&n.children.length>0&&!n.children.some(c=>c.kind==='project'||c.kind==='tool');
 const inChain=n=>isStep(n)||isProc(n);
 async function spliceStep(refP,dir,node){
@@ -1199,7 +1219,7 @@ let USER_TPLS=[];try{USER_TPLS=JSON.parse(localStorage.getItem('orgStudio.tpls')
 const allTpls=()=>TPLS.concat(USER_TPLS);
 function tplNode(tid){const t=allTpls().find(x=>x.id===tid);if(!t)return null;
   if(t.ser){const cl=q=>({id:q.id,kind:q.kind,title:q.title,tags:[...q.tags],icon:q.icon,tech:q.tech,desc:q.desc,meta:(q.meta||[]).map(x=>x.slice()),children:q.children.map(cl)});
-    const n=cl(t.ser);setLock(n,false);walk(n.children,'',c=>setLock(c,false));n._rels=t.rels;return n}
+    const n=cl(t.ser);setLock(n,false);walk(n.children,'',c=>setLock(c,false));markNew(n);walk(n.children,'',c=>markNew(c));n._rels=t.rels;return n}
   return mkNode({t:t.t,d:t.d,kind:'autoStep',skill:'—',kids:t.kids,sched:t.sched},'n')}
 async function addTplTo(tid,tp){const node=tplNode(tid);const t=tp&&IDX.get(tp);if(!node||!t)return;
   const top=!tp.includes('.');
@@ -1215,7 +1235,7 @@ const MACRO_SUG={before:[{blank:1},{tpl:'name'},{t:'تعریف نیاز و بو�
 async function acceptMacro(dir,k){const it=MACRO_SUG[dir][k];if(!it)return;const chain=M.nodes.filter(inChain);if(!chain.length)return;
   const node=it.tpl?tplNode(it.tpl):mkNode(it.blank?{t:'نود جدید',kind:'askStep',skill:'—',out:''}:it,'n');
   await spliceStep(dir==='before'?chain[0].id:chain[chain.length-1].id,dir,node)}
-function serNode(n){return{id:n.id,kind:n.kind,title:n.title,tags:n.tags.filter(t=>t!=='locked'),icon:n.icon||'',tech:n.tech||'',desc:n.desc||'',meta:(n.meta||[]).map(x=>x.slice()),children:n.children.map(serNode)}}
+function serNode(n){return{id:n.id,kind:n.kind,title:n.title,tags:n.tags.filter(t=>t!=='locked'),icon:n.icon||'',tech:n.tech||'',desc:n.desc||'',meta:(n.meta||[]).filter(x=>x[0]!=='is_new').map(x=>x.slice()),children:n.children.map(serNode)}}
 function saveAsTpl(p){const n=IDX.get(p);if(!n)return;
   const rels=M.rels.filter(r=>r.from.startsWith(p+'.')&&r.to.startsWith(p+'.')).map(r=>({from:r.from.slice(p.length+1),to:r.to.slice(p.length+1),label:r.label||''}));
   USER_TPLS.push({id:'u'+Date.now(),t:titleName(n),d:'تمپلیت شخصی (از '+p+')',ser:serNode(n),rels,user:1});
@@ -1256,7 +1276,7 @@ function extPanel(n,p){const dis=lockedN(n),cur=meta(n,'ext_tool');
     h('div',{},x.why),h('div',{class:'pro'},'＋ '+x.pro),h('div',{class:'con'},'－ '+x.con),
     h('button',{class:'sm',disabled:dis||cur===x.n,style:'margin-top:4px',onclick:()=>{setMeta(n,'ext_tool',x.n);setMeta(n,'ext_kind',x.k);touch(true)}},cur===x.n?'✓ انتخاب شده':'＋ استفاده در این قدم'))));
   return box}
-const extraH=n=>(meta(n,'ext_tool')?22:0)+(meta(n,'agent')?22:0)+((meta(n,'must')||meta(n,'must_not'))?22:0);
+const extraH=n=>!CARDDET?0:(meta(n,'ext_tool')?22:0)+(meta(n,'agent')?22:0)+((meta(n,'must')||meta(n,'must_not'))?22:0);
 function inputOf(p,n){const v=meta(n,'input');if(v)return{t:v,derived:false};
   const inc=M.rels.filter(r=>r.to===p);
   if(inc.length)return{t:inc.slice(0,2).map(r=>(r.label?'«'+r.label+'» ':'')+'از '+titleName(IDX.get(r.from)||{title:r.from,kind:''})).join('، '),derived:true};
@@ -1284,12 +1304,14 @@ function nodeEl(n,p,b,full){
   const ws=nest?lintNode(n,p):[];
   const par0=IDX.get(parentPath(p)),ord=nest&&par0?par0.children.findIndex(c=>c.id===n.id)+1:0,extT=meta(n,'ext_tool');
   const ex=[nest?h('span',{class:'grip','data-grip':p,title:'بکش تا جابه‌جا شود'},'⠿'):null,ord?h('span',{class:'ord',title:'ترتیب در این فرایند'},toFa(ord)):null,nest?h('button',{class:'lkb','data-lock':p,title:lk?'قفل است؛ برای باز کردن کلیک کن':'قفلش کن تا تغییر نکند'},lk?'🔒':'🔓'):null,
-    ws.length?h('span',{class:'wb',title:ws.join('\n')},'⚠ '+toFa(ws.length)):null];
+    ws.length?h('span',{class:'wb',title:ws.join('\n')},'⚠ '+toFa(ws.length)):null,
+    isNew(n)?h('span',{class:'nwd',title:'جدید؛ جزئیاتش را در پنل ویرایش ببین'},'جدید'):null,
+    (!CARDDET&&nest&&(meta(n,'agent')||extT||meta(n,'must')||meta(n,'must_not')))?h('span',{class:'dtl',title:[meta(n,'agent')&&'ایجنت: '+meta(n,'agent'),extT&&'ابزار: '+extT,meta(n,'must')&&'باید: '+meta(n,'must'),meta(n,'must_not')&&'نباید: '+meta(n,'must_not')].filter(Boolean).join('\n')+'\n(جزئیات در پنل ویرایش)'},(meta(n,'agent')?'🎯':'')+(extT?'🔌':'')+((meta(n,'must')||meta(n,'must_not'))?'⛔':'')):null];
   const mid=slot?h('div',{class:'slots'},
       h('div',{class:'slot sk'},h('b',{},'skill'),h('span',{class:'ltr'},(n.tech||'').replace(/^skill:\s*/,'')||'—')),
-      meta(n,'agent')?h('div',{class:'slot ag'},h('b',{},'ایجنت'),h('span',{},meta(n,'agent')+(meta(n,'stage_status')==='simple'?' · ساده':''))):null,
-      extT?h('div',{class:'slot ext'},h('b',{},'ابزار'),h('span',{},extT+(meta(n,'ext_kind')&&!extT.includes(meta(n,'ext_kind'))?' · '+meta(n,'ext_kind'):''))):null,
-      (meta(n,'must')||meta(n,'must_not'))?h('div',{class:'slot mu'},h('b',{},'قید'),h('span',{},(meta(n,'must')?'✓ '+meta(n,'must'):'')+(meta(n,'must_not')?'  ✗ '+meta(n,'must_not'):''))):null,
+      CARDDET&&meta(n,'agent')?h('div',{class:'slot ag'},h('b',{},'ایجنت'),h('span',{},meta(n,'agent')+(meta(n,'stage_status')==='simple'?' · ساده':''))):null,
+      CARDDET&&extT?h('div',{class:'slot ext'},h('b',{},'ابزار'),h('span',{},extT+(meta(n,'ext_kind')&&!extT.includes(meta(n,'ext_kind'))?' · '+meta(n,'ext_kind'):''))):null,
+      CARDDET&&(meta(n,'must')||meta(n,'must_not'))?h('div',{class:'slot mu'},h('b',{},'قید'),h('span',{},(meta(n,'must')?'✓ '+meta(n,'must'):'')+(meta(n,'must_not')?'  ✗ '+meta(n,'must_not'):''))):null,
       (()=>{const o=inputOf(p,n);return h('div',{class:'slot in'+(o.none?' none':'')},h('b',{},'ورودی'),h('span',{},o.derived?h('i',{},o.t):o.t))})(),
       h('div',{class:'slot out'+(outText(n)?'':' none') },h('b',{},'خروجی'),h('span',{},outText(n)||'نامشخص')))
     :[n.tech?h('div',{class:'ns'},n.tags.includes('gated')&&n.kind==='tool'?h('span',{class:'nb red'},'تأیید انسانی'):null,n.tags.includes('unknownSkill')?h('span',{class:'nb'},'skill؟'):null,n.tech):null,
@@ -1313,9 +1335,10 @@ function focusOn(p){if(!IDX.has(p))return;if(p.split('.')[0]!==rootOfView()){go(
   FOC=p;expandTo(p);NEEDFIT=false;renderDia();if(p.includes('.')&&!lastVis().has(p)){}
   const tgt=lastVis().has(p)?p:null;if(tgt)fitTo(tgt)}
 function setVer(v){VER=v;NEEDFIT=true;renderVers();renderDia();renderInsp()}
-const APP_VER=11,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
+const APP_VER=12,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
 const VIEW_VERS=[[1,'عبور','نمایش ۱','آرتیفکت v۴','۱۲:۵۹'],[2,'بازشدن درجا','نمایش ۲','آرتیفکت v۴','۱۲:۵۹'],[3,'درخت + کادرها','نمایش ۳','آرتیفکت v۴','۱۲:۵۹'],[4,'ترکیبی ۲+۳','نمایش ۴ (انتخاب تو)','آرتیفکت v۵','۱۳:۰۵']];
 const CHANGELOG=[
+ [12,'حذف، برچسب جدید و CrewAI','دکمهٔ حذف نود، برچسب «جدید» در ویرایش، کارت خلوت‌تر با جزئیات در ویرایش، فیلدهای goal و backstory و خروجی CrewAI','۱۴:۴۰'],
  [11,'تاریخچهٔ نسخه‌ها','نام، شمارهٔ نسخه و تاریخ ساخت در خود نقشه','۱۴:۲۰'],
  [10,'جابه‌جایی و طراح فرایند','کشیدن و رها کردن، ترتیب خودکار، طراح فرایند با ایجنت متخصص و قید باید/نباید','۱۴:۰۲'],
  [9,'نقشهٔ کل','کل فرایند یک نود، نود قبل و بعد، تمپلیت شخصی، دستور Claude','۱۳:۴۳'],
@@ -1334,6 +1357,7 @@ function histPanel(){return h('div',{class:'panel'},h('h2',{},'📜 تاریخچ
   h('button',{class:'sm',onclick:()=>{HISTOPEN=false;renderInsp()}},'بستن'))}
 function renderVers(){$('#vers').replaceChildren(
   ...VIEW_VERS.map(([v,l,tag,av,tm])=>h('button',{class:VER===v?'on':'',title:tag+' · '+av+' · ساخته‌شده '+APP_DATE+' ساعت '+tm+' UTC',onclick:()=>setVer(v)},'نسخه '+toFa(v)+' · '+l+' ',h('small',{style:'opacity:.75'},av+' · '+APP_DATE))),
+  h('button',{class:'sm',title:'کم: روی کارت فقط skill، ورودی و خروجی؛ ایجنت، ابزار و قید فقط در پنل ویرایش. زیاد: همه روی کارت.',onclick:()=>{CARDDET=!CARDDET;NEEDFIT=true;renderVers();renderDia()}},'🧩 جزئیات روی کارت: '+(CARDDET?'زیاد':'کم')),
   h('button',{class:'sm',title:'نام و تاریخ ساخت همهٔ نسخه‌ها',onclick:()=>{HISTOPEN=true;SEL=null;SELE=null;renderDia();renderInsp()}},'📜 تاریخچه · v'+toFa(APP_VER)+' · '+APP_DATE))}
 function renderTree(){
   const t=$('#tree'),tv=VER===3||VER===4;t.hidden=!tv;$('#p-dia').classList.toggle('v3',tv);if(!tv)return;
@@ -1346,7 +1370,7 @@ function renderTree(){
       kids?h('button',{class:'tg',onclick:()=>{if(four){if(open)EXP.delete(p);else{expandTo(p);EXP.add(p)}NEEDFIT=false;renderDia();return}if(open)TX.delete(p);else TX.add(p);renderTree()}},open?'▾':'▸'):h('span',{class:'tg'},'·'),
       h('span',{class:'tl',onclick:()=>{if(four){if(n.kind==='actor'){select(p);return}if(d===0&&p!==R){go('ov:'+p);return}if(kids)EXP.add(p);focusOn(p);return}
         if(n.kind==='actor'){select(p);return}
-        if(kids&&!(isStep(n)&&false))go(d===0?'ov:'+p:p);else go(parentPath(p).includes('.')?parentPath(p):'ov:'+parentPath(p),p)}},(lockedN(n)?'🔒 ':'')+titleName(n))));
+        if(kids&&!(isStep(n)&&false))go(d===0?'ov:'+p:p);else go(parentPath(p).includes('.')?parentPath(p):'ov:'+parentPath(p),p)}},(lockedN(n)?'🔒 ':'')+(isNew(n)?'● ':'')+titleName(n))));
     if(kids&&open)rec(n.children,p,d+1)});
   rec(four?M.nodes.filter(n=>n.id===R||true):M.nodes,'',0)}
 
@@ -1712,7 +1736,7 @@ async function addChild(pp){
   else if(par.kind==='orgBox'){const id=uniqueId(par.children,'proj');n={id,kind:'project',title:'پروژهٔ تازه',tags:[],icon:U+'box.svg',tech:'rest+mcp · planned',desc:'',children:[],meta:[['protocol','rest+mcp'],['status','planned'],['local_url','http://127.0.0.1:PORT'],['public_url','UNKNOWN'],['auth_env','UNKNOWN'],['rate_limit','UNKNOWN'],['async','poll']]}}
   else if(par.kind==='project'){const id=uniqueId(par.children,'tool_');n={id,kind:'tool',title:'ابزار تازه',tags:['gated'],tech:'write',children:[]}}
   else{const sub=isStep(par);n={id:uniqueId(par.children,sub?'c':'st'),kind:sub?'autoStep':'askStep',title:sub?'زیرقدم تازه':'قدم تازه',tags:[],icon:U+'unlock.svg',tech:'skill: —',desc:'',children:[]}}
-  par.children.push(n);reindex();SEL=pp+'.'+n.id;SELE=null;touch(true)}
+  markNew(n);par.children.push(n);reindex();SEL=pp+'.'+n.id;SELE=null;touch(true)}
 function moveNode(p,dir){const par=IDX.get(parentPath(p));const list=par?par.children:M.nodes;const i=list.findIndex(c=>c.id===IDX.get(p).id),j=i+dir;if(j<0||j>=list.length)return;[list[i],list[j]]=[list[j],list[i]];reindex();touch(true)}
 async function delNode(p){
   const n=IDX.get(p);let lk=lockedN(n);walk(n.children,p,c=>{if(lockedN(c))lk=true});
@@ -1763,7 +1787,8 @@ function renderInsp(){
   const n=IDX.get(SEL),L=lockedN(n),dis=L;
   const f=(lbl,val,set,o={})=>h('label',{class:'f'},h('span',{},lbl),h(o.area?'textarea':'input',{value:o.area?null:val,disabled:dis||o.dis,class:o.ltr?'ltr':'',list:o.list,rows:o.area?3:null,oninput:e=>{set(e.target.value);touch()}},o.area?val:null));
   const P=h('div',{class:'panel'});
-  P.append(h('h2',{},'ویرایش ',h('span',{class:'ltr mute'},SEL)));
+  P.append(h('h2',{},'ویرایش ',h('span',{class:'ltr mute'},SEL),isNew(n)?h('span',{class:'nwchip',title:'تازه اضافه شده'},'جدید'):null));
+  if(isNew(n))P.append(h('div',{class:'row',style:'margin-bottom:6px'},h('small',{class:'grow'},'این نود تازه اضافه شده و هنوز بازبینی نشده؛ جزئیاتش را همین‌جا کامل کن.'),h('button',{class:'sm',disabled:dis,onclick:()=>{clearNew(n);touch(true)}},'✓ دیدم، برچسب جدید برداشته شود')));
   if(L)P.append(h('div',{class:'lockbox'},'🔒 قفل است؛ تغییر ممنوع تا خودت صریحاً باز کنی. ',
     h('button',{class:'sm',onclick:async()=>{if(await ask(`قفل «${n.title}» با گفتهٔ صریح خودت باز شود؟`)){setLock(n,false);touch(true)}}},'باز کردن قفل')));
   else if(n.kind!=='actor')P.append(h('button',{class:'sm',onclick:()=>{setLock(n,true);touch(true)}},'🔓 قفلش کن'));
@@ -1793,13 +1818,16 @@ function renderInsp(){
     P.append(tg)}
   const act=h('div',{class:'row',style:'margin-top:8px'});
   if(n.kind!=='actor'&&n.kind!=='tool')act.append(h('button',{class:'sm',disabled:dis,onclick:()=>addChild(SEL)},n.kind==='role'||n.kind==='section'?'＋ قدم':n.kind==='project'?'＋ ابزار':isStep(n)?'＋ زیرقدم':'＋ زیرمجموعه'));
-  if(n.kind!=='actor'&&(SEL.includes('.')||isStep(n)||isProc(n)))act.append(h('button',{class:'sm',onclick:()=>moveNode(SEL,-1)},'↑ بالا'),h('button',{class:'sm',onclick:()=>moveNode(SEL,1)},'↓ پایین'),h('button',{class:'sm',disabled:dis,onclick:()=>delNode(SEL)},'✕ حذف'));
+  if(n.kind!=='actor'&&(SEL.includes('.')||isStep(n)||isProc(n)))act.append(h('button',{class:'sm',onclick:()=>moveNode(SEL,-1)},'↑ بالا'),h('button',{class:'sm',onclick:()=>moveNode(SEL,1)},'↓ پایین'));
   if(SEL.split('.').length===2&&(n.kind==='role'||n.kind==='section'||n.kind==='project'))act.append(h('button',{class:'sm pri',onclick:()=>go(SEL)},'فلوچارت این بخش ←'));
   if(n.kind!=='actor'&&!L&&(n.children.length||isStep(n)||n.kind==='section'||n.kind==='role'))P.append(h('button',{class:'sm pri',style:'margin-top:6px',onclick:()=>lockTree(SEL)},'✓ تمام شد؛ تأیید و قفل همهٔ این قسمت'));
-  P.append(act);box.append(P);
+  P.append(act);
+  if(n.kind!=='actor'&&n.id!=='company'&&n.id!=='projects'&&(SEL.includes('.')||isStep(n)||isProc(n)))P.append(h('div',{class:'row',style:'margin-top:10px;border-top:1px solid var(--line);padding-top:8px'},h('button',{class:'sm danger grow',title:L?'قفل است؛ اول قفل را باز کن':'این نود با زیرمجموعه‌ها و فلش‌هایش حذف می‌شود (با تأیید)',onclick:()=>delNode(SEL)},'🗑 حذف این نود')));
+  box.append(P);
   if(n.kind!=='actor'&&n.kind!=='tool'&&n.kind!=='project')box.append(metaPanel(n,SEL));
   if(isStep(n)&&n.kind!=='routeStep')box.append(extPanel(n,SEL));
   if(n.kind==='role'||n.kind==='section'||isStep(n)||isProc(n))box.append(tplPanel(SEL));
+  if(n.children.some(isStep)||(isStep(n)&&SEL.includes('.')))box.append(crewPanel(n,SEL));
   if(n.kind!=='actor'&&n.kind!=='tool')box.append(claudePanel(SEL));
   const E=h('div',{class:'panel'},h('h2',{},'فلش‌های این جعبه'));
   const mine=M.rels.map((r,i)=>[r,i]).filter(([r])=>r.from===SEL||r.to===SEL);
