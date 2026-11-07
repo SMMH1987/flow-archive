@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>استودیوی سازمان</title>
+<style>
+:root{--bg:#f4f5f8;--card:#fff;--ink:#1b2230;--mute:#667085;--line:#dfe3ea;--ask:#f59e0b;--auto:#16a34a;--gate:#dc2626;--route:#6366f1;--acc:#2563eb;--proj:#0891b2;--soft:#eef2ff;--warn:#fff7e0}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#13161c;--card:#1d222b;--ink:#e8ebf0;--mute:#9aa4b2;--line:#2f3642;--soft:#232b45;--warn:#3a3118}}
+:root[data-theme=dark]{--bg:#13161c;--card:#1d222b;--ink:#e8ebf0;--mute:#9aa4b2;--line:#2f3642;--soft:#232b45;--warn:#3a3118}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 Tahoma,"Segoe UI",system-ui,sans-serif}
+header{padding:10px 16px;border-bottom:1px solid var(--line);background:var(--card);display:flex;gap:8px;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:20}
+header h1{font-size:16px;margin:0;flex:1;min-width:200px}
+button,.btn{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:4px 10px}
+button:hover{border-color:var(--acc)}button:disabled{opacity:.45;cursor:not-allowed}
+button.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
+button.sm{padding:1px 7px;font-size:12px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:3px 7px;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc)}
+input:disabled,select:disabled,textarea:disabled{opacity:.6;cursor:not-allowed;background:transparent}
+small,.mute{color:var(--mute)}
+.ltr{direction:ltr;text-align:left;unicode-bidi:plaintext}
+nav.tabs{display:flex;gap:4px;padding:8px 16px 0;flex-wrap:wrap}
+nav.tabs button{border-radius:8px 8px 0 0;border-bottom:none}
+nav.tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.rules{margin:8px 16px 0;padding:8px 12px;background:var(--soft);border:1px solid var(--line);border-radius:10px;font-size:13px}
+.rules summary{cursor:pointer;font-weight:700}
+.rules ul{margin:6px 0 0;padding-inline-start:20px}
+.layout{display:grid;grid-template-columns:1fr 340px;gap:14px;padding:12px 16px;align-items:start}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}}
+.page{padding:12px 16px}
+.dia{position:relative}
+.dia svg{position:absolute;top:0;left:0;pointer-events:none;overflow:visible}
+.grp{margin-bottom:18px}
+.grp>h3{margin:0 0 8px;font-size:15px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.actors{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px;position:relative}
+.card.locked{border-color:var(--gate)}
+.card.sel,.chip.sel{outline:3px solid var(--acc)}
+.card>.ch{display:flex;gap:6px;align-items:center;cursor:pointer;font-weight:700;margin-bottom:4px}
+.chip{border:1px solid var(--line);border-inline-start:5px solid var(--auto);border-radius:8px;padding:3px 7px;margin-top:6px;cursor:pointer;background:var(--card);font-size:13px}
+.chip.t-askStep{border-inline-start-color:var(--ask)}.chip.t-gateStep{border-inline-start-color:var(--gate)}.chip.t-routeStep{border-inline-start-color:var(--route)}
+.chip.t-tool{border-inline-start-color:var(--mute)}.chip.gated{border-inline-start-color:var(--gate)}
+.chip.locked{background:repeating-linear-gradient(135deg,transparent 0 8px,rgba(220,38,38,.07) 8px 16px)}
+.chip .tech{display:block;font-size:11px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;text-align:right}
+.chip .sub{margin-inline-start:12px}
+.actor{background:var(--soft);border:1px dashed var(--acc);border-radius:20px;padding:4px 14px;cursor:pointer}
+.legend span{margin-inline-end:8px;font-size:12px}
+.edgebar{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.edgebar label{display:inline-flex;gap:3px;align-items:center;font-size:13px}
+.edgebar input{width:auto}
+.side{position:sticky;top:60px;display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 70px);overflow:auto}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+.panel h2{font-size:14px;margin:0 0 8px}
+.f{display:block;margin-top:6px}.f>span{display:block;font-size:12px;color:var(--mute)}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.row>*{flex:0 0 auto}.row>.grow{flex:1 1 120px}
+.edge{border-top:1px dashed var(--line);padding:4px 0;font-size:13px}
+.badge{display:inline-block;border-radius:10px;padding:0 8px;font-size:12px;border:1px solid var(--line)}
+.badge.red{background:var(--gate);color:#fff;border-color:var(--gate)}.badge.ok{background:var(--auto);color:#fff;border-color:var(--auto)}
+.warn{background:var(--warn);border:1px solid var(--ask);border-radius:8px;padding:6px 8px;margin-top:6px;font-size:13px}
+.lockbox{background:repeating-linear-gradient(135deg,transparent 0 8px,rgba(220,38,38,.08) 8px 16px);border:1px solid var(--gate);border-radius:8px;padding:6px 8px;margin-top:6px;font-size:13px}
+.proj{background:var(--card);border:1px solid var(--line);border-inline-start:6px solid var(--proj);border-radius:12px;padding:12px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px 12px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{border-bottom:1px solid var(--line);padding:3px 4px;text-align:start;vertical-align:middle}
+.chk li{list-style:none}.chk{padding:0;margin:6px 0 0}
+pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(--bg);border:1px solid var(--line);padding:8px;border-radius:8px;font-size:12px;white-space:pre}
+.diffs li{margin:2px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🧩 استودیوی سازمان <small>— موکاپ تعاملی؛ ویرایش کن، خروجی = متن کامل <span class="ltr">recruitment.c4</span></small></h1>
+  <span class="legend"><span style="color:var(--ask)">■ ask</span><span style="color:var(--auto)">■ auto</span><span style="color:var(--gate)">■ gate</span><span style="color:var(--route)">■ route</span><span style="color:var(--proj)">■ پروژه</span></span>
+  <button id="undo" title="برگشت">↶</button>
+  <button id="load">بارگذاری .c4</button>
+  <button id="reset">بازنشانی به نمونهٔ مخزن</button>
+  <button class="pri" id="goOut">خروجی C4 ←</button>
+  <input type="file" id="file" accept=".c4,.txt,text/plain" hidden>
+</header>
+<details class="rules"><summary>قواعد این موکاپ (از INTENT و دستورالعمل پروژه)</summary><ul>
+<li>🔒 <b>قفل</b> = غیرقابل‌ویرایش؛ فقط با «باز کردن قفل» که صراحتاً از تو می‌پرسد. هر تغییر روی قفل‌ها در تب خروجی هشدار می‌گیرد.</li>
+<li>خروجی همیشه <b>متن کامل</b> <span class="ltr">recruitment.c4</span> است تا جایگزین کنی (نه فقط تفاوت‌ها).</li>
+<li>interop: هر پروژه همیشه <b>هر دو مصرف‌کننده</b> (Claude/MCP و OpenAI/REST) و <b>هر دو حالت</b> (لوکال و عمومی) دارد؛ فقط «پرخطر بودن» ابزار پرسیده می‌شود. ابزار بدون دسته = پشت تأیید.</li>
+<li>همه‌چیز فقط در مرورگر است؛ چیزی ارسال یا نصب نمی‌شود. کلیدها هرگز اینجا نمی‌آیند، فقط <b>نام</b> متغیر محیطی.</li>
+</ul></details>
+<nav class="tabs" id="tabs"></nav>
+
+<div id="p-dia" class="layout">
+  <main>
+    <div class="edgebar">اتصال‌ها:
+      <label><input type="radio" name="em" value="cross">بین نقش‌ها</label>
+      <label><input type="radio" name="em" value="all">همه</label>
+      <label><input type="radio" name="em" value="sel" checked>فقط انتخاب‌شده</label>
+      <label><input type="radio" name="em" value="none">هیچ</label>
+      <small>روی هر جعبه کلیک کن تا سمت چپ ویرایش شود.</small>
+    </div>
+    <div class="dia" id="dia"></div>
+  </main>
+  <aside class="side" id="insp"></aside>
+</div>
+<div id="p-int" class="page" hidden></div>
+<div id="p-out" class="page" hidden></div>
+
+<script type="text/plain" id="base-c4">// نمونهٔ «سازمان کامل از یک ایده» — ایده: اتوماسیون کامل استخدام — 2026-11-06
+// هر بخش = یک نقش سازمانی · هر قدم: technology = skill · description = out · آیکون = وضعیت قفل
+// 🔒 = قفل (فقط با تأیید تو) · 🔓 = باز · tag designed = بخش ناشناخته که از ترکیب skillها طراحی شد
+// رنگ قدم = نوع after: ask نارنجی · auto سبز · gate قرمز · route بنفش
+
+specification {
+  element actor {
+    style {
+      shape person
+      color secondary
+    }
+  }
+  element orgBox {
+    style {
+      color slate
+    }
+  }
+  element role {
+    style {
+      color muted
+    }
+  }
+  element askStep {
+    notation "after: ask — خروجی را نشان بده و نظر بگیر"
+    style {
+      color amber
+    }
+  }
+  element autoStep {
+    notation "after: auto — خودکار برو قدم بعد"
+    style {
+      color green
+    }
+  }
+  element gateStep {
+    notation "after: gate — بایست تا کاربر تأیید کند"
+    style {
+      color red
+    }
+  }
+  element routeStep {
+    notation "after: route — شاخه را از روی نتیجه انتخاب کن"
+    style {
+      color indigo
+      shape queue
+    }
+  }
+  element flow {
+    style {
+      color slate
+    }
+  }
+  element section {
+    style {
+      color muted
+    }
+  }
+  element project {
+    notation "پروژهٔ قابل‌فراخوانی — Claude MCP + OpenAI/REST"
+    style {
+      color sky
+      shape component
+    }
+  }
+  element tool {
+    notation "ابزار پروژه — با #gated = پشت تأیید انسانی"
+    style {
+      color secondary
+    }
+  }
+  tag locked
+  tag designed
+  tag unknownSkill
+  tag gated
+}
+
+model {
+  owner = actor 'مدیر / کارفرما' {
+    description 'ایده می‌دهد · در دروازه‌ها تأیید می‌کند · قفل را او می‌زند'
+  }
+  candidate = actor 'کاندیدا' {
+    description 'آگهی را می‌بیند · پرسشنامه پر می‌کند · مصاحبه می‌دهد'
+  }
+
+  company = orgBox 'سازمان اتوماسیون استخدام' {
+    description '۹ نقش · هر قدم با skill خودش · بخش ناشناخته از skill طراحی شده'
+
+    r1 = role '🔓 1 · استراتژیست استخدام' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/compass.svg
+      goal = askStep 'هدف و نقش' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: identify-assumptions-new'
+        description 'out: نقش + تعداد + بودجه + فرض‌های پرخطر'
+      }
+      spec = askStep 'شرح شغل و معیار موفقیت' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: first-principles'
+        description 'out: وظایف + مهارت‌های ضروری + معیار ۹۰ روز'
+      }
+    }
+
+    r2 = role '🔓 2 · نویسندهٔ آگهی و برند کارفرما' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/pencil-square.svg
+      ad = autoStep 'طراحی آگهی' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: marketing-skills:copywriting'
+        description 'out: متن آگهی + ۳ تیتر + CTA'
+      }
+      brand = autoStep 'لحن و هویت کارفرما' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: ui-brand'
+        description 'out: لحن + ۳ جمله دربارهٔ فرهنگ سازمان'
+      }
+    }
+
+    r3 = role '🔓 3 · مدیر انتشار و جذب' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/megaphone.svg
+      post = gateStep 'انتشار آگهی' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: marketing-skills:social'
+        description 'out: پیش‌نویس برای هر کانال؛ انتشار فقط بعد از تأیید'
+      }
+      track = autoStep 'ردیابی منبع رزومه' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: marketing-skills:analytics'
+        description 'out: هر کانال چند رزومه آورد'
+      }
+    }
+
+    r4 = role '🔓 4 · طراح پرسشنامهٔ پویا (بخش طراحی‌شده)' {
+      #designed
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/ui-checks.svg
+      derive = autoStep 'استخراج سؤال از آگهی' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: grilling + fp-qmark-to-robot (ترکیب)'
+        description 'out: بانک سؤال برای هر مهارتِ آگهی + وزن'
+      }
+      branch = routeStep 'پاسخ ضعیف است؟' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'after: route'
+        description 'ضعیف ← سؤال عمیق‌تر · قوی ← مهارت بعدی'
+      }
+      form = autoStep 'ساخت فرم تعاملی' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: agent-skills:frontend-ui-engineering'
+        description 'out: فرم HTML با منطق شرطی (۴ زیرقدم داخلش)'
+        f1 = autoStep 'ساخت اسکلت فرم' {
+          icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+          technology 'skill: agent-skills:frontend-ui-engineering'
+        }
+        f2 = autoStep 'منطق شرطی سؤال‌ها' {
+          icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+          technology 'skill: fp-qmark-to-robot'
+        }
+        f3 = askStep 'پیش‌نمایش و تأیید' {
+          icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+          technology 'skill: ui-before-after'
+        }
+        f4 = autoStep 'ذخیرهٔ پاسخ‌ها' {
+          icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+          technology 'skill: —'
+        }
+        f1 -> f2 'بعد'
+        f2 -> f3 'بعد'
+        f3 -> f4 'تأیید'
+      }
+    }
+
+    r5 = role '🔓 5 · تحلیل‌گر غربال' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/funnel.svg
+      score = autoStep 'امتیازدهی رزومه + پرسشنامه' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: analytics-office:explore-my-data'
+        description 'out: امتیاز ۰ تا ۱۰ + دلیل برای هر نفر'
+      }
+      d1 = routeStep 'امتیاز ۷+ دارد؟' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'after: route'
+      }
+      reject = gateStep 'پیام رد مؤدبانه' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: marketing-skills:copywriting'
+        description 'out: پیش‌نویس پیام، بدون ارسال خودکار'
+      }
+    }
+
+    r6 = role '🔓 6 · مصاحبه‌گر' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/chat-dots.svg
+      qs = autoStep 'سؤال‌های مصاحبه' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: grilling'
+        description 'out: ۱۰ سؤال + یک سناریوی عملی'
+      }
+      iv = askStep 'مصاحبه و ثبت نمره' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: نمرهٔ هر سؤال از تو'
+      }
+      d2 = routeStep 'قبول شد؟' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'after: route'
+      }
+    }
+
+    r7 = role '🔓 7 · ارزیاب KPI' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/graph-up.svg
+      kpi = askStep 'تعریف KPI نقش' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: analytics-office:kpi-contract'
+        description 'out: ۳ KPI + فرمول + منبع داده + بازهٔ بازبینی'
+      }
+      board = autoStep 'داشبورد ارزیابی' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: analytics-office:review-my-dashboard'
+        description 'out: نمای نمره‌ها + روند ۳۰/۶۰/۹۰ روز'
+      }
+    }
+
+    r8 = role '🔒 8 · حقوقی و آنبوردینگ' {
+      #locked
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/shield-lock.svg
+      offer = gateStep 'قرارداد' {
+        #locked
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/lock-fill.svg
+        technology 'skill: anthropic-skills:docx'
+        description 'out: قرارداد.docx با شرایط مرحلهٔ ۱ (قفل از فلوی قبلی)'
+      }
+      accept = gateStep 'پیشنهاد پذیرفته شد؟' {
+        #locked
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/lock-fill.svg
+        technology 'after: gate'
+      }
+      onboard = askStep 'برنامهٔ ورود (ناشناخته — skill پیشنهادی منتظر «بله»)' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill پیشنهادی: marketing-skills:onboarding'
+        description 'out: چک‌لیست هفتهٔ اول + دسترسی‌ها + معرفی تیم'
+      }
+    }
+
+    r9 = role '🔓 9 · مسیریاب پروژه‌ها (ارجاع به پروژه‌های خودت)' {
+      #designed
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/diagram-3.svg
+      reg = askStep 'دفتر ظرفیت پروژه‌ها' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'فایل: capabilities.yaml — هر پروژه چه کاری می‌کند و از کجا صدا زده می‌شود'
+        description 'out: جدول «کار ← پروژه ← آدرس ← احراز هویت»'
+      }
+      legal = gateStep 'سؤال حقوقی / طراحی قرارداد ← ایجنت وکیل حق‌پرس' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'project: حق‌پرس (آدرس و پروتکل نامشخص — ask)'
+        description 'out: پاسخ حقوقی + پیش‌نویس قرارداد؛ ورود به قرارداد فقط با تأیید تو'
+      }
+      stt = autoStep 'تبدیل گفتار به متن ← API آوانگار (همدبیر)' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'api: api.hamdabir.co-ir.com:8440 · کلید avn_live از .env · callback با امضای whsec_'
+        description 'out: متن مصاحبه/صدا + هزینهٔ کسرشده از کیف پول'
+      }
+      miss = routeStep 'کاری که در دفتر نیست؟' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'after: route'
+        description 'نیست ← find-skills + تحقیق، بعد ثبت در دفتر'
+      }
+    }
+
+    r1.goal -> r1.spec 'بعد'
+    r1.spec -> r2.ad 'بعد'
+    r2.brand -> r2.ad 'لحن'
+    r2.ad -> r3.post 'بعد'
+    r3.post -> r4.derive 'منتشر شد'
+    r3.post -> r3.track 'پایش'
+    r4.derive -> r4.branch 'بعد'
+    r4.branch -> r4.derive 'ضعیف'
+    r4.branch -> r4.form 'کافی'
+    r4.form -> r5.score 'پاسخ‌ها'
+    r5.score -> r5.d1 'بعد'
+    r5.d1 -> r6.qs 'بله'
+    r5.d1 -> r5.reject 'نه'
+    r5.d1 -> r2.ad 'هیچ‌کس'
+    r6.qs -> r6.iv 'بعد'
+    r6.iv -> r6.d2 'بعد'
+    r6.d2 -> r8.offer 'قبول'
+    r6.d2 -> r5.reject 'رد'
+    r8.offer -> r8.accept 'بعد'
+    r8.accept -> r8.onboard 'بله'
+    r8.accept -> r5.score 'نه'
+    r8.onboard -> r7.kpi 'شروع کار'
+    r7.kpi -> r7.board 'بعد'
+    r9.reg -> r9.legal 'کار حقوقی'
+    r9.reg -> r9.stt 'کار صوتی'
+    r9.reg -> r9.miss 'کار تازه'
+    r9.legal -> r8.offer 'پیش‌نویس قرارداد'
+    r6.iv -> r9.stt 'ضبط مصاحبه'
+  }
+
+  hiring = flow 'استخدام فروشندهٔ درصدی' {
+    description '۶ بخش · هر قدم با skill خودش · find-skills پیشنهاد می‌دهد، کاربر تأیید می‌کند'
+
+    s1 = section '1 · تعریف نقش' {
+      goal = askStep 'هدف: استخدام فروشندهٔ درصدی برای {{product}}' {
+        technology 'skill: —'
+        description 'out: محصول + بازار + تعداد نفر'
+      }
+      role = askStep 'شرح شغل و مدل پورسانت' {
+        technology 'skill: first-principles'
+        description 'out: وظایف + درصد پورسانت + سقف + دورهٔ پرداخت'
+      }
+    }
+
+    s2 = section '2 · جذب' {
+      ad = autoStep 'آگهی استخدام' {
+        technology 'skill: marketing-skills:copywriting'
+        description 'out: متن آگهی + ۳ تیتر'
+      }
+      post = gateStep 'انتشار آگهی' {
+        technology 'skill: marketing-skills:social'
+        description 'out: پیش‌نویس پست در ۲ کانال، بدون انتشار خودکار'
+      }
+    }
+
+    s3 = section '3 · غربال' {
+      screen = autoStep 'غربال رزومه‌ها' {
+        technology 'skill: —'
+        description 'out: امتیاز ۰ تا ۱۰ برای هر نفر + دلیل'
+      }
+      d1 = routeStep 'کسی امتیاز ۷+ دارد؟' {
+        technology 'after: route'
+      }
+      reject = gateStep 'پیام رد مؤدبانه' {
+        technology 'skill: marketing-skills:copywriting'
+        description 'out: پیش‌نویس پیام، بدون ارسال خودکار'
+      }
+    }
+
+    s4 = section '4 · مصاحبه' {
+      qs = autoStep 'سؤال‌ها + نقش‌آفرینی فروش' {
+        technology 'skill: grilling'
+        description 'out: ۱۰ سؤال + یک سناریوی فروش تلفنی'
+      }
+      iv = askStep 'مصاحبه و ثبت نمره' {
+        technology 'skill: —'
+        description 'out: نمرهٔ هر سؤال از کاربر'
+      }
+      d2 = routeStep 'قبول شد؟' {
+        technology 'after: route'
+      }
+    }
+
+    s5 = section '5 · قرارداد 🔒' {
+      #locked
+      offer = gateStep 'قرارداد درصدی' {
+        #locked
+        technology 'skill: anthropic-skills:docx'
+        description 'out: قرارداد.docx با درصد و شرایط مرحلهٔ ۱'
+      }
+      d3 = gateStep 'پیشنهاد را پذیرفت؟' {
+        technology 'after: gate'
+      }
+    }
+
+    s6 = section '6 · شروع کار' {
+      kit = autoStep 'کیت فروش و آموزش' {
+        technology 'skill: marketing-skills:sales-enablement'
+        description 'out: اسکریپت فروش + پاسخ به اعتراض‌ها'
+      }
+      kpi = askStep 'هدف ۳۰ روز اول' {
+        technology 'skill: —'
+        description 'out: تعداد فروش + نرخ تبدیل + زمان بازبینی'
+      }
+    }
+
+    s1.goal -> s1.role 'بعد'
+    s1.role -> s2.ad 'بعد'
+    s2.ad -> s2.post 'بعد'
+    s2.post -> s3.screen 'تأیید شد'
+    s3.screen -> s3.d1 'بعد'
+    s3.d1 -> s4.qs 'بله'
+    s3.d1 -> s2.ad 'هیچ‌کس'
+    s4.qs -> s4.iv 'بعد'
+    s4.iv -> s4.d2 'بعد'
+    s4.d2 -> s5.offer 'قبول'
+    s4.d2 -> s3.reject 'رد'
+    s3.reject -> s3.screen 'نفر بعدی'
+    s5.offer -> s5.d3 'بعد'
+    s5.d3 -> s6.kit 'بله'
+    s5.d3 -> s3.screen 'نه'
+    s6.kit -> s6.kpi 'بعد'
+  }
+
+  projects = orgBox 'پروژه‌های قابل‌فراخوانی (interop)' {
+    description 'هر پروژه: Claude MCP + OpenAI/REST · لوکال + عمومی · پرخطر ← تأیید انسانی (استاندارد v1)'
+
+    hagh = project 'حق‌پرس — ایجنت وکیل' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/bank.svg
+      technology 'rest+mcp · planned'
+      description 'سؤال حقوقی و پیش‌نویس قرارداد؛ ورود به قرارداد فقط با تأیید تو'
+      metadata {
+        protocol 'rest+mcp'
+        status 'planned'
+        local_url 'http://127.0.0.1:8100'
+        public_url 'UNKNOWN'
+        auth_env 'UNKNOWN'
+        rate_limit 'UNKNOWN'
+        async 'poll'
+      }
+      vakil_case_start = tool 'شروع پرونده' {
+        technology 'write · read_or_draft'
+        description 'case_id برای ۷۲ ساعت معتبر است'
+      }
+      vakil_case_answer = tool 'پاسخ به پرسش‌های پرونده' {
+        technology 'write · read_or_draft'
+      }
+      vakil_case_result = tool 'گرفتن نتیجه' {
+        technology 'read · read_or_draft'
+      }
+    }
+
+    avanegar = project 'آوانگار (همدبیر) — گفتار به متن' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/mic.svg
+      technology 'rest · live'
+      description 'API گفتار به متن؛ کلید از .env؛ callback با امضای whsec_'
+      metadata {
+        protocol 'rest'
+        status 'live'
+        local_url 'UNKNOWN'
+        public_url 'https://api.hamdabir.co-ir.com:8440'
+        auth_env 'AVANEGAR_API_KEY'
+        rate_limit 'UNKNOWN'
+        async 'webhook'
+      }
+      stt_transcribe = tool 'تبدیل گفتار به متن (حدس — تأیید شود)' {
+        #gated
+        technology 'write · money'
+        description 'هزینه از کیف پول کسر می‌شود ← طبق gates پیش‌فرض پشت تأیید'
+      }
+    }
+  }
+
+  owner -> hiring.s1.goal 'هدف و تأییدها'
+  candidate -> hiring.s3.screen 'رزومه'
+  candidate -> hiring.s4.iv 'مصاحبه'
+
+  owner -> company.r1.goal 'ایده و تأییدها'
+  candidate -> company.r4.form 'پاسخ'
+  candidate -> company.r6.iv 'مصاحبه'
+
+  company.r9.legal -> projects.hagh 'سؤال حقوقی / پیش‌نویس قرارداد'
+  company.r9.stt -> projects.avanegar 'گفتار به متن'
+}
+
+views {
+  view index {
+    title 'سازمان استخدام — طرح کلی (general schematic)'
+    description 'اول کلیات: دو بازیگر و یک سازمان. روی جعبهٔ سازمان کلیک کنید.'
+    include *
+  }
+
+  view roles of company {
+    title 'نقش‌های سازمان'
+    description '۹ نقش؛ 🔒 قفل · 🔓 باز. روی هر نقش کلیک کنید.'
+    include *
+  }
+
+  view all of company {
+    title 'همهٔ قدم‌ها'
+    description 'skill (technology) + out (description) + آیکون قفل. رنگ = نوع after.'
+    include company.**
+    exclude company.r1, company.r2, company.r3, company.r4, company.r5, company.r6, company.r7, company.r8, company.r9
+  }
+
+  view nested of company.r4 {
+    title 'قدم داخل قدم — پرسشنامهٔ پویا'
+    description 'جعبهٔ «ساخت فرم» شفاف است و ۴ زیرقدمش داخلش دیده می‌شود.'
+    include *, form.*
+    style company.r4.form {
+      opacity 15%
+    }
+  }
+
+  view v1 of company.r1 {
+    title '1 · استراتژیست'
+    include *
+  }
+  view v2 of company.r2 {
+    title '2 · آگهی و برند'
+    include *
+  }
+  view v3 of company.r3 {
+    title '3 · انتشار و جذب'
+    include *
+  }
+  view v4 of company.r4 {
+    title '4 · پرسشنامهٔ پویا'
+    include *
+  }
+  view v5 of company.r5 {
+    title '5 · غربال'
+    include *
+  }
+  view v6 of company.r6 {
+    title '6 · مصاحبه'
+    include *
+  }
+  view v7 of company.r7 {
+    title '7 · KPI'
+    include *
+  }
+  view v9 of company.r9 {
+    title '9 · مسیریاب پروژه‌ها'
+    include *
+  }
+
+  view v8 of company.r8 {
+    title '8 · حقوقی و آنبوردینگ'
+    include *
+  }
+
+  view interop of projects {
+    title 'پروژه‌های قابل‌فراخوانی (interop)'
+    description 'هر پروژه با ابزارهایش؛ #gated = پشت تأیید انسانی.'
+    include *
+  }
+  view vp_hagh of projects.hagh {
+    title 'حق‌پرس — ابزارها'
+    include *
+  }
+  view vp_avanegar of projects.avanegar {
+    title 'آوانگار — ابزارها'
+    include *
+  }
+
+  view hiringOverview {
+    title 'استخدام فروشندهٔ درصدی — نمای کلی'
+    description 'اول کلیات: نقش‌ها و فلو. روی جعبهٔ فلو کلیک کنید تا بخش‌ها باز شوند.'
+    include *
+  }
+
+  view hiringRoles of hiring {
+    title 'بخش‌های فلو'
+    description 'هر جعبه یک بخش است؛ روی هر بخش کلیک کنید تا قدم‌هایش باز شود.'
+    include *
+  }
+
+  view hiringAll of hiring {
+    title 'همهٔ قدم‌ها'
+    description 'همهٔ ۱۴ قدم با skill (technology) و out (description). رنگ = نوع after.'
+    include hiring.**
+    exclude hiring.s1, hiring.s2, hiring.s3, hiring.s4, hiring.s5, hiring.s6
+  }
+
+  view hsec1 of hiring.s1 {
+    title '1 · تعریف نقش'
+    include *
+  }
+  view hsec2 of hiring.s2 {
+    title '2 · جذب'
+    include *
+  }
+  view hsec3 of hiring.s3 {
+    title '3 · غربال'
+    include *
+  }
+  view hsec4 of hiring.s4 {
+    title '4 · مصاحبه'
+    include *
+  }
+  view hsec5 of hiring.s5 {
+    title '5 · قرارداد'
+    include *
+  }
+  view hsec6 of hiring.s6 {
+    title '6 · شروع کار'
+    include *
+  }
+}
+</script>
+<script>
+'use strict';
+/* ───────── ابزارک‌ها ───────── */
+const $=(s,r=document)=>r.querySelector(s);
+const h=(t,a,...c)=>{const e=document.createElement(t);for(const[k,v]of Object.entries(a||{})){if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(k==='class')e.className=v;else if(v===true)e.setAttribute(k,'');else if(v!==false&&v!=null)e.setAttribute(k,v)}c.flat(9).forEach(x=>{if(x!=null&&x!==false)e.append(x.nodeType?x:document.createTextNode(x))});return e};
+const q=s=>"'"+String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"'";
+const toFa=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const U='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/';
+const BLOCK=new Set(['orgBox','flow','role','section','project']);
+const STEPKINDS={ask:'askStep',auto:'autoStep',gate:'gateStep',route:'routeStep'};
+const isStep=n=>/Step$/.test(n.kind);
+const CATS=['money','legal','outbound','destructive','read_or_draft'];
+const CATEX={money:['payment','refund','transfer'],legal:['sign','enter_contract','file_complaint'],outbound:['publish_post','publish_ad','message_customer'],destructive:['delete_data','delete_repo'],read_or_draft:['lookup','search','draft','advice']};
+const CATFA={money:'پول',legal:'حقوقی',outbound:'بیرونی (انتشار/پیام)',destructive:'نابودکننده',read_or_draft:'خواندن/پیش‌نویس'};
+const PROTOS=['rest+mcp','rest','mcp','a2a','none'];
+
+/* ───────── تجزیه ───────── */
+function matchBrace(s,open){let d=0;for(let i=open;i<s.length;i++){const c=s[i];
+  if(c==="'"||c==='"'){i++;while(i<s.length&&s[i]!==c){if(s[i]==='\\')i++;i++}continue}
+  if(c==='/'&&s[i+1]==='/'&&(i===0||/\s/.test(s[i-1]))){while(i<s.length&&s[i]!=='\n')i++;continue}
+  if(c==='{')d++;else if(c==='}'){d--;if(d===0)return i}}return -1}
+function tokenize(s){const t=[];let i=0,nl=0;
+  while(i<s.length){const c=s[i];
+    if(c==='\n'){nl++;i++;continue}
+    if(/\s/.test(c)){i++;continue}
+    if(c==='/'&&s[i+1]==='/'){while(i<s.length&&s[i]!=='\n')i++;continue}
+    if(c==="'"||c==='"'){let j=i+1,v='';while(j<s.length&&s[j]!==c){if(s[j]==='\\'){v+=s[j+1];j+=2}else v+=s[j++]}t.push({t:'str',v,nl});nl=0;i=j+1;continue}
+    if(c==='{'||c==='}'){t.push({t:c,nl});nl=0;i++;continue}
+    if(c==='-'&&s[i+1]==='>'){t.push({t:'->',nl});nl=0;i+=2;continue}
+    if(c==='='){t.push({t:'=',nl});nl=0;i++;continue}
+    let j=i;while(j<s.length&&!/[\s{}'"=]/.test(s[j])&&!(s[j]==='-'&&s[j+1]==='>'))j++;
+    t.push({t:'w',v:s.slice(i,j),nl});nl=0;i=j}
+  return t}
+function parseItems(tk,st,cpath){
+  const o={tags:[],children:[]};
+  while(st.p<tk.length&&tk[st.p].t!=='}'){
+    const k=tk[st.p],nx=tk[st.p+1];
+    if(k.t!=='w'){st.p++;continue}
+    if(k.v[0]==='#'){o.tags.push(k.v.slice(1));st.p++}
+    else if(nx&&nx.t==='='){
+      const n={id:k.v,kind:tk[st.p+2].v,title:tk[st.p+3].v,gap:k.nl>=2,tags:[],children:[]};st.p+=4;
+      if(tk[st.p]&&tk[st.p].t==='{'){st.p++;Object.assign(n,parseItems(tk,st,cpath.concat(n.id)));st.p++}
+      o.children.push(n)}
+    else if(nx&&nx.t==='->'){
+      const r={from:k.v,to:tk[st.p+2].v,c:cpath,gap:k.nl>=2};st.p+=3;
+      if(tk[st.p]&&tk[st.p].t==='str'){r.label=tk[st.p].v;st.p++}
+      st.rels.push(r)}
+    else if(k.v==='icon'&&nx){o.icon=nx.v;st.p+=2}
+    else if(k.v==='technology'&&nx){o.tech=nx.v;st.p+=2}
+    else if(k.v==='description'&&nx){o.desc=nx.v;st.p+=2}
+    else if(k.v==='metadata'&&nx&&nx.t==='{'){st.p+=2;o.meta=[];
+      while(tk[st.p]&&tk[st.p].t!=='}'){o.meta.push([tk[st.p].v,tk[st.p+1].v]);st.p+=2}st.p++}
+    else st.p++;
+  }
+  return o}
+function parseC4(text){
+  text=text.replace(/\r\n/g,'\n');
+  const mi=text.search(/^model\s*\{/m);if(mi<0)throw new Error('بلوک model پیدا نشد');
+  const mo=text.indexOf('{',mi),mc=matchBrace(text,mo);
+  const vi=text.search(/^views\s*\{/m);
+  const st={p:0,rels:[]};
+  const root=parseItems(tokenize(text.slice(mo+1,mc)),st,[]);
+  const M={pre:text.slice(0,mi),mid:text.slice(mc+1,vi<0?text.length:vi),views:vi<0?'':text.slice(vi),nodes:root.children,rels:st.rels};
+  const idx=new Map();walk(M.nodes,'',(n,p)=>idx.set(p,n));
+  const res=(c,ref)=>{for(let k=c.length;k>=0;k--){const p=c.slice(0,k).concat(ref.split('.')).join('.');if(idx.has(p))return p}return ref};
+  M.rels.forEach(r=>{r.from=res(r.c,r.from);r.to=res(r.c,r.to)});
+  return M}
+function walk(list,pre,f,par){list.forEach((n,i)=>{const p=pre?pre+'.'+n.id:n.id;n._p=p;f(n,p,par,list,i);walk(n.children,p,f,n)})}
+
+/* ───────── ساخت متن ───────── */
+function viewsAdjust(vs,idx,M){
+  if(!vs)return vs;
+  const open=vs.indexOf('{'),close=vs.lastIndexOf('}');
+  const head=vs.slice(0,open+1),tail=vs.slice(close);const body=vs.slice(open+1,close);
+  const re=/view\s+(\w+)(?:\s+of\s+([\w.]+))?\s*\{/g;let m,pos=0;const parts=[];
+  while((m=re.exec(body))){const bo=m.index+m[0].length-1,bc=matchBrace(body,bo);
+    parts.push({pre:body.slice(pos,m.index),text:body.slice(m.index,bc+1),id:m[1],of:m[2]});pos=bc+1;re.lastIndex=bc+1}
+  const rest=body.slice(pos);
+  let keep=parts.filter(p=>!p.of||idx.has(p.of));
+  const roots=M.nodes.filter(n=>n.children.length&&!isStep(n));
+  const nsteps=n=>n.children.reduce((a,c)=>a+(isStep(c)?1:0)+nsteps(c),0);
+  keep.forEach(p=>{
+    roots.forEach(R=>{
+      if(new RegExp('include\\s+'+R.id+'\\.\\*\\*').test(p.text)){
+        const ex=R.children.map(c=>R.id+'.'+c.id).join(', ');
+        if(/^\s*exclude [^\n]*$/m.test(p.text))p.text=ex?p.text.replace(/^(\s*)exclude [^\n]*$/m,'$1exclude '+ex):p.text.replace(/\n\s*exclude [^\n]*/,'');
+        else if(ex)p.text=p.text.replace(/^(\s*)(include [^\n]*)$/m,'$1$2\n$1exclude '+ex)}});
+    if(p.id==='roles'){const c=(M.nodes.find(n=>n.id==='company')||{children:[]}).children.length;p.text=p.text.replace(/[۰-۹]+ نقش؛/,toFa(c)+' نقش؛')}
+    if(p.id==='hiringAll'){const hr=M.nodes.find(n=>n.id==='hiring');if(hr)p.text=p.text.replace(/همهٔ [۰-۹]+ قدم/,'همهٔ '+toFa(nsteps(hr))+' قدم')}});
+  const has=new Set(keep.map(p=>p.of).filter(Boolean));
+  const add=(id,of,title)=>{if(!has.has(of)&&idx.has(of))keep.push({pre:'\n\n  ',text:`view ${id} of ${of} {\n    title ${q(title)}\n    include *\n  }`,id,of})};
+  const num=id=>(id.match(/\d+/)||[id])[0];
+  M.nodes.forEach(R=>R.children.forEach(c=>{
+    const p=R.id+'.'+c.id,name=c.title.replace(/^(🔒|🔓)\s*/,'').replace(/^\d+ · /,'').replace(/\s*🔒$/,'');
+    if(c.kind==='role')add('v'+num(c.id),p,num(c.id)+' · '+name);
+    else if(c.kind==='section')add('hsec'+num(c.id),p,num(c.id)+' · '+name);
+    else if(c.kind==='project')add('vp_'+c.id,p,name)}));
+  return head+keep.map(p=>p.pre+p.text).join('')+rest+tail}
+function emitC4(M){
+  const idx=new Map();walk(M.nodes,'',(n,p)=>idx.set(p,n));
+  const byC=new Map();M.rels.forEach(r=>{const k=r.c.join('.');if(!byC.has(k))byC.set(k,[]);byC.get(k).push(r)});
+  const ref=(a,c)=>{const s=a.split('.');return(c.length&&c.every((x,i)=>s[i]===x)&&s.length>c.length)?s.slice(c.length).join('.'):a};
+  const body=(list,d,cp,node)=>{const I='  '.repeat(d),L=[];
+    if(node){node.tags.forEach(t=>L.push(I+'#'+t));
+      if(node.icon)L.push(`${I}icon ${node.icon}`);
+      if(node.tech)L.push(`${I}technology ${q(node.tech)}`);
+      if(node.desc)L.push(`${I}description ${q(node.desc)}`);
+      if(node.meta&&node.meta.length){L.push(I+'metadata {');node.meta.forEach(([k,v])=>L.push(`${I}  ${k} ${q(v)}`));L.push(I+'}')}}
+    list.forEach(ch=>{const gap=ch.gap!==undefined?ch.gap:BLOCK.has(ch.kind);if(gap&&L.length)L.push('');L.push(...elem(ch,d,cp.concat(ch.id)))});
+    (byC.get(cp.join('.'))||[]).forEach((r,i)=>{const gap=r.gap!==undefined?r.gap:(i===0&&list.length&&BLOCK.has(list[list.length-1].kind));
+      if(gap&&L.length)L.push('');L.push(`${I}${ref(r.from,cp)} -> ${ref(r.to,cp)}${r.label?' '+q(r.label):''}`)});
+    return L};
+  const elem=(n,d,cp)=>{const I='  '.repeat(d),hd=`${I}${n.id} = ${n.kind} ${q(n.title)}`,b=body(n.children,d+1,cp,n);return b.length?[hd+' {',...b,I+'}']:[hd]};
+  // شمارنده‌های متنیِ توضیحات
+  const co=M.nodes.find(n=>n.id==='company'),hi=M.nodes.find(n=>n.id==='hiring');
+  const backup=[];const fix=(n,re,v)=>{if(n&&n.desc&&re.test(n.desc)){backup.push([n,n.desc]);n.desc=n.desc.replace(re,v)}};
+  if(co)fix(co,/^[۰-۹]+ نقش/,toFa(co.children.length)+' نقش');
+  if(hi)fix(hi,/^[۰-۹]+ بخش/,toFa(hi.children.length)+' بخش');
+  const lines=body(M.nodes,1,[],null);
+  backup.forEach(([n,d])=>n.desc=d);
+  let pre=M.pre;
+  const hasKind=k=>[...idx.values()].some(n=>n.kind===k);
+  if((hasKind('project')||hasKind('tool'))&&!/element project/.test(pre)){
+    pre=pre.replace(/^(\s*tag locked)/m,`  element project {\n    notation "پروژهٔ قابل‌فراخوانی — Claude MCP + OpenAI/REST"\n    style {\n      color sky\n      shape component\n    }\n  }\n  element tool {\n    notation "ابزار پروژه — با #gated = پشت تأیید انسانی"\n    style {\n      color secondary\n    }\n  }\n$1`);
+    if(!/tag gated/.test(pre))pre=pre.replace(/^(\s*tag unknownSkill)/m,'$1\n  tag gated')}
+  return pre+'model {\n'+lines.join('\n')+'\n}'+M.mid+viewsAdjust(M.views,idx,M)}
+
+/* ───────── حالت برنامه ───────── */
+const KEY='orgStudio.v1';
+const BASE=document.getElementById('base-c4').textContent;
+let M,BASEPARSE,BASETEXT,IDX=new Map(),SEL=null,TAB='dia',HIST=[],G={};
+const defaultG=()=>({cats:Object.fromEntries(CATS.map(c=>[c,c!=='read_or_draft'])),expires:24});
+function reindex(){IDX=new Map();walk(M.nodes,'',(n,p)=>IDX.set(p,n))}
+const parentPath=p=>p.includes('.')?p.slice(0,p.lastIndexOf('.')):'';
+const lockedN=n=>n.tags.includes('locked');
+const setTag=(n,t,on)=>{n.tags=n.tags.filter(x=>x!==t);if(on)n.tags.push(t)};
+function loadText(text,asBase){
+  const m=parseC4(text);M=m;if(asBase){BASETEXT=text.replace(/\r\n/g,'\n');BASEPARSE=parseC4(BASETEXT)}
+  reindex();deriveG();HIST=[emitC4(M)];SEL=null}
+function deriveG(){
+  const saved=G.cats?G:defaultG();G=saved;
+  const seen={};IDX.forEach(n=>{if(n.kind==='tool'){const c=toolInfo(n).cat;if(c)(seen[c]=seen[c]||[]).push(n.tags.includes('gated'))}});
+  Object.entries(seen).forEach(([c,a])=>{G.cats[c]=a.some(Boolean)})}
+function syncAuto(){ // سازگاری‌های خودکار پیش از ساخت خروجی
+  IDX.forEach(n=>{
+    if(n.kind==='tool'){const c=toolInfo(n).cat;setTag(n,'gated',c?!!G.cats[c]:true)}
+    if(n.kind==='project'){n.tech=`${meta(n,'protocol')||'?'} · ${meta(n,'status')||'?'}`}});
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({base:BASETEXT,cur:cur(),G}))}catch(e){}}
+function cur(){syncAuto();return emitC4(M)}
+let hT;function touch(full){syncAuto();save();clearTimeout(hT);hT=setTimeout(()=>{const t=emitC4(M);if(HIST[HIST.length-1]!==t){HIST.push(t);if(HIST.length>80)HIST.shift()}},500);
+  if(full)refresh();else{renderDia();if(TAB==='out')renderOut()}}
+function undo(){if(HIST.length>1){HIST.pop();const t=HIST[HIST.length-1];M=parseC4(t);reindex();if(!IDX.has(SEL))SEL=null;save();refresh()}}
+const meta=(n,k)=>{const e=(n.meta||[]).find(x=>x[0]===k);return e?e[1]:''};
+function setMeta(n,k,v){n.meta=n.meta||[];const e=n.meta.find(x=>x[0]===k);if(e)e[1]=v;else n.meta.push([k,v])}
+function toolInfo(n){const [a,c]=(n.tech||'').split(' · ');return{acc:a==='read'?'read':'write',cat:c||''}}
+function setTool(n,acc,cat){n.tech=acc+(cat?' · '+cat:'')}
+const rolePart=n=>{const m=n.title.match(/^(🔒|🔓) (\d+) · (.*)$/);return m?{em:m[1],num:m[2],name:m[3]}:null};
+const secPart=n=>{const m=n.title.match(/^(\d+) · (.*?)( 🔒)?$/);return m?{num:m[1],name:m[2],em:!!m[3]}:null};
+function titleName(n){const r=n.kind==='role'&&rolePart(n);if(r)return r.name;const s=n.kind==='section'&&secPart(n);if(s)return s.name;return n.title}
+function setTitleName(n,v){const r=n.kind==='role'&&rolePart(n);if(r){n.title=`${r.em} ${r.num} · ${v}`;return}const s=n.kind==='section'&&secPart(n);if(s){n.title=`${s.num} · ${v}${s.em?' 🔒':''}`;return}n.title=v}
+function setLock(n,on){
+  setTag(n,'locked',on);
+  if(n.kind==='role'){const r=rolePart(n);if(r)n.title=`${on?'🔒':'🔓'} ${r.num} · ${r.name}`}
+  if(n.kind==='section'){const s=secPart(n);if(s)n.title=`${s.num} · ${s.name}${on?' 🔒':''}`}
+  if(n.icon&&/\/(unlock|lock-fill)\.svg$/.test(n.icon))n.icon=U+(on?'lock-fill':'unlock')+'.svg'}
+const iconName=n=>n.icon?n.icon.replace(/^.*\//,'').replace(/\.svg$/,''):'';
+const customIcon=n=>n.icon&&!/\/(unlock|lock-fill)\.svg$/.test(n.icon);
+function nodeLabel(p){const n=IDX.get(p);if(!n)return p;const par=IDX.get(parentPath(p));return(par&&par.kind!=='orgBox'&&par.kind!=='flow'?titleName(par).slice(0,24)+' › ':'')+titleName(n)}
+const cardOf=p=>{const s=p.split('.');return IDX.get(s[0])&&IDX.get(s[0]).children.length&&s.length>1?s.slice(0,2).join('.'):s[0]};
+
+/* ───────── نمودار ───────── */
+function chip(n,p,depth){
+  const L=lockedN(n);
+  const kids=n.children.map(c=>chip(c,p+'.'+c.id,depth+1));
+  const cls=['chip',n.kind==='tool'?'t-tool':'t-'+n.kind,L?'locked':'',n.tags.includes('gated')?'gated':'',SEL===p?'sel':''].join(' ');
+  const el=h('div',{class:cls,'data-path':p,onclick:e=>{e.stopPropagation();select(p)}},
+    (L?'🔒 ':'')+(n.kind==='tool'?'🛠 ':'')+n.title,
+    n.tags.includes('gated')?h('span',{class:'badge red',style:'margin-inline-start:4px'},'gate'):null,
+    n.tags.includes('designed')?h('span',{class:'badge',style:'margin-inline-start:4px'},'طراحی‌شده'):null,
+    n.tags.includes('unknownSkill')?h('span',{class:'badge',style:'margin-inline-start:4px'},'؟skill'):null,
+    n.tech?h('span',{class:'tech'},n.tech):null,
+    kids.length?h('div',{class:'sub'},kids):null);
+  return el}
+function renderDia(){
+  const root=$('#dia');root.replaceChildren();
+  root.append(h('div',{class:'actors'},M.nodes.filter(n=>n.kind==='actor').map(n=>h('div',{class:'actor'+(SEL===n.id?' sel':''),'data-path':n.id,onclick:()=>select(n.id)},'👤 '+n.title))));
+  M.nodes.filter(n=>n.kind!=='actor').forEach(R=>{
+    const rp=R.id;
+    root.append(h('section',{class:'grp'},
+      h('h3',{},R.title,' ',h('small',{},R.desc||''),
+        h('button',{class:'sm',onclick:()=>addChild(rp)},R.kind==='flow'?'+ بخش':R.id==='projects'||R.kind==='orgBox'&&R.children.some(c=>c.kind==='project')?'+ پروژه':'+ نقش')),
+      h('div',{class:'cards'},R.children.map(c=>{
+        const p=rp+'.'+c.id,L=lockedN(c);
+        return h('div',{class:'card'+(L?' locked':'')+(SEL===p?' sel':''),'data-path':p},
+          h('div',{class:'ch',onclick:()=>select(p)},(L&&c.kind==='project'?'🔒 ':'')+c.title,
+            c.tags.includes('designed')?h('span',{class:'badge'},'طراحی‌شده'):null),
+          c.children.map(s=>chip(s,p+'.'+s.id)))}))));
+  });
+  const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');sv.id='edges';root.append(sv);
+  requestAnimationFrame(drawEdges)}
+function drawEdges(){
+  const root=$('#dia'),svg=$('#edges');if(!svg||$('#p-dia').hidden)return;
+  const mode=document.querySelector('input[name=em]:checked').value;
+  const wr=root.getBoundingClientRect();
+  svg.setAttribute('width',root.scrollWidth);svg.setAttribute('height',root.scrollHeight);
+  const NS='http://www.w3.org/2000/svg';
+  const mk=(t,a)=>{const e=document.createElementNS(NS,t);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));return e};
+  const defs=mk('defs',{});
+  [['m0','#8a94a6'],['m1','#2563eb']].forEach(([id,col])=>{const m=mk('marker',{id,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'});m.append(mk('path',{d:'M0 0L10 5L0 10z',fill:col}));defs.append(m)});
+  svg.append(defs);
+  const box=p=>{const e=root.querySelector(`[data-path="${p}"]`);if(!e)return null;const r=e.getBoundingClientRect();return{l:r.left-wr.left,r:r.right-wr.left,t:r.top-wr.top,b:r.bottom-wr.top,cx:(r.left+r.right)/2-wr.left,cy:(r.top+r.bottom)/2-wr.top}};
+  M.rels.forEach(r=>{
+    const isSel=SEL&&(r.from===SEL||r.to===SEL||r.from.startsWith(SEL+'.')||r.to.startsWith(SEL+'.'));
+    const cross=cardOf(r.from)!==cardOf(r.to);
+    if(mode==='none'||(mode==='cross'&&!cross&&!isSel)||(mode==='sel'&&!isSel))return;
+    const a=box(r.from),b=box(r.to);if(!a||!b)return;
+    let x1,y1,x2,y2,d;
+    if(b.t>a.b){x1=a.cx;y1=a.b;x2=b.cx;y2=b.t;const k=(y2-y1)/2;d=`M${x1} ${y1}C${x1} ${y1+k} ${x2} ${y2-k} ${x2} ${y2}`}
+    else if(b.b<a.t){x1=a.cx;y1=a.t;x2=b.cx;y2=b.b;const k=(y1-y2)/2;d=`M${x1} ${y1}C${x1} ${y1-k} ${x2} ${y2+k} ${x2} ${y2}`}
+    else{const right=b.cx>a.cx;x1=right?a.r:a.l;x2=right?b.l:b.r;y1=a.cy;y2=b.cy;const k=Math.abs(x2-x1)/2+20;d=`M${x1} ${y1}C${x1+(right?k:-k)} ${y1} ${x2-(right?k:-k)} ${y2} ${x2} ${y2}`}
+    const p=mk('path',{d,fill:'none',stroke:isSel?'#2563eb':'#8a94a6','stroke-width':isSel?2.2:1.2,'stroke-opacity':isSel?1:.6,'marker-end':`url(#${isSel?'m1':'m0'})`});
+    p.append(mk('title',{}));p.lastChild.textContent=(r.label||'')+'  ('+r.from+' → '+r.to+')';svg.append(p);
+    if(isSel&&r.label){const t=mk('text',{x:(x1+x2)/2,y:(y1+y2)/2,'font-size':11,'text-anchor':'middle',fill:'#2563eb','paint-order':'stroke',stroke:'var(--bg)','stroke-width':3});t.textContent=r.label;svg.append(t)}
+  })}
+window.addEventListener('resize',()=>drawEdges());
+document.querySelectorAll('input[name=em]').forEach(i=>i.onchange=drawEdges);
+
+/* ───────── بازرس ───────── */
+function select(p){SEL=p;renderDia();renderInsp()}
+function uniqueId(list,base){let i=1;while(list.some(c=>c.id===base+i))i++;return base+i}
+function addChild(pp){
+  const par=IDX.get(pp);if(!par)return;if(lockedN(par)){alert('این مورد قفل است.');return}
+  let n;
+  if(par.kind==='orgBox'&&par.children.every(c=>c.kind==='role'||false)||par.id==='company'){
+    const nums=par.children.map(c=>+((c.id.match(/^r(\d+)$/)||[])[1]||0));const k=Math.max(0,...nums)+1;
+    n={id:'r'+k,kind:'role',title:`🔓 ${k} · نقش تازه`,tags:[],icon:U+'person.svg',children:[]}}
+  else if(par.kind==='flow'){const nums=par.children.map(c=>+((c.id.match(/^s(\d+)$/)||[])[1]||0));const k=Math.max(0,...nums)+1;
+    n={id:'s'+k,kind:'section',title:`${k} · بخش تازه`,tags:[],children:[]}}
+  else if(par.kind==='orgBox'){
+    const id=prompt('شناسهٔ لاتین پروژه (مثل hagh):','');if(!id)return;
+    if(!/^[A-Za-z_][A-Za-z0-9_]*$/.test(id)||par.children.some(c=>c.id===id)){alert('شناسه نامعتبر یا تکراری است.');return}
+    n={id,kind:'project',title:'پروژهٔ تازه',tags:[],icon:U+'box.svg',tech:'rest+mcp · planned',desc:'',children:[],meta:[['protocol','rest+mcp'],['status','planned'],['local_url','http://127.0.0.1:PORT'],['public_url','UNKNOWN'],['auth_env','UNKNOWN'],['rate_limit','UNKNOWN'],['async','poll']]}}
+  else if(par.kind==='project'){
+    const id=prompt('نام ابزار (لاتین، snake_case، مثل vakil_case_start):','');if(!id)return;
+    if(!/^[A-Za-z_][A-Za-z0-9_]*$/.test(id)||par.children.some(c=>c.id===id)){alert('نام نامعتبر یا تکراری است.');return}
+    n={id,kind:'tool',title:'ابزار تازه',tags:['gated'],tech:'write',children:[]}}
+  else{const prefix=isStep(par)&&IDX.get(parentPath(pp))&&isStep(IDX.get(parentPath(pp)))?'x':'';
+    const sub=isStep(par);
+    n={id:uniqueId(par.children,sub?'c':'st'),kind:sub?'autoStep':'askStep',title:sub?'زیرقدم تازه':'قدم تازه',tags:[],icon:U+'unlock.svg',tech:'skill: —',desc:'',children:[]};if(prefix)return}
+  par.children.push(n);reindex();SEL=pp+'.'+n.id;touch(true)}
+function moveNode(p,dir){const par=IDX.get(parentPath(p));const list=par?par.children:M.nodes;const i=list.findIndex(c=>c.id===IDX.get(p).id),j=i+dir;if(j<0||j>=list.length)return;[list[i],list[j]]=[list[j],list[i]];reindex();touch(true)}
+function delNode(p){
+  const n=IDX.get(p);let lk=lockedN(n);walk(n.children,p,c=>{if(lockedN(c))lk=true});
+  if(lk){alert('این مورد (یا چیزی داخلش) قفل است. اول قفل را با دستور صریح باز کن.');return}
+  const gone=new Set([p]);walk(n.children,p,(c,cp)=>gone.add(cp));
+  const hit=M.rels.filter(r=>gone.has(r.from)||gone.has(r.to));
+  if(hit.some(r=>{const o=gone.has(r.from)?r.to:r.from;return gone.has(o)?false:lockedEnd(o)})&&!confirm('اتصالی به یک مورد قفل‌شده هم حذف می‌شود. ادامه؟'))return;
+  if(!confirm(`«${n.title}» با ${gone.size-1} زیرمورد و ${hit.length} اتصال حذف شود؟`))return;
+  M.rels=M.rels.filter(r=>!hit.includes(r));
+  const par=IDX.get(parentPath(p));const list=par?par.children:M.nodes;list.splice(list.indexOf(n),1);
+  reindex();SEL=null;touch(true)}
+const lockedEnd=p=>{const n=IDX.get(p);return n&&lockedN(n)};
+function lca(a,b){const A=a.split('.'),B=b.split('.');const o=[];for(let i=0;i<Math.min(A.length,B.length)-1&&A[i]===B[i];i++)o.push(A[i]);return o}
+function renderInsp(){
+  const box=$('#insp');box.replaceChildren();
+  if(!SEL||!IDX.has(SEL)){box.append(h('div',{class:'panel'},h('h2',{},'ویرایشگر'),h('small',{},'یک بخش، قدم، بازیگر یا پروژه را در نمودار انتخاب کن.'),
+    h('div',{class:'warn'},'🔒 = قفل: فیلدها خاموش‌اند. برای ویرایش، «باز کردن قفل» را بزن؛ این یعنی خودت صریحاً اجازه دادی.')));return}
+  const n=IDX.get(SEL),L=lockedN(n),dis=L;
+  const f=(lbl,val,set,o={})=>h('label',{class:'f'},h('span',{},lbl),h(o.area?'textarea':'input',{value:val,disabled:dis||o.dis,class:o.ltr?'ltr':'',list:o.list,oninput:e=>{set(e.target.value);touch()}},o.area?val:null));
+  const P=h('div',{class:'panel'});
+  P.append(h('h2',{},'ویرایش: ',h('span',{class:'ltr mute'},SEL)));
+  if(L)P.append(h('div',{class:'lockbox'},'🔒 قفل است؛ تغییر ممنوع تا خودت صریحاً باز کنی. ',
+    h('button',{class:'sm',onclick:()=>{if(confirm(`قفل «${n.title}» با گفتهٔ صریح خودت باز شود؟`)){setLock(n,false);touch(true)}}},'باز کردن قفل')));
+  else if(n.kind!=='actor')P.append(h('div',{class:'row'},h('button',{class:'sm',onclick:()=>{setLock(n,true);touch(true)}},'🔓 قفلش کن')));
+  P.append(f('نام',titleName(n),v=>setTitleName(n,v)));
+  if(isStep(n)){
+    const cur0=Object.keys(STEPKINDS).find(k=>STEPKINDS[k]===n.kind);
+    P.append(h('label',{class:'f'},h('span',{},'نوع after (رنگ)'),h('select',{disabled:dis,onchange:e=>{n.kind=STEPKINDS[e.target.value];touch(true)}},Object.keys(STEPKINDS).map(k=>h('option',{value:k,selected:k===cur0},k)))));
+    P.append(f('skill / فناوری',n.tech||'',v=>n.tech=v,{ltr:1,list:'dl-tech'}),f('خروجی (out)',n.desc||'',v=>n.desc=v,{area:1}));
+  }else if(n.kind==='tool'){
+    const ti=toolInfo(n);
+    P.append(h('div',{class:'row'},h('label',{class:'f grow'},h('span',{},'دسترسی'),h('select',{disabled:dis,onchange:e=>{setTool(n,e.target.value,toolInfo(n).cat);touch(true)}},['read','write'].map(a=>h('option',{value:a,selected:a===ti.acc},a)))),
+      h('label',{class:'f grow'},h('span',{},'دستهٔ ریسک'),h('select',{disabled:dis,onchange:e=>{setTool(n,toolInfo(n).acc,e.target.value);touch(true)}},[h('option',{value:''},'— بدون دسته (پشت تأیید)'),...CATS.map(c=>h('option',{value:c,selected:c===ti.cat},c+' — '+CATFA[c]))]))),
+      );
+    P.append(f('توضیح',n.desc||'',v=>n.desc=v,{area:1}),h('small',{},n.tags.includes('gated')?'⛔ پشت تأیید انسانی':'✅ بدون تأیید (خواندنی/پیش‌نویس)'));
+  }else{
+    P.append(f('توضیح',n.desc||'',v=>n.desc=v,{area:1}));
+    if(n.kind==='project')P.append(h('button',{class:'sm',style:'margin-top:6px',onclick:()=>{TAB='int';INTFOCUS=SEL;showTab()}},'تنظیمات interop این پروژه ←'));
+  }
+  if(customIcon(n))P.append(f('آیکون bootstrap-icons',iconName(n),v=>n.icon=U+v.trim()+'.svg',{ltr:1}));
+  if(n.kind!=='actor'){
+    const tg=h('div',{class:'row',style:'margin-top:6px'});
+    [['designed','طراحی‌شده'],['unknownSkill','skill ناشناخته']].forEach(([t,l])=>tg.append(h('label',{},h('input',{type:'checkbox',style:'width:auto',disabled:dis,checked:n.tags.includes(t),onchange:e=>{setTag(n,t,e.target.checked);touch(true)}}),' '+l)));
+    P.append(tg)}
+  const act=h('div',{class:'row',style:'margin-top:8px'});
+  if(n.kind==='role'||n.kind==='section'||isStep(n)||n.kind==='project'||(n.kind==='orgBox'||n.kind==='flow'))
+    act.append(h('button',{class:'sm',disabled:dis,onclick:()=>addChild(SEL)},n.kind==='role'||n.kind==='section'?'+ قدم':n.kind==='project'?'+ ابزار':isStep(n)?'+ زیرقدم':'+ زیرمجموعه'));
+  if(n.kind!=='actor'&&SEL.includes('.')){act.append(h('button',{class:'sm',onclick:()=>moveNode(SEL,-1)},'↑'),h('button',{class:'sm',onclick:()=>moveNode(SEL,1)},'↓'),h('button',{class:'sm',disabled:dis,onclick:()=>delNode(SEL)},'✕ حذف'))}
+  P.append(act);
+  box.append(P);
+  // اتصال‌ها
+  const E=h('div',{class:'panel'},h('h2',{},'اتصال‌ها (فلش‌ها)'));
+  const mine=M.rels.filter(r=>r.from===SEL||r.to===SEL);
+  if(!mine.length)E.append(h('small',{},'اتصالی نیست.'));
+  mine.forEach(r=>{
+    const out=r.from===SEL,other=out?r.to:r.from,lk=lockedEnd(r.from)||lockedEnd(r.to);
+    E.append(h('div',{class:'edge'},h('div',{class:'row'},h('span',{},out?'← به':'→ از'),h('b',{class:'grow',style:'cursor:pointer',onclick:()=>select(other)},nodeLabel(other)),
+      h('button',{class:'sm',disabled:lk,title:lk?'یک سرش قفل است':'حذف',onclick:()=>{M.rels.splice(M.rels.indexOf(r),1);touch(true)}},'✕')),
+      h('input',{value:r.label||'',placeholder:'برچسب (مثلاً بله / نه / بعد)',disabled:lk,oninput:e=>{r.label=e.target.value;touch()}})))});
+  const sel=h('select',{},h('option',{value:''},'+ اتصال تازه به…'));
+  const opts=[];walk(M.nodes,'',(m,p)=>{if(p!==SEL&&!p.startsWith(SEL+'.')&&!SEL.startsWith(p+'.')&&(m.kind!=='orgBox'&&m.kind!=='flow')&&!lockedN(m))opts.push(p)});
+  opts.forEach(p=>sel.append(h('option',{value:p},nodeLabel(p)+'  ['+p+']')));
+  const lbl=h('input',{placeholder:'برچسب'});
+  E.append(h('div',{class:'edge'},L?h('small',{},'قفل است؛ اتصال تازه ممکن نیست (مقصد قفل‌شده هم در فهرست نیست).'):[sel,h('div',{class:'row',style:'margin-top:4px'},h('span',{class:'grow'},lbl),
+    h('button',{class:'sm',onclick:()=>{if(!sel.value)return;M.rels.push({from:SEL,to:sel.value,label:lbl.value,c:lca(SEL,sel.value)});touch(true)}},'افزودن'))]));
+  box.append(E);
+  // دیتالیست skill
+  if(!$('#dl-tech')){document.body.append(h('datalist',{id:'dl-tech'}))}
+  const dl=$('#dl-tech');dl.replaceChildren();const seen=new Set();IDX.forEach(m=>{if(isStep(m)&&m.tech&&!seen.has(m.tech)){seen.add(m.tech);dl.append(h('option',{value:m.tech}))}})}
+
+/* ───────── interop ───────── */
+let INTFOCUS=null;
+function compliance(n){
+  const pr=meta(n,'protocol'),tools=n.children.filter(c=>c.kind==='tool'),none=pr==='none';
+  const unk=(n.meta||[]).filter(([k,v])=>/UNKNOWN/.test(v)&&k!=='exempt_reason').map(x=>x[0]);
+  return[
+    [none?!!meta(n,'exempt_reason'):/mcp/.test(pr),none?'استثنا دلیل دارد':'سرور MCP (Streamable HTTP)'],
+    [none||/rest/.test(pr),'REST + OpenAPI + تعریف ابزار قالب OpenAI'],
+    [none||/^https?:\/\/(127\.0\.0\.1|localhost)/.test(meta(n,'local_url')),'حالت لوکال: 127.0.0.1 بدون کلید'],
+    [none||/^https:\/\//.test(meta(n,'public_url')),'حالت عمومی: آدرس HTTPS'],
+    [none||(!/UNKNOWN|^$/.test(meta(n,'auth_env'))&&!/^(sk|avn|whsec)[_-]/i.test(meta(n,'auth_env'))),'کلید جدا: نام متغیر محیطی (نه مقدار)'],
+    [tools.length>0||none,'حداقل یک ابزار تعریف شده'],
+    [tools.every(t=>toolInfo(t).cat),'هر ابزار دستهٔ ریسک دارد (وگرنه پشت تأیید)'],
+    [!unk.length,unk.length?'مقدار نامعلوم: '+unk.join('، '):'هیچ مقدار UNKNOWN نمانده']]}
+function renderInt(){
+  const root=$('#p-int');root.replaceChildren();
+  const gp=h('div',{class:'panel',style:'margin-bottom:14px'},h('h2',{},'سیاست تأیید انسانی (gates.yaml) — پیش‌فرض‌ها، قابل ویرایش'),
+    h('small',{},'ابزار بدون دسته = پشت تأیید. برداشتن تأیید از دستهٔ پرخطر فقط با گفتهٔ صریح صاحب پروژه (ثبت در HISTORY.md).'));
+  const tb=h('table',{});CATS.forEach(c=>tb.append(h('tr',{},h('td',{},h('b',{},c)),h('td',{},CATFA[c]),h('td',{class:'ltr mute'},CATEX[c].join(', ')),
+    h('td',{},h('label',{},h('input',{type:'checkbox',style:'width:auto',checked:!!G.cats[c],onchange:e=>{
+      if(!e.target.checked&&c!=='read_or_draft'&&!confirm(`برداشتن تأیید از دستهٔ «${c}» پرخطر است. صراحتاً می‌خواهی؟`)){e.target.checked=true;return}
+      G.cats[c]=e.target.checked;touch(true)}}),' نیاز به تأیید')))));
+  gp.append(tb,h('div',{class:'row',style:'margin-top:6px'},h('label',{},'انقضای تأیید (ساعت): ',h('input',{type:'number',style:'width:80px',value:G.expires,oninput:e=>{G.expires=+e.target.value||24;touch()}})),h('small',{},'کانال تأیید: خارج از مدل (out_of_band)')));
+  root.append(gp);
+  const projs=[];IDX.forEach((n,p)=>{if(n.kind==='project')projs.push([p,n])});
+  if(!projs.length)root.append(h('div',{class:'warn'},'پروژه‌ای نیست؛ در نمودار روی «+ پروژه» بزن.'));
+  projs.forEach(([p,n])=>{
+    const L=lockedN(n),dis=L;
+    const inp=(lbl,k,o={})=>h('label',{class:'f'},h('span',{},lbl),h('input',{class:'ltr',value:meta(n,k),placeholder:o.ph||'',disabled:dis,oninput:e=>{setMeta(n,k,e.target.value);touch();if(o.re)renderChk()}}));
+    const sel=(lbl,k,arr)=>h('label',{class:'f'},h('span',{},lbl),h('select',{disabled:dis,onchange:e=>{setMeta(n,k,e.target.value);touch(true)}},arr.map(a=>h('option',{value:a,selected:a===meta(n,k)},a))));
+    const chkBox=h('ul',{class:'chk'});
+    const renderChk=()=>{chkBox.replaceChildren();compliance(n).forEach(([ok,t])=>chkBox.append(h('li',{},ok?'✅ ':'❌ ',t)))};renderChk();
+    const pr=meta(n,'protocol'),div=h('div',{class:'proj',id:'proj-'+p,style:INTFOCUS===p?'outline:3px solid var(--acc)':''});
+    div.append(h('div',{class:'row'},h('h3',{style:'margin:0;flex:1'},'🧩 ',h('input',{value:n.title,disabled:dis,style:'width:70%',oninput:e=>{n.title=e.target.value;touch()}}),' ',h('small',{class:'ltr'},p)),
+      h('button',{class:'sm',onclick:()=>{TAB='dia';SEL=p;showTab();renderDia();renderInsp()}},'نمایش در نمودار'),
+      h('button',{class:'sm',disabled:dis,onclick:()=>delNode(p)},'✕ حذف پروژه')));
+    div.append(h('div',{class:'grid2'},
+      sel('پروتکل','protocol',PROTOS),sel('وضعیت','status',['planned','live']),sel('حالت کار طولانی','async',['poll','webhook','none']),
+      pr==='none'?inp('دلیل استثنا (STANDARD-INTEROP §۳)','exempt_reason'):h('div',{class:'f'},h('span',{},'مصرف‌کننده‌ها (همیشه هر دو)'),
+        h('span',{class:'badge'+(/mcp/.test(pr)?' ok':'')},'Claude ← MCP'),' ',h('span',{class:'badge'+(/rest/.test(pr)?' ok':'')},'OpenAI/OpenRouter ← REST+OpenAPI'),' ',
+        h('label',{},h('input',{type:'checkbox',style:'width:auto',disabled:dis,checked:meta(n,'a2a')==='yes',onchange:e=>{setMeta(n,'a2a',e.target.checked?'yes':'no');touch()}}),' A2A (اختیاری)')),
+      inp('لوکال — بدون کلید','local_url',{ph:'http://127.0.0.1:8100',re:1}),inp('عمومی — HTTPS + کلید + سقف نرخ','public_url',{ph:'https://…',re:1}),
+      inp('نام متغیر کلید (.env)','auth_env',{ph:'AVANEGAR_API_KEY',re:1}),inp('سقف نرخ','rate_limit',{ph:'60/min'}),
+      h('label',{class:'f'},h('span',{},'توضیح'),h('input',{value:n.desc||'',disabled:dis,oninput:e=>{n.desc=e.target.value;touch()}}))));
+    const tools=n.children.filter(c=>c.kind==='tool');
+    const tt=h('table',{style:'margin-top:8px'},h('tr',{},['ابزار','عنوان','دسترسی','دستهٔ ریسک','تأیید',''].map(x=>h('th',{},x))));
+    tools.forEach(t=>{const ti=toolInfo(t),tl=lockedN(t)||dis;
+      tt.append(h('tr',{},h('td',{class:'ltr'},t.id),
+        h('td',{},h('input',{value:t.title,disabled:tl,oninput:e=>{t.title=e.target.value;touch()}})),
+        h('td',{},h('select',{disabled:tl,onchange:e=>{setTool(t,e.target.value,toolInfo(t).cat);touch(true)}},['read','write'].map(a=>h('option',{value:a,selected:a===ti.acc},a)))),
+        h('td',{},h('select',{disabled:tl,onchange:e=>{setTool(t,toolInfo(t).acc,e.target.value);touch(true)}},[h('option',{value:''},'— (پشت تأیید)'),...CATS.map(c=>h('option',{value:c,selected:c===ti.cat},c))])),
+        h('td',{},t.tags.includes('gated')||!ti.cat||G.cats[ti.cat]?h('span',{class:'badge red'},'⛔ انسان'):h('span',{class:'badge ok'},'خودکار')),
+        h('td',{},h('button',{class:'sm',disabled:tl,onclick:()=>delNode(p+'.'+t.id)},'✕'))))});
+    div.append(tt,h('div',{class:'row',style:'margin-top:6px'},h('button',{class:'sm',disabled:dis,onclick:()=>addChild(p)},'+ ابزار')),
+      h('b',{style:'display:block;margin-top:8px'},'چک‌لیست پذیرش'),chkBox);
+    root.append(div)});
+  if(INTFOCUS){const e=document.getElementById('proj-'+INTFOCUS);if(e)e.scrollIntoView({block:'center'});INTFOCUS=null}}
+
+/* ───────── خروجی ───────── */
+const ys=v=>/^[\w./:@+\-]+$/.test(v)&&!/^(true|false|null|yes|no|\d)/i.test(v)?v:JSON.stringify(v);
+function capsYaml(){
+  const o=['# capabilities.yaml — تولیدشده از استودیوی سازمان ('+new Date().toISOString().slice(0,10)+')','# فقط نام متغیر محیطی؛ هرگز مقدار کلید','# UNKNOWN = هنوز معلوم نیست (حدس نزن؛ در HISTORY.md «باز» ثبت کن)'];
+  IDX.forEach((n,p)=>{if(n.kind!=='project')return;
+    const tools=n.children.filter(c=>c.kind==='tool'),pr=meta(n,'protocol');
+    o.push(`- task: ${JSON.stringify(titleName(n))}`,`  project: ${n.id}`,`  status: ${meta(n,'status')}`,`  protocol: ${pr}`);
+    if(pr==='none')o.push(`  exempt_reason: ${JSON.stringify(meta(n,'exempt_reason')||'UNKNOWN')}`);
+    else{o.push(`  consumers: [${[/mcp/.test(pr)||'claude-mcp-planned',/rest/.test(pr)||'openai-rest-planned'].map((x,i)=>x===true?['claude-mcp','openai-rest'][i]:x).join(', ')}]${meta(n,'a2a')==='yes'?'  # + a2a':''}`,
+      '  modes:',`    local:  {base_url: ${ys(meta(n,'local_url')||'UNKNOWN')}, auth: none}`,
+      `    public: {base_url: ${ys(meta(n,'public_url')||'UNKNOWN')}, auth: {type: api_key, env: ${ys(meta(n,'auth_env')||'UNKNOWN')}}, rate_limit: ${ys(meta(n,'rate_limit')||'UNKNOWN')}}`,
+      `  async: ${meta(n,'async')||'none'}`)}
+    o.push(`  needs_human_gate: ${tools.some(t=>t.tags.includes('gated'))}`);
+    o.push('  tools:');tools.forEach(t=>{const ti=toolInfo(t);o.push(`    - {name: ${t.id}, access: ${ti.acc}, category: ${ti.cat||'null'}}`)});
+    if(!tools.length)o[o.length-1]='  tools: []'});
+  return o.join('\n')+'\n'}
+function gatesYaml(){
+  const o=['# interop/gates.yaml (نسخه 1) — تولیدشده از استودیوی سازمان','# هر ویرایش این فهرست را در HISTORY.md با تاریخ و دلیل ثبت کن','version: 1','default_policy: require_approval        # ابزار بدون ردیف = پشت تأیید','categories:'];
+  CATS.forEach(c=>o.push(`  ${(c+':').padEnd(14)}{gate: ${!!G.cats[c]}, examples: [${CATEX[c].join(', ')}]}`));
+  o.push('tools:');let any=false;
+  IDX.forEach(n=>{if(n.kind==='tool'){any=true;const c=toolInfo(n).cat;o.push(`  ${n.id}: ${c||'# بدون دسته ⇒ پشت تأیید'}`)}});
+  if(!any)o[o.length-1]='tools: {}';
+  o.push('approval:','  channel: out_of_band','  expires_hours: '+G.expires,'overrides: []');
+  return o.join('\n')+'\n'}
+function flat(Mx){const m=new Map(),r=new Set();walk(Mx.nodes,'',(n,p)=>m.set(p,JSON.stringify({k:n.kind,t:n.title,g:[...n.tags].sort(),i:n.icon||'',te:n.tech||'',d:n.desc||'',m:n.meta||[]})));Mx.rels.forEach(x=>r.add(`${x.from} → ${x.to} «${x.label||''}»`));return{m,r}}
+function diff(){
+  const a=flat(BASEPARSE),b=flat(M),out={add:[],del:[],mod:[],radd:[],rdel:[],lock:[]};
+  b.m.forEach((v,p)=>{if(!a.m.has(p))out.add.push(p);else if(a.m.get(p)!==v)out.mod.push(p)});
+  a.m.forEach((v,p)=>{if(!b.m.has(p))out.del.push(p)});
+  b.r.forEach(x=>{if(!a.r.has(x))out.radd.push(x)});a.r.forEach(x=>{if(!b.r.has(x))out.rdel.push(x)});
+  walk(BASEPARSE.nodes,'',(n,p)=>{if(!lockedN(n))return;const c=IDX.get(p);
+    if(!c)out.lock.push(`🗑 «${n.title}» (${p}) قفل‌شده بود و حذف شد`);
+    else if(!lockedN(c))out.lock.push(`🔓 قفل «${n.title}» (${p}) برداشته شد`);
+    else if(a.m.get(p)!==b.m.get(p))out.lock.push(`⚠ «${n.title}» (${p}) قفل است ولی محتوایش فرق دارد`)});
+  return out}
+let OUTTAB='c4';
+function renderOut(){
+  const root=$('#p-out');root.replaceChildren();
+  const text=cur();
+  let rt;try{const M2=parseC4(text);rt=emitC4(M2)===text}catch(e){rt=false}
+  let brt;try{brt=emitC4(parseC4(BASETEXT))===BASETEXT}catch(e){brt=false}
+  const d=diff();
+  const li=(arr,pre)=>arr.map(x=>h('li',{},pre+' ',h('span',{class:'ltr'},x)));
+  root.append(h('div',{class:'panel',style:'margin-bottom:12px'},h('h2',{},'تغییرات نسبت به نسخهٔ پایه'),
+    d.lock.length?h('div',{class:'lockbox'},h('b',{},'قفل‌ها:'),h('ul',{class:'diffs'},d.lock.map(x=>h('li',{},x)))):h('small',{},'🔒 هیچ مورد قفل‌شده‌ای تغییر نکرده.'),
+    h('ul',{class:'diffs'},li(d.add,'➕'),li(d.mod,'✏️'),li(d.del,'🗑'),li(d.radd,'🔗➕'),li(d.rdel,'🔗🗑')),
+    (d.add.length+d.mod.length+d.del.length+d.radd.length+d.rdel.length)?null:h('small',{},'بدون تغییر — خروجی با نسخهٔ پایه یکی است.'),
+    h('div',{class:'row',style:'margin-top:6px'},h('span',{class:'badge '+(rt?'ok':'red')},rt?'خودآزمون: خروجی دوباره تجزیه می‌شود و یکسان است ✓':'خودآزمون ناموفق ✗'),
+      h('span',{class:'badge '+(brt?'ok':'red')},brt?'فایل پایه بی‌تغییر بازتولید می‌شود ✓':'فایل پایه عیناً بازتولید نمی‌شود (قالب خاص/کامنت داخل model؟) — خروجی را با diff بررسی کن'))));
+  const files={c4:['recruitment.c4',text],caps:['capabilities.yaml',capsYaml()],gates:['gates.yaml',gatesYaml()]};
+  const tabs=h('div',{class:'row'},Object.entries({c4:'recruitment.c4 (کامل)',caps:'capabilities.yaml',gates:'interop/gates.yaml'}).map(([k,l])=>h('button',{class:OUTTAB===k?'pri':'',onclick:()=>{OUTTAB=k;renderOut()}},l)));
+  const [name,body]=files[OUTTAB];
+  root.append(h('div',{class:'panel'},tabs,h('div',{class:'row',style:'margin:8px 0'},
+    h('button',{class:'pri',onclick:async e=>{try{await navigator.clipboard.writeText(body);e.target.textContent='کپی شد ✓'}catch(x){const t=$('#outpre');const r=document.createRange();r.selectNodeContents(t);getSelection().removeAllRanges();getSelection().addRange(r);e.target.textContent='انتخاب شد؛ Ctrl+C'}}},'کپی متن کامل'),
+    h('button',{onclick:()=>{const a=h('a',{href:URL.createObjectURL(new Blob([body],{type:'text/plain;charset=utf-8'})),download:name});document.body.append(a);a.click();a.remove()}},'دانلود '+name),
+    h('small',{},OUTTAB==='c4'?'این متن را جایگزین c4-org/recruitment.c4 کن (کل فایل).':'برای پروژه‌ها؛ در پوشهٔ interop/ یا دفتر مرکزی بگذار.')),
+    h('pre',{id:'outpre'},body)))}
+
+/* ───────── صفحه‌ها ───────── */
+const TABS=[['dia','نمودار سازمان'],['int','پروژه‌ها و interop'],['out','تغییرات و خروجی']];
+function showTab(){
+  $('#p-dia').hidden=TAB!=='dia';$('#p-int').hidden=TAB!=='int';$('#p-out').hidden=TAB!=='out';
+  const nav=$('#tabs');nav.replaceChildren(...TABS.map(([k,l])=>h('button',{class:TAB===k?'on':'',onclick:()=>{TAB=k;showTab()}},l)));
+  if(TAB==='dia'){renderDia();renderInsp()}if(TAB==='int')renderInt();if(TAB==='out')renderOut()}
+function refresh(){syncAuto();showTab()}
+$('#undo').onclick=undo;
+$('#goOut').onclick=()=>{TAB='out';showTab()};
+$('#reset').onclick=()=>{if(confirm('همهٔ تغییرات پاک شود و نمونهٔ مخزن برگردد؟')){G={};loadText(BASE,true);save();refresh()}};
+$('#load').onclick=()=>$('#file').click();
+$('#file').onchange=async e=>{const f=e.target.files[0];if(!f)return;const t=await f.text();
+  try{G={};loadText(t,true);save();refresh()}catch(x){alert('فایل خوانده نشد: '+x.message)}e.target.value=''};
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();undo()}});
+
+/* ───────── شروع ───────── */
+(function init(){
+  let st=null;try{st=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+  try{
+    if(st&&st.cur&&st.base){G=st.G||{};BASETEXT=st.base;BASEPARSE=parseC4(BASETEXT);M=parseC4(st.cur);reindex();deriveG();G=st.G&&st.G.cats?Object.assign(G,{expires:st.G.expires||24}):G;HIST=[st.cur]}
+    else loadText(BASE,true)
+  }catch(e){G={};loadText(BASE,true)}
+  showTab()})();
+window.__studio={parseC4,emitC4,get M(){return M},get BASE(){return BASE},cur,diff,addChild,IDX:()=>IDX,select,setLock,loadText};
+</script>
+</body>
+</html>
