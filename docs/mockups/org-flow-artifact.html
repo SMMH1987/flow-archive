@@ -46,12 +46,12 @@ input[type=checkbox],input[type=radio]{width:auto}
 .lane.locked{border-color:var(--gate);border-style:dashed}
 .lane.proj{background:var(--projbg);border-color:var(--proj)}
 .lane.sel{outline:3px solid var(--acc)}
-.lh{position:absolute;left:0;right:0;top:0;height:40px;padding:6px 12px;font-weight:800;font-size:13px;line-height:1.35;cursor:move;direction:rtl;display:flex;gap:6px;align-items:center}
+.lh{position:absolute;left:0;right:0;top:0;height:44px;padding:6px 12px;font-weight:800;font-size:13px;line-height:1.35;cursor:move;direction:rtl;display:flex;gap:6px;align-items:center}
 .lh span.t{flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.grp{position:absolute;direction:rtl;text-align:right;display:flex;gap:8px;align-items:center;justify-content:flex-start}
-.grp b{font-size:16px;font-weight:800;white-space:nowrap}.grp small{font-size:12px}
-.node{position:absolute;direction:rtl;text-align:right;padding:3px 10px;background:var(--card);border:2px solid var(--line);cursor:grab;overflow:hidden;display:flex;flex-direction:column;justify-content:center;user-select:none}
-.node .nt{font-size:12px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.grp{position:absolute;direction:rtl;text-align:right;display:flex;gap:8px;align-items:center;justify-content:flex-start;flex-direction:row-reverse}
+.grp b{font-size:17px;font-weight:800}.grp small{font-size:12px}
+.node{position:absolute;direction:rtl;text-align:right;padding:5px 12px;background:var(--card);border:2px solid var(--line);cursor:grab;overflow:hidden;display:flex;flex-direction:column;justify-content:center;user-select:none}
+.node .nt{font-size:13px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .node .ns{font-size:10.5px;color:var(--mute);direction:ltr;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .node.askStep{border-color:var(--ask);background:var(--askbg);border-radius:20px}
 .node.autoStep{border-color:var(--auto);background:var(--autobg);border-radius:5px}
@@ -67,7 +67,7 @@ input[type=checkbox],input[type=radio]{width:auto}
 .nb{display:inline-block;font-size:10px;border:1px solid var(--line);border-radius:8px;padding:0 5px;margin-inline-end:3px;background:var(--card);color:var(--mute)}
 .nb.red{background:var(--gate);border-color:var(--gate);color:var(--card)}
 .cvtools{position:absolute;top:8px;left:8px;z-index:5;display:flex;gap:4px;flex-direction:column;direction:rtl}
-.cvhint{position:absolute;bottom:8px;left:10px;right:10px;font-size:12px;color:var(--mute);pointer-events:none;direction:rtl}
+.cvhint{position:absolute;bottom:8px;right:10px;font-size:12px;color:var(--mute);pointer-events:none;direction:rtl;background:var(--bg);border-radius:8px;padding:0 8px;max-width:calc(100% - 80px)}
 .side{position:sticky;top:8px;display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 30px);overflow:auto}
 @media(max-width:960px){.side{position:static;max-height:none}#cv{height:70vh}}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
@@ -92,8 +92,28 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
 .modal{position:fixed;inset:0;background:rgba(10,15,22,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
 .mbox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;max-width:420px;width:100%}
 .mbox p{margin:0 0 12px}
+
+.nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;direction:rtl}
+.lt{position:absolute;text-align:center;direction:rtl;display:flex;flex-direction:column;align-items:center;gap:0;pointer-events:none}
+.lt b{font-size:18px;font-weight:800}.lt small{font-size:12px}
+.frame{position:absolute;border:2px dashed var(--line);border-radius:12px;background:color-mix(in srgb,var(--lane) 70%,transparent)}
+.node{cursor:pointer}
+.node .nt{font-size:13.5px}.node .ns{font-size:11px}
+.node .no{font-size:12px;line-height:1.4;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.node.routeStep .no{display:none}
+.conn{position:absolute;height:28px;line-height:24px;padding:0 12px;border:1.5px solid var(--proj);background:var(--projbg);border-radius:14px;direction:rtl;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font-size:12px}
+.card2{position:absolute;direction:rtl;text-align:right;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:8px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.card2:hover{border-color:var(--acc)}.card2.sel{box-shadow:0 0 0 4px var(--acc)}
+.card2.locked{border-color:var(--gate);border-style:dashed}.card2.project{border-color:var(--proj);background:var(--projbg)}
+.card2 .ct{font-weight:800;font-size:13.5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-inline-end:26px}
+.card2 .cs{font-size:12px;color:var(--mute)}
+.card2 .cc{display:flex;gap:4px;flex-wrap:wrap;margin-top:auto}
+.chip2{font-size:11px;border:1px solid var(--proj);background:var(--projbg);border-radius:10px;padding:0 8px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.card2 .edit{position:absolute;top:6px;left:6px;padding:0 6px}
+.empty{position:absolute;left:300px;top:120px;width:400px;text-align:center;direction:rtl}
+.addrow{position:absolute;text-align:center;direction:rtl}
 </style>
-<div id="app" dir="rtl">
+<div id="app">
   <div class="top">
     <h1>استودیوی سازمان <small>— فلوچارت زنده؛ ویرایش کن، خروجی = متن کامل <span class="ltr">recruitment.c4</span></small></h1>
     <nav class="tabs" id="tabs"></nav>
@@ -103,16 +123,16 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
     <input type="file" id="file" accept=".c4,.txt,text/plain" hidden>
   </div>
   <div id="p-dia" class="flowwrap">
+    <div style="min-width:0"><div id="nav" class="nav"></div>
     <div id="cv">
       <div id="world"></div>
       <div class="cvtools">
         <button id="zin" title="بزرگ‌نمایی">＋</button><button id="zout" title="کوچک‌نمایی">－</button>
         <button id="zfit" title="کل نمودار در یک نگاه">⤢</button>
         <button id="bconn" title="رسم فلش: اول مبدأ بعد مقصد">↔ فلش</button>
-        <button id="blay" title="برگرداندن چیدمان اولیه">چیدمان</button>
       </div>
-      <div class="cvhint" id="cvhint">بکش = جابه‌جایی صفحه · چرخ ماوس = زوم · هر جعبه یا خط‌چین نقش را می‌شود کشید · روی جعبه یا فلش کلیک کن تا ویرایش شود</div>
-    </div>
+      <div class="cvhint" id="cvhint"></div>
+    </div></div>
     <aside class="side" id="insp"></aside>
   </div>
   <div id="p-int" class="page" hidden></div>
@@ -874,123 +894,169 @@ function ask(msg,o={}){return new Promise(res=>{
   document.body.append(m);const b=m.querySelector('#mok');if(b)b.focus()})}
 const sv=(t,a={})=>{const e=document.createElementNS('http://www.w3.org/2000/svg',t);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));return e};
 
-/* ───────── چیدمان و فلوچارت ───────── */
-const LW=204,LGAP=22,COLS=6,HEAD=40,PX=10,GY=9,NW0=190;
-let VIEW={x:10,y:10,k:.5},POS={},CONN=null,SELE=null,NEEDFIT=true,LAST=null;
-try{POS=JSON.parse(localStorage.getItem('orgFlow.pos'))||{}}catch(e){}
-const savePos=()=>{try{localStorage.setItem('orgFlow.pos',JSON.stringify(POS))}catch(e){}};
-function layout(){
-  const nodes=new Map(),lanes=[],groups=[];const W=COLS*(LW+LGAP)-LGAP;
-  M.nodes.filter(n=>n.kind==='actor').forEach((a,i)=>nodes.set(a.id,{x:W-NW0-i*(NW0+20),y:0,w:NW0,h:40,n:a,p:a.id}));
-  let y=40+30;
-  M.nodes.filter(n=>n.kind!=='actor').forEach(R=>{
-    groups.push({n:R,p:R.id,y});y+=40;
-    for(let r=0;r<R.children.length;r+=COLS){
-      const row=R.children.slice(r,r+COLS);let rowH=0;
-      row.forEach((ln,i)=>{
-        const lx=(COLS-1-i)*(LW+LGAP),lp=R.id+'.'+ln.id;let cy=y+HEAD;
-        const put=(c,p,dep)=>{const hh=dep?38:52;nodes.set(p,{x:lx+PX+dep*18,y:cy,w:LW-2*PX-dep*18,h:hh,n:c,p});cy+=hh+GY;c.children.forEach(k=>put(k,p+'.'+k.id,dep+1))};
-        ln.children.forEach(c=>put(c,lp+'.'+c.id,0));
-        lanes.push({n:ln,p:lp,x:lx,y,w:LW,h:Math.max(cy-y+PX-GY,HEAD+24)});
-        rowH=Math.max(rowH,cy-y+PX-GY);
-      });
-      y+=rowH+LGAP;
-    }
-  });
-  const ds=p=>{const s=p.split('.');let dx=0,dy=0;for(let i=1;i<=s.length;i++){const d=POS[s.slice(0,i).join('.')];if(d){dx+=d[0];dy+=d[1]}}return[dx,dy]};
-  nodes.forEach((b,p)=>{const[dx,dy]=ds(p);b.x+=dx;b.y+=dy});
-  lanes.forEach(b=>{const[dx,dy]=ds(b.p);b.x+=dx;b.y+=dy});
-  let H=y;nodes.forEach(b=>H=Math.max(H,b.y+b.h+20));lanes.forEach(b=>H=Math.max(H,b.y+b.h+20));
-  return{nodes,lanes,groups,W,H}}
-function edgeGeom(a,b){
-  const ax=a.x+a.w/2,bx=b.x+b.w/2;
-  if(Math.abs(ax-bx)<10){
-    const gap=b.y-(a.y+a.h);
-    if(gap>=0&&gap<70)return{d:`M${ax} ${a.y+a.h}L${bx} ${b.y}`,lx:ax,ly:(a.y+a.h+b.y)/2};
-    const x1=a.x+a.w,x2=b.x+b.w,y1=a.y+a.h/2,y2=b.y+b.h/2,o=40;
-    return{d:`M${x1} ${y1}C${x1+o} ${y1} ${x2+o} ${y2} ${x2} ${y2}`,lx:Math.max(x1,x2)+o*.75,ly:(y1+y2)/2}}
-  if(b.y>a.y+a.h+8){const x1=ax,y1=a.y+a.h,x2=bx,y2=b.y,k=(y2-y1)/2;return{d:`M${x1} ${y1}C${x1} ${y1+k} ${x2} ${y2-k} ${x2} ${y2}`,lx:(x1+x2)/2,ly:(y1+y2)/2}}
-  if(b.y+b.h<a.y-8){const x1=ax,y1=a.y,x2=bx,y2=b.y+b.h,k=(y1-y2)/2;return{d:`M${x1} ${y1}C${x1} ${y1-k} ${x2} ${y2+k} ${x2} ${y2}`,lx:(x1+x2)/2,ly:(y1+y2)/2}}
-  const right=bx>ax,x1=right?a.x+a.w:a.x,x2=right?b.x:b.x+b.w,y1=a.y+a.h/2,y2=b.y+b.h/2,k=Math.abs(x2-x1)/2+20;
-  return{d:`M${x1} ${y1}C${x1+(right?k:-k)} ${y1} ${x2-(right?k:-k)} ${y2} ${x2} ${y2}`,lx:(x1+x2)/2,ly:(y1+y2)/2}}
+/* ───────── فلوچارت عمودی (نمای کلی ← جزئیات هر بخش) ───────── */
+/* قراردادها: جریان از بالا به پایین؛ مستطیل = قدم، بیضی = ask، شش‌ضلعی = تصمیم (route)، کادر ضخیم = gate؛
+   پرش به قدم‌های دورتر کنار جعبه‌ها می‌رود؛ ارتباط با بخش دیگر = دکمهٔ اتصال‌دهنده (مثل off-page connector) */
+let VIEW={x:10,y:10,k:1},VIEWP='ov:company',CONN=null,SELE=null,NEEDFIT=true,LAST=null;
+const roots=()=>M.nodes.filter(n=>n.kind!=='actor');
+const laneOf=p=>p.split('.').slice(0,2).join('.');
+function go(vp,sel){VIEWP=vp;SEL=sel||null;SELE=null;NEEDFIT=true;setConn(false);TAB='dia';showTab()}
+function jump(p){const s=p.split('.');if(s.length===1){select(p)}else go(laneOf(p),p)}
+const outText=n=>(n.desc||'').replace(/^out:\s*/,'');
+function renderNav(){
+  const nav=$('#nav');nav.replaceChildren();
+  roots().forEach(R=>nav.append(h('button',{class:VIEWP==='ov:'+R.id?'on':'',onclick:()=>go('ov:'+R.id)},R.title.replace(/\s*\(.*$/,''))));
+  if(!VIEWP.startsWith('ov:')&&IDX.has(VIEWP)){
+    const ln=IDX.get(VIEWP),par=IDX.get(parentPath(VIEWP)),sib=par.children,i=sib.findIndex(c=>c.id===ln.id);
+    nav.append(h('span',{class:'mute'},'›'),h('b',{},ln.title),
+      h('button',{class:'sm',disabled:i<=0,onclick:()=>go(par.id+'.'+sib[i-1].id)},'› قبلی'),
+      h('button',{class:'sm',disabled:i>=sib.length-1,onclick:()=>go(par.id+'.'+sib[i+1].id)},'بعدی ‹'),
+      h('button',{class:'sm',onclick:()=>select(VIEWP)},'✎ ویرایش این بخش'),
+      h('button',{class:'sm',onclick:()=>go('ov:'+par.id)},'↑ نمای کلی'))}}
 function applyView(){$('#world').style.transform=`translate(${VIEW.x}px,${VIEW.y}px) scale(${VIEW.k})`}
 function fit(all){if(!LAST)return;const cv=$('#cv'),w=cv.clientWidth,hh=cv.clientHeight;if(!w)return;
-  const kw=w/(LAST.W+40),k=all===true?Math.min(kw,hh/(LAST.H+40)):Math.min(kw,1);VIEW.k=Math.max(.15,k);VIEW.x=(w-LAST.W*VIEW.k)/2;VIEW.y=10;applyView();NEEDFIT=false}
+  const kw=w/(LAST.W+30),k=all===true?Math.min(kw,hh/(LAST.H+30)):all==='ov'?Math.max(Math.min(kw,hh/(LAST.H+30)),.62):Math.min(kw,1.05);VIEW.k=Math.max(.2,k);VIEW.x=(w-LAST.W*VIEW.k)/2;VIEW.y=8;applyView();NEEDFIT=false}
+const polyD=pts=>pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join('');
+function drawEdge(svg,d,{on,dim,dash,label,lx,ly,anchor,idx}){
+  svg.append(sv('path',{d,fill:'none',style:`stroke:var(${on?'--acc':'--edge'})`,'stroke-width':on?3:1.7,'stroke-opacity':dim?.25:1,'stroke-dasharray':dash?'7 5':'none','stroke-linejoin':'round','marker-end':`url(#${on?'m1':'m0'})`}));
+  svg.append(sv('path',{d,fill:'none',stroke:'transparent','stroke-width':16,class:'hit','data-e':idx}));
+  if(label){const t=sv('text',{x:lx,y:ly,'font-size':12.5,'text-anchor':anchor||'middle',style:`fill:var(${on?'--acc':'--mute'});paint-order:stroke;stroke:var(--bg);stroke-width:5px;font-family:var(--font);font-weight:600`});t.textContent=label;svg.append(t)}}
+function newSvg(W,H){const svg=sv('svg',{id:'edges',width:W,height:H});const defs=sv('defs');
+  [['m0','var(--edge)'],['m1','var(--acc)']].forEach(([id,c])=>{const m=sv('marker',{id,viewBox:'0 0 10 10',refX:8.5,refY:5,markerWidth:8,markerHeight:8,orient:'auto'});m.append(sv('path',{d:'M0 0L10 5L0 10z',style:'fill:'+c}));defs.append(m)});svg.append(defs);return svg}
+function nodeEl(n,p,b,full){
+  const lk=lockedN(n),kind=n.kind==='actor'?'actor':n.kind==='tool'?'tool'+(n.tags.includes('gated')?' gated':''):n.kind;
+  return h('div',{class:`node ${kind}${lk?' locked':''}${SEL===p?' sel':''}${CONN&&CONN.from===p?' src':''}`,'data-p':p,style:`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`},
+    h('div',{class:'nt'},(lk?'🔒 ':'')+n.title),
+    n.tech?h('div',{class:'ns'},n.tags.includes('gated')&&n.kind==='tool'?h('span',{class:'nb red'},'تأیید انسانی'):null,n.tags.includes('unknownSkill')?h('span',{class:'nb'},'skill؟'):null,n.tech):null,
+    full&&outText(n)?h('div',{class:'no'},outText(n)):null)}
 function renderDia(){
-  const L=layout();LAST=L;const world=$('#world');world.replaceChildren();
-  world.style.width=L.W+'px';world.style.height=L.H+'px';
-  L.lanes.forEach(b=>{const n=b.n,lk=lockedN(n);
-    world.append(h('div',{class:'lane'+(n.kind==='project'?' proj':'')+(lk?' locked':'')+(SEL===b.p?' sel':''),style:`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`},
-      h('div',{class:'lh','data-p':b.p},h('span',{class:'t'},titleName(n)+(n.kind==='role'||n.kind==='section'?'':'')),
-        n.tags.includes('designed')?h('span',{class:'nb'},'طراحی‌شده'):null,lk?h('span',{},'🔒'):null,
-        h('button',{class:'sm',title:'افزودن زیرمجموعه',disabled:lk,onclick:ev=>{ev.stopPropagation();addChild(b.p)}},'＋'))))});
-  const svg=sv('svg',{id:'edges',width:L.W,height:L.H});
-  const defs=sv('defs');[['m0','var(--edge)'],['m1','var(--acc)']].forEach(([id,c])=>{const m=sv('marker',{id,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto'});m.append(sv('path',{d:'M0 0L10 5L0 10z',style:'fill:'+c}));defs.append(m)});
-  svg.append(defs);
-  const hasSel=SEL||SELE!=null;
-  M.rels.forEach((r,i)=>{
-    const a=L.nodes.get(r.from)||L.lanes.find(x=>x.p===r.from),b=L.nodes.get(r.to)||L.lanes.find(x=>x.p===r.to);if(!a||!b)return;
-    const g=edgeGeom(a,b);
-    const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=hasSel&&!on;
-    const cross=cardOf(r.from)!==cardOf(r.to);
-    const p=sv('path',{d:g.d,fill:'none',style:`stroke:var(${on?'--acc':'--edge'})`,'stroke-width':on?3:1.5,'stroke-opacity':dim?.25:1,'stroke-dasharray':cross&&!on?'6 4':'none','marker-end':`url(#${on?'m1':'m0'})`});
-    svg.append(p);
-    svg.append(sv('path',{d:g.d,fill:'none',stroke:'transparent','stroke-width':14,class:'hit','data-e':i}));
-    if(r.label&&(!dim||SELE===i)){const t=sv('text',{x:g.lx,y:g.ly+4,'font-size':11,'text-anchor':'middle',style:`fill:var(${on?'--acc':'--mute'});paint-order:stroke;stroke:var(--bg);stroke-width:4px;font-family:var(--font)`,'stroke-opacity':1});t.textContent=r.label;svg.append(t)}});
-  world.append(svg);
-  L.nodes.forEach((b,p)=>{const n=b.n,lk=lockedN(n);
-    const kind=n.kind==='actor'?'actor':n.kind==='tool'?'tool'+(n.tags.includes('gated')?' gated':''):n.kind;
-    world.append(h('div',{class:`node ${kind}${lk?' locked':''}${SEL===p?' sel':''}${CONN&&CONN.from===p?' src':''}`,'data-p':p,style:`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`},
-      h('div',{class:'nt'},(n.kind==='actor'?'👤 ':'')+(lk?'🔒 ':'')+n.title),
-      n.kind==='actor'?null:h('div',{class:'ns'},
-        n.tags.includes('gated')&&n.kind==='tool'?h('span',{class:'nb red'},'تأیید انسانی'):null,
-        n.tags.includes('unknownSkill')?h('span',{class:'nb'},'skill؟'):null,
-        n.tech||'')))});
-  L.groups.forEach(g=>world.append(h('div',{class:'grp',style:`left:0;top:${g.y}px;width:${L.W}px;height:34px`},
-    h('b',{},g.n.title),h('small',{style:'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0'},(g.n.desc||'').slice(0,90)),
-    h('button',{class:'sm',onclick:()=>addChild(g.p)},g.n.kind==='flow'?'＋ بخش':g.n.children.some(c=>c.kind==='project')||g.n.id==='projects'?'＋ پروژه':'＋ نقش'))));
-  applyView();
-  if(NEEDFIT&&!$('#p-dia').hidden)fit()}
+  renderNav();
+  if(!VIEWP.startsWith('ov:')&&!IDX.has(VIEWP))VIEWP='ov:'+roots()[0].id;
+  if(VIEWP.startsWith('ov:')&&!IDX.has(VIEWP.slice(3)))VIEWP='ov:'+roots()[0].id;
+  LAST=VIEWP.startsWith('ov:')?renderOverview(VIEWP.slice(3)):renderLane(VIEWP);
+  applyView();if(NEEDFIT&&!$('#p-dia').hidden)fit()}
 
-/* بوم: کشیدن، زوم، کلیک */
+/* نمای جزئیات: یک بخش، عمودی */
+function renderLane(lp){
+  const lane=IDX.get(lp),world=$('#world');world.replaceChildren();
+  const CW=330,NHH=88,CHH=60,VG=46,CX=500,W=1100;
+  const boxes=new Map(),order=[],frames=[];let y=64;
+  lane.children.forEach(c=>{
+    const p=lp+'.'+c.id,b={x:CX-CW/2,y,w:CW,h:NHH,n:c,p,outY:y+NHH};boxes.set(p,b);order.push(b);let by=y+NHH;
+    if(c.children.length){let cy=y+NHH+24;const cw=CW-70;
+      c.children.forEach(k=>{const kb={x:CX-cw/2,y:cy,w:cw,h:CHH,n:k,p:p+'.'+k.id,outY:cy+CHH};boxes.set(kb.p,kb);order.push(kb);cy+=CHH+30});
+      const fb=cy-30+14;frames.push({x:CX-CW/2+6,y:y+NHH+8,w:CW-12,h:fb-(y+NHH+8)});b.outY=fb;by=fb}
+    y=by+VG});
+  const H=Math.max(y+30,200),svg=newSvg(W,H);
+  world.style.width=W+'px';world.style.height=H+'px';
+  world.append(h('div',{class:'lt',style:`left:0;top:6px;width:${W}px`},h('b',{},lane.title),h('small',{},lane.desc||'')));
+  frames.forEach(f=>world.append(h('div',{class:'frame',style:`left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px`})));
+  world.append(svg);
+  // یال‌ها
+  const hasSel=SEL||SELE!=null,R=[],Lf=[],pills=new Map();
+  const cnt=(m,k)=>{const v=(m.get(k)||0);m.set(k,v+1);return v};const pcount=new Map();
+  M.rels.forEach((r,i)=>{
+    const a=boxes.get(r.from),b=boxes.get(r.to);
+    const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=hasSel&&!on,o={on,dim,idx:i,label:r.label};
+    if(a&&b&&a!==b){
+      const between=order.some(x=>x!==a&&x!==b&&x.y>=a.outY&&x.y<b.y);
+      if(b.y>=a.outY-1&&!between){const x=Math.min(a.x+a.w,b.x+b.w)-20-(a.x+a.w-(b.x+b.w))*0;const xa=(a.x+a.w/2+b.x+b.w/2)/2;
+        drawEdge(svg,polyD([[xa,a.outY],[xa,b.y]]),{...o,lx:xa+8,ly:(a.outY+b.y)/2+4,anchor:'start'})}
+      else if(b.y>a.y)R.push({r,i,a,b,o,span:b.y-a.y});else Lf.push({r,i,a,b,o,span:a.y-b.y})}
+    else if(a&&!b&&IDX.has(r.to)){const k=cnt(pcount,r.from);const py=a.y+8+k*36,px=CX+CW/2+190;
+      pills.set('o'+i,{x:px,y:py,w:220,p:r.to,dir:'out',i});
+      drawEdge(svg,polyD([[a.x+a.w,a.y+a.h/2],[a.x+a.w+18,a.y+a.h/2],[a.x+a.w+18,py+14],[px,py+14]]),{...o,label:r.label,lx:a.x+a.w+24,ly:py+8,anchor:'start'})}
+    else if(b&&!a&&IDX.has(r.from)){const k=cnt(pcount,r.to);const py=b.y+8+k*36,px=20;
+      pills.set('i'+i,{x:px,y:py,w:220,p:r.from,dir:'in',i});
+      drawEdge(svg,polyD([[px+220,py+14],[b.x-18,py+14],[b.x-18,b.y+b.h/2],[b.x,b.y+b.h/2]]),{...o,label:r.label,lx:b.x-24,ly:py+8,anchor:'end'})}});
+  R.sort((p,q)=>p.span-q.span).forEach((e,k)=>{const off=62+16*k,x1=e.a.x+e.a.w,x2=e.b.x+e.b.w,xm=Math.max(x1,x2)+off,y1=e.a.y+e.a.h/2,y2=e.b.y+e.b.h/2;
+    drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{...e.o,label:e.r.label,lx:xm+6,ly:(y1+y2)/2,anchor:'start'})});
+  Lf.sort((p,q)=>p.span-q.span).forEach((e,k)=>{const off=62+16*k,x1=e.a.x,x2=e.b.x,xm=Math.min(x1,x2)-off,y1=e.a.y+e.a.h/2,y2=e.b.y+e.b.h/2;
+    drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{...e.o,dash:1,label:e.r.label,lx:xm-6,ly:(y1+y2)/2,anchor:'end'})});
+  boxes.forEach((b,p)=>world.append(nodeEl(b.n,p,b,true)));
+  pills.forEach(pl=>world.append(h('div',{class:'conn','data-chip':pl.p,style:`left:${pl.x}px;top:${pl.y}px;width:${pl.w}px`,title:'برو به آن بخش'},(pl.dir==='out'?'↗ ':'↙ ')+nodeLabel(pl.p))));
+  if(!lane.children.length)world.append(h('div',{class:'empty'},'این بخش هنوز قدمی ندارد. دکمهٔ «＋» را بزن.',h('button',{class:'pri',style:'margin-top:8px',onclick:()=>addChild(lp)},'＋ افزودن قدم')));
+  else world.append(h('div',{class:'addrow',style:`left:${CX-CW/2}px;top:${y-VG+10}px;width:${CW}px`},h('button',{class:'sm',disabled:lockedN(lane),onclick:()=>addChild(lp)},'＋ قدم تازه')));
+  return{W,H}}
+
+/* نمای کلی: بخش‌ها به‌صورت لایه‌های عمودی */
+function renderOverview(rid){
+  const R=IDX.get(rid),world=$('#world');world.replaceChildren();
+  const CWd=232,CHt=82,VG=56,HG=34;
+  const nodeOf=p=>{const s=p.split('.');if(s[0]===rid&&s.length>=2)return rid+'.'+s[1];const n=IDX.get(p);return s.length===1&&n&&n.kind==='actor'?p:null};
+  const agg=new Map(),ext=new Map();
+  M.rels.forEach((r,i)=>{const a=nodeOf(r.from),b=nodeOf(r.to);
+    if(a&&b&&a!==b){const k=a+'|'+b;if(!agg.has(k))agg.set(k,{a,b,idx:[],labels:[]});const e=agg.get(k);e.idx.push(i);if(r.label&&!e.labels.includes(r.label))e.labels.push(r.label)}
+    else if(a&&!b&&a.includes('.')&&IDX.has(r.to)){if(!ext.has(a))ext.set(a,[]);ext.get(a).push({p:r.to,dir:'out'})}
+    else if(b&&!a&&b.includes('.')&&IDX.has(r.from)){if(!ext.has(b))ext.set(b,[]);ext.get(b).push({p:r.from,dir:'in'})}});
+  const used=new Set();agg.forEach(e=>{used.add(e.a);used.add(e.b)});
+  const ids=[...M.nodes.filter(n=>n.kind==='actor'&&used.has(n.id)).map(n=>n.id),...R.children.map(c=>rid+'.'+c.id)];
+  const adj=new Map(ids.map(id=>[id,[]]));agg.forEach(e=>adj.get(e.a)&&adj.get(e.a).push(e));
+  const hasIn=new Set([...agg.values()].map(e=>e.b)),state=new Map(),back=new Set();
+  const dfs=u=>{state.set(u,1);adj.get(u).forEach(e=>{const s=state.get(e.b);if(s===1)back.add(e);else if(!s)dfs(e.b)});state.set(u,2)};
+  ids.filter(id=>!hasIn.has(id)).concat(ids).forEach(id=>{if(!state.get(id))dfs(id)});
+  const rank=new Map(ids.map(id=>[id,0]));
+  for(let t=0;t<ids.length;t++)agg.forEach(e=>{if(!back.has(e)&&rank.get(e.a)!==undefined&&rank.get(e.b)<rank.get(e.a)+1)rank.set(e.b,rank.get(e.a)+1)});
+  const rows=[];ids.forEach(id=>{const r=rank.get(id);(rows[r]=rows[r]||[]).push(id)});
+  const maxC=Math.max(...rows.filter(Boolean).map(r=>r.length),1),W=Math.max(maxC*(CWd+HG)-HG+160,560),pos=new Map();
+  let ry=50;
+  rows.filter(Boolean).forEach(row=>{const tw=row.length*(CWd+HG)-HG;row.forEach((id,i)=>pos.set(id,{x:(W-tw)/2+i*(CWd+HG),y:ry,w:CWd,h:id.includes('.')?CHt:46}));ry+=CHt+VG});
+  const H=ry,svg=newSvg(W,H);world.style.width=W+'px';world.style.height=H+'px';
+  world.append(h('div',{class:'lt',style:`left:0;top:6px;width:${W}px`},h('b',{},R.title),h('small',{},'روی هر بخش کلیک کن تا فلوچارت عمودی‌اش باز شود')));
+  world.append(svg);
+  const hasSel=SEL||SELE!=null;
+  agg.forEach(e=>{const a=pos.get(e.a),b=pos.get(e.b);if(!a||!b)return;
+    const on=SELE!=null&&e.idx.includes(SELE)||(SEL&&(e.a===SEL||e.b===SEL)),dim=hasSel&&!on;
+    const lab=e.labels.slice(0,2).join(' · ')+(e.labels.length>2?' …':'');
+    const o={on,dim,idx:e.idx[0],label:lab};
+    if(back.has(e)){const x1=a.x,x2=b.x,xm=Math.min(x1,x2)-34-((e.idx[0]%3)*12),y1=a.y+a.h/2,y2=b.y+b.h/2;
+      drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{...o,dash:1,lx:xm-6,ly:(y1+y2)/2,anchor:'end'})}
+    else{const x1=a.x+a.w/2,y1=a.y+a.h,x2=b.x+b.w/2,y2=b.y,k=(y2-y1)/2;
+      drawEdge(svg,`M${x1} ${y1}C${x1} ${y1+k} ${x2} ${y2-k} ${x2} ${y2}`,{...o,lx:(x1+x2)/2+4,ly:(y1+y2)/2-2,anchor:'start'})}});
+  ids.forEach(id=>{const b=pos.get(id),n=IDX.get(id),lk=lockedN(n);
+    if(!id.includes('.')){world.append(h('div',{class:'node actor'+(SEL===id?' sel':''),'data-p':id,style:`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`},h('div',{class:'nt'},'👤 '+n.title)));return}
+    const steps=[];walk(n.children,'',c=>{if(isStep(c)||c.kind==='tool')steps.push(c)});
+    const chips=(ext.get(id)||[]).slice(0,2);
+    world.append(h('div',{class:'card2 '+n.kind+(lk?' locked':'')+(SEL===id?' sel':''),'data-p':id,style:`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`},
+      h('div',{class:'ct'},(lk&&n.kind==='project'?'🔒 ':'')+n.title),
+      h('div',{class:'cs'},toFa(steps.length)+(n.kind==='project'?' ابزار':' قدم'),n.tags.includes('designed')?h('span',{class:'nb'},'طراحی‌شده'):null,n.kind==='project'?h('span',{class:'nb'},n.tech||''):null),
+      h('div',{class:'cc'},chips.map(c=>h('span',{class:'chip2','data-chip':c.p,title:'برو به '+nodeLabel(c.p)},(c.dir==='out'?'↗ ':'↙ ')+nodeLabel(c.p).slice(0,26)))),
+      h('button',{class:'sm edit',title:'ویرایش مشخصات این بخش'},'✎')))});
+  return{W,H}}
+
+/* رویدادهای بوم: کشیدن صفحه، زوم، کلیک */
 (function(){
   const cv=$('#cv');let drag=null;
   cv.addEventListener('pointerdown',e=>{
-    if(e.target.closest('button,.cvtools'))return;
+    if(e.target.closest('.cvtools'))return;
     cv.setPointerCapture(e.pointerId);
-    const nd=e.target.closest('.node'),lh=e.target.closest('.lh');
-    drag={id:e.pointerId,x:e.clientX,y:e.clientY,lx:e.clientX,ly:e.clientY,moved:0,target:e.target,vx:VIEW.x,vy:VIEW.y,
-      kind:nd?(CONN?'click':'node'):lh?'lane':'pan',p:(nd||lh)?(nd||lh).dataset.p:null}});
+    drag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:0,target:e.target,vx:VIEW.x,vy:VIEW.y}});
   cv.addEventListener('pointermove',e=>{
     if(!drag||e.pointerId!==drag.id)return;
     const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.moved=Math.max(drag.moved,Math.abs(dx)+Math.abs(dy));
-    if(drag.moved<4)return;
-    if(drag.kind==='pan'){VIEW.x=drag.vx+dx;VIEW.y=drag.vy+dy;applyView()}
-    else if(drag.kind==='node'||drag.kind==='lane'){
-      const ix=(e.clientX-drag.lx)/VIEW.k,iy=(e.clientY-drag.ly)/VIEW.k;
-      const d=POS[drag.p]||[0,0];POS[drag.p]=[d[0]+ix,d[1]+iy];renderDia()}
-    drag.lx=e.clientX;drag.ly=e.clientY});
-  const up=e=>{
-    if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;
-    if(d.moved>=4){if(d.kind==='node'||d.kind==='lane')savePos();return}
-    const t=d.target,ed=t.closest&&t.closest('[data-e]');
-    if(ed){SELE=+ed.getAttribute('data-e');SEL=null;renderDia();renderInsp();return}
-    if(d.p&&(d.kind==='click'||d.kind==='node')){clickNode(d.p);return}
-    if(d.kind==='lane'){select(d.p);return}
-    SEL=null;SELE=null;renderDia();renderInsp()};
-  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',()=>{drag=null});
-  cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
-    const k0=VIEW.k,k1=Math.min(2.5,Math.max(.12,k0*Math.exp(-e.deltaY*.0015)));
-    VIEW.x=mx-(mx-VIEW.x)*(k1/k0);VIEW.y=my-(my-VIEW.y)*(k1/k0);VIEW.k=k1;applyView()},{passive:false});
-  const zoom=f=>{const r=cv.getBoundingClientRect(),mx=r.width/2,my=r.height/2,k0=VIEW.k,k1=Math.min(2.5,Math.max(.12,k0*f));VIEW.x=mx-(mx-VIEW.x)*(k1/k0);VIEW.y=my-(my-VIEW.y)*(k1/k0);VIEW.k=k1;applyView()};
+    if(drag.moved<5)return;VIEW.x=drag.vx+dx;VIEW.y=drag.vy+dy;applyView()});
+  cv.addEventListener('pointerup',e=>{
+    if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;if(d.moved>=5)return;
+    const t=d.target;if(!t.closest)return;
+    const ed=t.closest('[data-e]');if(ed){SELE=+ed.getAttribute('data-e');SEL=null;renderDia();renderInsp();return}
+    const ch=t.closest('[data-chip]');if(ch){jump(ch.getAttribute('data-chip'));return}
+    const nd=t.closest('.node');if(nd){clickNode(nd.dataset.p);return}
+    const cd=t.closest('.card2');if(cd){if(t.closest('.edit'))select(cd.dataset.p);else go(cd.dataset.p);return}
+    if(t.closest('button,.addrow'))return;
+    SEL=null;SELE=null;renderDia();renderInsp()});
+  cv.addEventListener('pointercancel',()=>{drag=null});
+  cv.addEventListener('wheel',e=>{e.preventDefault();
+    if(e.ctrlKey||e.metaKey){const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,k0=VIEW.k,k1=Math.min(2.5,Math.max(.2,k0*Math.exp(-e.deltaY*.01)));VIEW.x=mx-(mx-VIEW.x)*(k1/k0);VIEW.y=my-(my-VIEW.y)*(k1/k0);VIEW.k=k1}
+    else{VIEW.y-=e.deltaY;VIEW.x-=e.deltaX}applyView()},{passive:false});
+  const zoom=f=>{const r=cv.getBoundingClientRect(),mx=r.width/2,my=r.height/2,k0=VIEW.k,k1=Math.min(2.5,Math.max(.2,k0*f));VIEW.x=mx-(mx-VIEW.x)*(k1/k0);VIEW.y=my-(my-VIEW.y)*(k1/k0);VIEW.k=k1;applyView()};
   $('#zin').onclick=()=>zoom(1.25);$('#zout').onclick=()=>zoom(.8);$('#zfit').onclick=()=>fit(true);
-  $('#blay').onclick=async()=>{if(await ask('جابه‌جایی‌های دستی جعبه‌ها پاک شود و چیدمان اولیه برگردد؟ (محتوای C4 تغییر نمی‌کند)')){POS={};savePos();renderDia();fit()}};
   $('#bconn').onclick=()=>setConn(!CONN);
   window.addEventListener('keydown',e=>{if(e.key==='Escape'&&CONN)setConn(false)});
   window.addEventListener('resize',()=>{if(TAB==='dia')fit()});
 })();
-function setConn(on){CONN=on?{from:null}:null;$('#cv').classList.toggle('conn',!!CONN);$('#bconn').classList.toggle('on',!!CONN);
-  $('#cvhint').textContent=CONN?'حالت رسم فلش: اول جعبهٔ مبدأ، بعد جعبهٔ مقصد را بزن. Esc = لغو':'بکش = جابه‌جایی صفحه · چرخ ماوس = زوم · هر جعبه یا خط‌چین نقش را می‌شود کشید · روی جعبه یا فلش کلیک کن تا ویرایش شود';renderDia()}
+const HINT='بکش یا چرخ ماوس = بالا و پایین · Ctrl+چرخ = زوم · روی بخش کلیک کن تا فلوچارتش باز شود · روی قدم یا فلش کلیک کن تا ویرایش شود';
+function setConn(on){CONN=on?{from:null}:null;const cv=$('#cv');cv.classList.toggle('conn',!!CONN);$('#bconn').classList.toggle('on',!!CONN);
+  $('#cvhint').textContent=CONN?(VIEWP.startsWith('ov:')?'برای رسم فلش اول یک بخش را باز کن (فلش بین قدم‌هاست). Esc = لغو':'حالت رسم فلش: اول قدم مبدأ، بعد قدم مقصد را بزن. Esc = لغو'):HINT;if(IDX.size)renderDia()}
 async function clickNode(p){
   if(!CONN){select(p);return}
   if(!CONN.from){CONN.from=p;renderDia();return}
@@ -1030,7 +1096,6 @@ function renameId(p,nid){
   if(!/^[A-Za-z_][A-Za-z0-9_]*$/.test(nid)||list.some(c=>c.id===nid))return false;
   const np=(parentPath(p)?parentPath(p)+'.':'')+nid,rw=s=>s===p||s.startsWith(p+'.')?np+s.slice(p.length):s;
   M.rels.forEach(r=>{r.from=rw(r.from);r.to=rw(r.to);r.c=rw(r.c.join('.')||'_').split('.').filter(x=>x!=='_')});
-  Object.keys(POS).forEach(k=>{const nk=rw(k);if(nk!==k){POS[nk]=POS[k];delete POS[k]}});savePos();
   n.id=nid;reindex();SEL=np;return true}
 
 /* ───────── پنل ویرایش ───────── */
@@ -1045,7 +1110,7 @@ function renderInsp(){
       h('i',{style:'border:0;background:var(--route);clip-path:polygon(15% 0,85% 0,100% 50%,85% 100%,15% 100%,0 50%)'}),h('span',{},'route — شاخه از روی نتیجه'),
       h('i',{style:'border-color:var(--proj);border-style:dashed;border-radius:5px'}),h('span',{},'ابزار پروژه (قرمز = پشت تأیید انسانی)')),
       h('div',{class:'warn'},'🔒 قفل: فیلدها خاموش‌اند. فقط دکمهٔ «باز کردن قفل» با تأیید صریح خودت آن‌ها را باز می‌کند.')),
-      h('div',{class:'panel'},h('small',{},'روی یک جعبه کلیک کن تا نام، نوع، skill و قفلش را ویرایش کنی. روی یک فلش کلیک کن تا برچسبش را عوض کنی. برای فلش تازه دکمهٔ «↔ فلش» را بزن.')));
+      h('div',{class:'panel'},h('small',{},'روی یک جعبه کلیک کن تا نام، نوع، skill و قفلش را ویرایش کنی. روی یک فلش کلیک کن تا برچسبش را عوض کنی. برای فلش تازه دکمهٔ از پایین یا دکمهٔ «↔ فلش» بساز.')));
     return}
   const n=IDX.get(SEL),L=lockedN(n),dis=L;
   const f=(lbl,val,set,o={})=>h('label',{class:'f'},h('span',{},lbl),h(o.area?'textarea':'input',{value:o.area?null:val,disabled:dis||o.dis,class:o.ltr?'ltr':'',list:o.list,rows:o.area?3:null,oninput:e=>{set(e.target.value);touch()}},o.area?val:null));
@@ -1079,13 +1144,20 @@ function renderInsp(){
   const act=h('div',{class:'row',style:'margin-top:8px'});
   if(n.kind!=='actor'&&n.kind!=='tool')act.append(h('button',{class:'sm',disabled:dis,onclick:()=>addChild(SEL)},n.kind==='role'||n.kind==='section'?'＋ قدم':n.kind==='project'?'＋ ابزار':isStep(n)?'＋ زیرقدم':'＋ زیرمجموعه'));
   if(n.kind!=='actor'&&SEL.includes('.'))act.append(h('button',{class:'sm',onclick:()=>moveNode(SEL,-1)},'↑ بالا'),h('button',{class:'sm',onclick:()=>moveNode(SEL,1)},'↓ پایین'),h('button',{class:'sm',disabled:dis,onclick:()=>delNode(SEL)},'✕ حذف'));
+  if(SEL.split('.').length===2&&(n.kind==='role'||n.kind==='section'||n.kind==='project'))act.append(h('button',{class:'sm pri',onclick:()=>go(SEL)},'فلوچارت این بخش ←'));
   P.append(act);box.append(P);
   const E=h('div',{class:'panel'},h('h2',{},'فلش‌های این جعبه'));
   const mine=M.rels.map((r,i)=>[r,i]).filter(([r])=>r.from===SEL||r.to===SEL);
-  if(!mine.length)E.append(h('small',{},'فلشی نیست. «↔ فلش» را بزن.'));
+  if(!mine.length)E.append(h('small',{},'فلشی نیست. از پایین یا دکمهٔ «↔ فلش» بساز.'));
   mine.forEach(([r,i])=>{const out=r.from===SEL,other=out?r.to:r.from;
     E.append(h('div',{class:'edge'},h('div',{class:'row'},h('span',{},out?'← به':'→ از'),h('b',{class:'grow',style:'cursor:pointer',onclick:()=>select(other)},nodeLabel(other)),
       h('button',{class:'sm',onclick:()=>{SELE=i;SEL=null;renderDia();renderInsp()}},r.label?('«'+r.label+'»'):'برچسب'))))});
+  const sel=h('select',{},h('option',{value:''},'＋ فلش تازه به…'));
+  const opts=[];walk(M.nodes,'',(m,p)=>{if(p!==SEL&&!p.startsWith(SEL+'.')&&!SEL.startsWith(p+'.')&&m.kind!=='orgBox'&&m.kind!=='flow'&&!lockedN(m))opts.push(p)});
+  opts.forEach(p=>sel.append(h('option',{value:p},nodeLabel(p)+'  ['+p+']')));
+  const lbl=h('input',{placeholder:'برچسب (اختیاری)'});
+  E.append(h('div',{class:'edge'},L?h('small',{},'قفل است؛ فلش تازه ممکن نیست.'):[sel,h('div',{class:'row',style:'margin-top:4px'},h('span',{class:'grow'},lbl),
+    h('button',{class:'sm',onclick:()=>{if(!sel.value)return;M.rels.push({from:SEL,to:sel.value,label:lbl.value,c:lca(SEL,sel.value)});touch(true)}},'افزودن'))]));
   box.append(E);
   if(!$('#dl-tech'))document.body.append(h('datalist',{id:'dl-tech'}));
   const dl=$('#dl-tech');dl.replaceChildren();const seen=new Set();IDX.forEach(m=>{if(isStep(m)&&m.tech&&!seen.has(m.tech)){seen.add(m.tech);dl.append(h('option',{value:m.tech}))}})}
@@ -1221,14 +1293,14 @@ const TABS=[['dia','فلوچارت سازمان'],['int','پروژه‌ها و i
 function showTab(){
   $('#p-dia').hidden=TAB!=='dia';$('#p-int').hidden=TAB!=='int';$('#p-out').hidden=TAB!=='out';
   $('#tabs').replaceChildren(...TABS.map(([k,l])=>h('button',{class:TAB===k?'on':'',onclick:()=>{TAB=k;showTab()}},l)));
-  if(TAB==='dia'){renderDia();renderInsp();if(NEEDFIT)requestAnimationFrame(()=>fit())}
+  if(TAB==='dia'){renderDia();renderInsp();if(NEEDFIT)requestAnimationFrame(fit)}
   if(TAB==='int')renderInt();if(TAB==='out')renderOut()}
 function refresh(){syncAuto();showTab()}
 $('#undo').onclick=undo;
-$('#reset').onclick=async()=>{if(await ask('همهٔ تغییرات پاک شود و نمونهٔ مخزن برگردد؟')){G={};POS={};savePos();loadText(BASE,true);save();NEEDFIT=true;refresh()}};
+$('#reset').onclick=async()=>{if(await ask('همهٔ تغییرات پاک شود و نمونهٔ مخزن برگردد؟')){G={};loadText(BASE,true);save();NEEDFIT=true;refresh()}};
 $('#load').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{const f=e.target.files[0];if(!f)return;const t=await f.text();
-  try{G={};POS={};savePos();loadText(t,true);save();NEEDFIT=true;refresh()}catch(x){await ask('فایل خوانده نشد: '+x.message,{info:1})}e.target.value=''};
+  try{G={};loadText(t,true);save();NEEDFIT=true;refresh()}catch(x){await ask('فایل خوانده نشد: '+x.message,{info:1})}e.target.value=''};
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();undo()}});
 
 /* ───────── شروع ───────── */
@@ -1238,6 +1310,6 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&
     if(st&&st.cur&&st.base){G=st.G||{};BASETEXT=st.base;BASEPARSE=parseC4(BASETEXT);M=parseC4(st.cur);reindex();deriveG();G=st.G&&st.G.cats?Object.assign(G,{expires:st.G.expires||24}):G;HIST=[st.cur]}
     else loadText(BASE,true)
   }catch(e){G={};loadText(BASE,true)}
-  showTab()})();
+  $('#cvhint').textContent=HINT;showTab()})();
 window.__studio={parseC4,emitC4,get M(){return M},get BASE(){return BASE},cur,diff,addChild,IDX:()=>IDX,select,setLock,loadText};
 </script>
