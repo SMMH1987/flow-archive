@@ -102,16 +102,19 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
 .node .no{font-size:12px;line-height:1.4;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .node.routeStep .no{display:none}
 .conn{position:absolute;height:28px;line-height:24px;padding:0 12px;border:1.5px solid var(--proj);background:var(--projbg);border-radius:14px;direction:rtl;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font-size:12px}
-.card2{position:absolute;direction:rtl;text-align:right;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:8px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;overflow:hidden}
-.card2:hover{border-color:var(--acc)}.card2.sel{box-shadow:0 0 0 4px var(--acc)}
-.card2.locked{border-color:var(--gate);border-style:dashed}.card2.project{border-color:var(--proj);background:var(--projbg)}
-.card2 .ct{font-weight:800;font-size:13.5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-inline-end:26px}
+.card2{position:absolute;direction:rtl;text-align:right;background:transparent;border:2px solid var(--edge);border-radius:14px;padding:8px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.card2:hover{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 5%,transparent)}.card2.sel{box-shadow:0 0 0 4px var(--acc)}
+.card2.locked{border-color:var(--gate);border-style:dashed}.card2.project{border-color:var(--proj)}
+.card2 .ct{font-weight:800;font-size:13px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-inline-end:30px;height:38px}
 .card2 .cs{font-size:12px;color:var(--mute)}
-.card2 .cc{display:flex;gap:4px;flex-wrap:wrap;margin-top:auto}
+.card2 .cc{position:absolute;right:10px;left:10px;bottom:6px;display:flex;gap:4px;flex-wrap:nowrap;overflow:hidden}
 .chip2{font-size:11px;border:1px solid var(--proj);background:var(--projbg);border-radius:10px;padding:0 8px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .card2 .edit{position:absolute;top:6px;left:6px;padding:0 6px}
 .empty{position:absolute;left:300px;top:120px;width:400px;text-align:center;direction:rtl}
 .addrow{position:absolute;text-align:center;direction:rtl}
+.lanebox{position:absolute;border:2px solid var(--edge);border-radius:16px;background:transparent}.lanebox.locked{border-color:var(--gate);border-style:dashed}
+.lt2{position:absolute;top:8px;left:0;right:0;text-align:center;direction:rtl;display:flex;flex-direction:column;align-items:center;pointer-events:none}.lt2 b{font-size:16px;font-weight:800}.lt2 small{font-size:11.5px}
+.node[style*='height:36px'] .ns,.node[style*='height:28px'] .ns{display:none}.node[style*='height:36px'] .nt,.node[style*='height:28px'] .nt{font-size:11.5px;-webkit-line-clamp:1}.node[style*='height:36px'],.node[style*='height:28px']{padding:1px 8px}.node.routeStep[style*='height:36px']{padding:1px 18px}
 </style>
 <div id="app">
   <div class="top">
@@ -936,53 +939,64 @@ function renderDia(){
   LAST=VIEWP.startsWith('ov:')?renderOverview(VIEWP.slice(3)):renderLane(VIEWP);
   applyView();if(NEEDFIT&&!$('#p-dia').hidden)fit()}
 
-/* نمای جزئیات: یک بخش، عمودی */
+/* چیدمان یک بخش (مشترک بین نمای کلی و جزئیات) */
+function buildLane(lane,lp,o){
+  const boxes=new Map(),order=[],frames=[];let y=o.y;
+  lane.children.forEach(c=>{
+    const p=lp+'.'+c.id,b={x:o.CX-o.CW/2,y,w:o.CW,h:o.NHH,n:c,p,outY:y+o.NHH};boxes.set(p,b);order.push(b);let by=y+o.NHH;
+    if(c.children.length){let cy=y+o.NHH+o.fg;const cw=o.CW-o.ind;
+      c.children.forEach(k=>{const kb={x:o.CX-cw/2,y:cy,w:cw,h:o.CHH,n:k,p:p+'.'+k.id,outY:cy+o.CHH,child:1};boxes.set(kb.p,kb);order.push(kb);cy+=o.CHH+o.cg});
+      const fb=cy-o.cg+10;frames.push({x:b.x+4,y:y+o.NHH+6,w:o.CW-8,h:fb-(y+o.NHH+6)});b.outY=fb;by=fb}
+    y=by+o.VG});
+  return{boxes,order,frames,bottom:y-o.VG}}
+function drawInternal(svg,boxes,order,compact){
+  const hasSel=SEL||SELE!=null,R=[],Lf=[];
+  M.rels.forEach((r,i)=>{
+    const a=boxes.get(r.from),b=boxes.get(r.to);if(!a||!b||a===b)return;
+    const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=hasSel&&!on,o={on,dim,idx:i,label:(compact&&!on)?'':r.label};
+    const between=order.some(x=>x!==a&&x!==b&&x.y>=a.outY&&x.y<b.y);
+    if(b.y>=a.outY-1&&!between){const xa=(a.x+a.w/2+b.x+b.w/2)/2;drawEdge(svg,polyD([[xa,a.outY],[xa,b.y]]),{...o,lx:xa+8,ly:(a.outY+b.y)/2+4,anchor:'start'})}
+    else if(b.y>a.y)R.push({r,a,b,o,span:b.y-a.y});else Lf.push({r,a,b,o,span:a.y-b.y})});
+  const base=compact?12:62,stp=compact?8:16;
+  R.sort((p,q)=>p.span-q.span).forEach((e,k)=>{const off=base+stp*k,x1=e.a.x+e.a.w,x2=e.b.x+e.b.w,xm=Math.max(x1,x2)+off,y1=e.a.y+e.a.h/2,y2=e.b.y+e.b.h/2;
+    drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{...e.o,lx:xm+6,ly:(y1+y2)/2,anchor:'start'})});
+  Lf.sort((p,q)=>p.span-q.span).forEach((e,k)=>{const off=base+stp*k,x1=e.a.x,x2=e.b.x,xm=Math.min(x1,x2)-off,y1=e.a.y+e.a.h/2,y2=e.b.y+e.b.h/2;
+    drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{...e.o,dash:1,lx:xm-6,ly:(y1+y2)/2,anchor:'end'})})}
+
+/* نمای جزئیات: یک بخش، عمودی، داخل کادر شفاف خودش */
 function renderLane(lp){
   const lane=IDX.get(lp),world=$('#world');world.replaceChildren();
-  const CW=330,NHH=88,CHH=60,VG=46,CX=500,W=1100;
-  const boxes=new Map(),order=[],frames=[];let y=64;
-  lane.children.forEach(c=>{
-    const p=lp+'.'+c.id,b={x:CX-CW/2,y,w:CW,h:NHH,n:c,p,outY:y+NHH};boxes.set(p,b);order.push(b);let by=y+NHH;
-    if(c.children.length){let cy=y+NHH+24;const cw=CW-70;
-      c.children.forEach(k=>{const kb={x:CX-cw/2,y:cy,w:cw,h:CHH,n:k,p:p+'.'+k.id,outY:cy+CHH};boxes.set(kb.p,kb);order.push(kb);cy+=CHH+30});
-      const fb=cy-30+14;frames.push({x:CX-CW/2+6,y:y+NHH+8,w:CW-12,h:fb-(y+NHH+8)});b.outY=fb;by=fb}
-    y=by+VG});
-  const H=Math.max(y+30,200),svg=newSvg(W,H);
+  const CW=330,CX=500,W=1100;
+  const L=buildLane(lane,lp,{CX,CW,NHH:88,CHH:60,VG:46,y:92,fg:24,cg:30,ind:70});
+  const H=Math.max(L.bottom+90,260),svg=newSvg(W,H);
   world.style.width=W+'px';world.style.height=H+'px';
-  world.append(h('div',{class:'lt',style:`left:0;top:6px;width:${W}px`},h('b',{},lane.title),h('small',{},lane.desc||'')));
-  frames.forEach(f=>world.append(h('div',{class:'frame',style:`left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px`})));
+  const lk=lockedN(lane);
+  world.append(h('div',{class:'lanebox'+(lk?' locked':''),style:`left:${CX-CW/2-26}px;top:10px;width:${CW+52}px;height:${L.bottom-10+50}px`},
+    h('div',{class:'lt2'},h('b',{},lane.title),h('small',{},lane.desc||''))));
+  L.frames.forEach(f=>world.append(h('div',{class:'frame',style:`left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px`})));
   world.append(svg);
-  // یال‌ها
-  const hasSel=SEL||SELE!=null,R=[],Lf=[],pills=new Map();
-  const cnt=(m,k)=>{const v=(m.get(k)||0);m.set(k,v+1);return v};const pcount=new Map();
+  drawInternal(svg,L.boxes,L.order,false);
+  // ارتباط با بخش‌های دیگر: اتصال‌دهنده
+  const hasSel=SEL||SELE!=null,pills=[],pc=new Map();
   M.rels.forEach((r,i)=>{
-    const a=boxes.get(r.from),b=boxes.get(r.to);
-    const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=hasSel&&!on,o={on,dim,idx:i,label:r.label};
-    if(a&&b&&a!==b){
-      const between=order.some(x=>x!==a&&x!==b&&x.y>=a.outY&&x.y<b.y);
-      if(b.y>=a.outY-1&&!between){const x=Math.min(a.x+a.w,b.x+b.w)-20-(a.x+a.w-(b.x+b.w))*0;const xa=(a.x+a.w/2+b.x+b.w/2)/2;
-        drawEdge(svg,polyD([[xa,a.outY],[xa,b.y]]),{...o,lx:xa+8,ly:(a.outY+b.y)/2+4,anchor:'start'})}
-      else if(b.y>a.y)R.push({r,i,a,b,o,span:b.y-a.y});else Lf.push({r,i,a,b,o,span:a.y-b.y})}
-    else if(a&&!b&&IDX.has(r.to)){const k=cnt(pcount,r.from);const py=a.y+8+k*36,px=CX+CW/2+190;
-      pills.set('o'+i,{x:px,y:py,w:220,p:r.to,dir:'out',i});
+    const a=L.boxes.get(r.from),b=L.boxes.get(r.to);
+    const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=hasSel&&!on,o={on,dim,idx:i};
+    if(a&&!b&&IDX.has(r.to)){const k=pc.get(r.from)||0;pc.set(r.from,k+1);const py=a.y+8+k*36,px=CX+CW/2+190;
+      pills.push({x:px,y:py,p:r.to,dir:'out'});
       drawEdge(svg,polyD([[a.x+a.w,a.y+a.h/2],[a.x+a.w+18,a.y+a.h/2],[a.x+a.w+18,py+14],[px,py+14]]),{...o,label:r.label,lx:a.x+a.w+24,ly:py+8,anchor:'start'})}
-    else if(b&&!a&&IDX.has(r.from)){const k=cnt(pcount,r.to);const py=b.y+8+k*36,px=20;
-      pills.set('i'+i,{x:px,y:py,w:220,p:r.from,dir:'in',i});
+    else if(b&&!a&&IDX.has(r.from)){const k=pc.get(r.to)||0;pc.set(r.to,k+1);const py=b.y+8+k*36,px=20;
+      pills.push({x:px,y:py,p:r.from,dir:'in'});
       drawEdge(svg,polyD([[px+220,py+14],[b.x-18,py+14],[b.x-18,b.y+b.h/2],[b.x,b.y+b.h/2]]),{...o,label:r.label,lx:b.x-24,ly:py+8,anchor:'end'})}});
-  R.sort((p,q)=>p.span-q.span).forEach((e,k)=>{const off=62+16*k,x1=e.a.x+e.a.w,x2=e.b.x+e.b.w,xm=Math.max(x1,x2)+off,y1=e.a.y+e.a.h/2,y2=e.b.y+e.b.h/2;
-    drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{...e.o,label:e.r.label,lx:xm+6,ly:(y1+y2)/2,anchor:'start'})});
-  Lf.sort((p,q)=>p.span-q.span).forEach((e,k)=>{const off=62+16*k,x1=e.a.x,x2=e.b.x,xm=Math.min(x1,x2)-off,y1=e.a.y+e.a.h/2,y2=e.b.y+e.b.h/2;
-    drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{...e.o,dash:1,label:e.r.label,lx:xm-6,ly:(y1+y2)/2,anchor:'end'})});
-  boxes.forEach((b,p)=>world.append(nodeEl(b.n,p,b,true)));
-  pills.forEach(pl=>world.append(h('div',{class:'conn','data-chip':pl.p,style:`left:${pl.x}px;top:${pl.y}px;width:${pl.w}px`,title:'برو به آن بخش'},(pl.dir==='out'?'↗ ':'↙ ')+nodeLabel(pl.p))));
-  if(!lane.children.length)world.append(h('div',{class:'empty'},'این بخش هنوز قدمی ندارد. دکمهٔ «＋» را بزن.',h('button',{class:'pri',style:'margin-top:8px',onclick:()=>addChild(lp)},'＋ افزودن قدم')));
-  else world.append(h('div',{class:'addrow',style:`left:${CX-CW/2}px;top:${y-VG+10}px;width:${CW}px`},h('button',{class:'sm',disabled:lockedN(lane),onclick:()=>addChild(lp)},'＋ قدم تازه')));
+  L.boxes.forEach((b,p)=>world.append(nodeEl(b.n,p,b,true)));
+  pills.forEach(pl=>world.append(h('div',{class:'conn','data-chip':pl.p,style:`left:${pl.x}px;top:${pl.y}px;width:220px`,title:'برو به آن بخش'},(pl.dir==='out'?'↗ ':'↙ ')+nodeLabel(pl.p))));
+  if(!lane.children.length)world.append(h('div',{class:'empty'},'این بخش هنوز قدمی ندارد.',h('div',{},h('button',{class:'pri',style:'margin-top:8px',disabled:lk,onclick:()=>addChild(lp)},'＋ افزودن قدم'))));
+  else world.append(h('div',{class:'addrow',style:`left:${CX-CW/2}px;top:${L.bottom+12}px;width:${CW}px`},h('button',{class:'sm',disabled:lk,onclick:()=>addChild(lp)},'＋ قدم تازه')));
   return{W,H}}
 
-/* نمای کلی: بخش‌ها به‌صورت لایه‌های عمودی */
+/* نمای کلی: هر بخش یک کادر شفاف با فلوچارت خودش داخلش؛ کادرها در لایه‌های عمودی */
 function renderOverview(rid){
   const R=IDX.get(rid),world=$('#world');world.replaceChildren();
-  const CWd=232,CHt=82,VG=56,HG=34;
+  const CWd=262,VG=64,HG=34;
   const nodeOf=p=>{const s=p.split('.');if(s[0]===rid&&s.length>=2)return rid+'.'+s[1];const n=IDX.get(p);return s.length===1&&n&&n.kind==='actor'?p:null};
   const agg=new Map(),ext=new Map();
   M.rels.forEach((r,i)=>{const a=nodeOf(r.from),b=nodeOf(r.to);
@@ -997,31 +1011,45 @@ function renderOverview(rid){
   ids.filter(id=>!hasIn.has(id)).concat(ids).forEach(id=>{if(!state.get(id))dfs(id)});
   const rank=new Map(ids.map(id=>[id,0]));
   for(let t=0;t<ids.length;t++)agg.forEach(e=>{if(!back.has(e)&&rank.get(e.a)!==undefined&&rank.get(e.b)<rank.get(e.a)+1)rank.set(e.b,rank.get(e.a)+1)});
+  // اندازهٔ هر کادر از فلوچارت داخلش
+  const inner=new Map(),size=new Map();
+  ids.forEach(id=>{
+    if(!id.includes('.')){size.set(id,{w:CWd-30,h:46});return}
+    const n=IDX.get(id),L=buildLane(n,id,{CX:CWd/2,CW:CWd-64,NHH:36,CHH:28,VG:16,y:46,fg:10,cg:10,ind:28});
+    const chips=(ext.get(id)||[]).length;
+    inner.set(id,L);size.set(id,{w:CWd,h:(n.children.length?L.bottom+14:84)+(chips?28:0)})});
   const rows=[];ids.forEach(id=>{const r=rank.get(id);(rows[r]=rows[r]||[]).push(id)});
-  const maxC=Math.max(...rows.filter(Boolean).map(r=>r.length),1),W=Math.max(maxC*(CWd+HG)-HG+160,560),pos=new Map();
-  let ry=50;
-  rows.filter(Boolean).forEach(row=>{const tw=row.length*(CWd+HG)-HG;row.forEach((id,i)=>pos.set(id,{x:(W-tw)/2+i*(CWd+HG),y:ry,w:CWd,h:id.includes('.')?CHt:46}));ry+=CHt+VG});
+  const maxC=Math.max(...rows.filter(Boolean).map(r=>r.length),1),W=Math.max(maxC*(CWd+HG)-HG+160,620),pos=new Map();
+  let ry=56;
+  rows.filter(Boolean).forEach(row=>{const tw=row.length*(CWd+HG)-HG;let rh=0;
+    row.forEach((id,i)=>{const sz=size.get(id);pos.set(id,{x:(W-tw)/2+i*(CWd+HG)+(CWd-sz.w)/2,y:ry,w:sz.w,h:sz.h});rh=Math.max(rh,sz.h)});ry+=rh+VG});
   const H=ry,svg=newSvg(W,H);world.style.width=W+'px';world.style.height=H+'px';
-  world.append(h('div',{class:'lt',style:`left:0;top:6px;width:${W}px`},h('b',{},R.title),h('small',{},'روی هر بخش کلیک کن تا فلوچارت عمودی‌اش باز شود')));
+  world.append(h('div',{class:'lt',style:`left:0;top:6px;width:${W}px`},h('b',{},R.title),h('small',{},'کادر هر بخش فلوچارت خودش را داخلش دارد؛ روی عنوان کادر کلیک کن تا بزرگ شود')));
   world.append(svg);
+  // کادرها (شفاف)
+  ids.forEach(id=>{if(!id.includes('.'))return;const b=pos.get(id),n=IDX.get(id),lk=lockedN(n),chips=(ext.get(id)||[]).slice(0,2);
+    world.append(h('div',{class:'card2 '+n.kind+(lk?' locked':'')+(SEL===id?' sel':''),'data-p':id,style:`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`},
+      h('div',{class:'ct'},(lk&&n.kind==='project'?'🔒 ':'')+n.title),
+      n.tags.includes('designed')?h('span',{class:'nb',style:'position:absolute;top:30px;right:12px'},'طراحی‌شده'):null,
+      h('div',{class:'cc'},chips.map(c=>h('span',{class:'chip2','data-chip':c.p,title:'برو به '+nodeLabel(c.p)},(c.dir==='out'?'↗ ':'↙ ')+nodeLabel(c.p).slice(0,26)))),
+      h('button',{class:'sm edit',title:'ویرایش مشخصات این بخش'},'✎')))});
   const hasSel=SEL||SELE!=null;
   agg.forEach(e=>{const a=pos.get(e.a),b=pos.get(e.b);if(!a||!b)return;
     const on=SELE!=null&&e.idx.includes(SELE)||(SEL&&(e.a===SEL||e.b===SEL)),dim=hasSel&&!on;
     const lab=e.labels.slice(0,2).join(' · ')+(e.labels.length>2?' …':'');
     const o={on,dim,idx:e.idx[0],label:lab};
-    if(back.has(e)){const x1=a.x,x2=b.x,xm=Math.min(x1,x2)-34-((e.idx[0]%3)*12),y1=a.y+a.h/2,y2=b.y+b.h/2;
+    if(back.has(e)){const x1=a.x,x2=b.x,xm=Math.min(x1,x2)-34-((e.idx[0]%3)*12),y1=a.y+22,y2=b.y+22;
       drawEdge(svg,polyD([[x1,y1],[xm,y1],[xm,y2],[x2,y2]]),{...o,dash:1,lx:xm-6,ly:(y1+y2)/2,anchor:'end'})}
-    else{const x1=a.x+a.w/2,y1=a.y+a.h,x2=b.x+b.w/2,y2=b.y,k=(y2-y1)/2;
+    else{const x1=a.x+a.w/2,y1=a.y+a.h,x2=b.x+b.w/2,y2=b.y,k=Math.max((y2-y1)/2,20);
       drawEdge(svg,`M${x1} ${y1}C${x1} ${y1+k} ${x2} ${y2-k} ${x2} ${y2}`,{...o,lx:(x1+x2)/2+4,ly:(y1+y2)/2-2,anchor:'start'})}});
-  ids.forEach(id=>{const b=pos.get(id),n=IDX.get(id),lk=lockedN(n);
-    if(!id.includes('.')){world.append(h('div',{class:'node actor'+(SEL===id?' sel':''),'data-p':id,style:`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`},h('div',{class:'nt'},'👤 '+n.title)));return}
-    const steps=[];walk(n.children,'',c=>{if(isStep(c)||c.kind==='tool')steps.push(c)});
-    const chips=(ext.get(id)||[]).slice(0,2);
-    world.append(h('div',{class:'card2 '+n.kind+(lk?' locked':'')+(SEL===id?' sel':''),'data-p':id,style:`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`},
-      h('div',{class:'ct'},(lk&&n.kind==='project'?'🔒 ':'')+n.title),
-      h('div',{class:'cs'},toFa(steps.length)+(n.kind==='project'?' ابزار':' قدم'),n.tags.includes('designed')?h('span',{class:'nb'},'طراحی‌شده'):null,n.kind==='project'?h('span',{class:'nb'},n.tech||''):null),
-      h('div',{class:'cc'},chips.map(c=>h('span',{class:'chip2','data-chip':c.p,title:'برو به '+nodeLabel(c.p)},(c.dir==='out'?'↗ ':'↙ ')+nodeLabel(c.p).slice(0,26)))),
-      h('button',{class:'sm edit',title:'ویرایش مشخصات این بخش'},'✎')))});
+  // فلوچارت داخل هر کادر
+  ids.forEach(id=>{const b=pos.get(id);
+    if(!id.includes('.')){const n=IDX.get(id);world.append(h('div',{class:'node actor'+(SEL===id?' sel':''),'data-p':id,style:`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`},h('div',{class:'nt'},'👤 '+n.title)));return}
+    const L=inner.get(id);const mv=o=>{o.x+=b.x;o.y+=b.y;if(o.outY!==undefined)o.outY+=b.y};
+    L.boxes.forEach(mv);L.frames.forEach(f=>{f.x+=b.x;f.y+=b.y});
+    L.frames.forEach(f=>world.append(h('div',{class:'frame',style:`left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px`})));
+    drawInternal(svg,L.boxes,L.order,true);
+    L.boxes.forEach((bx,p)=>world.append(nodeEl(bx.n,p,bx,false)))});
   return{W,H}}
 
 /* رویدادهای بوم: کشیدن صفحه، زوم، کلیک */
@@ -1054,9 +1082,9 @@ function renderOverview(rid){
   window.addEventListener('keydown',e=>{if(e.key==='Escape'&&CONN)setConn(false)});
   window.addEventListener('resize',()=>{if(TAB==='dia')fit()});
 })();
-const HINT='بکش یا چرخ ماوس = بالا و پایین · Ctrl+چرخ = زوم · روی بخش کلیک کن تا فلوچارتش باز شود · روی قدم یا فلش کلیک کن تا ویرایش شود';
+const HINT='بکش یا چرخ ماوس = بالا و پایین · Ctrl+چرخ = زوم · روی عنوان کادر کلیک کن تا بزرگ شود · روی قدم یا فلش کلیک کن تا ویرایش شود';
 function setConn(on){CONN=on?{from:null}:null;const cv=$('#cv');cv.classList.toggle('conn',!!CONN);$('#bconn').classList.toggle('on',!!CONN);
-  $('#cvhint').textContent=CONN?(VIEWP.startsWith('ov:')?'برای رسم فلش اول یک بخش را باز کن (فلش بین قدم‌هاست). Esc = لغو':'حالت رسم فلش: اول قدم مبدأ، بعد قدم مقصد را بزن. Esc = لغو'):HINT;if(IDX.size)renderDia()}
+  $('#cvhint').textContent=CONN?'حالت رسم فلش: اول قدم مبدأ، بعد قدم مقصد را بزن. Esc = لغو':HINT;if(IDX.size)renderDia()}
 async function clickNode(p){
   if(!CONN){select(p);return}
   if(!CONN.from){CONN.from=p;renderDia();return}
