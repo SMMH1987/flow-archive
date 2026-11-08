@@ -457,8 +457,10 @@ model {
       #unknownSkill
       icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
       technology 'skill: —'
-      description 'out: مقایسهٔ شرکت ما با شرایط ارزیابی دانش‌بنیان؛ شرایط و مزایا UNKNOWN تا تأیید از منبع رسمی'
+      description 'out: مقایسهٔ شرکت ما با شرایط ارزیابی دانش‌بنیان؛ شرایط و مزایا UNKNOWN و پژوهشش به پروژهٔ وکیل منتقل شد'
       metadata {
+        ext_tool 'پروژهٔ وکیل (حق‌پرس)'
+        ext_kind 'API'
         agent 'ایجنت مالکیت فکری'
       }
     }
@@ -507,8 +509,10 @@ model {
       #unknownSkill
       icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
       technology 'skill: —'
-      description 'out: حسابدار، دفتر حساب، سامانهٔ مؤدیان و ارزش افزوده؛ رویه UNKNOWN تا تأیید از tax.gov.ir؛ هر اظهارنامه و پرداخت با انسان'
+      description 'out: حسابدار، دفتر حساب، سامانهٔ مؤدیان و ارزش افزوده؛ رویه UNKNOWN و پژوهشش به پروژهٔ وکیل منتقل شد؛ هر اظهارنامه و پرداخت با انسان'
       metadata {
+        ext_tool 'پروژهٔ وکیل (حق‌پرس)'
+        ext_kind 'API'
         agent 'ایجنت مالی'
       }
     }
@@ -696,8 +700,10 @@ model {
       #unknownSkill
       icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
       technology 'skill: —'
-      description 'out: لیست ماهانهٔ بیمه و مالیات حقوق؛ رویه UNKNOWN تا تأیید از tamin.ir و tax.gov.ir؛ پرداخت با انسان'
+      description 'out: لیست ماهانهٔ بیمه و مالیات حقوق؛ رویه UNKNOWN و پژوهشش به پروژهٔ وکیل منتقل شد؛ پرداخت با انسان'
       metadata {
+        ext_tool 'پروژهٔ وکیل (حق‌پرس)'
+        ext_kind 'API'
         agent 'ایجنت منابع انسانی'
       }
     }
