@@ -159,6 +159,18 @@ button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover
 .lanebox.anc{border-color:var(--line)}
 .node.role,.node.section,.node.project,.node.orgBox{background:transparent;border:2px solid var(--edge);border-radius:12px}
 .node.project{border-color:var(--proj)}
+
+.mm{overflow:auto;background:var(--lane);border:1px solid var(--line);border-radius:12px;height:calc(100vh - 150px);min-height:420px}
+.mm svg{display:block;font:13px var(--font)}
+.mm .mn rect{fill:var(--card);stroke:var(--edge);stroke-width:1.5}
+.mm .mn text{fill:var(--ink)}
+.mm .mn{cursor:pointer}.mm .mn:hover rect{stroke:var(--acc)}
+.mm .k-askStep rect{stroke:var(--ask);fill:var(--askbg)}.mm .k-autoStep rect{stroke:var(--auto);fill:var(--autobg)}
+.mm .k-gateStep rect{stroke:var(--gate);fill:var(--gatebg);stroke-width:2.5}.mm .k-routeStep rect{stroke:var(--route);fill:var(--routebg)}
+.mm .k-root rect{fill:var(--acc);stroke:var(--acc)}.mm .k-root text{fill:var(--card);font-weight:700}
+.mm .k-phase rect{stroke:var(--acc);stroke-width:2}
+.mm .mp{fill:none;stroke:var(--edge);stroke-width:1.5;opacity:.75}
+.mmbar{display:flex;gap:8px;align-items:center;margin:0 0 8px;flex-wrap:wrap}
 </style>
 <div id="app">
   <div class="top">
@@ -184,6 +196,7 @@ button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover
     </div></div>
     <aside class="side" id="insp"></aside>
   </div>
+  <div id="p-mind" class="page" hidden></div>
   <div id="p-int" class="page" hidden></div>
   <div id="p-out" class="page" hidden></div>
 </div>
@@ -1677,9 +1690,10 @@ function focusOn(p){if(!IDX.has(p))return;if(p.split('.')[0]!==rootOfView()){go(
   FOC=p;expandTo(p);NEEDFIT=false;renderDia();if(p.includes('.')&&!lastVis().has(p)){}
   const tgt=lastVis().has(p)?p:null;if(tgt)fitTo(tgt)}
 function setVer(v){VER=v;NEEDFIT=true;renderVers();renderDia();renderInsp()}
-const APP_VER=23,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
+const APP_VER=24,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
 const VIEW_VERS=[[1,'عبور','نمایش ۱','آرتیفکت v۴','۱۲:۵۹'],[2,'بازشدن درجا','نمایش ۲','آرتیفکت v۴','۱۲:۵۹'],[3,'درخت + کادرها','نمایش ۳','آرتیفکت v۴','۱۲:۵۹'],[4,'ترکیبی ۲+۳','نمایش ۴ (انتخاب تو)','آرتیفکت v۵','۱۳:۰۵']];
 const CHANGELOG=[
+ [24,'ذهن‌نقشه','تب تازهٔ ذهن‌نقشه از همان نقشه و همان خروجی C4 (بدون داده‌ٔ دوم)؛ شاخه‌ها باز و بسته می‌شوند و برگ‌ها به فلوچارت می‌روند','۱۶:۳۰'],
  [23,'پروندهٔ مشترک، یافتن skill و ثبت رویه','سه قدم تازه در استودیو: پروندهٔ مشترک استارتاپ برای همهٔ ایجنت‌ها، یافتن بهترین skill هر مرحله با تأیید انسان، و ثبت رویهٔ تکراری تا ایجنت بار بعد خودش بداند','۲۰:۵۰'],
  [22,'پژوهش ایران به پروژهٔ وکیل','رویهٔ مالیات، بیمه و دانش‌بنیان که تأیید نشده بود، به‌عنوان حوزهٔ پژوهشی تازه به پروژهٔ وکیل (حق‌پرس) منتقل شد؛ در نقشه برچسب ابزار بیرونی دارد','۰۸:۴۰'],
  [21,'سایت، تبلیغات و محتوا','سه مرحلهٔ تازه در استودیو با برچسب ثابت و پویا برای هر قدم: سایت و صفحهٔ فرود، تبلیغات، محتوا و انتشار','۱۹:۵۰'],
@@ -2331,11 +2345,59 @@ function renderOut(){
     h('pre',{id:'outpre'},body)))}
 
 /* ───────── صفحه‌ها ───────── */
-const TABS=[['dia','فلوچارت سازمان'],['int','پروژه‌ها و interop'],['out','تغییرات و خروجی C4']];
+
+/* ───────── ذهن‌نقشه: همان M، بدون کپی دوم ───────── */
+let MIND_EXP=new Set();
+const SVGNS='http://www.w3.org/2000/svg';
+const msv=(t,a,...c)=>{const e=document.createElementNS(SVGNS,t);for(const[k,v]of Object.entries(a||{})){if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(v!=null&&v!==false)e.setAttribute(k,v)}c.flat(9).forEach(x=>{if(x!=null&&x!==false)e.append(x.nodeType?x:document.createTextNode(x))});return e};
+function renderMind(){
+  const el=$('#p-mind'),ROW=34,GAP=60,LV=[0,150,360,570,780];
+  const clip=(t,n)=>{t=String(t||'—');return t.length>n?t.slice(0,n-1)+'…':t};
+  const width=t=>Math.min(230,Math.max(70,t.length*8+24));
+  const open=n=>MIND_EXP.has(n._p);
+  const rows=n=>!open(n)||!n.children.length?1:n.children.reduce((a,c)=>a+rows(c),0);
+  const tops=M.nodes;
+  const sides=[[],[]];tops.forEach((n,i)=>sides[i%2].push(n));      // راست و چپِ ریشه به‌نوبت
+  const H=Math.max(...sides.map(l=>l.reduce((a,n)=>a+rows(n),0)),4)*ROW+40;
+  const W=2*LV[4]+400,CX=W/2,CY=H/2,items=[],paths=[];
+  const place=(n,dir,depth,y0)=>{            // y0: بالای بازهٔ این زیردرخت
+    const r=rows(n),cy=y0+r*ROW/2,t=clip(n.title,depth===1?24:28),w=width(t);
+    const x=CX+dir*LV[depth];
+    items.push({n,x,y:cy,w,t,depth,dir});
+    if(open(n)&&n.children.length){let y=y0;n.children.forEach(c=>{const cr=rows(c);const ci=place(c,dir,depth+1,y);
+      paths.push({x1:x+dir*w/2,y1:cy,x2:ci.x-dir*ci.w/2,y2:ci.y});y+=cr*ROW});}
+    return items.find(i=>i.n===n)};
+  sides.forEach((list,si)=>{const dir=si===0?1:-1;let y=(H-list.reduce((a,n)=>a+rows(n),0)*ROW)/2;
+    list.forEach(n=>{const it=place(n,dir,1,y);paths.push({x1:CX+dir*60,y1:CY,x2:it.x-dir*it.w/2,y2:it.y});y+=rows(n)*ROW})});
+  const svg=msv('svg',{width:W,height:H,viewBox:`0 0 ${W} ${H}`,direction:'rtl'});
+  paths.forEach(p=>{const mx=(p.x1+p.x2)/2;svg.append(msv('path',{class:'mp',d:`M${p.x1},${p.y1} C${mx},${p.y1} ${mx},${p.y2} ${p.x2},${p.y2}`}))});
+  const root=msv('g',{class:'mn k-root'},msv('rect',{x:CX-60,y:CY-20,width:120,height:40,rx:20}),msv('text',{x:CX,y:CY+5,'text-anchor':'middle'},clip(M.nodes.length?DOCFILE().replace('.c4',''):'—',16)));
+  svg.append(root);
+  items.forEach(({n,x,y,w,t})=>{
+    const kids=n.children.length,top=!n._p.includes('.');
+    const g=msv('g',{class:'mn '+(top?'k-phase':'k-'+n.kind),onclick:()=>{
+      if(kids){open(n)?MIND_EXP.delete(n._p):MIND_EXP.add(n._p);renderMind()}
+      else{go(n._p.split('.')[0],n._p)}}},
+      msv('title',{},n.title+(kids?' — کلیک: باز و بسته':' — کلیک: نمایش در فلوچارت')),
+      msv('rect',{x:x-w/2,y:y-14,width:w,height:28,rx:top?14:kindR(n.kind)}),
+      msv('text',{x,y:y+5,'text-anchor':'middle'},t+(kids?(open(n)?' −':' +'+toFa(kids)):'')));
+    svg.append(g)});
+  el.replaceChildren(
+    h('div',{class:'mmbar'},
+      h('b',{},'ذهن‌نقشه'),h('small',{},'از همان نقشهٔ فلوچارت ساخته می‌شود؛ ویرایش در تب فلوچارت است. کلیک روی شاخه: باز و بسته؛ کلیک روی برگ: نمایش در فلوچارت.'),
+      h('button',{class:'sm',onclick:()=>{MIND_EXP=new Set();walk(M.nodes,'',(n,p)=>{if(n.children.length&&p.split('.').length<=2)MIND_EXP.add(p)});renderMind()}},'باز کردن دو سطح'),
+      h('button',{class:'sm',onclick:()=>{MIND_EXP=new Set();walk(M.nodes,'',(n,p)=>{if(n.children.length)MIND_EXP.add(p)});renderMind()}},'باز کردن همه'),
+      h('button',{class:'sm',onclick:()=>{MIND_EXP=new Set();renderMind()}},'بستن همه')),
+    h('div',{class:'mm'},svg));
+  const box=el.querySelector('.mm');box.scrollLeft=(W-box.clientWidth)/2*(getComputedStyle(box).direction==='rtl'?-1:1);box.scrollTop=Math.max(0,CY-box.clientHeight/2)}
+const kindR=k=>k==='askStep'?14:k==='routeStep'?10:k==='gateStep'?3:5;
+
+const TABS=[['dia','فلوچارت سازمان'],['mind','ذهن‌نقشه'],['int','پروژه‌ها و interop'],['out','تغییرات و خروجی C4']];
 function showTab(){
-  $('#p-dia').hidden=TAB!=='dia';$('#p-int').hidden=TAB!=='int';$('#p-out').hidden=TAB!=='out';
+  $('#p-dia').hidden=TAB!=='dia';$('#p-mind').hidden=TAB!=='mind';$('#p-int').hidden=TAB!=='int';$('#p-out').hidden=TAB!=='out';
   $('#tabs').replaceChildren(...TABS.map(([k,l])=>h('button',{class:TAB===k?'on':'',onclick:()=>{TAB=k;showTab()}},l)));
   if(TAB==='dia'){renderDia();renderInsp();if(NEEDFIT)requestAnimationFrame(fit)}
+  if(TAB==='mind')renderMind();
   if(TAB==='int')renderInt();if(TAB==='out')renderOut()}
 function refresh(){syncAuto();showTab()}
 $('#undo').onclick=undo;
