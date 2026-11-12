@@ -1690,9 +1690,10 @@ function focusOn(p){if(!IDX.has(p))return;if(p.split('.')[0]!==rootOfView()){go(
   FOC=p;expandTo(p);NEEDFIT=false;renderDia();if(p.includes('.')&&!lastVis().has(p)){}
   const tgt=lastVis().has(p)?p:null;if(tgt)fitTo(tgt)}
 function setVer(v){VER=v;NEEDFIT=true;renderVers();renderDia();renderInsp()}
-const APP_VER=24,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
+const APP_VER=25,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
 const VIEW_VERS=[[1,'عبور','نمایش ۱','آرتیفکت v۴','۱۲:۵۹'],[2,'بازشدن درجا','نمایش ۲','آرتیفکت v۴','۱۲:۵۹'],[3,'درخت + کادرها','نمایش ۳','آرتیفکت v۴','۱۲:۵۹'],[4,'ترکیبی ۲+۳','نمایش ۴ (انتخاب تو)','آرتیفکت v۵','۱۳:۰۵']];
 const CHANGELOG=[
+ [25,'خروجی Freeplane','دکمهٔ دانلود .mm در ذهن‌نقشه؛ فایل از همان مدل ساخته می‌شود و در Freeplane و FreeMind باز می‌شود','۲۳:۳۰'],
  [24,'ذهن‌نقشه','تب تازهٔ ذهن‌نقشه از همان نقشه و همان خروجی C4 (بدون داده‌ٔ دوم)؛ شاخه‌ها باز و بسته می‌شوند و برگ‌ها به فلوچارت می‌روند','۱۶:۳۰'],
  [23,'پروندهٔ مشترک، یافتن skill و ثبت رویه','سه قدم تازه در استودیو: پروندهٔ مشترک استارتاپ برای همهٔ ایجنت‌ها، یافتن بهترین skill هر مرحله با تأیید انسان، و ثبت رویهٔ تکراری تا ایجنت بار بعد خودش بداند','۲۰:۵۰'],
  [22,'پژوهش ایران به پروژهٔ وکیل','رویهٔ مالیات، بیمه و دانش‌بنیان که تأیید نشده بود، به‌عنوان حوزهٔ پژوهشی تازه به پروژهٔ وکیل (حق‌پرس) منتقل شد؛ در نقشه برچسب ابزار بیرونی دارد','۰۸:۴۰'],
@@ -2387,9 +2388,27 @@ function renderMind(){
       h('b',{},'ذهن‌نقشه'),h('small',{},'از همان نقشهٔ فلوچارت ساخته می‌شود؛ ویرایش در تب فلوچارت است. کلیک روی شاخه: باز و بسته؛ کلیک روی برگ: نمایش در فلوچارت.'),
       h('button',{class:'sm',onclick:()=>{MIND_EXP=new Set();walk(M.nodes,'',(n,p)=>{if(n.children.length&&p.split('.').length<=2)MIND_EXP.add(p)});renderMind()}},'باز کردن دو سطح'),
       h('button',{class:'sm',onclick:()=>{MIND_EXP=new Set();walk(M.nodes,'',(n,p)=>{if(n.children.length)MIND_EXP.add(p)});renderMind()}},'باز کردن همه'),
-      h('button',{class:'sm',onclick:()=>{MIND_EXP=new Set();renderMind()}},'بستن همه')),
+      h('button',{class:'sm',onclick:()=>{MIND_EXP=new Set();renderMind()}},'بستن همه'),
+      h('button',{class:'sm pri',title:'فایل برای Freeplane و FreeMind',onclick:()=>{const t=downloadMM();$('#mmcopy').value=t;$('#mmcopy').hidden=false}},'⬇ دانلود .mm (Freeplane)')),
+    h('textarea',{id:'mmcopy',class:'ltr',rows:6,hidden:true,readonly:true,title:'اگر دانلود مسدود بود، این متن را در فایل name.mm ذخیره کن'}),
     h('div',{class:'mm'},svg));
   const box=el.querySelector('.mm');box.scrollLeft=(W-box.clientWidth)/2*(getComputedStyle(box).direction==='rtl'?-1:1);box.scrollTop=Math.max(0,CY-box.clientHeight/2)}
+
+/* خروجی Freeplane (.mm) از همان M */
+function toFreeplane(){
+  const esc=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'&#10;');
+  const COL={askStep:'#d98a00',autoStep:'#2f8f4e',gateStep:'#d13438',routeStep:'#4f5bd5'};
+  const nd=(n,top,i)=>{
+    const col=COL[n.kind]?` COLOR="${COL[n.kind]}"`:'';
+    const pos=top?` POSITION="${i%2===0?'right':'left'}" FOLDED="true"`:'';
+    const attrs=[['skill',n.tech],['out',n.desc&&n.desc.replace(/^out:\s*/,'')],['id',n._p]].filter(a=>a[1]&&a[1]!=='—')
+      .map(a=>`<attribute NAME="${esc(a[0])}" VALUE="${esc(a[1])}"/>`).join('');
+    return `<node TEXT="${esc(n.title)}"${col}${pos}>${attrs}${n.children.map(c=>nd(c,false)).join('')}</node>`};
+  return `<map version="freeplane 1.9.0">\n<node TEXT="${esc(DOCFILE().replace('.c4',''))}">${M.nodes.map((n,i)=>nd(n,true,i)).join('')}</node>\n</map>\n`}
+function downloadMM(){
+  const t=toFreeplane(),name=DOCFILE().replace('.c4','')+'.mm';
+  try{const a=h('a',{href:URL.createObjectURL(new Blob([t],{type:'application/xml'})),download:name});document.body.append(a);a.click();a.remove()}catch(e){}
+  return t}
 const kindR=k=>k==='askStep'?14:k==='routeStep'?10:k==='gateStep'?3:5;
 
 const TABS=[['dia','فلوچارت سازمان'],['mind','ذهن‌نقشه'],['int','پروژه‌ها و interop'],['out','تغییرات و خروجی C4']];
