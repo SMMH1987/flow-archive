@@ -2669,6 +2669,8 @@ function renderN8n(rid){
     const used=new Map();ck.forEach((c,ci)=>cols.get(c).forEach(q=>{const li=lanes.indexOf(key(q)),k=li+':'+ci,o=used.get(k)||0;used.set(k,o+1);B.set(q,{x:X0+ci*DX+o*20,y:Y0+li*DY+o*14,w:150,h:120,ci})}));
     W=X0+NC*DX+40;H=Y0+lanes.length*DY+20}
   else if(N8LAY==='stairs'){let i=0;ck.forEach((c,ci)=>cols.get(c).forEach(q=>{B.set(q,{x:X0+ci*DX,y:Y0+(i++)*110,w:150,h:120,ci})}));W=X0+NC*DX+40;H=Y0+ps.length*110+60}
+  else if(N8LAY==='orig'&&ps.every(q=>meta(IDX.get(q),'n8n_pos'))){const P=ps.map(q=>meta(IDX.get(q),'n8n_pos').split(',').map(Number)),mx0=Math.min(...P.map(a=>a[0])),my0=Math.min(...P.map(a=>a[1]));
+    ps.forEach((q,i)=>B.set(q,{x:X0+P[i][0]-mx0-27,y:Y0+P[i][1]-my0,w:150,h:120,ci:0}));W=X0+Math.max(...P.map(a=>a[0]))-mx0+260;H=Y0+Math.max(...P.map(a=>a[1]))-my0+200}
   else{const snap=v=>Math.round(v/G16)*G16,Yc=new Map(),mid=Y0+(maxRows-1)*DY/2;
     // کاهش تقاطع (Sugiyama/dagre): چند دور مرتب‌سازی بر اساس میانگین جای همسایه‌ها، رفت و برگشت
     const pos=new Map();ck.forEach(c=>cols.get(c).forEach((q,j)=>pos.set(q,j)));
@@ -2688,7 +2690,7 @@ function renderN8n(rid){
       const t=sv('text',{x,y:y0-12,'text-anchor':'middle','font-size':12,style:'fill:var(--ink);font-family:var(--font);font-weight:700'});t.textContent='مرحلهٔ '+toFa(ci+1);svg.append(t);
       if(dayAt[NC-1]){const t2=sv('text',{x,y:y0+20,'text-anchor':'middle','font-size':11,style:'fill:var(--mute);font-family:var(--font)'});t2.textContent='تا روز '+toFa(dayAt[ci]);svg.append(t2)}}
     const lt=sv('text',{x:X0-30,y:y0+4,'text-anchor':'end','font-size':11,style:'fill:var(--mute);font-family:var(--font)'});lt.textContent='زمان →';svg.append(lt)};
-  if(document.body.classList.contains('n8full')){}else if(N8LAY==='snake'){for(let b=0;b*PER<NC;b++)axis(Y0-50+b*bandH,b*PER,Math.min(NC,(b+1)*PER))}else axis(Y0-50,0,NC);
+  if(document.body.classList.contains('n8full')||N8LAY==='orig'){}else if(N8LAY==='snake'){for(let b=0;b*PER<NC;b++)axis(Y0-50+b*bandH,b*PER,Math.min(NC,(b+1)*PER))}else axis(Y0-50,0,NC);
   if(N8LAY==='lanes')lanes.forEach((l,li)=>{const y=Y0+li*DY-18;svg.append(sv('rect',{x:10,y,width:W-20,height:DY-8,rx:8,style:'fill:var(--card);stroke:var(--line)','fill-opacity':.55}));
     const t=sv('text',{x:20,y:y+DY/2,'font-size':12.5,style:'fill:var(--ink);font-family:var(--font);font-weight:700'});t.textContent=l.length>16?l.slice(0,15)+'…':l;svg.append(t)});
   world.style.width=W+'px';world.style.height=H+'px';world.style.direction='ltr';world.append(svg);
@@ -2730,6 +2732,24 @@ function renderN8n(rid){
     svg.append(sv('path',{d:`M${b.x+75+HB+6} ${b.y+HB} L${b.x+75+HB+44} ${b.y+HB}`,style:'stroke:var(--n8e)','stroke-width':2}))});
   if(!ps.length)world.append(h('div',{class:'empty'},'این بخش هنوز قدمی ندارد.'));
   return{W:W+80,H,vis}}
+
+
+/* ───────── ورود ورک‌فلوی n8n (JSON) ← .c4 ─────────
+   نوع گره‌ها نگاشت می‌شود؛ مختصات اصلی n8n در metadata n8n_pos نگه داشته می‌شود تا هر دو چیدمان مقایسه شوند. */
+function n8nToC4(wf){
+  const spec=(BASE.match(/specification\s*\{/)?BASE.slice(BASE.indexOf('specification'),matchBrace(BASE,BASE.indexOf('{',BASE.indexOf('specification')))+1):'');
+  const kindOf=t=>/trigger|webhook|cron|schedule/i.test(t)?'triggerStep':/\.(if|switch|filter)$/i.test(t)?'routeStep':/\.(wait|form)$|sendAndWait/i.test(t)?'gateStep':/executeWorkflow/i.test(t)?'subflowStep':/stickyNote/i.test(t)?'noteStep':'autoStep';
+  const q=s=>"'"+String(s).replace(/\\/g,'').replace(/'/g,'’')+"'";
+  const ids=new Map();(wf.nodes||[]).forEach((n,i)=>ids.set(n.name,'n'+(i+1)));
+  const L=['model {','  wf = orgBox '+q(wf.name||'n8n workflow')+' {',"    description 'out: وارد شده از n8n'"];
+  (wf.nodes||[]).filter(n=>!/stickyNote/.test(n.type)).forEach(n=>{L.push(`    ${ids.get(n.name)} = ${kindOf(n.type)} ${q(n.name)} {`,`      technology ${q('n8n: '+n.type.replace(/^n8n-nodes-base\./,''))}`,`      metadata {`,`        n8n_pos ${q((n.position||[0,0]).join(','))}`,`      }`,`    }`)});
+  Object.entries(wf.connections||{}).forEach(([from,c])=>(c.main||[]).forEach((outs,oi)=>(outs||[]).forEach(o=>{if(ids.has(from)&&ids.has(o.node)){
+    const isIf=/\.if$/.test((wf.nodes.find(n=>n.name===from)||{}).type||''),lb=isIf?(oi===0?'true':'false'):((c.main.length>1)?'output '+oi:'بعد');
+    L.push(`    ${ids.get(from)} -> ${ids.get(o.node)} ${q(lb)}`)}})));
+  L.push('  }','}','','views {','  view index {','    include *','  }','  view wf of wf {','    include *','  }','}');
+  return spec+'\n\n'+L.join('\n')+'\n'}
+async function importN8n(){const fi=h('input',{type:'file',accept:'.json'});fi.onchange=async()=>{const f=fi.files[0];if(!f)return;
+  try{const wf=JSON.parse(await f.text());G={};loadText(n8nToC4(wf),true);save();N8MODE=true;NEEDFIT=true;TAB='dia';go('ov:wf');refresh()}catch(x){await ask('فایل n8n خوانده نشد: '+x.message,{info:1})}};fi.click()}
 
 /* ───────── نمای «سفر» (Customer Journey Map + Service Blueprint) ─────────
    الگو: NN/g Journey Map (مرحله‌ها × کارها، فکرها، احساس، دردها، فرصت‌ها) و Service Blueprint
@@ -2790,10 +2810,10 @@ function n8dashChrome(on){document.body.classList.toggle('n8full',on);const P=$(
   if(!N8MODE){$('#world').style.direction='';return _rd()}
   if(!VIEWP.startsWith('ov:')&&!IDX.has(VIEWP))VIEWP='ov:'+roots()[0].id;
   RV=REVIEW?reviewFind():new Map();renderNav();renderTree();
-  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=N8LAY==='journey'?1:N8LAY==='n8dash'?Math.max(.5,Math.min(1,cv.clientWidth/(LAST.W+60),cv.clientHeight/(LAST.H+60))):Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:(N8LAY==='journey'?cv.clientWidth-LAST.W*VIEW.k-10:10);VIEW.y=10;applyView();NEEDFIT=false}
+  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=N8LAY==='journey'?1:N8LAY==='n8dash'?Math.max(.3,Math.min(1,cv.clientWidth/(LAST.W+60),cv.clientHeight/(LAST.H+60))):Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:(N8LAY==='journey'?cv.clientWidth-LAST.W*VIEW.k-10:10);VIEW.y=10;applyView();NEEDFIT=false}
   try{N8.badges()}catch(e){}}}
 {const _rv=renderVers;renderVers=function(){_rv();$('#vers').append(h('button',{id:'n8mode',class:N8MODE?'on':'',title:'نمایش همهٔ نمودارها افقی، مثل n8n',onclick:()=>{N8MODE=!N8MODE;try{localStorage.setItem('n8mode',N8MODE?'1':'0')}catch(e){}NEEDFIT=true;renderVers();renderDia()}},N8MODE?'⇄ حالت n8n: روشن':'⇄ حالت n8n'),
-  h('button',{class:'pri',onclick:()=>{N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderVers();renderDia()}},'⛶ تمام‌صفحه، دقیقاً مثل n8n'),h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)'],['journey','🧭 نقشهٔ سفر (Journey + Service Blueprint)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
+  h('button',{class:'pri',onclick:()=>{N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderVers();renderDia()}},'⛶ تمام‌صفحه، دقیقاً مثل n8n'),h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['orig','📍 مختصات اصلی n8n (اگر از n8n وارد شده)'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)'],['journey','🧭 نقشهٔ سفر (Journey + Service Blueprint)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
 
 /* ───────── پوستهٔ n8n: نوار کناری، منوی فایل و نما، زبانه‌های ویرایشگر و اجراها ───────── */
 (function n8shell(){
@@ -2805,7 +2825,7 @@ function n8dashChrome(on){document.body.classList.toggle('n8full',on);const P=$(
   const h1=top.querySelector('h1');h1.insertBefore(h('span',{class:'crumb'},'فلوها / '),h1.firstChild);
   const mk=(lbl,...kids)=>h('details',{class:'n8menu'},h('summary',{},lbl),h('div',{class:'dd'},...kids));
   const fileDocs=h('div',{class:'vers'});
-  const fileM=mk('📁 فایل',h('h4',{},'جدید از قالب'),fileDocs,h('h4',{},'باز کردن و برگرداندن'),$('#load'),$('#reset'));
+  const fileM=mk('📁 فایل',h('h4',{},'جدید از قالب'),fileDocs,h('h4',{},'باز کردن و برگرداندن'),$('#load'),h('button',{onclick:()=>importN8n()},'📥 باز کردن ورک‌فلوی n8n (JSON)'),$('#reset'));
   const viewM=mk('👁 نما',vers);
   const undo=$('#undo');undo.textContent='↶';undo.title='برگشت (Ctrl+Z)';
   const save=h('button',{class:'save',title:'متن کامل .c4 را در زبانهٔ خروجی ببین و کپی کن',onclick:()=>{TAB='out';showTab()}},'ذخیره (.c4)');
