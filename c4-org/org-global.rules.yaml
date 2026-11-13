@@ -1,0 +1,12 @@
+# جدول تصمیم لایهٔ مکانی (DMN-like, hit: COLLECT) — طبق STANDARD-PROCESS-BUILD
+# ورودی: org.location از پرسشنامهٔ سازمان. خروجی: کدام تگ‌ها فعال باشند.
+decision: location_layer
+hit: COLLECT
+rules:
+  - when: {location: any}    then: {include_tags: [loc_global]}
+  - when: {location: IR}     then: {include_tags: [loc_ir]}
+  # کشور بعدی = فقط یک ردیف + یک بلوک extend با تگ loc_xx، بدون کپی مدل
+questionnaire:
+  - id: location
+    q: "سازمان در کدام کشور ثبت و فعال است؟"
+    options: [global, IR]
