@@ -298,13 +298,19 @@ body.n8full #n8mini{display:none}
 
 /* آرام مثل n8n (calm-panels): بوم تمام‌عرض؛ پنل جزئیات فقط با انتخاب گره، کشویی از راست؛ درخت پشت دکمهٔ نوار کناری */
 body.n8on #p-dia{display:block!important}
-body.n8on #p-dia #tree{position:fixed;top:64px;right:64px;width:260px;max-height:calc(100vh - 80px);overflow:auto;z-index:22;box-shadow:0 10px 30px #0003}
+body.n8on #p-dia #tree{position:fixed;top:64px;left:16px;width:260px;max-height:calc(100vh - 80px);overflow:auto;z-index:22;box-shadow:0 10px 30px #0003}
 body.n8on:not(.treeopen) #p-dia #tree{display:none!important}
 body.n8on #p-dia #cv{height:calc(100vh - 90px)!important}
 body.n8on #insp{position:fixed;top:64px;bottom:12px;right:64px;width:380px;overflow:auto;z-index:21;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:-10px 0 30px #0002;transition:transform .2s}
 body.n8on:not(.inspopen) #insp{transform:translateX(120%);visibility:hidden}
 body.n8on .cvhint{display:none!important}
-#inspx{display:none}body.n8on #inspx{display:block;position:sticky;top:0;margin-inline-start:auto;z-index:2}
+
+
+.pnlh{display:flex;align-items:center;gap:10px;position:sticky;top:-10px;z-index:3;background:var(--card);border-bottom:1px solid var(--line);margin:-10px -10px 10px;padding:10px 12px;border-radius:12px 12px 0 0}
+.pnlh .ic svg{width:26px;height:26px}.pnlh .ic{font-size:20px;display:grid;place-items:center;width:36px;height:36px;border:1.5px solid var(--line);border-radius:8px}
+.pnlh .pt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}.pnlh .pt b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pnlh .pt small{font-size:11px}
+#n8mini::before{content:"نقشهٔ کوچک";position:absolute;bottom:2px;left:6px;font-size:10px;color:var(--mute);z-index:1}
+#inspx{display:block!important;position:static!important}
 </style>
 <div id="app">
   <div class="top">
@@ -2840,7 +2846,11 @@ function n8dashChrome(on){document.body.classList.toggle('n8full',on);const P=$(
 
 /* پنل کشویی: با انتخاب گره باز، با ✕ یا Esc بسته */
 {const _ri=renderInsp;renderInsp=function(){_ri();const I=$('#insp');document.body.classList.toggle('inspopen',!!SEL||!!SELE||HISTOPEN);
-  if(!I.querySelector('#inspx'))I.prepend(h('button',{id:'inspx',class:'sm',title:'بستن (Esc)',onclick:()=>{SEL=null;SELE=null;HISTOPEN=false;document.body.classList.remove('inspopen');renderDia()}},'✕ بستن'))}}
+  // سربرگ پنل مثل NDV در n8n و Inspector در Figma: آیکن نوع + نام + نوع + بستن
+  I.querySelector('.pnlh')?.remove();const n=SEL&&IDX.get(SEL);
+  I.prepend(h('div',{class:'pnlh'},n?lucide(n.kind):h('span',{class:'ic'},'⚙'),h('div',{class:'pt'},h('b',{},n?titleName(n):SELE!=null?'جزئیات فلش':'جزئیات'),h('small',{},n?(N8KIND[n.kind]||n.kind)+' · '+SEL:'ویرایش و تنظیمات')),
+    h('button',{id:'inspx',class:'sm',title:'بستن (Esc)',onclick:()=>{SEL=null;SELE=null;HISTOPEN=false;document.body.classList.remove('inspopen');renderDia()}},'✕')))}}
+{const _rt=renderTree;renderTree=function(){_rt();const T=$('#tree');if(!T.querySelector('.pnlh'))T.prepend(h('div',{class:'pnlh'},h('span',{class:'ic'},'🗂'),h('div',{class:'pt'},h('b',{},'فهرست بخش‌ها'),h('small',{},'برای رفتن به هر بخش کلیک کن')),h('button',{class:'sm',onclick:()=>document.body.classList.remove('treeopen')},'✕')))}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('inspopen')){SEL=null;SELE=null;document.body.classList.remove('inspopen');renderDia();renderInsp()}});
 
 /* ───────── پوستهٔ n8n: نوار کناری، منوی فایل و نما، زبانه‌های ویرایشگر و اجراها ───────── */
