@@ -48,5 +48,15 @@
    "models/studenthub-architecture.mmd",
    "models/studenthub-architecture.ofk"
   ]
+ },
+ {
+  "kind": "c4",
+  "stem": "taje-gol-journey",
+  "title": "مسیر سفارش تاج گل (نیلابا) — LikeC4 با اجرای گام‌به‌گام مثل n8n (2026-11-13)",
+  "c4site": "c4-journey/site/index.html#/view/run_seo/",
+  "files": [
+   "c4-journey/journey.c4",
+   "c4-journey/site/index.html"
+  ]
  }
 ]
