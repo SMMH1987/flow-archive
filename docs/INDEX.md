@@ -12,6 +12,8 @@
 | مدل‌های معماری | `models/` و `docs/models-src/` |
 | سایت ایستای LikeC4 ساخته‌شدهٔ محلی | `likec4/` (همان که روی `localhost:8766` سرو می‌شد) |
 | موکاپ‌ها (۳ تب BPM / Mermaid / PlantUML / BPMN) | `docs/mockups/` |
+| **دستورالعمل ساخت هر فرایند/ایجنت جدید** (تثبیت‌شده ۲۰۲۶-۱۱-۱۳؛ مدل Camunda: `flow.c4` + `rules.yaml` + زیرفلو؛ پرسشنامهٔ سازمان → پروفایل → اجرا) | `STANDARD-PROCESS-BUILD.md` (با PR #5 می‌آید؛ نمونه: `agent-hr-recruit/`) — استودیو هر چیز تازه را با همین می‌سازد |
+| استودیوی سازمان (موکاپ تعاملی؛ ویرایش ← خروجی کامل `recruitment.c4`) | `docs/mockups/org-studio.html` |
 | لینک‌های آنلاین ساخته‌شده | `docs/links/` |
 | اجراکنندهٔ فلو (skill) | `C:\Users\mmhse\.claude\skills\mental-rules\skills\cc-flow-run\` — `SKILL.md`، `check_parity.py`، `to_markmap.py`، `build_archive.py`، `likec4/hiring.c4`، `site/` |
 
@@ -20,3 +22,5 @@
 - روی GitHub کامیت `f06f106` (`likec4/hiring.c4`، منبع LikeC4) هست که این‌جا نیست ← دو شاخه از هم جدا شده‌اند.
 - در مخزن GitHub، `likec4/` = **منبع** (`.c4`)؛ در این کپی محلی، `likec4/` = **سایت ساخته‌شده**. قبل از push یکی را جابه‌جا کنید (پیشنهاد: سایت ← `c4/`).
 - ۲۷ فایل تغییر داده‌شده/کامیت‌نشده در `likec4/` (بازسازی سایت).
+
+- [STANDARD-PROCESS-BUILD.md](STANDARD-PROCESS-BUILD.md) — دستورالعمل ساخت هر فرایند/ایجنت (مدل Camunda)

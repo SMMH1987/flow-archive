@@ -1,0 +1,11 @@
+# Org questionnaire: each answer becomes org.<id>. Filled once per organization -> orgs/<name>.yaml
+questions:
+  - id: country
+    ask: "سازمان در کدام کشور است؟"
+    type: text
+  - id: uses_paid_ads
+    ask: "برای آگهی استخدام هزینه می‌کنید؟"
+    type: yes_no
+  - id: reference_check
+    ask: "برای نیروی ارشد بررسی رفرنس لازم است؟"
+    type: yes_no

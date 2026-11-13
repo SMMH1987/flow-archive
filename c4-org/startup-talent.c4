@@ -1,0 +1,1018 @@
+// نمونهٔ «سازمان کامل از یک ایده» — ایده: اتوماسیون کامل استخدام — 2026-11-06
+// هر بخش = یک نقش سازمانی · هر قدم: technology = skill · description = out · آیکون = وضعیت قفل
+// 🔒 = قفل (فقط با تأیید تو) · 🔓 = باز · tag designed = بخش ناشناخته که از ترکیب skillها طراحی شد
+// رنگ قدم = نوع after: ask نارنجی · auto سبز · gate قرمز · route بنفش
+
+specification {
+  element actor {
+    style {
+      shape person
+      color secondary
+    }
+  }
+  element orgBox {
+    style {
+      color slate
+    }
+  }
+  element role {
+    style {
+      color muted
+    }
+  }
+  element askStep {
+    notation "after: ask — خروجی را نشان بده و نظر بگیر"
+    style {
+      color amber
+    }
+  }
+  element autoStep {
+    notation "after: auto — خودکار برو قدم بعد"
+    style {
+      color green
+    }
+  }
+  element gateStep {
+    notation "after: gate — بایست تا کاربر تأیید کند"
+    style {
+      color red
+    }
+  }
+  element routeStep {
+    notation "after: route — شاخه را از روی نتیجه انتخاب کن"
+    style {
+      color indigo
+      shape queue
+    }
+  }
+  element flow {
+    style {
+      color slate
+    }
+  }
+  element section {
+    style {
+      color muted
+    }
+  }
+  element project {
+    notation "پروژهٔ قابل‌فراخوانی — Claude MCP + OpenAI/REST"
+    style {
+      color sky
+      shape component
+    }
+  }
+  element tool {
+    notation "ابزار پروژه — با #gated = پشت تأیید انسانی"
+    style {
+      color secondary
+    }
+  }
+  tag locked
+  tag designed
+  tag unknownSkill
+  tag gated
+}
+
+model {
+  p0 = orgBox 'پیش‌نیازهای شروع' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: چه چیزهایی از ابتدا لازم است'
+    metadata {
+      agent 'ایجنت راه‌انداز'
+    }
+    c1 = askStep 'تعیین بودجه، زمان و هدف شش‌ماههٔ اول' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: بودجه و مهلت؛ هر دو الان UNKNOWN و باید تعیین شوند'
+      metadata {
+        agent 'ایجنت راه‌انداز'
+      }
+    }
+    c2 = askStep 'تعیین مسئول انسانی و تیم' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: نام مسئول تصمیم‌ها + نقش‌های لازم (فنی، فروش، حقوقی)'
+      metadata {
+        agent 'ایجنت راه‌انداز'
+      }
+    }
+    c3 = askStep 'فراهم کردن دسترسی‌ها و حساب‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: کلید API مدل زبانی، ربات تلگرام و بله، دامنه، درگاه پرداخت'
+      metadata {
+        agent 'ایجنت راه‌انداز'
+      }
+    }
+    c4 = askStep 'تعیین مرز بازار و محدودیت‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: بازار ایران، زبان فارسی، فقط استخدام‌های غیرحساس در ابتدا'
+      metadata {
+        agent 'ایجنت راه‌انداز'
+      }
+    }
+    c5 = gateStep 'تأیید شروع پروژه' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: تأیید انسان؛ بدون آن هزینه‌ای انجام نمی‌شود'
+      metadata {
+        agent 'ایجنت راه‌انداز'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+  }
+
+  p1 = orgBox 'ایده و اعتبارسنجی' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: قبل از ساخت، مطمئن شو مشکل واقعی است'
+    metadata {
+      agent 'ایجنت پژوهش'
+    }
+    c1 = askStep 'تعریف مسئله و مشتری هدف' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: first-principles'
+      description 'out: مسئله در یک جمله + دو گروه مشتری (کارفرمای کوچک و متوسط، کارجو)'
+      metadata {
+        agent 'ایجنت پژوهش'
+      }
+    }
+    c2 = autoStep 'پژوهش بازار و رقبا در ایران' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: جدول رقبا و خلأها با منبع + مزایا و معایب'
+      metadata {
+        ext_tool 'Firecrawl MCP'
+        ext_kind 'MCP'
+        agent 'ایجنت پژوهش'
+      }
+    }
+    c3 = askStep 'مصاحبه با کارفرما و کارجو' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: خلاصهٔ ۱۰ مصاحبه با کارفرما و ۱۰ مصاحبه با کارجو'
+      metadata {
+        agent 'ایجنت پژوهش'
+      }
+    }
+    c4 = gateStep 'تصمیم ادامه یا توقف' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ادامه، تغییر مسیر یا توقف؛ فقط انسان تصمیم می‌گیرد'
+      metadata {
+        agent 'ایجنت پژوهش'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+  }
+
+  p2 = orgBox 'نام‌گذاری و برند' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: از نام تا هویت ساده'
+    metadata {
+      agent 'ایجنت نام‌گذاری'
+    }
+    c1 = askStep 'گرفتن حس برند و محدودیت‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: حس برند + زبان + محدودیت‌ها'
+      metadata {
+        agent 'ایجنت نام‌گذاری'
+      }
+    }
+    c2 = autoStep 'تولید ۲۰ نام پیشنهادی' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: startup-naming'
+      description 'out: ۲۰ نام با معنی هر کدام'
+      metadata {
+        agent 'ایجنت نام‌گذاری'
+      }
+    }
+    c3 = autoStep 'بررسی دامنه، نشان و نام‌کاربری' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: دامنه و نام‌کاربری تلگرام و بله آزاد است؟ + برخورد با نشان تجاری'
+      metadata {
+        ext_tool 'RDAP / Namecheap API'
+        ext_kind 'API'
+        agent 'ایجنت نام‌گذاری'
+      }
+    }
+    c4 = gateStep 'انتخاب نهایی نام' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: یک نام برگزیده'
+      metadata {
+        agent 'ایجنت نام‌گذاری'
+      }
+    }
+    c5 = autoStep 'ساخت هویت ساده: لوگو و لحن' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: لوگو، رنگ و لحن پیام‌ها'
+      metadata {
+        agent 'ایجنت نام‌گذاری'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+  }
+
+  p3 = orgBox 'طراحی فرایند محصول' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: ربات هوشمند استعدادیابی، غربال و رزومه: ثابت برای همه + پویا بر پایهٔ عنوان شغلی'
+    metadata {
+      agent 'ایجنت محصول'
+      blueprint 'talentbot'
+      must 'رضایت صریح پیش از هر پرسشنامه؛ تأیید انسان پیش از رد یا استخدام؛ داده‌های روانشناختی فقط برای همین استخدام و قابل حذف'
+      must_not 'تشخیص بالینی؛ تصمیم نهایی خودکار؛ جمع‌آوری داده بدون رضایت؛ آزمون دارای حق‌نشر بدون مجوز'
+    }
+    c1 = askStep 'آماده‌سازی و پیش‌نیازها' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: همهٔ پیش‌نیازها کامل و تأییدشده'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت انطباق و آماده‌سازی'
+      }
+      c1 = askStep 'تعیین هدف و دامنهٔ ربات' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: سند یک‌صفحه‌ای: برای چه عناوینی، با چه کانالی'
+        metadata {
+          agent 'ایجنت انطباق و آماده‌سازی'
+        }
+      }
+      c2 = gateStep 'تدوین رضایت‌نامه و سیاست حریم خصوصی' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: متن رضایت + مدت نگهداری + راه حذف داده؛ قوانین داده در ایران UNKNOWN و باید بررسی شود'
+        metadata {
+          agent 'ایجنت انطباق و آماده‌سازی'
+        }
+      }
+      c3 = autoStep 'ساخت کتابخانهٔ پرسشنامهٔ ثابت' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: questionnaire-builder'
+        description 'out: پرسشنامهٔ پایه + پرسشنامهٔ شخصیت استاندارد باز (Big Five از IPIP)'
+        metadata {
+          part 'fixed'
+          agent 'ایجنت انطباق و آماده‌سازی'
+        }
+      }
+      c4 = askStep 'انتخاب کانال‌ها و حساب‌ها' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: ربات تلگرام و بله + فرم وب؛ توکن‌ها فقط در env'
+        metadata {
+          ext_tool 'Telegram Bot API'
+          ext_kind 'API'
+          agent 'ایجنت انطباق و آماده‌سازی'
+        }
+      }
+      c5 = gateStep 'تعیین مسئول انسانی و آستانه‌ها' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: نام مسئول + فهرست تصمیم‌هایی که فقط انسان می‌گیرد'
+        metadata {
+          agent 'ایجنت انطباق و آماده‌سازی'
+        }
+      }
+      c1 -> c2 'بعد'
+      c2 -> c3 'بعد'
+      c3 -> c4 'بعد'
+      c4 -> c5 'بعد'
+    }
+    c2 = askStep 'تعریف عنوان شغلی' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: پروفایل شایستگی و پرسشنامهٔ همین عنوان'
+      metadata {
+        part 'dynamic'
+        agent 'ایجنت تحلیل شغل'
+      }
+      c1 = askStep 'گرفتن عنوان و شرایط از کارفرما' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: عنوان + شرح کار + شرایط + حقوق'
+        metadata {
+          agent 'ایجنت تحلیل شغل'
+        }
+      }
+      c2 = autoStep 'جستجوی ۱۰ skill و الگوی مرتبط' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: find-skills'
+        description 'out: ۱۰ skill یا الگو با دلیل؛ یکی انتخاب یا skill تازه ساخته شود'
+        metadata {
+          ext_tool 'Skill registry (SearchSkills)'
+          ext_kind 'API'
+          agent 'ایجنت تحلیل شغل'
+        }
+      }
+      c3 = autoStep 'ساخت پروفایل شایستگی' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: ۵ تا ۸ شایستگی با وزن و نشانهٔ سنجش'
+        metadata {
+          agent 'ایجنت تحلیل شغل'
+        }
+      }
+      c4 = autoStep 'ساخت پرسشنامهٔ پویای عنوان' {
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: questionnaire-builder'
+        description 'out: ۸ تا ۱۲ پرسش مهارت و سناریو برای همین عنوان'
+        metadata {
+          agent 'ایجنت تحلیل شغل'
+        }
+      }
+      c5 = gateStep 'تأیید کارفرما' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: پروفایل و پرسشنامه تأییدشده'
+        metadata {
+          agent 'ایجنت تحلیل شغل'
+        }
+      }
+      c1 -> c2 'بعد'
+      c2 -> c3 'بعد'
+      c3 -> c4 'بعد'
+      c4 -> c5 'بعد'
+    }
+    c3 = autoStep 'استعدادیابی و دعوت' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: دعوت‌نامه‌های تأییدشده ارسال شده'
+      metadata {
+        part 'dynamic'
+        agent 'ایجنت استعدادیاب'
+      }
+      c1 = autoStep 'پیدا کردن منابع و کانال‌های مناسب' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: فهرست منابع با نرخ پاسخ تخمینی'
+        metadata {
+          ext_tool 'Firecrawl MCP'
+          ext_kind 'MCP'
+          agent 'ایجنت استعدادیاب'
+        }
+      }
+      c2 = autoStep 'نوشتن پیام دعوت برای هر کانال' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: متن کوتاه دعوت با لینک ربات'
+        metadata {
+          agent 'ایجنت استعدادیاب'
+        }
+      }
+      c3 = gateStep 'تأیید و ارسال دعوت' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: دعوت تأییدشده ارسال شد؛ ارسال بیرونی فقط با تأیید'
+        metadata {
+          agent 'ایجنت استعدادیاب'
+        }
+      }
+      c1 -> c2 'بعد'
+      c2 -> c3 'بعد'
+    }
+    c4 = askStep 'پذیرش داوطلب' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: داوطلب با رضایت ثبت‌شده وارد شد'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت پذیرش'
+      }
+      c1 = autoStep 'خوش‌آمد و توضیح شفاف' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: داوطلب می‌داند چه چیزی جمع می‌شود و چرا'
+        metadata {
+          agent 'ایجنت پذیرش'
+        }
+      }
+      c2 = gateStep 'گرفتن رضایت صریح' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: رضایت با زمان ثبت شد؛ بدون آن ادامه نیست'
+        metadata {
+          agent 'ایجنت پذیرش'
+        }
+      }
+      c3 = autoStep 'ثبت اطلاعات پایه' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: نام، تماس، تجربه'
+        metadata {
+          part 'fixed'
+          agent 'ایجنت پذیرش'
+        }
+      }
+      c1 -> c2 'بعد'
+      c2 -> c3 'بعد'
+    }
+    c5 = askStep 'پرسشنامه‌ها' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: پاسخ‌های ثابت و پویا ذخیره شد'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت پرسشنامه‌ساز'
+      }
+      c1 = askStep 'پرسشنامهٔ ثابت: پیشینه و انگیزه' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: پاسخ‌های استاندارد برای همهٔ عناوین'
+        metadata {
+          part 'fixed'
+          agent 'ایجنت پرسشنامه‌ساز'
+        }
+      }
+      c2 = askStep 'پرسشنامهٔ روانشناختی استاندارد' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: نمرهٔ پنج بعد شخصیت؛ توصیفی است نه تشخیصی'
+        metadata {
+          part 'fixed'
+          agent 'ایجنت پرسشنامه‌ساز'
+        }
+      }
+      c3 = askStep 'پرسشنامهٔ شایستگی همین عنوان' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: پاسخ به پرسش‌های مهارتی عنوان'
+        metadata {
+          part 'dynamic'
+          agent 'ایجنت پرسشنامه‌ساز'
+        }
+      }
+      c4 = askStep 'سناریو یا نمونه‌کار کوتاه' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: پاسخ سناریو با معیار روشن'
+        metadata {
+          part 'dynamic'
+          agent 'ایجنت پرسشنامه‌ساز'
+        }
+      }
+      c5 = autoStep 'ذخیرهٔ امن پاسخ‌ها' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: پاسخ‌های رمزگذاری‌شده با کد داوطلب'
+        metadata {
+          part 'fixed'
+          agent 'ایجنت پرسشنامه‌ساز'
+        }
+      }
+      c1 -> c2 'بعد'
+      c2 -> c3 'بعد'
+      c3 -> c4 'بعد'
+      c4 -> c5 'بعد'
+    }
+    c6 = autoStep 'غربال' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: فهرست کوتاه یا پیام رد تأییدشده'
+      metadata {
+        part 'dynamic'
+        agent 'ایجنت غربال'
+      }
+      c1 = autoStep 'امتیازدهی بر پایهٔ شایستگی‌ها' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: امتیاز هر شایستگی با دلیل کوتاه'
+        metadata {
+          agent 'ایجنت غربال'
+        }
+      }
+      c2 = routeStep 'مناسب است؟' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        metadata {
+          agent 'ایجنت غربال'
+        }
+      }
+      c3 = autoStep 'ثبت در فهرست کوتاه' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: داوطلب + امتیاز در فهرست کوتاه'
+        metadata {
+          agent 'ایجنت غربال'
+        }
+      }
+      c4 = gateStep 'پیش‌نویس پیام رد مؤدبانه' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: پیام رد با بازخورد کوتاه؛ ارسال فقط با تأیید انسان'
+        metadata {
+          agent 'ایجنت غربال'
+        }
+      }
+      c1 -> c2 'بعد'
+      c2 -> c3 'بله'
+      c2 -> c4 'نه'
+    }
+    c7 = autoStep 'پروفایل و رزومه' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: رزومه و پروفایل تأییدشدهٔ داوطلب'
+      metadata {
+        part 'fixed'
+        agent 'ایجنت پروفایل و رزومه'
+      }
+      c1 = autoStep 'ترکیب پاسخ‌ها و امتیازها' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: دادهٔ یکپارچهٔ داوطلب'
+        metadata {
+          agent 'ایجنت پروفایل و رزومه'
+        }
+      }
+      c2 = autoStep 'ساخت پروفایل شایستگی و شخصیت' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: پروفایل توصیفی؛ با هشدار: ابزار تشخیص نیست'
+        metadata {
+          agent 'ایجنت پروفایل و رزومه'
+        }
+      }
+      c3 = autoStep 'ساخت رزومه با قالب ثابت' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: رزومهٔ PDF و DOCX'
+        metadata {
+          part 'fixed'
+          ext_tool 'Pandoc / DOCX template'
+          ext_kind 'API'
+          agent 'ایجنت پروفایل و رزومه'
+        }
+      }
+      c4 = askStep 'بازبینی و تأیید داوطلب' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: داوطلب نسخهٔ نهایی را تأیید یا اصلاح کرد'
+        metadata {
+          agent 'ایجنت پروفایل و رزومه'
+        }
+      }
+      c1 -> c2 'بعد'
+      c2 -> c3 'بعد'
+      c3 -> c4 'بعد'
+    }
+    c8 = askStep 'گزارش و تصمیم' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: تصمیم نهایی انسان ثبت شد'
+      metadata {
+        part 'dynamic'
+        agent 'ایجنت گزارش'
+      }
+      c1 = autoStep 'گزارش یک‌صفحه‌ای برای کارفرما' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: خلاصه + نقاط قوت + ریسک + پیشنهاد مصاحبه'
+        metadata {
+          agent 'ایجنت گزارش'
+        }
+      }
+      c2 = autoStep 'زمان‌بندی مصاحبه' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: زمان قطعی مصاحبه'
+        metadata {
+          ext_tool 'Google Calendar MCP'
+          ext_kind 'MCP'
+          agent 'ایجنت گزارش'
+        }
+      }
+      c3 = gateStep 'تصمیم نهایی انسان' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: استخدام، رد یا انتظار؛ فقط انسان تصمیم می‌گیرد'
+        metadata {
+          agent 'ایجنت گزارش'
+        }
+      }
+      c1 -> c2 'بعد'
+      c2 -> c3 'بعد'
+    }
+    c9 = autoStep 'نگهداری و بهبود' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: داده‌ها طبق سیاست حذف و ابزارها به‌روز شدند'
+      metadata {
+        part 'fixed'
+        schedule 'weekly'
+        agent 'ایجنت بهبود'
+      }
+      c1 = autoStep 'حذف یا ناشناس‌سازی داده طبق مدت نگهداری' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: گزارش حذف + اجرای درخواست‌های داوطلب'
+        metadata {
+          agent 'ایجنت بهبود'
+        }
+      }
+      c2 = askStep 'گرفتن بازخورد کارفرما و داوطلب' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: بازخورد ثبت‌شده'
+        metadata {
+          agent 'ایجنت بهبود'
+        }
+      }
+      c3 = autoStep 'به‌روزرسانی پرسشنامه‌ها و شایستگی‌ها' {
+        #unknownSkill
+        icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+        technology 'skill: —'
+        description 'out: فهرست تغییرهای پیشنهادی؛ اعمال با تأیید'
+        metadata {
+          agent 'ایجنت بهبود'
+        }
+      }
+      c1 -> c2 'بعد'
+      c2 -> c3 'بعد'
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+    c5 -> c6 'بعد'
+    c6 -> c7 'بعد'
+    c7 -> c8 'بعد'
+    c8 -> c9 'بعد'
+  }
+
+  p4 = orgBox 'حقوقی، حریم خصوصی و انطباق' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: قبل از جمع‌کردن هر دادهٔ شخصی'
+    metadata {
+      agent 'ایجنت انطباق'
+    }
+    c1 = askStep 'بررسی قوانین داده و کار در ایران' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: گزارش حقوقی؛ قوانین حفاظت داده UNKNOWN و باید با مشاور حقوقی بررسی شود'
+      metadata {
+        agent 'ایجنت انطباق'
+      }
+    }
+    c2 = askStep 'ثبت شرکت و مجوزهای فروش آنلاین' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: فهرست مجوزهای لازم (مثلا نماد اعتماد)؛ UNKNOWN تا بررسی شود'
+      metadata {
+        agent 'ایجنت انطباق'
+      }
+    }
+    c3 = gateStep 'نوشتن شرایط استفاده و رضایت‌نامه' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: متن تأییدشدهٔ حقوقی'
+      metadata {
+        agent 'ایجنت انطباق'
+      }
+    }
+    c4 = gateStep 'انتخاب آزمون‌های روانشناختی مجاز' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: فقط آزمون‌های باز یا دارای مجوز (Big Five از IPIP)؛ نه MBTI و DISC بدون مجوز'
+      metadata {
+        agent 'ایجنت انطباق'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+  }
+
+  p5 = orgBox 'ساخت MVP' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: کوچک‌ترین نسخه که ارزش بدهد'
+    metadata {
+      agent 'ایجنت ساخت'
+    }
+    c1 = askStep 'انتخاب معماری و مدل زبانی' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: معماری یک‌صفحه‌ای + هزینهٔ تخمینی هر داوطلب'
+      metadata {
+        ext_tool 'Claude API'
+        ext_kind 'API'
+        agent 'ایجنت ساخت'
+      }
+    }
+    c2 = autoStep 'ساخت ربات تلگرام و بله' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ربات پرسشنامه و پذیرش داوطلب'
+      metadata {
+        ext_tool 'Telegram Bot API'
+        ext_kind 'API'
+        agent 'ایجنت ساخت'
+      }
+    }
+    c3 = autoStep 'ساخت پنل کارفرما' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ثبت عنوان شغلی و دیدن فهرست کوتاه و گزارش'
+      metadata {
+        agent 'ایجنت ساخت'
+      }
+    }
+    c4 = gateStep 'راه‌اندازی پرداخت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: کارت‌به‌کارت یا درگاه؛ هر مرحلهٔ مالی فقط با تأیید انسان'
+      metadata {
+        agent 'ایجنت ساخت'
+      }
+    }
+    c5 = autoStep 'تست کیفیت، امنیت و بازیابی' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: گزارش تست + عیب‌های باز'
+      metadata {
+        agent 'ایجنت ساخت'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+  }
+
+  p6 = orgBox 'آزمایش با کاربران واقعی' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: پایلوت کوچک پیش از فروش'
+    metadata {
+      agent 'ایجنت آزمایش'
+    }
+    c1 = askStep 'انتخاب ۵ کارفرمای پایلوت' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ۵ کارفرما با رضایت کتبی'
+      metadata {
+        agent 'ایجنت آزمایش'
+      }
+    }
+    c2 = autoStep 'اجرای ۲۰ داوطلب از ابتدا تا رزومه' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ۲۰ رزومه و پروفایل ساخته‌شده'
+      metadata {
+        agent 'ایجنت آزمایش'
+      }
+    }
+    c3 = autoStep 'اندازه‌گیری شاخص‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: زمان غربال، رضایت کارفرما و داوطلب، دقت'
+      metadata {
+        agent 'ایجنت آزمایش'
+      }
+    }
+    c4 = gateStep 'تصمیم تغییر یا ادامه' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: فهرست اصلاح‌ها یا تأیید شروع فروش'
+      metadata {
+        agent 'ایجنت آزمایش'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+  }
+
+  p7 = orgBox 'قیمت‌گذاری و تجاری‌سازی' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: از مدل درآمد تا مشتری اول'
+    metadata {
+      agent 'ایجنت تجاری‌سازی'
+    }
+    c1 = askStep 'انتخاب مدل درآمد' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: اشتراک ماهانه، کارمزد هر استخدام موفق یا ترکیبی؛ با مزایا و معایب'
+      metadata {
+        agent 'ایجنت تجاری‌سازی'
+      }
+    }
+    c2 = autoStep 'قیمت‌گذاری و بستهٔ جذب مشتری' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: pricing-advisor'
+      description 'out: جدول قیمت + نردبان جذب مشتری'
+      metadata {
+        agent 'ایجنت تجاری‌سازی'
+      }
+    }
+    c3 = autoStep 'ساخت صفحهٔ فرود و محتوا' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: صفحهٔ فرود + ۱۰ محتوای معرفی'
+      metadata {
+        agent 'ایجنت تجاری‌سازی'
+      }
+    }
+    c4 = gateStep 'تأیید و انتشار کمپین' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: انتشار بیرونی فقط با تأیید انسان'
+      metadata {
+        agent 'ایجنت تجاری‌سازی'
+      }
+    }
+    c5 = askStep 'فروش به ۳ مشتری اول' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: ۳ قرارداد یا پیش‌پرداخت'
+      metadata {
+        agent 'ایجنت تجاری‌سازی'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+    c4 -> c5 'بعد'
+  }
+
+  p8 = orgBox 'رشد، پشتیبانی و بهبود' {
+    icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+    description 'out: حلقهٔ همیشگی بعد از شروع فروش'
+    metadata {
+      schedule 'weekly'
+      agent 'ایجنت بهبود'
+    }
+    c1 = autoStep 'پایش شاخص‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: گزارش هفتگی: کاربر فعال، هزینه، رضایت'
+      metadata {
+        agent 'ایجنت بهبود'
+      }
+    }
+    c2 = askStep 'پشتیبانی و رسیدگی به درخواست‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: پاسخ‌ها و درخواست‌های حذف داده'
+      metadata {
+        agent 'ایجنت بهبود'
+      }
+    }
+    c3 = autoStep 'به‌روزرسانی پرسشنامه‌ها و شایستگی‌ها' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: فهرست تغییرهای پیشنهادی؛ اعمال با تأیید'
+      metadata {
+        ext_tool 'Firecrawl MCP'
+        ext_kind 'MCP'
+        agent 'ایجنت بهبود'
+      }
+    }
+    c4 = gateStep 'تصمیم مقیاس‌دهی' {
+      #unknownSkill
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg
+      technology 'skill: —'
+      description 'out: عنوان‌های شغلی تازه، بازار تازه یا توقف'
+      metadata {
+        agent 'ایجنت بهبود'
+      }
+    }
+    c1 -> c2 'بعد'
+    c2 -> c3 'بعد'
+    c3 -> c4 'بعد'
+  }
+
+  p0 -> p1 'بعد'
+  p1 -> p2 'بعد'
+  p2 -> p3 'بعد'
+  p3 -> p4 'بعد'
+  p4 -> p5 'بعد'
+  p5 -> p6 'بعد'
+  p6 -> p7 'بعد'
+  p7 -> p8 'بعد'
+}
+
+views {
+  view index {
+    title 'استارتاپ ایجنت هوشمند استعدادیابی، غربال، رزومه و استخدام'
+    include *
+  }
+
+  view p0 of p0 {
+    title 'پیش‌نیازهای شروع'
+    include *
+  }
+
+  view p1 of p1 {
+    title 'ایده و اعتبارسنجی'
+    include *
+  }
+
+  view p2 of p2 {
+    title 'نام‌گذاری و برند'
+    include *
+  }
+
+  view p3 of p3 {
+    title 'طراحی فرایند محصول'
+    include *
+  }
+
+  view p4 of p4 {
+    title 'حقوقی، حریم خصوصی و انطباق'
+    include *
+  }
+
+  view p5 of p5 {
+    title 'ساخت MVP'
+    include *
+  }
+
+  view p6 of p6 {
+    title 'آزمایش با کاربران واقعی'
+    include *
+  }
+
+  view p7 of p7 {
+    title 'قیمت‌گذاری و تجاری‌سازی'
+    include *
+  }
+
+  view p8 of p8 {
+    title 'رشد، پشتیبانی و بهبود'
+    include *
+  }
+}

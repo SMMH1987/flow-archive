@@ -1,0 +1,9 @@
+// subflow: foreign hire, runs AFTER interview. Offer stays in main flow (no duplicate contract step).
+model {
+  subflow visa 'ویزا و مدارک خارجی' {
+    step docs     'جمع‌آوری مدارک' { metadata { external 'no' } }
+    step apply    'درخواست ویزا'   { #gate metadata { gate 'visa_apply'; external 'yes' } }
+    step relocate 'برنامهٔ انتقال' { metadata { external 'no' } }
+    docs -> apply -> relocate
+  }
+}

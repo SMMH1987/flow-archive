@@ -1,0 +1,13 @@
+// hr-recruit main flow: shared steps only. Decisions from rules.yaml (DMN-style).
+model {
+  agent hrRecruit 'ایجنت استخدام' {
+    step writeAd   'نوشتن آگهی'          { #skill metadata { skill 'job-ad-writer'; external 'no' } }
+    decision ad    'جدول: کانال آگهی'     { metadata { table 'ad_channel' } }
+    step screen    'غربال رزومه'          { #skill metadata { skill 'cv-screener'; external 'no' } }
+    decision pre   'جدول: پیش از مصاحبه'  { metadata { table 'pre_interview' } }
+    step interview 'مصاحبه'               { #skill metadata { skill 'interview-scheduler'; external 'no' } }
+    decision post  'جدول: پس از مصاحبه'   { metadata { table 'post_interview' } }
+    step offer     'ارسال پیشنهاد'        { #gate  metadata { gate 'send_offer'; external 'yes' } }
+    writeAd -> ad -> screen -> pre -> interview -> post -> offer
+  }
+}

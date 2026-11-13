@@ -55,9 +55,23 @@ specification {
       color muted
     }
   }
+  element project {
+    notation "پروژهٔ قابل‌فراخوانی — Claude MCP + OpenAI/REST"
+    style {
+      color sky
+      shape component
+    }
+  }
+  element tool {
+    notation "ابزار پروژه — با #gated = پشت تأیید انسانی"
+    style {
+      color secondary
+    }
+  }
   tag locked
   tag designed
   tag unknownSkill
+  tag gated
 }
 
 model {
@@ -374,6 +388,55 @@ model {
     s6.kit -> s6.kpi 'بعد'
   }
 
+  projects = orgBox 'پروژه‌های قابل‌فراخوانی (interop)' {
+    description 'هر پروژه: Claude MCP + OpenAI/REST · لوکال + عمومی · پرخطر ← تأیید انسانی (استاندارد v1)'
+
+    hagh = project 'حق‌پرس — ایجنت وکیل' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/bank.svg
+      technology 'rest+mcp · planned'
+      description 'سؤال حقوقی و پیش‌نویس قرارداد؛ ورود به قرارداد فقط با تأیید تو'
+      metadata {
+        protocol 'rest+mcp'
+        status 'planned'
+        local_url 'http://127.0.0.1:8100'
+        public_url 'UNKNOWN'
+        auth_env 'UNKNOWN'
+        rate_limit 'UNKNOWN'
+        async 'poll'
+      }
+      vakil_case_start = tool 'شروع پرونده' {
+        technology 'write · read_or_draft'
+        description 'case_id برای ۷۲ ساعت معتبر است'
+      }
+      vakil_case_answer = tool 'پاسخ به پرسش‌های پرونده' {
+        technology 'write · read_or_draft'
+      }
+      vakil_case_result = tool 'گرفتن نتیجه' {
+        technology 'read · read_or_draft'
+      }
+    }
+
+    avanegar = project 'آوانگار (همدبیر) — گفتار به متن' {
+      icon https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/mic.svg
+      technology 'rest · live'
+      description 'API گفتار به متن؛ کلید از .env؛ callback با امضای whsec_'
+      metadata {
+        protocol 'rest'
+        status 'live'
+        local_url 'UNKNOWN'
+        public_url 'https://api.hamdabir.co-ir.com:8440'
+        auth_env 'AVANEGAR_API_KEY'
+        rate_limit 'UNKNOWN'
+        async 'webhook'
+      }
+      stt_transcribe = tool 'تبدیل گفتار به متن (حدس — تأیید شود)' {
+        #gated
+        technology 'write · money'
+        description 'هزینه از کیف پول کسر می‌شود ← طبق gates پیش‌فرض پشت تأیید'
+      }
+    }
+  }
+
   owner -> hiring.s1.goal 'هدف و تأییدها'
   candidate -> hiring.s3.screen 'رزومه'
   candidate -> hiring.s4.iv 'مصاحبه'
@@ -381,6 +444,9 @@ model {
   owner -> company.r1.goal 'ایده و تأییدها'
   candidate -> company.r4.form 'پاسخ'
   candidate -> company.r6.iv 'مصاحبه'
+
+  company.r9.legal -> projects.hagh 'سؤال حقوقی / پیش‌نویس قرارداد'
+  company.r9.stt -> projects.avanegar 'گفتار به متن'
 }
 
 views {
@@ -447,6 +513,20 @@ views {
 
   view v8 of company.r8 {
     title '8 · حقوقی و آنبوردینگ'
+    include *
+  }
+
+  view interop of projects {
+    title 'پروژه‌های قابل‌فراخوانی (interop)'
+    description 'هر پروژه با ابزارهایش؛ #gated = پشت تأیید انسانی.'
+    include *
+  }
+  view vp_hagh of projects.hagh {
+    title 'حق‌پرس — ابزارها'
+    include *
+  }
+  view vp_avanegar of projects.avanegar {
+    title 'آوانگار — ابزارها'
     include *
   }
 
