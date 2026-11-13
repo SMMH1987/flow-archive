@@ -6473,11 +6473,14 @@ window.__studio={parseC4,emitC4,get M(){return M},get BASE(){return BASE},cur,di
     pop.append(h('p',`موتور در ${F(loadMs)} میلی‌ثانیه رسید · ${F(res.views.length)} نما در ${F(res.ms)} میلی‌ثانیه ساخته شد.`));
     if(res.errors.length){const ul=document.createElement('ul');res.errors.slice(0,50).forEach(e=>ul.append(h('li',(e.line!=null?'خط '+F(e.line+1)+': ':'')+e.message)));pop.append(h('p','خطاهای LikeC4 در خروجی .c4 همین نقشه:'),ul)}
     else pop.append(h('p','✓ خروجی .c4 این نقشه از نظر خود LikeC4 معتبر است.'))
+    if(window.LikeC4Layout&&!res.errors.length){const b=h('button','⬇ چیدمان همین نما برای LikeC4 (.likec4.snap)');b.className='sm';b.onclick=async e=>{e.stopPropagation();b.disabled=true;
+      try{const r=await LikeC4Layout.snapCurrent();if(r.error)throw new Error(r.error);const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r.text],{type:'text/plain'}));a.download=r.viewId+'.likec4.snap';a.click();
+        b.after(h('p',`نمای ${r.viewId}: ${F(r.placed)} گره از بوم استودیو · drift: ${r.drifts.length?r.drifts.join('، '):'ندارد'} · فایل را در پوشهٔ .likec4 کنار .c4 بگذار.`))}catch(err){b.after(h('p','نشد: '+err.message))}b.disabled=false};pop.append(b)}
     if(res.parsed&&window.LikeC4Reader){try{const o=parseC4(last),d=LikeC4Reader.diff(LikeC4Reader.fromLikeC4(res.parsed,last,o),o);
       pop.append(h('p',d.length?`خواندن دوتایی: ${F(d.length)} فرق بین خوانش LikeC4 و مبدل استودیو (مبدل استودیو فعلاً اصلی است).`:'✓ خواندن دوتایی: خوانش LikeC4 و مبدل استودیو یکسان‌اند.'))}catch(e){}}}
   badge.onclick=e=>{e.stopPropagation();pop.hidden=!pop.hidden;show()};
   document.addEventListener('click',e=>{if(!pop.contains(e.target)&&e.target!==badge)pop.hidden=true});
-  window.LikeC4Engine={ask:(op,text)=>new Promise((ok,no)=>{if(!W||state!=='ready')return no(new Error('engine not ready'));const id=++seq;wait.set(id,ok);W.postMessage({id,op,text})}),get state(){return state}};
+  window.LikeC4Engine={ask:(op,text)=>new Promise((ok,no)=>{if(!W||state!=='ready')return no(new Error('engine not ready'));const id=++seq;wait.set(id,ok);W.postMessage(typeof text==='string'?{id,op,text}:{id,op,...text})}),get state(){return state}};
   async function check(){place();if(state!=='ready')return;let t;try{t=cur()}catch(e){return}if(t===last||busy)return;last=t;busy=true;badge.className='sm';badge.textContent='LikeC4 …';
     let r;try{r=await LikeC4Engine.ask('parse',t)}finally{busy=false}if(t!==last)return;res=r;const n=r.errors.length;
     badge.className='sm '+(n?'bad':'ok');badge.textContent=n?`LikeC4 ✗ ${F(n)} خطا`:`LikeC4 ✓ ${F(r.views.length)} نما`;if(!pop.hidden)show()}
@@ -6545,5 +6548,9 @@ window.__studio={parseC4,emitC4,get M(){return M},get BASE(){return BASE},cur,di
     const vs=old?diff(M,old):['خوانندهٔ قدیمی نتوانست بخواند: '+oldErr];
     return{ok:roundtrip,errors2:r2.errors.length,sameAsOld:!vs.length,diffs:vs.slice(0,20),nDiffs:vs.length,sameText:out===text,nodes:s1.N.length,rels:s1.R.length}}
   window.LikeC4Reader={fromLikeC4,semantic,diff,readWithLikeC4,golden};
+  // فرق ۱: جای گره‌های بوم استودیو → فایل چیدمان دستی LikeC4
+  function studioPositions(){const pos={};document.querySelectorAll('#world .node[data-p]').forEach(n=>{const w=n.offsetWidth,h=n.offsetHeight;pos[n.dataset.p]={x:n.offsetLeft+w/2,y:n.offsetTop+h/2,w,h}});return pos}
+  async function snapCurrent(viewId){return LikeC4Engine.ask('snap',Object.assign({text:cur()},{viewId,pos:studioPositions()}))}
+  window.LikeC4Layout={studioPositions,snapCurrent};
 })();
 </script>

@@ -16,6 +16,10 @@ srv.listen(0, '127.0.0.1', async () => {
   let fail = errs.length > 0
   for (const [id, x] of Object.entries(r)) { if (!x.ok) fail = true
     console.log(`${x.ok ? 'PASS' : 'FAIL'} ${id}: roundtrip=${x.ok} nodes=${x.nodes} rels=${x.rels} sameAsOld=${x.sameAsOld}${x.nDiffs ? ' (' + x.nDiffs + ' فرق با مبدل قدیمی)' : ''}`) }
+  // فرق ۱: چیدمان بوم استودیو → .likec4.snap؛ LikeC4 باید همان جای‌ها را نشان دهد و drift نداشته باشد
+  const L = await p.evaluate(async () => { const s = await LikeC4Layout.snapCurrent(); return { v: s.viewId, placed: s.placed, same: s.same, drifts: s.drifts } })
+  const lok = L.same && !L.drifts.length && L.placed > 0; if (!lok) fail = true
+  console.log(`${lok ? 'PASS' : 'FAIL'} layout ${L.v}: ${L.placed} گره از بوم استودیو، same=${L.same}, drifts=${L.drifts.join(',') || 'none'}`)
   if (errs.length) console.log('page errors:', errs)
   await b.close(); srv.close(); process.exit(fail ? 1 : 0)
 })
