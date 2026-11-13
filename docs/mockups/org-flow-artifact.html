@@ -317,6 +317,7 @@ body.n8on .cvhint{display:none!important}
 .vmi .vtx{flex:1;display:flex;flex-direction:column;line-height:1.4;text-align:right}.vmi .vtx small{font-size:11px;color:var(--mute)}
 .vmi kbd{font-size:10.5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--mute);font-family:inherit}
 .vmi .vck{width:14px;color:#ea4b71;font-weight:800}
+.n8menu .dd button.vdots{display:flex;align-items:center;gap:8px;color:var(--mute);border:0;background:none;padding:6px 10px;border-radius:8px}.vdots span:first-child{font-size:18px;line-height:1;width:34px;text-align:center}.vdots small{margin-inline-start:auto;font-size:10.5px;border:1px solid var(--line);border-radius:10px;padding:0 6px}.n8menu .dd button.vdots:hover,.n8menu .dd button.vdots.on{background:var(--lane);color:var(--ink)}.vsep{border:0;border-top:1px solid var(--line);margin:6px 0}.vmore[hidden]{display:none}
 .n8menu .dd button.vmi.on{background:var(--lane)!important;color:var(--ink)!important;border:0}.vmi.on .vic{border-color:#ea4b71}
 </style>
 <div id="app">
@@ -2908,7 +2909,11 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.class
   const fs=null,fsOld=old.find(b=>/تمام‌صفحه/.test(b.textContent)),rv=old.find(b=>/بازبینی/.test(b.textContent)),hs=old.find(b=>/تاریخچه/.test(b.textContent));
   V.append(h('h4',{},'ابزار'),...[rv,hs].filter(Boolean));
   const more=old.filter(b=>![fsOld,rv,hs].includes(b)&&b.tagName==='BUTTON'&&!/حالت n8n/.test(b.textContent)&&!/^➡ یک خط|سفر \(Journey/.test(b.textContent));
-  V.append(h('details',{},h('summary',{style:'cursor:pointer;padding:6px 10px;color:var(--mute)'},'بیشتر: نسخه‌های قدیمی و چیدمان‌های دیگر'),h('div',{class:'vers'},...more)))}}
+  // منوی سه‌نقطه (⋯) مثل Linear/Notion: گزینه‌های قدیمی حذف نشده‌اند، فقط با کلیک کاربر باز می‌شوند
+  const box=h('div',{class:'vers vmore',hidden:!window.__vmoreOpen},...more);
+  const dots=h('button',{class:'vdots',title:'گزینه‌های قدیمی',onclick:e=>{e.stopPropagation();window.__vmoreOpen=box.hidden;box.hidden=!box.hidden;dots.classList.toggle('on',!box.hidden)}},h('span',{},'⋯'),h('span',{},'گزینه‌های قدیمی'),h('small',{},toFa(more.length)));
+  if(!box.hidden)dots.classList.add('on');
+  V.append(h('hr',{class:'vsep'}),dots,box)}}
 
 /* ───────── شروع ───────── */
 (function init(){
