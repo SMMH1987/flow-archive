@@ -250,7 +250,7 @@ body.n8on #cv{height:calc(100vh - 90px)!important;min-height:520px}
 .node.n8 .n8l{font-size:13px!important;margin-top:8px!important;max-width:150px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .node.n8.routeStep{clip-path:none!important;filter:none!important}.node.n8.routeStep::before{display:none!important}
 .node.n8::before,.node.n8::after{display:none!important}
-.node.n8 .n8k{display:none}.node.n8:hover .n8k{display:block}
+.node.n8 .n8k{display:block;font-size:11px!important;color:var(--mute);opacity:1!important;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* نقشهٔ سفر */
 .jm{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12.5px}
@@ -266,6 +266,7 @@ body.n8on #cv{height:calc(100vh - 90px)!important;min-height:520px}
 .jtag{display:inline-block;font-size:11px;background:var(--lane);border-radius:10px;padding:1px 8px;margin:1px}
 .jline{border-top:2px dashed #ea4b71;border-bottom:1px solid var(--line);padding:2px 12px;font-size:11px;color:#ea4b71;background:var(--lane)}
 .jcurve{flex:0 0 auto}.jsm{font-size:11px;color:var(--mute)}
+.n8plus{position:absolute;width:28px;height:28px;padding:0;border:2px dashed var(--n8e);border-radius:6px;background:var(--card);color:var(--mute);font-size:18px;line-height:1;z-index:3}.n8plus:hover{border-color:#ea4b71;color:#ea4b71}
 </style>
 <div id="app">
   <div class="top">
@@ -2606,6 +2607,18 @@ let N8MODE=true,N8LAY='row';try{N8LAY=localStorage.getItem('n8lay')||'row'}catch
 let N8MODE_=0;try{const v=localStorage.getItem('n8mode');if(v!==null)N8MODE=v==='1'}catch(e){}
 const N8ICON={triggerStep:'⚡',autoStep:'⚙️',askStep:'💬',gateStep:'✋',routeStep:'🔀',subflowStep:'⧉',noteStep:'📌',orgBox:'📦',flow:'🔁',section:'🗂',role:'👤',tool:'🔧',project:'🧩',actor:'🙂'};
 const N8KIND={triggerStep:'شروع‌کننده',autoStep:'خودکار',askStep:'پرسش از انسان',gateStep:'تأیید انسان',routeStep:'شاخه',subflowStep:'زیرفلو',orgBox:'فاز',section:'بخش',flow:'فرایند',role:'نقش'};
+
+// آیکن‌های خطی Lucide (ISC) مثل سبک n8n
+const LUC={triggerStep:['#f59e0b','<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>'],
+ gateStep:['#dc2626','<path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/>'],
+ askStep:['#d97706','<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'],
+ autoStep:['#16a34a','<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>'],
+ routeStep:['#6366f1','<path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/>'],
+ subflowStep:['#0ea5e9','<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>'],
+ noteStep:['#ca8a04','<path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/>'],
+ orgBox:['#475569','<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>']};
+function lucide(kind){const L=LUC[kind]||LUC.orgBox,sp=document.createElement('span');sp.className='ic';
+  sp.innerHTML=`<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="${L[0]}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${L[1]}</svg>`;return sp}
 function renderN8n(rid){
   const world=$('#world');world.replaceChildren();
   let ps;
@@ -2674,14 +2687,18 @@ function renderN8n(rid){
   ps.forEach(q=>{const n=IDX.get(q),b=B.get(q);vis.set(q,b);const kids=n.children.filter(isStep).length,st=run&&(run.nodes[q]||null);
     const no=(outs.get(q)||[]),nOut=n.kind==='routeStep'?Math.max(1,no.length):1;
     world.append(h('div',{class:`node n8 ${n.kind}${SEL===q?' sel':''}${lockedN(n)?' locked':''}${st?' rs-'+st.s:''}`,'data-p':q,style:`left:${b.x}px;top:${b.y}px`},
-      h('div',{class:'n8i'},h('span',{class:'ic'},N8ICON[n.kind]||'◻️'),
+      h('div',{class:'n8i'},lucide(n.kind),
         n.kind!=='triggerStep'?h('i',{class:'hin'}):null,
         ...Array.from({length:nOut},(_,k)=>h('i',{class:'hout',style:`top:${HB-8+(nOut>1?(k-(nOut-1)/2)*26:0)}px`})),
         lockedN(n)?h('span',{class:'lk'},'🔒'):null,kids?h('span',{class:'ct',title:'قدم‌های داخلی'},toFa(kids)):null,
         st&&st.s==='ok'?h('span',{class:'okc'},'✓'):null),
       h('div',{class:'n8l'},titleName(n)),h('div',{class:'n8k'},(N8KIND[n.kind]||n.kind)+(n.tech&&!/—/.test(n.tech)?' · '+n.tech.replace(/^skill:\s*/,''):''))))});
+  // مثل n8n: «+» بعد از آخرین گره‌ها برای افزودن قدم بعدی
+  ps.filter(q=>!outs.has(q)&&isStep(IDX.get(q))).forEach(q=>{const b=B.get(q);const pp=parentPath(q);
+    world.append(h('button',{class:'n8plus',title:'افزودن قدم بعدی',style:`left:${b.x+75+HB+44}px;top:${b.y+HB-14}px`,onclick:e=>{e.stopPropagation();addChild(pp)}},'+'));
+    svg.append(sv('path',{d:`M${b.x+75+HB+6} ${b.y+HB} L${b.x+75+HB+44} ${b.y+HB}`,style:'stroke:var(--n8e)','stroke-width':2}))});
   if(!ps.length)world.append(h('div',{class:'empty'},'این بخش هنوز قدمی ندارد.'));
-  return{W,H,vis}}
+  return{W:W+80,H,vis}}
 
 /* ───────── نمای «سفر» (Customer Journey Map + Service Blueprint) ─────────
    الگو: NN/g Journey Map (مرحله‌ها × کارها، فکرها، احساس، دردها، فرصت‌ها) و Service Blueprint
