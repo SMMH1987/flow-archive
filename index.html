@@ -31,10 +31,11 @@ for (const e of items) {
   const links = [];
   if (e.markmap) links.push(['🌿 Map جمع‌وبازشو', 'map.html?md=' + encodeURIComponent(e.markmap), 'leaf']);
   if (e.map_ofk) links.push(['🗺 Map اوپن‌فلوکیت', await ofkLink(e.map_ofk), 'map']);
-  links.push([e.kind === 'models' ? '🗺 Map اوپن‌فلوکیت' : '✏️ فلوچارت OpenFlowKit', await ofkLink(e.ofk), e.kind === 'models' ? 'map' : 'ofk']);
+  if (e.c4site) links.push(['▶ LikeC4 (اجرا)', e.c4site, 'map']);
+  if (e.ofk) links.push([e.kind === 'models' ? '🗺 Map اوپن‌فلوکیت' : '✏️ فلوچارت OpenFlowKit', await ofkLink(e.ofk), e.kind === 'models' ? 'map' : 'ofk']);
   if (e.vertical) links.push(['↕ نسخهٔ عمودی', await ofkLink(e.vertical), 'ofk']);
   if (e.mmd) links.push(['🧜 Mermaid Live', await mmdLink(e.mmd), 'mmd']);
-  grid.insertAdjacentHTML('beforeend', `<section class="card"><div class="kind">${e.kind === 'models' ? '🏛 مدل معماری' : '🧩 فلوی اجرایی'}</div>
+  grid.insertAdjacentHTML('beforeend', `<section class="card"><div class="kind">${e.kind === 'models' ? '🏛 مدل معماری' : e.kind === 'c4' ? '🧭 مدل LikeC4' : '🧩 فلوی اجرایی'}</div>
     <h2>${esc(e.title)}</h2><div class="btns">${links.map(([t, u, c]) => `<a class="${c}" href="${esc(u)}" target="${c === 'leaf' ? '_self' : '_blank'}" rel="noopener">${t}</a>`).join('')}</div>
     <div class="files">${e.files.map((f) => `<a href="${esc(f)}" target="_blank">${esc(f)}</a>`).join('')}</div></section>`);
 }

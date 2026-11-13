@@ -1,0 +1,144 @@
+// مسیر سفارش تاج گل (نیلابا) — به سبک n8n روی LikeC4 — 2026-11-13
+// رنگ = نوع گره: ورود بنفش · ماژول سبز · بیرونی خاکستری · هسته (گل‌نامه) قرمز
+// نماهای dynamic = «اجرا»ی گام‌به‌گام مثل n8n (دکمهٔ پخش در LikeC4)
+specification {
+  element actor { style { shape person; color secondary } }
+  element stage { style { color muted } }
+  element trigger { notation "ورود (Trigger)"; style { color indigo; shape queue } }
+  element node { notation "ماژول نیلابا"; style { color green } }
+  element ext { notation "سرویس بیرونی"; style { color gray } }
+  element core { notation "هسته"; style { color red } }
+}
+model {
+  customer = actor 'مشتری'
+  operator = actor 'اپراتور'
+  entry = stage 'ورود' {
+    seo = trigger 'گوگل سئو' { technology 'onpage-seo'; description 'جست‌وجوی «تاج گل»' }
+    ads = trigger 'آگهی گوگل' { technology 'Google Ads'; description 'تبدیل: تماس و فرم' }
+    sms = trigger 'پیامک لینک‌دار' { technology 'sms'; description 'لینک کوتاه روی دامنهٔ خودمان' }
+    social = trigger 'شبکهٔ اجتماعی' { technology 'messenger'; description 'واتس‌اپ، بله، اینستاگرام' }
+  }
+  site = stage 'سایت' {
+    channels = node 'ثبت منبع' { technology 'channels' }
+    trust = node 'بنر اعتماد' { technology 'trust' }
+    product = ext 'صفحهٔ محصول' { technology 'WooCommerce' }
+    qadnama = node 'قدنما' { technology 'qadnama'; description 'اندازهٔ تاج گل کنار آدم' }
+    checkout = node 'فرم سفارش' { technology 'checkout'; description 'زمان، مناسبت، گیرنده' }
+    account = node 'ورود با موبایل' { technology 'account' }
+    coupon = node 'کد تخفیف / باشگاه' { technology 'coupon · club' }
+  }
+  pay = ext 'پرداخت زیبال' { technology 'Zibal'; description 'رویداد order.paid' }
+  golnameh = core 'گل‌نامه' { technology 'golnameh'; description 'صفحهٔ مشترک سفارش · ۱۰۵ اتصال' }
+  ops = stage 'ساخت و ارسال' {
+    hesab = node 'قیمت از تأمین‌کننده' { technology 'hesabnameh' }
+    make = node 'ساخت + عکس کارگاه' { technology 'golnameh · image' }
+    dispatch = node 'زمان‌بندی ارسال' { technology 'dispatch' }
+    snapp = ext 'اسنپ‌باکس' { technology 'snapp' }
+    smsout = node 'پیامک وضعیت' { technology 'sms' }
+    desk = node 'میز اپراتور' { technology 'calm · opqueue · pulse' }
+  }
+  after = stage 'بعد از تحویل' {
+    deliver = node 'تحویل + عکس' { technology 'photo-review' }
+    review = node 'نظر' { technology 'rezayat' }
+    reward = node 'امتیاز و کد تشکر' { technology 'club · rezayat-x-coupon' }
+    maps = node 'نظر در گوگل‌مپ' { technology 'maps' }
+    ledger = node 'حساب و KPI' { technology 'hesabnameh · sheets · kpi · bitrix' }
+    remind = node 'یادآور سال بعد' { technology 'reminder' }
+  }
+  customer -> entry 'جست‌وجو یا کلیک'
+  entry.seo -> site.channels
+  entry.ads -> site.channels
+  entry.sms -> site.channels
+  entry.social -> site.channels
+  site.channels -> site.product
+  site.trust -> site.product
+  site.product -> site.qadnama
+  site.product -> site.checkout
+  site.checkout -> site.account
+  site.account -> site.coupon
+  site.checkout -> pay
+  pay -> golnameh 'order.paid'
+  golnameh -> ops.hesab 'درخواست قیمت'
+  ops.hesab -> ops.make
+  golnameh -> ops.smsout 'stage'
+  golnameh -> ops.desk 'استثناها'
+  operator -> ops.desk
+  ops.make -> ops.dispatch 'made'
+  ops.dispatch -> ops.snapp 'بی‌راننده'
+  ops.dispatch -> after.deliver 'handover'
+  after.deliver -> after.review 'delivered'
+  after.review -> after.reward
+  after.review -> after.maps
+  after.deliver -> after.ledger
+  after.reward -> after.remind
+  after.remind -> entry.sms 'سال بعد ← برگشت'
+}
+views {
+  view index {
+    title 'نقشهٔ کلی مسیر سفارش'
+    include *
+    include entry, site, ops, after
+    autoLayout LeftRight
+  }
+  view site of site {
+    title 'سایت'
+    include *
+    autoLayout LeftRight
+  }
+  view ops of ops {
+    title 'ساخت و ارسال'
+    include *
+    autoLayout LeftRight
+  }
+  view after of after {
+    title 'بعد از تحویل'
+    include *
+    autoLayout LeftRight
+  }
+  view golnameh of golnameh {
+    title 'گل‌نامه و همسایه‌ها'
+    include *, -> golnameh ->
+    autoLayout LeftRight
+  }
+
+  dynamic view run_seo {
+    title '▶ اجرا: ورود از گوگل سئو'
+    customer -> entry.seo 'جست‌وجو'
+    entry.seo -> site.channels 'منبع = seo'
+    site.channels -> site.product
+    site.product -> site.qadnama 'دیدن اندازه'
+    site.product -> site.checkout
+    site.checkout -> site.account 'کد پیامکی'
+    site.checkout -> pay
+    pay -> golnameh 'order.paid'
+    golnameh -> ops.smsout 'پیامک لینک گل‌نامه'
+    golnameh -> ops.hesab 'قیمت'
+    ops.hesab -> ops.make
+    ops.make -> ops.dispatch 'made'
+    ops.dispatch -> after.deliver 'handover'
+    after.deliver -> after.review 'delivered'
+    after.review -> after.maps
+    after.review -> after.reward
+    after.reward -> after.remind
+    autoLayout LeftRight
+  }
+  dynamic view run_sms {
+    title '▶ اجرا: برگشت با پیامک یادآور'
+    after.remind -> entry.sms 'سال بعد'
+    customer -> entry.sms 'کلیک لینک'
+    entry.sms -> site.channels 'منبع = sms'
+    site.channels -> site.product
+    site.product -> site.checkout
+    site.checkout -> site.account
+    site.account -> site.coupon 'کد هدیه'
+    site.checkout -> pay
+    pay -> golnameh 'order.paid'
+    golnameh -> ops.desk 'میز'
+    operator -> ops.desk
+    ops.make -> ops.dispatch
+    ops.dispatch -> ops.snapp 'بی‌راننده'
+    ops.dispatch -> after.deliver
+    after.deliver -> after.ledger
+    autoLayout LeftRight
+  }
+}
