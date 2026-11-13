@@ -1,0 +1,89 @@
+<title>سازندهٔ فرایند استخدام</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&family=JetBrains+Mono&display=swap">
+<style>
+/* layout: 3 numbered input steps (org questionnaire, profile) then a vertical flow; files tab below */
+:root{--bg:#f3f5f8;--card:#fff;--fg:#1b2130;--mut:#667085;--line:#dce1e9;--acc:#4f46e5;--on:#1f9d55;--off:#b8bfcc;--warn:#d97706;--sub:#0e7490;
+--f:"Vazirmatn",Tahoma,sans-serif;--m:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151b;--card:#1c2029;--fg:#e7eaf1;--mut:#9aa3b5;--line:#2c3240;--acc:#8b85ff;--on:#3ccf7a;--off:#4a5160;--warn:#f5a524;--sub:#38bdf8;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12151b;--card:#1c2029;--fg:#e7eaf1;--mut:#9aa3b5;--line:#2c3240;--acc:#8b85ff;--on:#3ccf7a;--off:#4a5160;--warn:#f5a524;--sub:#38bdf8;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f);direction:rtl;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px}
+.wrap{max-width:760px;margin:0 auto;display:grid;gap:14px}
+h1{font-size:1.4rem;margin:0}h2{font-size:1rem;margin:0 0 10px}.sub{color:var(--mut);margin:4px 0 0}
+.c{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.q{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}.q:last-child{border:0}
+.bar{display:flex;gap:6px;flex-wrap:wrap}
+button,select{font-family:var(--f);font-size:.9rem;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:6px 12px;cursor:pointer}
+button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+button:focus-visible,select:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.pf{font-size:.8rem;color:var(--mut);margin-top:8px}
+.flow{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.st{display:flex;gap:10px;align-items:center;border:1.5px solid var(--on);border-radius:8px;padding:9px 12px;background:var(--card)}
+.st::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--on);flex:none}
+.st.h{border-color:var(--warn)}.st.h::before{background:var(--warn)}
+.st.sb{border-color:var(--sub);margin-inline-start:24px}.st.sb::before{background:var(--sub)}
+.st.off{border:1.5px dashed var(--off);color:var(--mut)}.st.off::before{background:var(--off)}.st.off .t{text-decoration:line-through}
+.dec{align-self:center;font-size:.75rem;color:var(--acc);border:1px solid var(--acc);border-radius:99px;padding:2px 10px;margin:6px 0}
+.ar{text-align:center;color:var(--mut);line-height:1.3}
+.tag{margin-inline-start:auto;font-size:.72rem;color:var(--mut);white-space:nowrap}
+.why{font-size:.72rem;color:var(--mut);margin-inline-start:auto;font-family:var(--m);direction:ltr}
+.sum{display:flex;gap:16px;flex-wrap:wrap;font-size:.9rem;margin-bottom:10px}.sum b{font-variant-numeric:tabular-nums}
+pre{font-family:var(--m);font-size:.75rem;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto;direction:ltr;text-align:left;margin:0;white-space:pre}
+.legend{font-size:.75rem;color:var(--mut);display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+</style>
+
+<div class="wrap">
+<header><h1>سازندهٔ فرایند استخدام</h1><p class="sub">نمونهٔ دستورالعمل ساخت فرایند (مدل Camunda). سازمان پرسشنامه را پر می‌کند، پروفایل را انتخاب می‌کند، فلو خودش مشخص می‌کند چه انجام شود و چه رد شود. دادهٔ نمونه.</p></header>
+
+<section class="c"><h2>۱. پرسشنامهٔ سازمان</h2><div class="bar" id="orgs" style="margin-bottom:8px"></div><div id="qs"></div></section>
+<section class="c"><h2>۲. پروفایل (موقعیت)</h2><div class="bar" id="profs"></div><div class="pf" id="pf"></div></section>
+<section class="c"><h2>۳. فلوی نتیجه</h2><div class="sum" id="sum"></div><div class="flow" id="flow"></div>
+<div class="legend"><span>🟢 اجرا</span><span>🟠 گام انسانی (gate)</span><span>🔵 زیرفلو</span><span>⚪ رد شد + دلیل</span></div></section>
+<section class="c"><h2>۴. فایل‌های پشت این صفحه</h2><div class="bar" id="ftabs" style="margin-bottom:8px"></div><pre id="file"></pre></section>
+</div>
+
+<script>
+const Q=[{id:"country",ask:"سازمان در کدام کشور است؟",opts:["IR","DE"]},{id:"uses_paid_ads",ask:"برای آگهی هزینه می‌کنید؟",opts:["yes","no"]},{id:"reference_check",ask:"برای نیروی ارشد بررسی رفرنس لازم است؟",opts:["yes","no"]}];
+const ORGS={"sample-startup-ir":{name:"استارتاپ نمونه",country:"IR",uses_paid_ads:"yes",reference_check:"yes"},"sample-small-ngo":{name:"خیریهٔ کوچک",country:"IR",uses_paid_ads:"no",reference_check:"no"}};
+const PROFS={intern:{name:"کارآموز",role:"Python",level:"junior",country:"IR",budget_eur:0},"seo-specialist":{name:"متخصص سئو",role:"SEO",level:"senior",country:"IR",budget_eur:150},"foreign-dev":{name:"برنامه‌نویس خارجی",role:"Python",level:"senior",country:"DE",budget_eur:300}};
+const RULES={ad_channel:{hit:"FIRST",label:"جدول: کانال آگهی",rules:[
+ [{"org.uses_paid_ads":"== no"},{step:"آگهی رایگان (دانشگاه/شبکه)",gate:1}],
+ [{budget_eur:"== 0"},{step:"آگهی رایگان (دانشگاه/شبکه)",gate:1}],
+ [{budget_eur:"> 0"},{step:"آگهی پولی جابینجا",gate:1}]]},
+ pre_interview:{hit:"COLLECT",label:"جدول: پیش از مصاحبه",rules:[[{role:"== Python"},{step:"آزمون برنامه‌نویسی"}],[{role:"== SEO"},{step:"نمونه‌کار سئو"}]]},
+ post_interview:{hit:"COLLECT",label:"جدول: پس از مصاحبه",rules:[[{level:"== senior","org.reference_check":"== yes"},{step:"بررسی رفرنس"}],[{country:"!= org.country"},{step:"subflow:visa"}]]}};
+const FLOW=["نوشتن آگهی","table:ad_channel","غربال رزومه","table:pre_interview","مصاحبه","table:post_interview","gate:ارسال پیشنهاد"];
+const VISA=["جمع‌آوری مدارک","gate:درخواست ویزا","برنامهٔ انتقال"];
+let org={...ORGS["sample-startup-ir"]},orgKey="sample-startup-ir",prof="intern",ftab="flow.c4";
+const $=s=>document.getElementById(s);
+const get=(c,k)=>k.startsWith("org.")?c.org[k.slice(4)]:c[k];
+function match(cond,v,c){let [op,val]=cond.split(" ");if(val.startsWith("org."))val=get(c,val);if(typeof v=="number")val=+val;
+ return op=="=="?v==val:op=="!="?v!=val:op==">"?v>val:v<val}
+function plan(){const c={...PROFS[prof],org};const out=[];
+ for(const s of FLOW){if(!s.startsWith("table:")){out.push({t:s.replace("gate:",""),k:s.startsWith("gate:")?"h":""});continue}
+  const T=RULES[s.slice(6)];out.push({dec:T.label+" ("+T.hit+")"});let hit=0;const seen=new Set();
+  for(const [w,th] of T.rules){const ok=Object.entries(w).every(([k,cn])=>match(cn,get(c,k),c));
+   const why=Object.entries(w).map(([k,cn])=>k+" "+cn).join(" , ");
+   if(ok&&!(T.hit=="FIRST"&&hit)){hit++;seen.add(th.step);
+    if(th.step=="subflow:visa"){out.push({t:"زیرفلو: ویزا و مدارک خارجی",k:"sb"});VISA.forEach(v=>out.push({t:v.replace("gate:",""),k:v.startsWith("gate:")?"h sb":"sb"}))}
+    else out.push({t:th.step,k:th.gate?"h":""})}
+   else if(!seen.has(th.step)&&!out.some(o=>o.t==th.step&&!o.skip)){seen.add(th.step);out.push({t:th.step=="subflow:visa"?"زیرفلو: ویزا":th.step,k:"off",skip:1,why:ok?"FIRST: قبلاً ردیف دیگری انتخاب شد":why})}}}
+ return out}
+function render(){
+ $("orgs").innerHTML="";for(const k in ORGS){const b=document.createElement("button");b.textContent=ORGS[k].name;b.className=k==orgKey?"on":"";b.onclick=()=>{orgKey=k;org={...ORGS[k]};render()};$("orgs").append(b)}
+ $("qs").innerHTML=Q.map(q=>`<div class="q"><label for="q_${q.id}">${q.ask}</label><select id="q_${q.id}">${q.opts.map(o=>`<option ${org[q.id]==o?"selected":""}>${o}</option>`).join("")}</select></div>`).join("");
+ Q.forEach(q=>$("q_"+q.id).onchange=e=>{org[q.id]=e.target.value;orgKey="";render()});
+ $("profs").innerHTML="";for(const k in PROFS){const b=document.createElement("button");b.textContent=PROFS[k].name;b.className=k==prof?"on":"";b.onclick=()=>{prof=k;render()};$("profs").append(b)}
+ const p=PROFS[prof];$("pf").textContent=`role: ${p.role} · level: ${p.level} · country: ${p.country} · budget_eur: ${p.budget_eur}`;
+ const P=plan();const run=P.filter(x=>x.t&&!x.skip&&!x.t.startsWith("زیرفلو:"));
+ $("sum").innerHTML=`<span>گام اجرا: <b>${run.length}</b></span><span>گام انسانی: <b>${run.filter(x=>x.k.includes("h")).length}</b></span><span>رد شده: <b>${P.filter(x=>x.skip).length}</b></span>`;
+ $("flow").innerHTML=P.map((x,i)=>(i?'<div class="ar">↓</div>':"")+(x.dec?`<div class="dec">◆ ${x.dec}</div>`:`<div class="st ${x.k}"><span class="t">${x.t}</span>${x.skip?`<span class="why">${x.why}</span>`:x.k.includes("h")?'<span class="tag">منتظر انسان</span>':""}</div>`)).join("");
+ files()}
+const FILES={"flow.c4":()=>`agent hrRecruit 'ایجنت استخدام' {\n  step writeAd 'نوشتن آگهی'\n  decision ad 'کانال آگهی'      -> rules.yaml#ad_channel\n  step screen 'غربال رزومه'\n  decision pre 'پیش از مصاحبه'  -> rules.yaml#pre_interview\n  step interview 'مصاحبه'\n  decision post 'پس از مصاحبه'  -> rules.yaml#post_interview\n  step offer 'ارسال پیشنهاد' #gate\n}`,
+ "rules.yaml":()=>"tables:\n"+Object.entries(RULES).map(([k,t])=>`  ${k}:\n    hit_policy: ${t.hit}\n    rules:\n`+t.rules.map(([w,th])=>`      - when: ${JSON.stringify(w)}\n        then: ${JSON.stringify(th)}`).join("\n")).join("\n"),
+ "questionnaire.yaml":()=>"questions:\n"+Q.map(q=>`  - id: ${q.id}\n    ask: "${q.ask}"`).join("\n"),
+ "orgs/<org>.yaml":()=>Object.entries(org).filter(([k])=>k!="name").map(([k,v])=>`${k}: ${v}`).join("\n"),
+ "profiles/<profile>.yaml":()=>`profile: ${prof}\n`+Object.entries(PROFS[prof]).filter(([k])=>k!="name").map(([k,v])=>`${k}: ${v}`).join("\n")};
+function files(){$("ftabs").innerHTML="";for(const k in FILES){const b=document.createElement("button");b.textContent=k;b.className=k==ftab?"on":"";b.onclick=()=>{ftab=k;files()};$("ftabs").append(b)}$("file").textContent=FILES[ftab]()}
+render();
+</script>

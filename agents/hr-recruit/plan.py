@@ -24,7 +24,12 @@ def plan(org, p):
                 if h["step"].startswith("subflow:"): run += ["  ↳ " + x for x in VISA]
                 else: run.append(h["step"] + (" [gate]" if "gate" in h else ""))
             elif not ok: skipped.append(f'{r["then"]["step"]}  ({", ".join(f"{k} {c}" for k, c in r["when"].items())})')
-    return run, skipped
+    ran = {x.replace(" [gate]","") for x in run}
+    out, seen = [], set()
+    for x in skipped:
+        k = x.split("  (")[0]
+        if k not in ran and k not in seen: seen.add(k); out.append(x)
+    return run, out
 if __name__ == "__main__":
     org = yaml.safe_load(open(sys.argv[1], encoding="utf-8")); p = yaml.safe_load(open(sys.argv[2], encoding="utf-8"))
     run, sk = plan(org, p)
