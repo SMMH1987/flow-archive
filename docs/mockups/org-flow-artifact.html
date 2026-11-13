@@ -118,6 +118,9 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
 .node[style*='height:36px'] .ns,.node[style*='height:28px'] .ns{display:none}.node[style*='height:36px'] .nt,.node[style*='height:28px'] .nt{font-size:11.5px;-webkit-line-clamp:1}.node[style*='height:36px'],.node[style*='height:28px']{padding:1px 8px}.node.routeStep[style*='height:36px']{padding:1px 18px}
 .vers{display:flex;gap:4px;flex-wrap:wrap}.vers button.on{background:var(--ask);border-color:var(--ask);color:var(--card);font-weight:600}
 #p-dia.v3{grid-template-columns:230px minmax(0,1fr) 340px}
+body:not(.n8on).treehide #p-dia #tree{display:none!important}body:not(.n8on).insphide #p-dia #insp{display:none!important}
+body:not(.n8on).treehide #p-dia.v3{grid-template-columns:minmax(0,1fr) 340px}body:not(.n8on).insphide #p-dia.v3{grid-template-columns:230px minmax(0,1fr)}body:not(.n8on).treehide.insphide #p-dia.v3{grid-template-columns:minmax(0,1fr)}
+body:not(.n8on).insphide #p-dia:not(.v3){grid-template-columns:minmax(0,1fr)!important}
 @media(max-width:1200px){#p-dia.v3{grid-template-columns:minmax(0,1fr) 340px}#p-dia.v3 #tree{grid-column:1/-1;max-height:200px}}
 @media(max-width:960px){#p-dia.v3{grid-template-columns:minmax(0,1fr)}}
 .fh{display:flex;align-items:center;gap:8px}.fh .ft{cursor:pointer;flex:1}.fh .ft:hover{text-decoration:underline}.lanebox.foc{outline:3px solid var(--acc);outline-offset:2px}.node.foc{outline:3px solid var(--acc);outline-offset:2px}.crumbs{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}
@@ -2903,12 +2906,12 @@ function n8dashChrome(on){document.body.classList.toggle('n8full',on);const P=$(
 
 
 /* پنل کشویی: با انتخاب گره باز، با ✕ یا Esc بسته */
-{const _ri=renderInsp;renderInsp=function(){_ri();const I=$('#insp');document.body.classList.toggle('inspopen',!!SEL||!!SELE||HISTOPEN);
+{const _ri=renderInsp;renderInsp=function(){_ri();const I=$('#insp');if(SEL||SELE!=null)document.body.classList.remove('insphide');document.body.classList.toggle('inspopen',!!SEL||!!SELE||HISTOPEN);
   // سربرگ پنل مثل NDV در n8n و Inspector در Figma: آیکن نوع + نام + نوع + بستن
   I.querySelector('.pnlh')?.remove();const n=SEL&&IDX.get(SEL);
   I.prepend(h('div',{class:'pnlh'},n?lucide(n.kind):h('span',{class:'ic'},'⚙'),h('div',{class:'pt'},h('b',{},n?titleName(n):SELE!=null?'جزئیات فلش':'جزئیات'),h('small',{},n?(N8KIND[n.kind]||n.kind)+' · '+SEL:'ویرایش و تنظیمات')),
-    h('button',{id:'inspx',class:'sm',title:'بستن (Esc)',onclick:()=>{SEL=null;SELE=null;HISTOPEN=false;document.body.classList.remove('inspopen');renderDia()}},'✕')))}}
-{const _rt=renderTree;renderTree=function(){_rt();const T=$('#tree');if(!T.querySelector('.pnlh'))T.prepend(h('div',{class:'pnlh'},h('span',{class:'ic'},'🗂'),h('div',{class:'pt'},h('b',{},'فهرست بخش‌ها'),h('small',{},'برای رفتن به هر بخش کلیک کن')),h('button',{class:'sm',onclick:()=>document.body.classList.remove('treeopen')},'✕')))}}
+    h('button',{id:'inspx',class:'sm',title:'بستن (Esc)',onclick:()=>{SEL=null;SELE=null;HISTOPEN=false;document.body.classList.remove('inspopen');if(!N8MODE)document.body.classList.add('insphide');renderDia();renderInsp()}},'✕')))}}
+{const _rt=renderTree;renderTree=function(){_rt();const T=$('#tree');if(!T.querySelector('.pnlh'))T.prepend(h('div',{class:'pnlh'},h('span',{class:'ic'},'🗂'),h('div',{class:'pt'},h('b',{},'فهرست بخش‌ها'),h('small',{},'برای رفتن به هر بخش کلیک کن')),h('button',{class:'sm',title:'بستن (با 🗂 در نوار کناری دوباره باز می‌شود)',onclick:()=>{document.body.classList.remove('treeopen');document.body.classList.add('treehide')}},'✕')))}}
 document.addEventListener('keydown',e=>{if(/^[1-4]$/.test(e.key)&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)&&TAB==='dia'){const b=document.querySelectorAll('#vers .vmi')[+e.key-1];if(b)b.click()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('inspopen')){SEL=null;SELE=null;document.body.classList.remove('inspopen');renderDia();renderInsp()}});
 
@@ -2916,7 +2919,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.class
 (function n8shell(){
   const top=$('.top'),tabs=$('#tabs'),vers=$('#vers');
   const side=h('nav',{id:'n8side','aria-label':'بخش‌ها'},h('div',{class:'logo'},'س'));
-  side.append(h('button',{title:'فهرست بخش‌ها',onclick:()=>{document.body.classList.toggle('treeopen')}},'🗂',h('span',{},'فهرست بخش‌ها')));
+  side.append(h('button',{title:'فهرست بخش‌ها',onclick:()=>{if(N8MODE)document.body.classList.toggle('treeopen');else document.body.classList.toggle('treehide')}},'🗂',h('span',{},'فهرست بخش‌ها')));
   const SB=[['dia','🗺','ویرایشگر فلو'],['run','▶','اجراها'],['mind','🧠','ذهن‌نقشه'],['int','🔗','پروژه‌ها و interop'],['out','📤','تغییرات و خروجی C4']];
   SB.forEach(([k,i,l])=>side.append(h('button',{'data-k':k,title:l,onclick:()=>{TAB=k;showTab()}},i,h('span',{},l))));
   document.body.prepend(side);
