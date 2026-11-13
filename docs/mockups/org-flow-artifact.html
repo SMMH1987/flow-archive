@@ -236,7 +236,8 @@ body.n8on #cv{height:calc(100vh - 90px)!important;min-height:520px}
 #cv{background-color:var(--lane)}
 
 /* n8n نمای دقیق‌تر */
-:root{--n8e:#9aa1ab}
+:root{--n8e:#9aa1ab;--n8back:#e8590c}
+.node.n8.n8tgt .n8i{box-shadow:0 0 0 5px #e8590c66}
 .node.n8 .n8i{width:96px!important;height:96px!important;border-radius:8px!important;border:2px solid #c9ced6!important;background:var(--card)!important;box-shadow:0 1px 2px #0000000f}
 .node.n8 .n8i .ic{font-size:38px;line-height:1}
 .node.n8.triggerStep .n8i{border-radius:50px 8px 8px 50px!important}
@@ -2700,23 +2701,28 @@ function renderN8n(rid){
   world.style.width=W+'px';world.style.height=H+'px';world.style.direction='ltr';world.append(svg);
   // فلش‌ها به سبک n8n: خروج از دستگیرهٔ راست، ورود به دستگیرهٔ چپ، منحنی بزیه با بازوی افقی؛
   // شاخه‌ها از دستگیره‌های جدا (یکی زیر دیگری) با برچسب کنار دستگیره؛ پس از اجرا سبز با «n مورد»
-  for(let k=rels.length-1;k>=0;k--){const [r]=rels[k];if(!same(r)&&B.get(r.to).x<=B.get(r.from).x){if(window.N8DIFF){r._back=1;continue}r._back=0;(xref.get(r.from)||xref.set(r.from,[]).get(r.from)).push(r.to);rels.splice(k,1)}}
+  for(let k=rels.length-1;k>=0;k--){const [r]=rels[k];if(false){(xref.get(r.from)||xref.set(r.from,[]).get(r.from)).push(r.to);rels.splice(k,1)}}
   const run=N8.cur(),BX=96,HB=BX/2,cxn=b=>b.x+75,cyn=b=>b.y+HB;
   const outs=new Map();rels.forEach(([r])=>{(outs.get(r.from)||outs.set(r.from,[]).get(r.from)).push(r.to)});
   const ins=new Map();rels.forEach(([r])=>{(ins.get(r.to)||ins.set(r.to,[]).get(r.to)).push(r.from)});
   const portY=(q,list,t,base)=>{const L=list.get(q)||[];const k=L.indexOf(t),n=L.length;return base+(n>1&&IDX.get(q).kind==='routeStep'?(k-(n-1)/2)*26:0)};
   const marker=sv('marker',{id:'n8ar',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto'});marker.append(sv('path',{d:'M0 1L9 5L0 9z',style:'fill:var(--n8e)'}));
   const markerG=sv('marker',{id:'n8arg',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto'});markerG.append(sv('path',{d:'M0 1L9 5L0 9z',style:'fill:#16a34a'}));
-  svg.querySelector('defs').append(marker,markerG);
+  const markerB=sv('marker',{id:'n8arb',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto'});markerB.append(sv('path',{d:'M0 1L9 5L0 9z',style:'fill:var(--n8back)'}));
+  svg.querySelector('defs').append(marker,markerG,markerB);
   rels.forEach(([r,i])=>{const A=B.get(r.from),Bb=B.get(r.to),isRoute=IDX.get(r.from).kind==='routeStep';
     const x1=cxn(A)+HB+6,y1=portY(r.from,outs,r.to,cyn(A)),x2=cxn(Bb)-HB-6,y2=cyn(Bb);
     let d;const dx=x2-x1;
     if(x1-20<=x2){const c=dx>=0?dx/2:0.25*25*Math.sqrt(-dx);d=`M${x1} ${y1} C${x1+c} ${y1} ${x2-c} ${y2} ${x2} ${y2}`}
     else{const R=16,P=40,yb=y1+130,ax=x1+P,bx=x2-P;
       d=`M${x1} ${y1} L${ax-R} ${y1} Q${ax} ${y1} ${ax} ${y1+R} L${ax} ${yb-R} Q${ax} ${yb} ${ax-R} ${yb} L${bx+R} ${yb} Q${bx} ${yb} ${bx} ${yb-R} L${bx} ${y2+R*Math.sign(yb-y2)} Q${bx} ${y2} ${bx+R} ${y2} L${x2} ${y2}`}
-    const cnt=run&&run.edges[r.from+'>'+r.to],err=(IDX.get(r.to).tags||[]).includes('onError');
-    svg.append(sv('path',{d,fill:'none',style:`stroke:${r._back&&window.N8DIFF?'#dc2626':cnt?'#16a34a':'var(--n8e)'}`,'stroke-width':r._back&&window.N8DIFF?3.5:cnt?2.6:2,'stroke-dasharray':err?'6 5':'none','marker-end':`url(#${cnt?'n8arg':'n8ar'})`}));
-    const hit=sv('path',{d,fill:'none',stroke:'transparent','stroke-width':16,class:'hit','data-e':i});const tt=sv('title');tt.textContent='از «'+nodeLabel(r.from)+'» به «'+nodeLabel(r.to)+'»'+(r.label?' — '+r.label:'');hit.append(tt);svg.append(hit);
+    const cnt=run&&run.edges[r.from+'>'+r.to],err=(IDX.get(r.to).tags||[]).includes('onError'),back=!(x1-20<=x2);
+    // برگشت (حلقه): نارنجی، خط‌چین، از زیر گره‌ها، با برچسب «↩ برگشت به …» روی پایین‌ترین بخش؛ با نشانگر موس پررنگ می‌شود
+    const col=cnt?'#16a34a':back?'var(--n8back)':err?'#dc2626':'var(--n8e)';
+    const pe=sv('path',{d,fill:'none',class:back?'n8bk':'',style:`stroke:${col}`,'stroke-width':cnt?2.6:2,'stroke-dasharray':back?'7 5':err?'6 5':'none','marker-end':`url(#${cnt?'n8arg':back?'n8arb':'n8ar'})`});svg.append(pe);
+    if(back){const yb=y1+130,tx=(x1+x2)/2,t=sv('text',{x:tx,y:yb+15,'text-anchor':'middle','font-size':11.5,style:'fill:var(--n8back);paint-order:stroke;stroke:var(--lane);stroke-width:5px;font-family:var(--font);font-weight:700'});
+      t.textContent='↩ برگشت به «'+titleName(IDX.get(r.to)).slice(0,24)+'»';svg.append(t)}
+    const hit=sv('path',{d,fill:'none',stroke:'transparent','stroke-width':16,class:'hit','data-e':i});hit.addEventListener('mouseenter',()=>{pe.style.strokeWidth=4;const a=$('#world').querySelector(`.node[data-p="${r.to}"]`);if(a)a.classList.add('n8tgt')});hit.addEventListener('mouseleave',()=>{pe.style.strokeWidth='';document.querySelectorAll('.n8tgt').forEach(e=>e.classList.remove('n8tgt'))});const tt=sv('title');tt.textContent='از «'+nodeLabel(r.from)+'» به «'+nodeLabel(r.to)+'»'+(r.label?' — '+r.label:'');hit.append(tt);svg.append(hit);
     const lb=(isRoute||(r.label&&r.label!=='بعد'))?r.label:'';
     const pill=(x,y,txt,col)=>{const t=sv('text',{x,y,'font-size':11.5,'text-anchor':'middle',style:`fill:${col};paint-order:stroke;stroke:var(--lane);stroke-width:5px;font-family:var(--font);font-weight:600`});t.textContent=txt;svg.append(t)};
     if(lb)pill(x1+14+Math.min(60,lb.length*6.5)/2,y1+(y2<y1?-8:y2>y1?16:-8),lb.length>14?lb.slice(0,13)+'…':lb,'var(--mute)');
