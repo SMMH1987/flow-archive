@@ -82,6 +82,7 @@ input[type=checkbox],input[type=radio]{width:auto}
 .lockbox{background:var(--gatebg);border:1px solid var(--gate);border-radius:8px;padding:6px 8px;margin-top:6px;font-size:13px}
 .legend{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:13px}
 .legend i{display:block;width:46px;height:22px;border:2px solid;font-style:normal}
+[hidden]{display:none!important}
 .page{padding-block:4px}
 .proj{background:var(--card);border:1px solid var(--line);border-inline-start:6px solid var(--proj);border-radius:12px;padding:12px;margin-bottom:14px}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 12px}
@@ -274,10 +275,10 @@ body.n8on #cv{height:calc(100vh - 90px)!important;min-height:520px}
 .n8plus{position:absolute;width:28px;height:28px;padding:0;border:2px dashed var(--n8e);border-radius:6px;background:var(--card);color:var(--mute);font-size:18px;line-height:1;z-index:3}.n8plus:hover{border-color:#ea4b71;color:#ea4b71}
 
 /* نمای «داشبورد n8n»: تمام‌صفحه، مثل ویرایشگر n8n */
-body.n8full #app>*:not(#p-dia){display:none!important}
-body.n8full #p-dia{position:fixed;inset:0;inset-inline-end:56px;padding:0!important;display:block!important;z-index:25;background:#f5f5f5}
-body.n8full #p-dia>*{display:none!important}
-body.n8full #p-dia .n8cvhost{display:block!important;position:absolute;inset:0}
+body.n8full:not(.offdia) #app>*:not(#p-dia){display:none!important}
+body.n8full:not(.offdia) #p-dia{position:fixed;inset:0;inset-inline-end:56px;padding:0!important;display:block!important;z-index:25;background:#f5f5f5}
+body.n8full:not(.offdia) #p-dia>*{display:none!important}
+body.n8full:not(.offdia) #p-dia .n8cvhost{display:block!important;position:absolute;inset:0}
 body.n8full #cv{position:absolute!important;top:96px;left:0;right:0;bottom:36px;height:auto!important;border:0;border-radius:0;background-color:#f5f5f5;background-image:radial-gradient(#c8c8c8 1px,transparent 1px);background-size:16px 16px}
 body.n8full .cvtools,body.n8full .cvhint{display:none!important}
 .n8bar{display:none}
@@ -301,7 +302,7 @@ body.n8full #n8mini{display:none}
 .node.n8 .n8x{font-size:10.5px;color:#6366f1;margin-top:2px}
 
 /* آرام مثل n8n (calm-panels): بوم تمام‌عرض؛ پنل جزئیات فقط با انتخاب گره، کشویی از راست؛ درخت پشت دکمهٔ نوار کناری */
-body.n8on #p-dia{display:block!important}
+body.n8on #p-dia:not([hidden]){display:block!important}
 body.n8on #p-dia #tree{position:fixed;top:64px;left:16px;width:260px;max-height:calc(100vh - 80px);overflow:auto;z-index:22;box-shadow:0 10px 30px #0003}
 body.n8on:not(.treeopen) #p-dia #tree{display:none!important}
 body.n8on #p-dia #cv{height:calc(100vh - 90px)!important}
@@ -395,6 +396,475 @@ body.n8on .cvhint{display:none!important}
   </div>
   <div id="p-mind" class="page" hidden></div>
   <div id="p-proc" class="page" hidden></div>
+<script type="text/plain" id="orgglobal-c4">// چارت سازمانی جهانی + لایهٔ مکانی ایران — یک مدل واحد (SSOT) — 2026-11-13
+// منابع (از حافظه، نیاز به بررسی): APQC PCF Cross-Industry v7.x (۱۳ دسته)، Porter Value Chain 1985، COSO ERM 2017، ISO 37000/31000/27001/9001، ITIL 4، SCOR
+// لایهٔ ایران = همان مدل + عناصر با تگ #loc_ir؛ هیچ بخشی کپی نشده. انتخاب لایه: org-global.rules.yaml
+// رنگ: ask نارنجی · auto سبز · gate قرمز. هر قدم external: yes|no|? صریح دارد. محتوای حقوقی ایران: تأییدنشده → پروژهٔ حق‌پرس
+
+specification {
+  element orgBox { style { color slate } }
+  element dept { style { color muted } }
+  element askStep { notation "after: ask" style { color amber } }
+  element autoStep { notation "after: auto" style { color green } }
+  element gateStep { notation "after: gate — پول/حقوقی/انتشار/غیرقابل‌برگشت" style { color red } }
+  tag loc_global
+  tag loc_ir
+  tag unverified
+  tag primary
+  tag support
+}
+
+model {
+  org = orgBox 'سازمان (نسخهٔ جهانی)' {
+    description 'سلسله‌مراتب: بخش → واحد. اولیه = زنجیرهٔ ارزش اصلی، پشتیبان = بقیه'
+    strategy = dept '۱. راهبرد و حاکمیت' {
+      #loc_global #support
+      technology 'APQC 1.0 + ISO 37000'
+      board = gateStep 'هیئت‌مدیره و کمیته‌ها' { #loc_global
+        description 'تصویب راهبرد، نظارت، کمیتهٔ حسابرسی و ریسک'
+        metadata { external '?' }
+      }
+      ceo = autoStep 'مدیرعامل / دفتر مدیرعامل' { #loc_global
+        description 'اجرای راهبرد، هماهنگی بخش‌ها'
+        metadata { external 'no' }
+      }
+      strategy_pmo = askStep 'برنامه‌ریزی راهبردی و PMO' { #loc_global
+        description 'OKR، بودجهٔ سالانه، سبد پروژه'
+        metadata { external 'no' }
+      }
+      corpdev = gateStep 'توسعهٔ کسب‌وکار و M&A' { #loc_global
+        description 'ادغام، خرید، سرمایه‌گذاری'
+        metadata { external '?' }
+      }
+    }
+    rnd = dept '۲. تحقیق و توسعه / محصول' {
+      #loc_global #primary
+      technology 'APQC 2.0 + Porter (Technology Dev.)'
+      product = askStep 'مدیریت محصول' { #loc_global
+        description 'نقشهٔ راه، نیازسنجی'
+        metadata { external 'no' }
+      }
+      research = askStep 'تحقیق و نوآوری' { #loc_global
+        description 'نمونه‌سازی، IP'
+        metadata { external 'no' }
+      }
+      design = autoStep 'طراحی (UX/صنعتی)' { #loc_global
+        description 'تجربهٔ کاربر'
+        metadata { external 'no' }
+      }
+      engineering = autoStep 'مهندسی / توسعهٔ نرم‌افزار' { #loc_global
+        description 'ساخت و تست'
+        metadata { external 'no' }
+      }
+    }
+    marketing = dept '۳. بازاریابی' {
+      #loc_global #primary
+      technology 'APQC 3.0 + Porter (Marketing & Sales)'
+      brand = gateStep 'برند و ارتباطات' { #loc_global
+        description 'هویت، روابط عمومی'
+        metadata { external 'yes' }
+      }
+      growth = gateStep 'بازاریابی دیجیتال و رشد' { #loc_global
+        description 'سئو، تبلیغات، کمپین'
+        metadata { external 'yes' }
+      }
+      market_research = autoStep 'تحقیقات بازار' { #loc_global
+        description 'رقبا، مشتری'
+        metadata { external 'no' }
+      }
+      pricing = gateStep 'قیمت‌گذاری' { #loc_global
+        description 'مدل درآمد، تخفیف'
+        metadata { external 'yes' }
+      }
+    }
+    sales = dept '۴. فروش' {
+      #loc_global #primary
+      technology 'APQC 3.0 + Porter'
+      bizdev = gateStep 'توسعهٔ فروش / B2B' { #loc_global
+        description 'قرارداد مشتری'
+        metadata { external 'yes' }
+      }
+      salesops = autoStep 'عملیات فروش و CRM' { #loc_global
+        description 'قیف فروش، پیش‌بینی'
+        metadata { external 'no' }
+      }
+      channel = gateStep 'کانال و شرکا' { #loc_global
+        description 'نمایندگی، همکاری'
+        metadata { external 'yes' }
+      }
+    }
+    ops = dept '۵. عملیات و زنجیره تأمین' {
+      #loc_global #primary
+      technology 'APQC 4.0 + SCOR + Porter (Inbound/Ops/Outbound)'
+      procurement = gateStep 'خرید و تدارکات' { #loc_global
+        description 'انتخاب تأمین‌کننده، سفارش'
+        metadata { external 'yes' }
+      }
+      production = autoStep 'تولید / ارائهٔ خدمت' { #loc_global
+        description 'اجرای کار اصلی'
+        metadata { external 'no' }
+      }
+      logistics = autoStep 'انبار و لجستیک' { #loc_global
+        description 'حمل، موجودی'
+        metadata { external 'no' }
+      }
+      quality = askStep 'کنترل کیفیت' { #loc_global
+        description 'ISO 9001'
+        metadata { external 'no' }
+      }
+    }
+    service = dept '۶. خدمات مشتری' {
+      #loc_global #primary
+      technology 'APQC 5.0–6.0 + Porter (Service)'
+      support = autoStep 'پشتیبانی و تیکت' { #loc_global
+        description 'پاسخ به مشتری'
+        metadata { external 'no' }
+      }
+      success = askStep 'موفقیت مشتری' { #loc_global
+        description 'نگهداشت، تمدید'
+        metadata { external 'no' }
+      }
+      complaints = gateStep 'رسیدگی به شکایات' { #loc_global
+        description 'ISO 10002'
+        metadata { external 'yes' }
+      }
+    }
+    hr = dept '۷. منابع انسانی' {
+      #loc_global #support
+      technology 'APQC 7.0 + Porter (HR Mgmt)'
+      recruit = gateStep 'جذب و استخدام' { #loc_global
+        description '→ recruitment.c4'
+        metadata { external 'yes' }
+      }
+      onboarding = autoStep 'ورود و آموزش' { #loc_global
+        description 'L&D'
+        metadata { external 'no' }
+      }
+      comp = gateStep 'حقوق، مزایا و پرداخت' { #loc_global
+        description 'payroll'
+        metadata { external 'yes' }
+      }
+      perf = askStep 'ارزیابی عملکرد' { #loc_global
+        description 'بازخورد، ارتقا'
+        metadata { external 'no' }
+      }
+      employee_rel = askStep 'روابط کار و فرهنگ' { #loc_global
+        description 'انضباط، رضایت'
+        metadata { external 'no' }
+      }
+      offboarding = gateStep 'خروج کارکنان' { #loc_global
+        description 'تسویه'
+        metadata { external 'yes' }
+      }
+    }
+    tech = dept '۸. فناوری اطلاعات' {
+      #loc_global #support
+      technology 'APQC 8.0 + ITIL 4'
+      infra = autoStep 'زیرساخت و ابر' { #loc_global
+        description 'شبکه، سرور'
+        metadata { external 'no' }
+      }
+      apps = autoStep 'سامانه‌های داخلی (ERP/CRM)' { #loc_global
+        description 'انتخاب و نگهداری'
+        metadata { external 'no' }
+      }
+      data = autoStep 'داده و هوش تجاری' { #loc_global
+        description 'گزارش، داشبورد'
+        metadata { external 'no' }
+      }
+      helpdesk = autoStep 'میز خدمت IT' { #loc_global
+        description 'پشتیبانی کارکنان'
+        metadata { external 'no' }
+      }
+    }
+    finance = dept '۹. مالی و حسابداری' {
+      #loc_global #support
+      technology 'APQC 9.0 + IFRS'
+      accounting = autoStep 'حسابداری عمومی' { #loc_global
+        description 'دفاتر، بستن ماه'
+        metadata { external 'no' }
+      }
+      ap_ar = gateStep 'پرداختنی / دریافتنی' { #loc_global
+        description 'فاکتور، وصول'
+        metadata { external 'yes' }
+      }
+      treasury = gateStep 'خزانه‌داری' { #loc_global
+        description 'نقدینگی، بانک'
+        metadata { external 'yes' }
+      }
+      fpa = askStep 'بودجه و تحلیل مالی (FP&A)' { #loc_global
+        description 'پیش‌بینی'
+        metadata { external 'no' }
+      }
+      tax = gateStep 'مالیات' { #loc_global
+        description 'اظهارنامه، برنامه‌ریزی مالیاتی'
+        metadata { external 'yes' }
+      }
+      audit_int = askStep 'حسابرسی داخلی' { #loc_global
+        description 'COSO'
+        metadata { external 'no' }
+      }
+      investor_rel = gateStep 'روابط سرمایه‌گذار' { #loc_global
+        description 'گزارش به سهام‌دار'
+        metadata { external 'yes' }
+      }
+    }
+    assets = dept '۱۰. دارایی و امکانات' {
+      #loc_global #support
+      technology 'APQC 10.0'
+      facilities = gateStep 'ساختمان و امکانات' { #loc_global
+        description 'اجاره، نگهداری'
+        metadata { external 'yes' }
+      }
+      fixed_assets = autoStep 'دارایی ثابت' { #loc_global
+        description 'ثبت، استهلاک'
+        metadata { external 'no' }
+      }
+    }
+    risk = dept '۱۱. ریسک، انطباق و امنیت' {
+      #loc_global #support
+      technology 'APQC 11.0 + COSO ERM + ISO 31000/27001'
+      erm = askStep 'مدیریت ریسک سازمانی' { #loc_global
+        description 'ثبت ریسک'
+        metadata { external 'no' }
+      }
+      compliance = askStep 'انطباق و اخلاق' { #loc_global
+        description 'کدهای رفتاری'
+        metadata { external 'no' }
+      }
+      infosec = gateStep 'امنیت اطلاعات' { #loc_global
+        description 'ISO 27001'
+        metadata { external 'yes' }
+      }
+      privacy = gateStep 'حریم خصوصی داده' { #loc_global
+        description 'GDPR-style'
+        metadata { external 'yes' }
+      }
+      bcp = askStep 'تداوم کسب‌وکار' { #loc_global
+        description 'ISO 22301'
+        metadata { external 'no' }
+      }
+      hse = askStep 'ایمنی، بهداشت، محیط زیست' { #loc_global
+        description 'ISO 45001/14001'
+        metadata { external 'no' }
+      }
+    }
+    legal = dept '۱۲. حقوقی و روابط خارجی' {
+      #loc_global #support
+      technology 'APQC 12.0'
+      contracts = gateStep 'قراردادها' { #loc_global
+        description 'تنظیم و بازبینی'
+        metadata { external 'yes' }
+      }
+      corp_legal = gateStep 'امور شرکتی و ثبت' { #loc_global
+        description 'صورت‌جلسات'
+        metadata { external 'yes' }
+      }
+      ip = gateStep 'مالکیت فکری' { #loc_global
+        description 'علامت تجاری، پتنت'
+        metadata { external 'yes' }
+      }
+      litigation = gateStep 'دعاوی' { #loc_global
+        description 'وکالت'
+        metadata { external 'yes' }
+      }
+      gov_rel = gateStep 'روابط با دولت و نهادها' { #loc_global
+        description 'مجوزها'
+        metadata { external 'yes' }
+      }
+      csr = gateStep 'مسئولیت اجتماعی / ESG' { #loc_global
+        description 'گزارش پایداری'
+        metadata { external 'yes' }
+      }
+    }
+    capability = dept '۱۳. توانمندی و بهبود سازمان' {
+      #loc_global #support
+      technology 'APQC 13.0 + Lean/ISO 9001'
+      process = autoStep 'مدیریت فرایند (BPM)' { #loc_global
+        description 'این مخزن: .c4'
+        metadata { external 'no' }
+      }
+      knowledge = autoStep 'مدیریت دانش' { #loc_global
+        description 'مستندسازی'
+        metadata { external 'no' }
+      }
+      change = askStep 'مدیریت تغییر' { #loc_global
+        description 'ADKAR'
+        metadata { external 'no' }
+      }
+    }
+  }
+
+  // ===== لایهٔ ایران (overlay): همان بخش‌ها گسترش می‌یابند =====
+  extend org.finance {
+    ir_tax_portal = gateStep '🇮🇷 سامانهٔ مؤدیان و صورتحساب الکترونیک' { #loc_ir #unverified
+      description 'ارسال فاکتور به سامانهٔ مؤدیان — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.finance {
+    ir_vat = gateStep '🇮🇷 ارزش افزوده (فصلی)' { #loc_ir #unverified
+      description 'اظهارنامهٔ VAT — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.finance {
+    ir_seasonal = gateStep '🇮🇷 گزارش معاملات فصلی' { #loc_ir #unverified
+      description 'ماده ۱۶۹ — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.finance {
+    ir_statutory_audit = gateStep '🇮🇷 حسابرس مستقل و بازرس قانونی' { #loc_ir #unverified
+      description 'عضو جامعهٔ حسابداران رسمی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.finance {
+    ir_banking = gateStep '🇮🇷 بانک، چک صیادی، ارز' { #loc_ir #unverified
+      description 'نقدینگی و محدودیت ارزی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.hr {
+    ir_tamin = gateStep '🇮🇷 بیمهٔ تأمین اجتماعی' { #loc_ir #unverified
+      description 'لیست ماهانهٔ بیمه — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.hr {
+    ir_labor_law = gateStep '🇮🇷 قانون کار و قرارداد کار' { #loc_ir #unverified
+      description 'فرم قرارداد، تسویه — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.hr {
+    ir_payroll_tax = gateStep '🇮🇷 مالیات حقوق' { #loc_ir #unverified
+      description 'فهرست ماهانه — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.hr {
+    ir_military = askStep '🇮🇷 وضعیت نظام‌وظیفه کارکنان' { #loc_ir #unverified
+      description 'بررسی مدارک — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external '?' }
+    }
+  }
+  extend org.legal {
+    ir_registration = gateStep '🇮🇷 ثبت شرکت (ایران‌من / ثبت شرکت‌ها)' { #loc_ir #unverified
+      description 'آگهی روزنامهٔ رسمی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.legal {
+    ir_enamad = gateStep '🇮🇷 اینماد و مجوزهای کسب‌وکار (درگاه مجوزها)' { #loc_ir #unverified
+      description 'مجوز فعالیت — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.legal {
+    ir_trademark = gateStep '🇮🇷 علامت تجاری ایران' { #loc_ir #unverified
+      description 'اظهارنامه — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.legal {
+    ir_knowledge_based = gateStep '🇮🇷 دانش‌بنیان / پارک علم و فناوری' { #loc_ir #unverified
+      description 'ارزیابی معاونت علمی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.legal {
+    ir_chamber = gateStep '🇮🇷 کارت بازرگانی / اتاق اصناف' { #loc_ir #unverified
+      description 'واردات/صادرات — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.tech {
+    ir_data_localization = gateStep '🇮🇷 میزبانی داخلی و دامنهٔ .ir' { #loc_ir #unverified
+      description 'ثبت دامنه، هاست — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.tech {
+    ir_sanctions_tools = askStep '🇮🇷 جایگزین ابزارهای تحریمی' { #loc_ir #unverified
+      description 'فهرست ابزار مجاز — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'no' }
+    }
+  }
+  extend org.risk {
+    ir_sanctions = askStep '🇮🇷 ریسک تحریم و ارز' { #loc_ir #unverified
+      description 'ارزیابی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'no' }
+    }
+  }
+  extend org.risk {
+    ir_fata = gateStep '🇮🇷 امنیت سایبری / الزامات افتا' { #loc_ir #unverified
+      description 'ارزیابی امنیتی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external '?' }
+    }
+  }
+  extend org.ops {
+    ir_standards = gateStep '🇮🇷 استاندارد ملی و نشان استاندارد' { #loc_ir #unverified
+      description 'مجوز کالا — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.ops {
+    ir_customs = gateStep '🇮🇷 گمرک و ثبت‌سفارش (سامانهٔ جامع تجارت)' { #loc_ir #unverified
+      description 'کوتاژ — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.marketing {
+    ir_ad_rules = gateStep '🇮🇷 مقررات تبلیغات و پیامک' { #loc_ir #unverified
+      description 'تأیید محتوا — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+
+  // جریان کار اصلی (زنجیرهٔ ارزش پورتر)
+  org.strategy -> org.rnd 'راهبرد → محصول'
+  org.rnd -> org.marketing 'محصول آماده'
+  org.marketing -> org.sales 'سرنخ'
+  org.sales -> org.ops 'سفارش'
+  org.ops -> org.service 'تحویل'
+  org.service -> org.rnd 'بازخورد'
+  org.sales -> org.finance 'فاکتور'
+  org.hr -> org.ops 'نیرو'
+  org.finance -> org.strategy 'گزارش مالی'
+  org.risk -> org.strategy 'گزارش ریسک'
+  org.legal -> org.sales 'قرارداد'
+  org.tech -> org.capability 'داده و ابزار'
+}
+
+views {
+  view world of org {
+    title 'چارت جهانی (بدون ماژول‌های ایران)'
+    include *
+    exclude element.tag = #loc_ir
+    autoLayout TopBottom
+  }
+  view iran_layer of org {
+    title 'چارت ایران = جهانی + ماژول‌های ایران'
+    include *
+    autoLayout TopBottom
+  }
+  view strategy_detail of org.strategy { title '۱. راهبرد و حاکمیت' include * autoLayout TopBottom }
+  view rnd_detail of org.rnd { title '۲. تحقیق و توسعه / محصول' include * autoLayout TopBottom }
+  view marketing_detail of org.marketing { title '۳. بازاریابی' include * autoLayout TopBottom }
+  view sales_detail of org.sales { title '۴. فروش' include * autoLayout TopBottom }
+  view ops_detail of org.ops { title '۵. عملیات و زنجیره تأمین' include * autoLayout TopBottom }
+  view service_detail of org.service { title '۶. خدمات مشتری' include * autoLayout TopBottom }
+  view hr_detail of org.hr { title '۷. منابع انسانی' include * autoLayout TopBottom }
+  view it_detail of org.tech { title '۸. فناوری اطلاعات' include * autoLayout TopBottom }
+  view finance_detail of org.finance { title '۹. مالی و حسابداری' include * autoLayout TopBottom }
+  view assets_detail of org.assets { title '۱۰. دارایی و امکانات' include * autoLayout TopBottom }
+  view risk_detail of org.risk { title '۱۱. ریسک، انطباق و امنیت' include * autoLayout TopBottom }
+  view legal_detail of org.legal { title '۱۲. حقوقی و روابط خارجی' include * autoLayout TopBottom }
+  view capability_detail of org.capability { title '۱۳. توانمندی و بهبود سازمان' include * autoLayout TopBottom }
+}
+</script>
 <script type="text/plain" id="journey-c4">// مسیر سفارش تاج گل (نیلابا) — به سبک n8n روی LikeC4 — 2026-11-13
 // رنگ = نوع گره: ورود بنفش · ماژول سبز · بیرونی خاکستری · هسته (گل‌نامه) قرمز
 // نماهای dynamic = «اجرا»ی گام‌به‌گام مثل n8n (دکمهٔ پخش در LikeC4)
@@ -1787,11 +2257,25 @@ function phaseModel(PH,TITLE){
 const startupModel=()=>phaseModel(STARTUP,STARTUP_TITLE),studioModel=()=>phaseModel(STUDIO,STUDIO_TITLE);
 // نسخهٔ فقط‌خواندنی از c4-journey/journey.c4 (پروژهٔ تاج گل)؛ منبع همان‌جاست
 const JTEXT=(document.getElementById('journey-c4')||{}).textContent||'';
-const DOCKEY={startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1',n8n:'orgStudio.n8n1',journey:'orgStudio.journey1'},BUILD={startup:startupModel,studio:studioModel,n8n:studioModel,journey:()=>parseC4(JTEXT)};
+// چارت جهانی: نسخهٔ فقط‌خواندنی از c4-org/org-global.c4. بلوک‌های extend (لایهٔ ایران) جدا و در صورت انتخاب کشور ایران به بخش‌ها وصل می‌شوند
+const OGTEXT=(document.getElementById('orgglobal-c4')||{}).textContent||'';
+function ogModel(ir){const ext=[];let t=OGTEXT,i;
+  while((i=t.search(/\n\s*extend\s+[\w.]+\s*\{/))>=0){const st=t.indexOf('extend',i),tgt=t.slice(st).match(/extend\s+([\w.]+)/)[1];let k=t.indexOf('{',st),d=0,e=k;
+    for(;e<t.length;e++){if(t[e]==='{')d++;else if(t[e]==='}'&&--d===0)break}ext.push([tgt,t.slice(k+1,e)]);t=t.slice(0,i)+t.slice(e+1)}
+  const m=parseC4(t);reindexOf(m);
+  if(ir)ext.forEach(([tg,body])=>{const x=parseC4('model {\n  tmp = orgBox \'x\' {'+body+'}\n}');const host=findPath(m,tg);if(host&&x.nodes[0])host.children.push(...x.nodes[0].children)});
+  if(!ir){const strip=n=>{n.children=n.children.filter(c=>!(c.tags||[]).includes('loc_ir'));n.children.forEach(strip)};m.nodes.forEach(strip)}
+  // مثل استودیو: بخش‌ها در سطح بالا (کادر فاز)، واحدها داخلشان؛ رابطه‌های org.x → x
+  const root=m.nodes[0];m.nodes=root.children.map(d=>{d.kind='orgBox';if(ir&&d.children.some(c=>(c.tags||[]).includes('loc_ir')))d.title+=' 🇮🇷';return d});
+  m.rels=m.rels.map(r=>({...r,from:r.from.replace(/^org\./,''),to:r.to.replace(/^org\./,''),c:[]}));
+  m.views='views {\n  view index {\n    title '+q(ir?'چارت سازمانی ایران (جهانی + ماژول‌های ایران)':'چارت سازمانی جهانی')+'\n    include *\n  }\n}';return m}
+function reindexOf(m){}
+function findPath(m,path){let L=m.nodes,n=null;for(const s of path.split('.')){n=L.find(c=>c.id===s);if(!n)return null;L=n.children}return n}
+const DOCKEY={startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1',n8n:'orgStudio.n8n1',journey:'orgStudio.journey1',ogw:'orgStudio.ogw1',ogir:'orgStudio.ogir1'},BUILD={startup:startupModel,studio:studioModel,n8n:studioModel,journey:()=>parseC4(JTEXT),ogw:()=>ogModel(false),ogir:()=>ogModel(true)};
 // مهاجرت: اگر نقشهٔ سازمان قبلاً با ورک‌فلوی n8n بازنویسی شده، آن را به جای جدای خودش ببر و نقشهٔ اصلی را برگردان
 try{const o=localStorage.getItem('orgStudio.v1');if(o&&/n8n_pos/.test(o)&&!localStorage.getItem('orgStudio.n8n1')){localStorage.setItem('orgStudio.n8n1',o);localStorage.removeItem('orgStudio.v1')}}catch(e){}
-let DOC='studio';try{const d=localStorage.getItem('orgStudio.doc2');if(d==='org'||d==='startup'||d==='n8n'||d==='journey')DOC=d}catch(e){}
-const DOCFILE=()=>({startup:'startup-talent.c4',studio:'startup-studio.c4',org:'recruitment.c4',n8n:'imported-n8n.c4',journey:'journey.c4'}[DOC]);
+let DOC='studio';try{const d=localStorage.getItem('orgStudio.doc2');if(d==='org'||d==='startup'||d==='n8n'||d==='journey'||d==='ogw'||d==='ogir')DOC=d}catch(e){}
+const DOCFILE=()=>({startup:'startup-talent.c4',studio:'startup-studio.c4',org:'recruitment.c4',n8n:'imported-n8n.c4',journey:'journey.c4',ogw:'org-global.c4',ogir:'org-global.c4 (ایران)'}[DOC]);
 function openDoc(d){
   DOC=d;try{localStorage.setItem('orgStudio.doc2',d)}catch(e){}
   let st=null;try{st=JSON.parse(localStorage.getItem(DOCKEY[d]))}catch(e){}
@@ -2081,6 +2565,8 @@ function renderVers(){$('#vers').replaceChildren(
   h('button',{class:DOC==='studio'?'pri':'',title:'سازمان تازه: با دادن ایده یا پروژه و کد، ارزیابی، ساخت، حقوقی، ارزش‌گذاری، سرمایه‌گذار و فروش را پیش می‌برد',onclick:()=>switchDoc('studio')},'🏭 استودیوی استارتاپ‌ساز'),
   h('button',{class:DOC==='startup'?'pri':'',title:'نقشهٔ تازه از صفر: استارتاپ استعدادیابی، غربال، رزومه و استخدام؛ از نام‌گذاری تا تجاری‌سازی',onclick:()=>switchDoc('startup')},'🚀 استارتاپ استعدادیابی'),
   (()=>{let has=false;try{has=!!localStorage.getItem('orgStudio.n8n1')}catch(e){}return has?h('button',{class:DOC==='n8n'?'pri':'',title:'آخرین ورک‌فلویی که از n8n وارد کردی',onclick:()=>switchDoc('n8n')},'📥 ورک‌فلوی واردشده از n8n'):null})(),
+  h('button',{class:DOC==='ogw'?'pri':'',title:'چارت سازمانی جهانی (APQC، پورتر) از c4-org/org-global.c4؛ بدون ماژول‌های ایران',onclick:()=>switchDoc('ogw')},'🌍 چارت سازمانی جهانی'),
+  h('button',{class:DOC==='ogir'?'pri':'',title:'همان چارت + ۲۱ ماژول ایران (لایهٔ extend، محتوای حقوقی تأییدنشده)',onclick:()=>switchDoc('ogir')},'🇮🇷 چارت سازمانی ایران'),
   h('button',{class:DOC==='journey'?'pri':'',title:'مسیر سفارش تاج گل (نیلابا) از c4-journey/journey.c4؛ فایل مال پروژهٔ تاج گل است و این‌جا فقط نمایش داده می‌شود',onclick:()=>switchDoc('journey')},'💐 مسیر سفارش تاج گل'),
   h('button',{class:DOC==='org'?'pri':'',title:'نقشهٔ قبلی: سازمان اتوماسیون استخدام (recruitment.c4)',onclick:()=>switchDoc('org')},'🏢 نقشهٔ سازمان قبلی'),
 ...VIEW_VERS.map(([v,l,tag,av,tm])=>h('button',{class:VER===v?'on':'',title:tag+' · '+av+' · ساخته‌شده '+APP_DATE+' ساعت '+tm+' UTC',onclick:()=>setVer(v)},'نسخه '+toFa(v)+' · '+l+' ',h('small',{style:'opacity:.75'},av+' · '+APP_DATE))),
@@ -2843,6 +3329,7 @@ function renderProc(){
 
 const TABS=[['dia','فلوچارت سازمان'],['proc','ساخت فرایند'],['mind','ذهن‌نقشه'],['int','پروژه‌ها و interop'],['out','تغییرات و خروجی C4'],['run','▶ اجراها (n8n)']];
 function showTab(){
+  document.body.classList.toggle('offdia',TAB!=='dia');
   $('#p-dia').hidden=TAB!=='dia';$('#p-mind').hidden=TAB!=='mind';$('#p-proc').hidden=TAB!=='proc';$('#p-int').hidden=TAB!=='int';$('#p-out').hidden=TAB!=='out';
   $('#tabs').replaceChildren(...TABS.map(([k,l])=>h('button',{class:TAB===k?'on':'',onclick:()=>{TAB=k;showTab()}},l)));
   if(TAB==='dia'){renderDia();renderInsp();if(NEEDFIT)requestAnimationFrame(fit)}
