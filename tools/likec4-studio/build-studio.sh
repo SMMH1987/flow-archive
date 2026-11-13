@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
-# استودیوی اصلی (بدون هیچ تغییر ظاهری) + موتور رسمی LikeC4 داخل همان صفحه → out/studio-likec4.html
+# استودیوی اصلی بدون تغییر ظاهری + موتور رسمی LikeC4 به‌صورت فایل کناری (Web Worker، بعد از باز شدن صفحه)
+#  out/likec4-engine.js  ← موتور (حدود ۳ مگابایت؛ کنار صفحه منتشر می‌شود)
+#  docs/mockups/org-flow-artifact.html ← بلوک LIKEC4-HOOK (چند کیلوبایت) تازه می‌شود
 set -e; cd "$(dirname "$0")"
-npx esbuild src/engine.js --bundle --format=esm --platform=browser --minify --outfile=out/engine.js --log-level=error
+npx esbuild src/worker.js --bundle --format=esm --platform=browser --minify --outfile=out/likec4-engine.js --log-level=error
 python3 - <<'PY'
-import pathlib
-page = pathlib.Path('../../docs/mockups/org-flow-artifact.html').read_text(encoding='utf-8')
-eng = pathlib.Path('out/engine.js').read_text(encoding='utf-8').replace('</script', '<\\/script').replace('�', '\\uFFFD')
-hook = pathlib.Path('src/hook.js').read_text(encoding='utf-8')
-i = page.rindex('</body>') if '</body>' in page else len(page)
-out = page[:i] + '<script type="module">' + eng + '</script>\n<script>' + hook + '</script>\n' + page[i:]
-pathlib.Path('out/studio-likec4.html').write_text(out, encoding='utf-8'); print('out/studio-likec4.html', len(out))
+import pathlib, re
+p = pathlib.Path('../../docs/mockups/org-flow-artifact.html')
+page = p.read_text(encoding='utf-8')
+hook = pathlib.Path('src/hook.js').read_text(encoding='utf-8').strip()
+page = re.sub(r'\n<script>\n/\* LIKEC4-HOOK.*?</script>\n?', '\n', page, flags=re.S).rstrip()
+page += '\n<script>\n' + hook + '\n</script>\n'
+p.write_text(page, encoding='utf-8'); print(p, len(page.encode()))
+eng = pathlib.Path('out/likec4-engine.js')
+eng.write_text(eng.read_text(encoding='utf-8').replace('�', '\\uFFFD'), encoding='utf-8'); print(eng, eng.stat().st_size)
 PY
