@@ -2670,8 +2670,13 @@ function renderN8n(rid){
     W=X0+NC*DX+40;H=Y0+lanes.length*DY+20}
   else if(N8LAY==='stairs'){let i=0;ck.forEach((c,ci)=>cols.get(c).forEach(q=>{B.set(q,{x:X0+ci*DX,y:Y0+(i++)*110,w:150,h:120,ci})}));W=X0+NC*DX+40;H=Y0+ps.length*110+60}
   else{const snap=v=>Math.round(v/G16)*G16,Yc=new Map(),mid=Y0+(maxRows-1)*DY/2;
+    // کاهش تقاطع (Sugiyama/dagre): چند دور مرتب‌سازی بر اساس میانگین جای همسایه‌ها، رفت و برگشت
+    const pos=new Map();ck.forEach(c=>cols.get(c).forEach((q,j)=>pos.set(q,j)));
+    const nb=(q,dir)=>rels.filter(([r])=>dir?r.to===q:r.from===q).map(([r])=>dir?r.from:r.to).filter(x=>pos.has(x));
+    for(let it=0;it<6;it++){const order=it%2?[...ck].reverse():ck;order.forEach(c=>{const a=cols.get(c),bcv=q=>{const n=nb(q,it%2===0);return n.length?n.reduce((x,y)=>x+pos.get(y),0)/n.length:pos.get(q)};
+      a.sort((x,y)=>bcv(x)-bcv(y));a.forEach((q,j)=>pos.set(q,j))})}
     ck.forEach((c,ci)=>{const a=cols.get(c),bc=q=>{const pr=rels.filter(([r])=>r.to===q&&Yc.has(r.from)).map(([r])=>Yc.get(r.from));return pr.length?pr.reduce((x,y)=>x+y,0)/pr.length:mid};
-      a.sort((p1,p2)=>bc(p1)-bc(p2));const want=a.map(bc),cen=want.reduce((x,y)=>x+y,0)/a.length;
+      const want0=a.map(bc);const want=a.map((q,j)=>want0[j]),cen=want.reduce((x,y)=>x+y,0)/a.length;
       a.forEach((q,j)=>{let y=a.length===1?want[0]:cen+(j-(a.length-1)/2)*DY;Yc.set(q,snap(y))})});
     const minY=Math.min(...Yc.values());ps.forEach(q=>{const ci=ck.indexOf(L.get(q));B.set(q,{x:X0+ci*DX,y:Yc.get(q)-minY+Y0,w:150,h:120,ci})});
     W=X0+NC*DX+40;H=Y0+(Math.max(...Yc.values())-minY)+DY+80}
