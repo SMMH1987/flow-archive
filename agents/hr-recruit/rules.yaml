@@ -1,0 +1,26 @@
+# DMN-style decision tables. FIRST = first matching row; COLLECT = all matching rows.
+# Inputs come from: profile (position) + org (questionnaire answers). Output "subflow:x" calls subflows/x.c4.
+tables:
+  ad_channel:
+    hit_policy: FIRST
+    rules:
+      - when: {org.uses_paid_ads: "== no"}
+        then: {step: "آگهی رایگان (دانشگاه/شبکه)", gate: publish_ad}
+      - when: {budget_eur: "== 0"}
+        then: {step: "آگهی رایگان (دانشگاه/شبکه)", gate: publish_ad}
+      - when: {budget_eur: "> 0"}
+        then: {step: "آگهی پولی جابینجا", gate: publish_ad}
+  pre_interview:
+    hit_policy: COLLECT
+    rules:
+      - when: {role: "== Python"}
+        then: {step: "آزمون برنامه‌نویسی", skill: code-test}
+      - when: {role: "== SEO"}
+        then: {step: "نمونه‌کار سئو", skill: seo-portfolio}
+  post_interview:
+    hit_policy: COLLECT
+    rules:
+      - when: {level: "== senior", org.reference_check: "== yes"}
+        then: {step: "بررسی رفرنس", skill: reference-check}
+      - when: {country: "!= org.country"}
+        then: {step: "subflow:visa"}
