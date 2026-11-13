@@ -171,6 +171,21 @@ button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover
 .mm .k-phase rect{stroke:var(--acc);stroke-width:2}
 .mm .mp{fill:none;stroke:var(--edge);stroke-width:1.5;opacity:.75}
 .mmbar{display:flex;gap:8px;align-items:center;margin:0 0 8px;flex-wrap:wrap}
+
+/* ── لایهٔ n8n‌گونه ── */
+.node.triggerStep{border-color:#f59e0b;border-radius:28px 10px 10px 28px}
+.node.noteStep,.node.note{background:#fde68a;color:#5b4708;border-color:#e0c75a}
+.node.subflowStep{border-style:double;border-width:4px}
+.n8c{position:absolute;bottom:-9px;left:6px;display:flex;gap:3px;z-index:3}
+.n8c span{font-size:10px;padding:0 5px;border-radius:8px;background:var(--panel,#fff);border:1px solid #bbb;white-space:nowrap}
+.n8b{position:absolute;top:-12px;left:calc(50% - 14px);min-width:28px;height:24px;box-shadow:0 0 0 2px #fff;font-weight:700;min-width:20px;height:20px;border-radius:10px;color:#fff;font-size:11px;display:grid;place-items:center;padding:0 4px;z-index:4}
+.n8b.ok{background:#16a34a}.n8b.err{background:#dc2626}.n8b.wait{background:#ea580c}.n8b.skip{background:#888}
+.node.n8step{box-shadow:0 0 0 4px #ea4b71!important}
+#n8mini{position:absolute;left:10px;bottom:10px;width:170px;height:110px;background:rgba(127,127,127,.12);border:1px solid #9995;border-radius:6px;overflow:hidden;z-index:5;pointer-events:none}
+#n8mini i{position:absolute;background:#6b7280;border-radius:1px}#n8mini i.ok{background:#16a34a}#n8mini i.err{background:#dc2626}#n8mini i.wait{background:#ea580c}
+#n8mini b{position:absolute;border:1.5px solid #ea4b71}
+.n8t{width:100%;border-collapse:collapse;font-size:.85rem}.n8t td,.n8t th{border-bottom:1px solid #9994;padding:4px 6px;text-align:right}
+.n8log{font-family:ui-monospace,monospace;font-size:.78rem;white-space:pre-wrap;direction:ltr;text-align:left;max-height:220px;overflow:auto;background:#8881;padding:8px;border-radius:6px}
 </style>
 <div id="app">
   <div class="top">
@@ -199,6 +214,7 @@ button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover
   <div id="p-mind" class="page" hidden></div>
   <div id="p-int" class="page" hidden></div>
   <div id="p-out" class="page" hidden></div>
+  <div id="p-run" class="page" hidden></div>
 </div>
 <script type="text/plain" id="base-c4">// نمونهٔ «سازمان کامل از یک ایده» — ایده: اتوماسیون کامل استخدام — 2026-11-06
 // هر بخش = یک نقش سازمانی · هر قدم: technology = skill · description = out · آیکون = وضعیت قفل
@@ -2411,13 +2427,13 @@ function downloadMM(){
   return t}
 const kindR=k=>k==='askStep'?14:k==='routeStep'?10:k==='gateStep'?3:5;
 
-const TABS=[['dia','فلوچارت سازمان'],['mind','ذهن‌نقشه'],['int','پروژه‌ها و interop'],['out','تغییرات و خروجی C4']];
+const TABS=[['dia','فلوچارت سازمان'],['mind','ذهن‌نقشه'],['int','پروژه‌ها و interop'],['out','تغییرات و خروجی C4'],['run','▶ اجراها (n8n)']];
 function showTab(){
   $('#p-dia').hidden=TAB!=='dia';$('#p-mind').hidden=TAB!=='mind';$('#p-int').hidden=TAB!=='int';$('#p-out').hidden=TAB!=='out';
   $('#tabs').replaceChildren(...TABS.map(([k,l])=>h('button',{class:TAB===k?'on':'',onclick:()=>{TAB=k;showTab()}},l)));
   if(TAB==='dia'){renderDia();renderInsp();if(NEEDFIT)requestAnimationFrame(fit)}
   if(TAB==='mind')renderMind();
-  if(TAB==='int')renderInt();if(TAB==='out')renderOut()}
+  if(TAB==='int')renderInt();if(TAB==='out')renderOut();$('#p-run').hidden=TAB!=='run';if(TAB==='run')N8.panel()}
 function refresh(){syncAuto();showTab()}
 $('#undo').onclick=undo;
 $('#reset').onclick=async()=>{if(await ask(DOC!=='org'?'همهٔ تغییرات این نقشه پاک شود و نمونهٔ اولیه برگردد؟':'همهٔ تغییرات پاک شود و نمونهٔ مخزن برگردد؟')){try{localStorage.removeItem(KEY())}catch(e){}openDoc(DOC);renderVers();refresh()}};
@@ -2425,6 +2441,85 @@ $('#load').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{const f=e.target.files[0];if(!f)return;const t=await f.text();
   try{G={};loadText(t,true);save();NEEDFIT=true;refresh()}catch(x){await ask('فایل خوانده نشد: '+x.message,{info:1})}e.target.value=''};
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();undo()}});
+
+/* ───────── لایهٔ n8n‌گونه: اجراها، وضعیت هر قدم، دیباگ، مینی‌مپ، گام‌به‌گام، خروجی n8n ─────────
+   منبع حقیقت همان .c4 است. وضعیت اجرا جدا نگه داشته می‌شود (runs JSON) و هرگز در .c4 نوشته نمی‌شود. */
+const N8=(()=>{
+  const RK=()=>'n8runs.'+(typeof DOC==='undefined'?'org':DOC);
+  let RUNS=[];try{RUNS=JSON.parse(localStorage.getItem(RK())||'[]')}catch(e){}
+  let CUR=RUNS[0]||null;
+  const persist=()=>{try{localStorage.setItem(RK(),JSON.stringify(RUNS.slice(0,20)))}catch(e){}};
+  const steps=()=>{const a=[];IDX.forEach((n,p)=>{if(isStep(n))a.push([p,n])});return a};
+  const order=root=>{ // ترتیب قدم‌ها با پیروی از رابطه‌ها
+    const st=steps().filter(([p])=>!root||p.split('.')[0]===root),set=new Set(st.map(x=>x[0]));
+    const nx=new Map(),indeg=new Map(st.map(([p])=>[p,0]));
+    M.rels.forEach(r=>{if(set.has(r.from)&&set.has(r.to)){(nx.get(r.from)||nx.set(r.from,[]).get(r.from)).push(r);indeg.set(r.to,indeg.get(r.to)+1)}});
+    return{st,nx,starts:st.filter(([p])=>!indeg.get(p)).map(x=>x[0])}};
+  function simulate(root){ // اجرای آزمایشی: auto=ok، ask=پاسخ نمونه، gate=منتظر، route=شاخهٔ اول، #onError=رد
+    const {nx,starts}=order(root),nodes={},edges={},log=[];let t=0;const seen=new Set();
+    const q=[...starts];
+    while(q.length){const p=q.shift();if(seen.has(p))continue;seen.add(p);const n=IDX.get(p);
+      const ts=new Date(Date.now()+t*1000).toISOString().slice(11,19);t+=1;
+      if(n.kind==='gateStep'){nodes[p]={s:'wait',n:1};log.push(`[${ts}] ${p} ⏸ منتظر تأیید انسان: ${titleName(n)}`);continue}
+      nodes[p]={s:'ok',n:1};log.push(`[${ts}] ${p} ✓ ${titleName(n)}${n.kind==='askStep'?' (پاسخ نمونه)':''}`);
+      let outs=(nx.get(p)||[]).filter(r=>!(IDX.get(r.to).tags||[]).includes('onError'));
+      if(n.kind==='routeStep')outs=outs.slice(0,1);
+      outs.forEach(r=>{edges[r.from+'>'+r.to]=(edges[r.from+'>'+r.to]||0)+1;q.push(r.to)})}
+    steps().forEach(([p])=>{if(!nodes[p]&&(!root||p.split('.')[0]===root))nodes[p]={s:'skip',n:0}});
+    return{id:'#'+(RUNS.length+1),at:new Date().toISOString(),mode:'آزمایشی',root:root||'همه',nodes,edges,log}}
+  const agg=p=>{const k=Object.entries(CUR.nodes).filter(([q])=>q.startsWith(p+'.')).map(x=>x[1]);if(!k.length)return null;
+    const s=k.some(r=>r.s==='err')?'err':k.some(r=>r.s==='wait')?'wait':k.every(r=>r.s==='skip')?'skip':'ok';return{s,n:k.filter(r=>r.s==='ok').length}};
+  function badges(){if(!$('#world'))return;
+    $('#world').querySelectorAll('.n8b,.n8c').forEach(x=>x.remove());
+    $('#world').querySelectorAll('.node[data-p]').forEach(el=>{const p=el.dataset.p,n=IDX.get(p);if(!n)return;
+      const r=CUR&&(CUR.nodes[p]||agg(p));if(r)el.append(h('span',{class:'n8b '+r.s,title:{ok:'موفق',err:'خطا',wait:'منتظر انسان',skip:'اجرا نشد'}[r.s]},r.s==='ok'?'✓'+(r.n>1?toFa(r.n):''):r.s==='err'?'✗':r.s==='wait'?'⏸':'–'));
+      const c=[meta(n,'trigger')&&'⚡ '+meta(n,'trigger'),meta(n,'sla')&&'⏱ '+meta(n,'sla'),meta(n,'credential')&&'🔑 '+meta(n,'credential'),meta(n,'retry')&&'↻ '+meta(n,'retry'),meta(n,'pin')&&'📌',meta(n,'subflow')&&'⧉ '+meta(n,'subflow'),(n.tags||[]).includes('onError')&&'🚨 مسیر خطا'].filter(Boolean);
+      if(c.length)el.append(h('div',{class:'n8c'},...c.map(x=>h('span',{},x))))});
+    mini()}
+  function mini(){const cv=$('#cv');if(!cv)return;let m=$('#n8mini');if(!m){m=h('div',{id:'n8mini',title:'مینی‌مپ'});cv.append(m)}
+    const ns=[...$('#world').querySelectorAll('.node[data-p]')];if(!ns.length){m.hidden=true;return}m.hidden=false;
+    const bx=ns.map(e=>({x:e.offsetLeft,y:e.offsetTop,w:e.offsetWidth,h:e.offsetHeight,p:e.dataset.p}));
+    const X=Math.min(...bx.map(b=>b.x)),Y=Math.min(...bx.map(b=>b.y)),W=Math.max(...bx.map(b=>b.x+b.w))-X,H=Math.max(...bx.map(b=>b.y+b.h))-Y,k=Math.min(166/W,106/H);
+    m.replaceChildren(...bx.map(b=>{const r=CUR&&(CUR.nodes[b.p]||agg(b.p));return h('i',{class:r?r.s:'',style:`left:${2+(b.x-X)*k}px;top:${2+(b.y-Y)*k}px;width:${Math.max(2,b.w*k)}px;height:${Math.max(2,b.h*k)}px`})}),
+      h('b',{style:`left:${2+(-VIEW.x/VIEW.k-X)*k}px;top:${2+(-VIEW.y/VIEW.k-Y)*k}px;width:${cv.clientWidth/VIEW.k*k}px;height:${cv.clientHeight/VIEW.k*k}px`}))}
+  let timer;function stepThrough(){clearInterval(timer);if(!CUR)return;TAB='dia';showTab();
+    const seq=CUR.log.map(l=>l.split(' ')[1]).filter(p=>IDX.has(p));let i=0;
+    timer=setInterval(()=>{document.querySelectorAll('.node.n8step').forEach(x=>x.classList.remove('n8step'));
+      if(i>=seq.length){clearInterval(timer);return}const p=seq[i++];if(p.split('.')[0]!==rootOfView()){go('ov:'+p.split('.')[0])}
+      const el=$('#world').querySelector(`.node[data-p="${p}"]`);if(el)el.classList.add('n8step')},800)}
+  function toN8n(){ // یک‌طرفه: .c4 → n8n (نسخهٔ پیش‌نویس، پیش از وارد کردن بازبینی شود)
+    const ty={triggerStep:'n8n-nodes-base.manualTrigger',gateStep:'n8n-nodes-base.wait',askStep:'n8n-nodes-base.form',routeStep:'n8n-nodes-base.switch',autoStep:'n8n-nodes-base.noOp',subflowStep:'n8n-nodes-base.executeWorkflow',noteStep:'n8n-nodes-base.stickyNote'};
+    const root=rootOfView(),{st}=order(root),name=p=>titleName(IDX.get(p)).slice(0,60)+' ('+p+')';
+    const nodes=st.map(([p,n],i)=>({id:p,name:name(p),type:ty[n.kind]||'n8n-nodes-base.noOp',typeVersion:1,position:[i*260,0],parameters:{},notes:outText(n)}));
+    const connections={};M.rels.forEach(r=>{if(st.some(x=>x[0]===r.from)&&st.some(x=>x[0]===r.to)){const k=name(r.from);(connections[k]=connections[k]||{main:[[]]}).main[0].push({node:name(r.to),type:'main',index:0})}});
+    return JSON.stringify({name:'from '+DOCFILE()+' / '+root,nodes,connections,settings:{}},null,2)}
+  function panel(){const P=$('#p-run'),root=rootOfView();
+    const tbl=CUR?h('table',{class:'n8t'},h('tr',{},h('th',{},'قدم'),h('th',{},'وضعیت'),h('th',{},'تعداد')),
+      ...Object.entries(CUR.nodes).map(([p,r])=>h('tr',{},h('td',{},h('a',{href:'#',onclick:e=>{e.preventDefault();TAB='dia';showTab();jump(p)}},nodeLabel(p))),h('td',{},{ok:'✓ موفق',err:'✗ خطا',wait:'⏸ منتظر انسان',skip:'– اجرا نشد'}[r.s]),h('td',{},toFa(r.n))))):h('p',{},'هنوز اجرایی نیست. «اجرای آزمایشی» را بزن یا فایل اجرای واقعی را بارگذاری کن.');
+    const edg=CUR&&Object.keys(CUR.edges).length?h('table',{class:'n8t'},h('tr',{},h('th',{},'سیم'),h('th',{},'شمار عبور')),...Object.entries(CUR.edges).map(([k,v])=>{const[a,b]=k.split('>');return h('tr',{},h('td',{},nodeLabel(a)+' ← '+nodeLabel(b)),h('td',{},toFa(v)))})):null;
+    const fi=h('input',{type:'file',accept:'.json',hidden:true,onchange:async e=>{const f=e.target.files[0];if(!f)return;try{const r=JSON.parse(await f.text());r.id=r.id||'#'+(RUNS.length+1);r.mode=r.mode||'واقعی';r.edges=r.edges||{};r.log=r.log||[];RUNS.unshift(r);CUR=r;persist();panel()}catch(x){await ask('فایل اجرا خوانده نشد: '+x.message,{info:1})}}});
+    const exp=h('textarea',{rows:8,class:'ltr',readonly:true,hidden:true});
+    P.replaceChildren(h('div',{class:'panel'},
+      h('h2',{},'▶ اجراها: وضعیت هر قدم مثل n8n'),
+      h('p',{},'وضعیت اجرا جدا از .c4 نگه داشته می‌شود و فقط روی نمودار نمایش داده می‌شود. در اجرای آزمایشی، قدم‌های ask با پاسخ نمونه جلو می‌روند و قدم‌های gate منتظر تأیید انسان می‌مانند.'),
+      h('div',{class:'row'},
+        h('button',{class:'pri',onclick:()=>{CUR=simulate(root);RUNS.unshift(CUR);persist();panel()}},'▶ اجرای آزمایشی «'+titleName(IDX.get(root))+'»'),
+        h('button',{onclick:stepThrough,disabled:!CUR},'⏯ نمایش گام‌به‌گام روی نمودار'),
+        h('button',{onclick:()=>fi.click()},'📂 بارگذاری اجرای واقعی (JSON)'),fi,
+        h('button',{onclick:()=>{CUR=null;panel()}},'پاک کردن نمایش'),
+        h('button',{onclick:async()=>{exp.value=toN8n();exp.hidden=false;try{await navigator.clipboard.writeText(exp.value)}catch(e){exp.select()}}},'⇢ خروجی ورک‌فلوی n8n (کپی)')),
+      exp,
+      h('h2',{},'تاریخچهٔ اجراها'),
+      h('div',{class:'row'},...RUNS.slice(0,10).map(r=>h('button',{class:'sm'+(r===CUR?' on':''),onclick:()=>{CUR=r;panel()}},`${r.id} · ${r.mode} · ${r.root} · ${r.at.slice(11,16)}`))),
+      CUR?h('h2',{},'وضعیت قدم‌ها در '+CUR.id):null,tbl,
+      edg?h('h2',{},'شمار عبور روی هر سیم'):null,edg,
+      CUR?h('h2',{},'پنل دیباگ (پیام هر قدم)'):null,CUR?h('div',{class:'n8log'},CUR.log.join('\n')):null,
+      h('h2',{},'قالب فایل اجرای واقعی'),
+      h('div',{class:'n8log'},'{ "mode":"واقعی", "root":"p0", "at":"2026-11-13T13:20:00Z",\n  "nodes": { "p0.c1": {"s":"ok","n":3}, "p0.c2": {"s":"wait","n":1}, "reg.c4": {"s":"err","n":1} },\n  "edges": { "p0.c1>p0.c2": 3 },\n  "log": ["[13:20:01] p0.c1 ✓ ..."] }')));
+  }
+  return{badges,panel,mini}})();
+{const _rd=renderDia;renderDia=function(){_rd();try{N8.badges()}catch(e){console.warn(e)}}}
+{const _av=applyView;applyView=function(){_av();try{N8.mini()}catch(e){}}}
 
 /* ───────── شروع ───────── */
 (function init(){
