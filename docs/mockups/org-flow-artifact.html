@@ -234,6 +234,23 @@ body.n8on #cv{height:calc(100vh - 90px)!important;min-height:520px}
 .top .save{background:#ea4b71;border-color:#ea4b71;color:#fff;font-weight:600}
 #p-dia,#p-mind,#p-int,#p-out,#p-run{padding-inline:16px}
 #cv{background-color:var(--lane)}
+
+/* n8n نمای دقیق‌تر */
+:root{--n8e:#9aa1ab}
+.node.n8 .n8i{width:96px!important;height:96px!important;border-radius:8px!important;border:2px solid #c9ced6!important;background:var(--card)!important;box-shadow:0 1px 2px #0000000f}
+.node.n8 .n8i .ic{font-size:38px;line-height:1}
+.node.n8.triggerStep .n8i{border-radius:50px 8px 8px 50px!important}
+.node.n8.gateStep .n8i{border-color:#e7a1a1!important}.node.n8.askStep .n8i{border-color:#efc77a!important}.node.n8.routeStep .n8i{border-color:#b4b8f5!important}
+.node.n8.orgBox .n8i{border-color:#c9ced6!important}
+.node.n8.sel .n8i{border-color:#ea4b71!important;box-shadow:0 0 0 3px #ea4b7133}
+.node.n8.rs-ok .n8i{border-color:#16a34a!important}.node.n8.rs-wait .n8i{border-color:#ea580c!important}.node.n8.rs-err .n8i{border-color:#dc2626!important}.node.n8.rs-skip .n8i{opacity:.55}
+.node.n8 .hin{position:absolute;left:-7px;top:38px;width:8px;height:16px;border-radius:2px;background:#9aa1ab}
+.node.n8 .hout{position:absolute;right:-7px;width:12px;height:12px;border-radius:50%;background:#9aa1ab;border:2px solid var(--card)}
+.node.n8 .okc{position:absolute;right:6px;bottom:4px;color:#16a34a;font-weight:800;font-size:15px}
+.node.n8 .n8l{font-size:13px!important;margin-top:8px!important;max-width:150px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.node.n8.routeStep{clip-path:none!important;filter:none!important}.node.n8.routeStep::before{display:none!important}
+.node.n8::before,.node.n8::after{display:none!important}
+.node.n8 .n8k{display:none}.node.n8:hover .n8k{display:block}
 </style>
 <div id="app">
   <div class="top">
@@ -2519,7 +2536,7 @@ const N8=(()=>{
     const s=k.some(r=>r.s==='err')?'err':k.some(r=>r.s==='wait')?'wait':k.every(r=>r.s==='skip')?'skip':'ok';return{s,n:k.filter(r=>r.s==='ok').length}};
   function badges(){if(!$('#world'))return;
     $('#world').querySelectorAll('.n8b,.n8c').forEach(x=>x.remove());
-    $('#world').querySelectorAll('.node[data-p]').forEach(el=>{const p=el.dataset.p,n=IDX.get(p);if(!n)return;
+    $('#world').querySelectorAll('.node[data-p]').forEach(el=>{const p=el.dataset.p,n=IDX.get(p);if(!n)return;if(el.classList.contains('n8')&&CUR&&CUR.nodes[p])return;
       const r=CUR&&(CUR.nodes[p]||agg(p));if(r)el.append(h('span',{class:'n8b '+r.s,title:{ok:'موفق',err:'خطا',wait:'منتظر انسان',skip:'اجرا نشد'}[r.s]},r.s==='ok'?'✓'+(r.n>1?toFa(r.n):''):r.s==='err'?'✗':r.s==='wait'?'⏸':'–'));
       const c=[meta(n,'trigger')&&'⚡ '+meta(n,'trigger'),meta(n,'sla')&&'⏱ '+meta(n,'sla'),meta(n,'credential')&&'🔑 '+meta(n,'credential'),meta(n,'retry')&&'↻ '+meta(n,'retry'),meta(n,'pin')&&'📌',meta(n,'subflow')&&'⧉ '+meta(n,'subflow'),(n.tags||[]).includes('onError')&&'🚨 مسیر خطا'].filter(Boolean);
       if(c.length)el.append(h('div',{class:'n8c'},...c.map(x=>h('span',{},x))))});
@@ -2565,7 +2582,7 @@ const N8=(()=>{
       h('h2',{},'قالب فایل اجرای واقعی'),
       h('div',{class:'n8log'},'{ "mode":"واقعی", "root":"p0", "at":"2026-11-13T13:20:00Z",\n  "nodes": { "p0.c1": {"s":"ok","n":3}, "p0.c2": {"s":"wait","n":1}, "reg.c4": {"s":"err","n":1} },\n  "edges": { "p0.c1>p0.c2": 3 },\n  "log": ["[13:20:01] p0.c1 ✓ ..."] }')));
   }
-  return{badges,panel,mini}})();
+  return{badges,panel,mini,cur:()=>CUR}})();
 {const _rd=renderDia;renderDia=function(){_rd();try{N8.badges()}catch(e){console.warn(e)}}}
 {const _av=applyView;applyView=function(){_av();try{N8.mini()}catch(e){}}}
 
@@ -2587,7 +2604,7 @@ function renderN8n(rid){
   // قدم‌های بدون رابطه پشت سر هم
   let mx=Math.max(0,...L.values());ps.forEach(q=>{if(!rels.some(([r])=>r.from===q||r.to===q)&&ps.length>1){L.set(q,++mx)}});
   const cols=new Map();ps.forEach(q=>{const c=L.get(q);(cols.get(c)||cols.set(c,[]).get(c)).push(q)});
-  const DX=230,DY=165,X0=150,Y0=110,B=new Map(),ck=[...cols.keys()].sort((a,b)=>a-b),NC=ck.length;
+  const G16=16,NSZ=G16*6,DX=NSZ+G16*8,DY=NSZ+G16*6+48,X0=G16*10,Y0=G16*8,B=new Map(),ck=[...cols.keys()].sort((a,b)=>a-b),NC=ck.length;
   const maxRows=Math.max(1,...[...cols.values()].map(a=>a.length));
   let W,H,lanes=[],bandH=0,PER=NC;
   if(N8LAY==='snake'){PER=Math.max(2,Math.min(6,Math.floor((($('#cv')||{}).clientWidth||1200)/230)));bandH=maxRows*DY+60;
@@ -2598,7 +2615,12 @@ function renderN8n(rid){
     const used=new Map();ck.forEach((c,ci)=>cols.get(c).forEach(q=>{const li=lanes.indexOf(key(q)),k=li+':'+ci,o=used.get(k)||0;used.set(k,o+1);B.set(q,{x:X0+ci*DX+o*20,y:Y0+li*DY+o*14,w:150,h:120,ci})}));
     W=X0+NC*DX+40;H=Y0+lanes.length*DY+20}
   else if(N8LAY==='stairs'){let i=0;ck.forEach((c,ci)=>cols.get(c).forEach(q=>{B.set(q,{x:X0+ci*DX,y:Y0+(i++)*110,w:150,h:120,ci})}));W=X0+NC*DX+40;H=Y0+ps.length*110+60}
-  else{ck.forEach((c,ci)=>{const a=cols.get(c);a.forEach((q,j)=>B.set(q,{x:X0+ci*DX,y:Y0+(j+(maxRows-a.length)/2)*DY,w:150,h:120,ci}))});W=X0+NC*DX+40;H=Y0+maxRows*DY+40}
+  else{const snap=v=>Math.round(v/G16)*G16,Yc=new Map(),mid=Y0+(maxRows-1)*DY/2;
+    ck.forEach((c,ci)=>{const a=cols.get(c),bc=q=>{const pr=rels.filter(([r])=>r.to===q&&Yc.has(r.from)).map(([r])=>Yc.get(r.from));return pr.length?pr.reduce((x,y)=>x+y,0)/pr.length:mid};
+      a.sort((p1,p2)=>bc(p1)-bc(p2));const want=a.map(bc),cen=want.reduce((x,y)=>x+y,0)/a.length;
+      a.forEach((q,j)=>{let y=a.length===1?want[0]:cen+(j-(a.length-1)/2)*DY;Yc.set(q,snap(y))})});
+    const minY=Math.min(...Yc.values());ps.forEach(q=>{const ci=ck.indexOf(L.get(q));B.set(q,{x:X0+ci*DX,y:Yc.get(q)-minY+Y0,w:150,h:120,ci})});
+    W=X0+NC*DX+40;H=Y0+(Math.max(...Yc.values())-minY)+DY+80}
   W=Math.max(600,W);H=Math.max(320,H);const svg=newSvg(W,H);
   // محور زمان: هر ستون یک مرحله؛ اگر قدم‌ها metadata duration (روز) داشته باشند، روز تجمعی هم نوشته می‌شود
   const dur=q=>parseFloat(meta(IDX.get(q),'duration')||meta(IDX.get(q),'sla')||'')||0;let acc=0;const dayAt=ck.map(c=>{acc+=Math.max(0,...cols.get(c).map(dur));return acc});
@@ -2611,14 +2633,37 @@ function renderN8n(rid){
   if(N8LAY==='lanes')lanes.forEach((l,li)=>{const y=Y0+li*DY-18;svg.append(sv('rect',{x:10,y,width:W-20,height:DY-8,rx:8,style:'fill:var(--card);stroke:var(--line)','fill-opacity':.55}));
     const t=sv('text',{x:20,y:y+DY/2,'font-size':12.5,style:'fill:var(--ink);font-family:var(--font);font-weight:700'});t.textContent=l.length>16?l.slice(0,15)+'…':l;svg.append(t)});
   world.style.width=W+'px';world.style.height=H+'px';world.style.direction='ltr';world.append(svg);
-  rels.forEach(([r,i])=>{const a=B.get(r.from),b=B.get(r.to);const x1=a.x+75+38,y1=a.y+36,x2=b.x+75-38,y2=b.y+36;
-    let d;if(N8LAY==='snake'&&b.y>a.y+100&&x2<x1){const ym=a.y+120;d=`M${x1} ${y1} C${x1+50} ${y1} ${x1+50} ${ym} ${x1} ${ym} L${x2} ${ym+20} C${x2-50} ${ym+20} ${x2-50} ${y2} ${x2} ${y2}`}else if(x2>x1)d=`M${x1} ${y1} C${x1+60} ${y1} ${x2-60} ${y2} ${x2} ${y2}`;else{const yy=Math.max(a.y,b.y)+130;d=`M${x1} ${y1} C${x1+70} ${y1} ${x1+70} ${yy} ${(x1+x2)/2} ${yy} S${x2-70} ${y2} ${x2} ${y2}`}
-    const lb=(IDX.get(r.from).kind==='routeStep'||(r.label&&r.label!=='بعد'))?r.label:'';
-    drawEdge(svg,d,{idx:i,label:lb,lx:(x1+x2)/2,ly:(y1+y2)/2-10,dash:(IDX.get(r.to).tags||[]).includes('onError')})});
+  // فلش‌ها به سبک n8n: خروج از دستگیرهٔ راست، ورود به دستگیرهٔ چپ، منحنی بزیه با بازوی افقی؛
+  // شاخه‌ها از دستگیره‌های جدا (یکی زیر دیگری) با برچسب کنار دستگیره؛ پس از اجرا سبز با «n مورد»
+  const run=N8.cur(),BX=96,HB=BX/2,cxn=b=>b.x+75,cyn=b=>b.y+HB;
+  const outs=new Map();rels.forEach(([r])=>{(outs.get(r.from)||outs.set(r.from,[]).get(r.from)).push(r.to)});
+  const ins=new Map();rels.forEach(([r])=>{(ins.get(r.to)||ins.set(r.to,[]).get(r.to)).push(r.from)});
+  const portY=(q,list,t,base)=>{const L=list.get(q)||[];const k=L.indexOf(t),n=L.length;return base+(n>1&&IDX.get(q).kind==='routeStep'?(k-(n-1)/2)*26:0)};
+  const marker=sv('marker',{id:'n8ar',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto'});marker.append(sv('path',{d:'M0 1L9 5L0 9z',style:'fill:var(--n8e)'}));
+  const markerG=sv('marker',{id:'n8arg',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto'});markerG.append(sv('path',{d:'M0 1L9 5L0 9z',style:'fill:#16a34a'}));
+  svg.querySelector('defs').append(marker,markerG);
+  rels.forEach(([r,i])=>{const A=B.get(r.from),Bb=B.get(r.to),isRoute=IDX.get(r.from).kind==='routeStep';
+    const x1=cxn(A)+HB+6,y1=portY(r.from,outs,r.to,cyn(A)),x2=cxn(Bb)-HB-6,y2=cyn(Bb);
+    let d;const dx=x2-x1;
+    if(x1-20<=x2){const c=dx>=0?dx/2:0.25*25*Math.sqrt(-dx);d=`M${x1} ${y1} C${x1+c} ${y1} ${x2-c} ${y2} ${x2} ${y2}`}
+    else{const R=16,P=40,yb=y1+130,ax=x1+P,bx=x2-P;
+      d=`M${x1} ${y1} L${ax-R} ${y1} Q${ax} ${y1} ${ax} ${y1+R} L${ax} ${yb-R} Q${ax} ${yb} ${ax-R} ${yb} L${bx+R} ${yb} Q${bx} ${yb} ${bx} ${yb-R} L${bx} ${y2+R*Math.sign(yb-y2)} Q${bx} ${y2} ${bx+R} ${y2} L${x2} ${y2}`}
+    const cnt=run&&run.edges[r.from+'>'+r.to],err=(IDX.get(r.to).tags||[]).includes('onError');
+    svg.append(sv('path',{d,fill:'none',style:`stroke:${cnt?'#16a34a':'var(--n8e)'}`,'stroke-width':cnt?2.6:2,'stroke-dasharray':err?'6 5':'none','marker-end':`url(#${cnt?'n8arg':'n8ar'})`}));
+    const hit=sv('path',{d,fill:'none',stroke:'transparent','stroke-width':16,class:'hit','data-e':i});const tt=sv('title');tt.textContent='از «'+nodeLabel(r.from)+'» به «'+nodeLabel(r.to)+'»'+(r.label?' — '+r.label:'');hit.append(tt);svg.append(hit);
+    const lb=(isRoute||(r.label&&r.label!=='بعد'))?r.label:'';
+    const pill=(x,y,txt,col)=>{const t=sv('text',{x,y,'font-size':11.5,'text-anchor':'middle',style:`fill:${col};paint-order:stroke;stroke:var(--lane);stroke-width:5px;font-family:var(--font);font-weight:600`});t.textContent=txt;svg.append(t)};
+    if(lb)pill(x1+14+Math.min(60,lb.length*6.5)/2,y1+(y2<y1?-8:y2>y1?16:-8),lb.length>14?lb.slice(0,13)+'…':lb,'var(--mute)');
+    if(cnt)pill((x1+x2)/2,(y1+y2)/2-8,toFa(cnt)+' مورد','#16a34a')});
   const vis=new Map();
-  ps.forEach(q=>{const n=IDX.get(q),b=B.get(q);vis.set(q,b);const kids=n.children.filter(isStep).length;
-    world.append(h('div',{class:`node n8 ${n.kind}${SEL===q?' sel':''}${lockedN(n)?' locked':''}`,'data-p':q,style:`left:${b.x}px;top:${b.y}px`},
-      h('div',{class:'n8i'},N8ICON[n.kind]||'◻️',lockedN(n)?h('span',{class:'lk'},'🔒'):null,kids?h('span',{class:'ct',title:'قدم‌های داخلی'},toFa(kids)):null),
+  ps.forEach(q=>{const n=IDX.get(q),b=B.get(q);vis.set(q,b);const kids=n.children.filter(isStep).length,st=run&&(run.nodes[q]||null);
+    const no=(outs.get(q)||[]),nOut=n.kind==='routeStep'?Math.max(1,no.length):1;
+    world.append(h('div',{class:`node n8 ${n.kind}${SEL===q?' sel':''}${lockedN(n)?' locked':''}${st?' rs-'+st.s:''}`,'data-p':q,style:`left:${b.x}px;top:${b.y}px`},
+      h('div',{class:'n8i'},h('span',{class:'ic'},N8ICON[n.kind]||'◻️'),
+        n.kind!=='triggerStep'?h('i',{class:'hin'}):null,
+        ...Array.from({length:nOut},(_,k)=>h('i',{class:'hout',style:`top:${HB-8+(nOut>1?(k-(nOut-1)/2)*26:0)}px`})),
+        lockedN(n)?h('span',{class:'lk'},'🔒'):null,kids?h('span',{class:'ct',title:'قدم‌های داخلی'},toFa(kids)):null,
+        st&&st.s==='ok'?h('span',{class:'okc'},'✓'):null),
       h('div',{class:'n8l'},titleName(n)),h('div',{class:'n8k'},(N8KIND[n.kind]||n.kind)+(n.tech&&!/—/.test(n.tech)?' · '+n.tech.replace(/^skill:\s*/,''):''))))});
   if(!ps.length)world.append(h('div',{class:'empty'},'این بخش هنوز قدمی ندارد.'));
   return{W,H,vis}}
