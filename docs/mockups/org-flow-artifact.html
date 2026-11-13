@@ -251,6 +251,21 @@ body.n8on #cv{height:calc(100vh - 90px)!important;min-height:520px}
 .node.n8.routeStep{clip-path:none!important;filter:none!important}.node.n8.routeStep::before{display:none!important}
 .node.n8::before,.node.n8::after{display:none!important}
 .node.n8 .n8k{display:none}.node.n8:hover .n8k{display:block}
+
+/* نقشهٔ سفر */
+.jm{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12.5px}
+.jr{display:flex;border-bottom:1px solid var(--line)}
+.jr.head{background:var(--lane);position:sticky;top:0}
+.jl{flex:0 0 170px;padding:10px;font-weight:700;border-inline-end:1px solid var(--line);display:flex;flex-direction:column;gap:2px;background:var(--lane)}
+.jl small{font-weight:400;font-size:10.5px}
+.jc{flex:0 0 210px;padding:8px;border-inline-end:1px dashed var(--line);display:flex;flex-direction:column;gap:4px;min-height:44px}
+.jc.jh{cursor:pointer}.jc.jh:hover{background:var(--accbg)}.jc.jh b{font-size:13px}
+.jchip{display:block;border:1.5px solid #c9ced6;border-radius:6px;padding:3px 6px;background:var(--card);cursor:pointer;line-height:1.45}
+.jchip.gateStep{border-color:#e7a1a1}.jchip.askStep{border-color:#efc77a}.jchip.autoStep{border-color:#9fd8b0}.jchip.routeStep{border-color:#b4b8f5}
+.jchip:hover{border-color:#ea4b71}
+.jtag{display:inline-block;font-size:11px;background:var(--lane);border-radius:10px;padding:1px 8px;margin:1px}
+.jline{border-top:2px dashed #ea4b71;border-bottom:1px solid var(--line);padding:2px 12px;font-size:11px;color:#ea4b71;background:var(--lane)}
+.jcurve{flex:0 0 auto}.jsm{font-size:11px;color:var(--mute)}
 </style>
 <div id="app">
   <div class="top">
@@ -2667,15 +2682,53 @@ function renderN8n(rid){
       h('div',{class:'n8l'},titleName(n)),h('div',{class:'n8k'},(N8KIND[n.kind]||n.kind)+(n.tech&&!/—/.test(n.tech)?' · '+n.tech.replace(/^skill:\s*/,''):''))))});
   if(!ps.length)world.append(h('div',{class:'empty'},'این بخش هنوز قدمی ندارد.'));
   return{W,H,vis}}
+
+/* ───────── نمای «سفر» (Customer Journey Map + Service Blueprint) ─────────
+   الگو: NN/g Journey Map (مرحله‌ها × کارها، فکرها، احساس، دردها، فرصت‌ها) و Service Blueprint
+   (کار مشتری | خط دید | پشت صحنه | سیستم‌ها). ستون = فاز یا قدم؛ ردیف‌ها از نوع و metadata ساخته می‌شوند. */
+function renderJourney(rid){
+  const world=$('#world');world.replaceChildren();world.style.direction='rtl';
+  const stages=MACRO||!rid?roots().filter(inChain).map(n=>[n.id,n]):(()=>{const a=[];const rec=(n,p)=>n.children.forEach(c=>{const q=p+'.'+c.id;if(isStep(c))a.push([q,c]);else rec(c,q)});rec(IDX.get(rid),rid);return a})();
+  const stepsOf=(q,n)=>{if(isStep(n))return[[q,n]];const a=[];const rec=(m,p)=>m.children.forEach(c=>{const qq=p+'.'+c.id;if(isStep(c))a.push([qq,c]);rec(c,qq)});rec(n,q);return a};
+  const human=k=>k==='askStep'||k==='gateStep'||k==='triggerStep';
+  const emo=(q,n)=>{const v=parseFloat(meta(n,'emotion'));if(!isNaN(v))return v;const st=stepsOf(q,n);if(!st.length)return 0;
+    return st.reduce((s,[,m])=>s+(m.kind==='gateStep'?-1:m.kind==='askStep'?-.3:m.kind==='autoStep'?.6:0)+((m.tags||[]).includes('unknownSkill')?-.4:0),0)/st.length};
+  const ROWS=[
+    ['🎯 مرحله',null],['🙋 کار انسان (پیش صحنه)','front'],['👁 خط دید',null],['🤖 پشت صحنه (ایجنت و خودکار)','back'],
+    ['🔌 سیستم‌ها و ابزار','sys'],['😊 احساس',null],['⚠️ درد و ریسک','pain'],['💡 فرصت','opp']];
+  const CW=210,LW=170,RH={front:120,back:120,sys:70,pain:90,opp:80},W=LW+stages.length*CW+20;
+  const table=h('div',{class:'jm',style:`width:${W}px`});
+  const row=(lbl,cells,cls)=>table.append(h('div',{class:'jr '+(cls||'')},h('div',{class:'jl'},lbl),...cells));
+  row('🎯 مرحله',stages.map(([q,n],i)=>h('div',{class:'jc jh','data-p':q,onclick:()=>{if(!isStep(n)){MACRO=false;go('ov:'+q)}else select(q)}},h('b',{},toFa(i+1)+'. '+titleName(n)),h('small',{},meta(n,'agent')||''))),'head');
+  const chips=(q,n,f)=>stepsOf(q,n).filter(([,m])=>f(m)).map(([qq,m])=>h('span',{class:'jchip '+m.kind,title:outText(m),onclick:e=>{e.stopPropagation();select(qq)}},(N8ICON[m.kind]||'')+' '+titleName(m)));
+  row('🙋 کار انسان (پیش صحنه)',stages.map(([q,n])=>h('div',{class:'jc'},...chips(q,n,m=>human(m.kind)))));
+  table.append(h('div',{class:'jline'},h('span',{},'خط دید: بالای خط را انسان می‌بیند و انجام می‌دهد، پایین خط را ایجنت‌ها')));
+  row('🤖 پشت صحنه (ایجنت و خودکار)',stages.map(([q,n])=>h('div',{class:'jc'},...chips(q,n,m=>!human(m.kind)))));
+  row('🔌 سیستم‌ها و ابزار',stages.map(([q,n])=>{const t=[...new Set(stepsOf(q,n).map(([,m])=>meta(m,'ext_tool')||(m.tech&&!/—/.test(m.tech)?m.tech.replace(/^skill:\s*/,''):'')).filter(Boolean))];return h('div',{class:'jc'},...t.slice(0,4).map(x=>h('span',{class:'jtag ltr'},x)))}));
+  // منحنی احساس
+  const EH=110,es=stages.map(([q,n])=>emo(q,n)),cv=newSvg(stages.length*CW,EH);cv.style.position='static';
+  const pts=es.map((v,i)=>[stages.length*CW-(i*CW+CW/2),EH/2-Math.max(-1.5,Math.min(1.5,v))*30]);
+  cv.append(sv('line',{x1:0,y1:EH/2,x2:stages.length*CW,y2:EH/2,style:'stroke:var(--line)','stroke-dasharray':'4 4'}));
+  if(pts.length>1){let d=`M${pts[0][0]} ${pts[0][1]}`;for(let i=1;i<pts.length;i++){const [x0,y0]=pts[i-1],[x,y]=pts[i],c=(x0-x)/2;d+=` C${x0-c} ${y0} ${x+c} ${y} ${x} ${y}`}cv.append(sv('path',{d,fill:'none',style:'stroke:#ea4b71','stroke-width':2.5}))}
+  pts.forEach(([x,y],i)=>{cv.append(sv('circle',{cx:x,cy:y,r:6,style:`fill:${es[i]>.2?'#16a34a':es[i]<-.2?'#dc2626':'#f59e0b'}`}));const t=sv('text',{x,y:y-12,'text-anchor':'middle','font-size':16});t.textContent=es[i]>.2?'🙂':es[i]<-.2?'😟':'😐';cv.append(t)});
+  table.append(h('div',{class:'jr'},h('div',{class:'jl'},'😊 احساس',h('small',{},'از نوع قدم‌ها؛ با metadata emotion از ۲- تا ۲ دقیقش کن')),h('div',{class:'jcurve'},cv)));
+  row('⚠️ درد و ریسک',stages.map(([q,n])=>{const st=stepsOf(q,n),g=st.filter(([,m])=>m.kind==='gateStep').length,u=st.filter(([,m])=>(m.tags||[]).includes('unknownSkill')).length;
+    return h('div',{class:'jc'},g?h('div',{},'⏸ '+toFa(g)+' انتظار برای تأیید'):null,u?h('div',{},'❓ '+toFa(u)+' قدم بدون skill'):null,meta(n,'must_not')?h('div',{class:'jsm'},'⛔ '+meta(n,'must_not').slice(0,80)):null)}));
+  row('💡 فرصت',stages.map(([q,n])=>{const st=stepsOf(q,n),a=st.filter(([,m])=>m.kind==='askStep').length,u=st.filter(([,m])=>(m.tags||[]).includes('unknownSkill')).length;
+    return h('div',{class:'jc'},u?h('div',{},'🔎 یافتن skill برای '+toFa(u)+' قدم'):null,a>1?h('div',{},'⚡ ادغام '+toFa(a)+' پرسش در یک فرم'):null)}));
+  world.append(table);world.style.width=W+'px';
+  requestAnimationFrame(()=>{world.style.height=table.offsetHeight+'px'});
+  return{W,H:900,vis:new Map()}}
+{const _rn=renderN8n;renderN8n=function(rid){if(N8LAY==='journey')return renderJourney(rid);$('#world').style.direction='ltr';return _rn(rid)}}
 {const _rd=renderDia;renderDia=function(){
   document.body.classList.toggle('n8on',N8MODE);
   if(!N8MODE){$('#world').style.direction='';return _rd()}
   if(!VIEWP.startsWith('ov:')&&!IDX.has(VIEWP))VIEWP='ov:'+roots()[0].id;
   RV=REVIEW?reviewFind():new Map();renderNav();renderTree();
-  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:10;VIEW.y=10;applyView();NEEDFIT=false}
+  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=N8LAY==='journey'?1:Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:(N8LAY==='journey'?cv.clientWidth-LAST.W*VIEW.k-10:10);VIEW.y=10;applyView();NEEDFIT=false}
   try{N8.badges()}catch(e){}}}
 {const _rv=renderVers;renderVers=function(){_rv();$('#vers').append(h('button',{id:'n8mode',class:N8MODE?'on':'',title:'نمایش همهٔ نمودارها افقی، مثل n8n',onclick:()=>{N8MODE=!N8MODE;try{localStorage.setItem('n8mode',N8MODE?'1':'0')}catch(e){}NEEDFIT=true;renderVers();renderDia()}},N8MODE?'⇄ حالت n8n: روشن':'⇄ حالت n8n'),
-  h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
+  h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)'],['journey','🧭 نقشهٔ سفر (Journey + Service Blueprint)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
 
 /* ───────── پوستهٔ n8n: نوار کناری، منوی فایل و نما، زبانه‌های ویرایشگر و اجراها ───────── */
 (function n8shell(){
