@@ -326,6 +326,10 @@ body.n8on .cvhint{display:none!important}
 #insp .itabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;border-radius:0;padding:9px 4px;font-size:12.5px;color:var(--mute);font-weight:600}
 #insp .itabs button.on{color:var(--ink);border-bottom-color:#ea4b71}#insp .itabs small{margin-inline-start:4px;font-size:10px;background:var(--lane);border-radius:8px;padding:0 5px}
 #insp .panel[hidden]{display:none!important}
+#insp .acch .hic{background:none;border:1px solid transparent;border-radius:6px;padding:2px 7px;font-size:14px;color:var(--mute)}#insp .acch .hic:hover{border-color:var(--line);color:var(--ink)}
+#insp .hmenu{display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:8px;padding:4px;margin:0 0 8px;background:var(--card,#fff);box-shadow:0 8px 20px #0002}#insp .hmenu[hidden]{display:none}
+#insp .hmenu button{text-align:right;background:none;border:0;padding:6px 8px;border-radius:6px}#insp .hmenu button:hover{background:var(--lane)}
+#insp details.adv{margin:6px 0;border-top:1px dashed var(--line);padding-top:6px}#insp details.adv summary{cursor:pointer;font-size:12px;color:var(--mute)}
 #insp .panel.acc{background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;margin:0;padding:4px 4px 10px}
 #insp .acch{display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 4px;font-size:12.5px;font-weight:700;color:var(--ink);user-select:none}
 #insp .acch:hover{color:#ea4b71}#insp .acch .at{flex:1}
@@ -2948,7 +2952,7 @@ const accSave=()=>{try{localStorage.setItem('acc',JSON.stringify(__acc))}catch(e
 function proPanels(){const I=$('#insp');if(!I)return;let first=true;
   I.querySelectorAll(':scope > .panel').forEach(P=>{const H=P.querySelector(':scope > h2');if(!H||P.classList.contains('acc'))return;
     P.classList.add('acc');const key=H.textContent.replace(/[·\d۰-۹]+.*$/,'').trim();
-    const open=key in __acc?__acc[key]:first;first=false;P.classList.toggle('shut',!open);
+    const open=key in __acc?__acc[key]:(first&&!/فلش‌های این/.test(key));first=false;P.classList.toggle('shut',!open);
     const help=P.querySelector(':scope > small');
     const head=h('div',{class:'acch'},h('span',{class:'chev'},'›'),h('span',{class:'at'},H.textContent));
     if(help){help.classList.add('acchelp');help.hidden=true;head.append(h('button',{class:'qm',title:'راهنما',onclick:e=>{e.stopPropagation();help.hidden=!help.hidden}},'؟'))}
@@ -2961,13 +2965,25 @@ function proTree(){const T=$('#tree');if(!T||T.querySelector('.trq'))return;
 // تب‌های معنایی مثل پنل راست Figma (Design / Prototype / Inspect) و n8n (Parameters / Settings)
 window.__itab=window.__itab||'all';
 function proTabs(){const I=$('#insp');if(!I)return;const ps=[...I.querySelectorAll(':scope > .panel')];
-  const cat=P=>{const t=(P.querySelector('.acch .at')||P).textContent;return /گزارش|بازبینی|هشدار/.test(t)?'check':/طراح|تمپلیت/.test(t)?'build':/راهنما/.test(t)?'help':'detail'};
-  const T=[['detail','جزئیات'],['check','بررسی'],['build','ساخت'],['help','راهنما']].filter(([k])=>ps.some(P=>cat(P)===k));
+  const cat=P=>{const t=(P.querySelector('.acch .at')||P).textContent;return /گزارش|بازبینی|هشدار/.test(t)?'check':/طراح|تمپلیت/.test(t)?'build':/راهنما/.test(t)?'help':/ایجنت متخصص|ابزار بیرونی|CrewAI|توسعه با Claude/.test(t)?'ai':'detail'};
+  const T=[['detail','جزئیات'],['ai','دستیار'],['check','بررسی'],['build','ساخت'],['help','راهنما']].filter(([k])=>ps.some(P=>cat(P)===k));
   if(T.length<2)return;if(!T.some(([k])=>k===__itab))__itab=T[0][0];
   const bar=h('div',{class:'itabs',role:'tablist'},...T.map(([k,l])=>{const n=ps.filter(P=>cat(P)===k).length;return h('button',{role:'tab',class:k===__itab?'on':'',onclick:()=>{__itab=k;renderInsp()}},l,n>1?h('small',{},toFa(n)):null)}));
   ps.forEach(P=>{P.hidden=cat(P)!==__itab;if(!P.hidden&&P.classList.contains('shut')&&ps.filter(x=>cat(x)===__itab).length===1)P.classList.remove('shut')});
   (I.querySelector('.pnlh')||I.firstChild)?.after(bar)}
-{const _ri3=renderInsp;renderInsp=function(){_ri3();proPanels();proTabs()}}
+// پنل گره مثل n8n NDV: ورودی ← خروجی، کارهای کم‌کاربرد پشت ⋯، فیلدهای فنی زیر «پیشرفته»
+function proNode(){const I=$('#insp');const P=[...I.querySelectorAll(':scope > .panel.acc')].find(x=>/^›?\s*ویرایش/.test((x.querySelector('.acch .at')||{}).textContent||''));if(!P||P.dataset.pro)return;P.dataset.pro=1;
+  const head=P.querySelector('.acch');
+  const lock=[...P.querySelectorAll(':scope > button.sm')].find(b=>/قفل/.test(b.textContent)&&!b.classList.contains('pri'));
+  if(lock){lock.classList.add('hic');lock.title=lock.textContent.trim();lock.textContent=lock.textContent.includes('🔒')?'🔒':'🔓';lock.addEventListener('click',e=>e.stopPropagation(),true);head.append(lock)}
+  const rows=[...P.querySelectorAll(':scope > .row')];const fields=rows.find(r=>r.querySelector('input'));
+  const acts=rows.filter(r=>r!==fields&&r.querySelector('button'));
+  if(acts.length){const m=h('div',{class:'hmenu',hidden:true},...acts.flatMap(r=>[...r.children]));acts.forEach(r=>r.remove());
+    const dots=h('button',{class:'hic',title:'کارهای بیشتر',onclick:e=>{e.stopPropagation();m.hidden=!m.hidden}},'⋯');head.append(dots);head.after(m)}
+  if(fields){const d=h('details',{class:'adv'},h('summary',{},'پیشرفته'));fields.replaceWith(d);d.append(fields)}
+  const labs=[...P.querySelectorAll(':scope > label.f')],out=labs.find(l=>/خروجی/.test(l.textContent)),inp=labs.find(l=>/ورودی/.test(l.textContent));
+  if(out&&inp)out.before(inp)}
+{const _ri3=renderInsp;renderInsp=function(){_ri3();proPanels();proNode();proTabs()}}
 {const _rt3=renderTree;renderTree=function(){_rt3();proTree()}}
 
 /* ───────── شروع ───────── */
