@@ -316,6 +316,7 @@ body.n8on .cvhint{display:none!important}
 .vmi .vic{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;background:var(--lane);font-size:16px}
 .vmi .vtx{flex:1;display:flex;flex-direction:column;line-height:1.4;text-align:right}.vmi .vtx small{font-size:11px;color:var(--mute)}
 .vmi kbd{font-size:10.5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--mute);font-family:inherit}
+.navsel{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card,#fff);color:var(--ink);font:inherit;margin-inline:6px}
 .vmi .vck{width:14px;color:#ea4b71;font-weight:800}
 .n8menu .dd button.vdots{display:flex;align-items:center;gap:8px;color:var(--mute);border:0;background:none;padding:6px 10px;border-radius:8px}.vdots span:first-child{font-size:18px;line-height:1;width:34px;text-align:center}.vdots small{margin-inline-start:auto;font-size:10.5px;border:1px solid var(--line);border-radius:10px;padding:0 6px}.n8menu .dd button.vdots:hover,.n8menu .dd button.vdots.on{background:var(--lane);color:var(--ink)}.vsep{border:0;border-top:1px solid var(--line);margin:6px 0}.vmore[hidden]{display:none}
 .n8menu .dd button.vmi.on{background:var(--lane)!important;color:var(--ink)!important;border:0}.vmi.on .vic{border-color:#ea4b71}
@@ -1122,7 +1123,8 @@ const rootOfView=()=>VIEWP.startsWith('ov:')?VIEWP.slice(3):VIEWP.split('.')[0];
 function renderNav(){
   const nav=$('#nav');nav.replaceChildren();
   nav.append(h('button',{class:MACRO?'on':'',title:'کل فرایندها هر کدام یک نود',onclick:goMacro},'🗺 نقشهٔ کل'));
-  roots().filter(R=>!isStep(R)).forEach(R=>nav.append(h('button',{class:(!MACRO&&rootOfView()===R.id)?'on':'',onclick:()=>go('ov:'+R.id)},R.title.replace(/\s*\(.*$/,''))));
+  // به‌جای ۲۶ دکمه، یک فهرست کشویی مثل breadcrumb نرم‌افزارهای تجاری (همان فهرست بخش‌ها در ستون کنار هم هست)
+  {const sel=h('select',{class:'navsel',onchange:e=>{if(e.target.value)go('ov:'+e.target.value)}},h('option',{value:''},'بخش…'),...roots().filter(R=>!isStep(R)).map(R=>{const o=h('option',{value:R.id},R.title.replace(/\s*\(.*$/,''));if(!MACRO&&rootOfView()===R.id)o.selected=true;return o}));nav.append(sel)}
   if(MACRO){nav.append(h('button',{class:'sm',onclick:()=>autoOrder('')},'↧ ترتیب خودکار بر اساس فلش‌ها'),h('span',{class:'mac-note'},'  نقشهٔ کل: هر فرایند بزرگ یک نود است. قبل و بعدش نود تازه اضافه کن، با «＋ باز کردن» واردش شو.'));return}
   if(VER===2||VER===4){
     const rid=rootOfView();
@@ -1828,7 +1830,7 @@ function renderDia(){
   RV=REVIEW?reviewFind():new Map();
   renderNav();renderTree();
   LAST=MACRO?renderMacro():(VER===2||VER===4)?renderNested(rootOfView()):VIEWP.startsWith('ov:')?renderOverview(VIEWP.slice(3)):renderLane(VIEWP);
-  applyView();if(NEEDFIT&&!$('#p-dia').hidden)fit();if(REVIEW)renderVers()}
+  applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');if(LAST&&LAST.W>LAST.H){VIEW.k=Math.max(.55,Math.min(1,cv.clientHeight/(LAST.H+30)));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:10;VIEW.y=10;applyView();NEEDFIT=false}else fit()}if(REVIEW)renderVers()}
 const lastVis=()=>(LAST&&LAST.vis)||new Map();
 function expandTo(p){const s=p.split('.');for(let i=1;i<s.length;i++)EXP.add(s.slice(0,i).join('.'))}
 function fitTo(p){const v0=lastVis().get(p);if(!v0)return;const cv=$('#cv'),w=cv.clientWidth,hh=cv.clientHeight;if(!w)return;
@@ -2021,49 +2023,50 @@ function renderOverview(rid){
 
 /* نسخهٔ ۲: بازشدن درجا — کادرهای تو در تو در همان بوم باز و بسته می‌شوند */
 function renderMacro(){
+  // افقی چپ‌به‌راست مثل n8n و بقیهٔ نماها: بازیگران بالا، زنجیرهٔ فازها وسط، ایجنت‌های دیگر پایین
   const world=$('#world');world.replaceChildren();
-  const chain=M.nodes.filter(inChain),CW=330,X0=400,HEADH=38;
+  const chain=M.nodes.filter(inChain),CW=300,HG=128,HEADH=38;
   const nsteps=n=>n.children.reduce((a,c)=>a+(isStep(c)?1:0)+nsteps(c),0);
   const hOf=n=>isProc(n)?190:(isStep(n)?136+extraH(n)+(n.children.length?26:0):90);
   const grp=(dir)=>{const it=MACRO_SUG[dir];const rows=Math.ceil(it.length/2);return{it,rows,h:HEADH+12+rows*94+8}};
   const gB=grp('before'),gA=grp('after');
-  let y=16;const gBy=y;y+=gB.h+56;
-  const vis=new Map();chain.forEach(n=>{const hh=hOf(n);vis.set(n.id,{n,p:n.id,x:X0,y,w:CW,h:hh});y+=hh+56});
-  const gAy=y-56+56;const H=gAy+gA.h+40,W=1180;
+  const actors=M.nodes.filter(n=>n.kind==='actor'),pj=[];M.nodes.forEach(R=>{if(R.kind==='orgBox'&&R.children.some(c=>c.kind==='project'))R.children.forEach(c=>{if(c.kind==='project')pj.push({n:c,p:R.id+'.'+c.id})})});
+  const AY=16,PH=90+HEADH+30,CY=AY+(actors.length?PH+90:0),chH=Math.max(190,...chain.map(hOf));
+  let x=40;const gBx=x;x+=CW+24+HG;
+  const vis=new Map();chain.forEach(n=>{const hh=hOf(n);vis.set(n.id,{n,p:n.id,x,y:CY+(chH-hh)/2,w:CW,h:hh});x+=CW+HG});
+  const gAx=x;const W=gAx+CW+24+60,PY=CY+Math.max(chH,gB.h,gA.h)+110,H=PY+(pj.length?PH:0)+40;
   world.style.width=W+'px';world.style.height=H+'px';
   const svg=newSvg(W,H);
-  const mkGroup=(dir,g,gy)=>{
-    world.append(h('div',{class:'lanebox ghost',style:`left:${X0-12}px;top:${gy}px;width:${CW+24}px;height:${g.h}px`},h('div',{class:'fh'},h('span',{class:'ft'},dir==='before'?'💡 قبل از کل فرایند':'💡 بعد از کل فرایند'),h('span',{class:'cnt'},'پیشنهاد'))));
+  const mid=CY+chH/2;
+  const mkGroup=(dir,g,gx)=>{const gy=mid-g.h/2;
+    world.append(h('div',{class:'lanebox ghost',style:`left:${gx-12}px;top:${gy}px;width:${CW+24}px;height:${g.h}px`},h('div',{class:'fh'},h('span',{class:'ft'},dir==='before'?'💡 قبل از کل فرایند':'💡 بعد از کل فرایند'),h('span',{class:'cnt'},'پیشنهاد'))));
     g.it.forEach((x,k)=>{const tpl=x.tpl?allTpls().find(t=>t.id===x.tpl):null,title=x.blank?'نود خالی':(tpl?tpl.t:x.t),sub=x.blank?'خودت پر می‌کنی':(tpl?(tpl.kids.length+' زیرقدم (تمپلیت)'):x.out);
-      const cx=X0+(k%2)*(CW/2),cy=gy+HEADH+12+Math.floor(k/2)*94;
+      const cx=gx+(k%2)*(CW/2),cy=gy+HEADH+12+Math.floor(k/2)*94;
       world.append(h('div',{class:'ghostn',style:`left:${cx}px;top:${cy}px;width:${CW/2-10}px;height:84px`},h('b',{},title),h('small',{},sub),h('button',{class:'sm pri','data-msug':dir+':'+k},'＋ افزودن')))})};
-  mkGroup('before',gB,gBy);mkGroup('after',gA,gAy);
-  // chain edges
+  mkGroup('before',gB,gBx);mkGroup('after',gA,gAx);
   const mapEnd=q=>{const r0=q.split('.')[0];return vis.get(r0)||null};
-  const sd=new Set();
+  const hz=(x1,y1,x2,y2)=>{const k=Math.max((x2-x1)/2,30);return`M${x1} ${y1}C${x1+k} ${y1} ${x2-k} ${y2} ${x2} ${y2}`};
   const first=chain[0],last=chain[chain.length-1];
-  if(first)drawEdge(svg,`M${X0+CW/2} ${gBy+gB.h}L${X0+CW/2} ${vis.get(first.id).y}`,{col:'--e-x',dash:1,dim:1});
-  if(last)drawEdge(svg,`M${X0+CW/2} ${vis.get(last.id).y+vis.get(last.id).h}L${X0+CW/2} ${gAy}`,{col:'--e-x',dash:1,dim:1});
+  if(first)drawEdge(svg,hz(gBx+CW+12,mid,vis.get(first.id).x,mid),{col:'--e-x',dash:1,dim:1});
+  if(last){const l=vis.get(last.id);drawEdge(svg,hz(l.x+l.w,mid,gAx-12,mid),{col:'--e-x',dash:1,dim:1})}
   for(let i=0;i<chain.length-1;i++){const a=vis.get(chain[i].id),b=vis.get(chain[i+1].id);
     const ri=M.rels.findIndex(r=>mapEnd(r.from)===a&&mapEnd(r.to)===b);
-    drawEdge(svg,`M${X0+CW/2} ${a.y+a.h}L${X0+CW/2} ${b.y}`,{idx:ri>=0?ri:undefined,label:ri>=0?M.rels[ri].label:'بعد',lx:X0+CW/2+10,ly:(a.y+a.h+b.y)/2+4,anchor:'start'})}
-  // actors (left) and projects (right)
-  const actors=M.nodes.filter(n=>n.kind==='actor'),pj=[];M.nodes.forEach(R=>{if(R.kind==='orgBox'&&R.children.some(c=>c.kind==='project'))R.children.forEach(c=>{if(c.kind==='project')pj.push({n:c,p:R.id+'.'+c.id})})});
-  const cmid=chain.length?(vis.get(chain[0].id).y+vis.get(chain[chain.length-1].id).y+vis.get(chain[chain.length-1].id).h)/2:300;
-  const pool=(list,x,title,cls)=>{const ph=list.length*108+HEADH+14,py=Math.max(16,cmid-ph/2);
-    world.append(h('div',{class:'lanebox '+(cls||''),style:`left:${x-20}px;top:${py}px;width:290px;height:${ph}px`},h('div',{class:'fh'},h('span',{class:'ft'},title))));
-    return list.map((it,k)=>({...it,x,y:py+HEADH+14+k*108,w:250,h:90}))};
-  const aL=pool(actors.map(n=>({n,p:n.id})),50,'👤 بازیگران','');
-  const pL=pool(pj,X0+CW+110,'🤖 ایجنت‌های دیگر · MCP / REST','ext');
+    drawEdge(svg,hz(a.x+a.w,mid,b.x,mid),{idx:ri>=0?ri:undefined,label:ri>=0?M.rels[ri].label:'بعد',lx:(a.x+a.w+b.x)/2,ly:mid-8,anchor:'middle'})}
+  const pool=(list,y,title,cls)=>{if(!list.length)return[];const pw=list.length*(250+40)+20,px=Math.max(20,(W-pw)/2);
+    world.append(h('div',{class:'lanebox '+(cls||''),style:`left:${px}px;top:${y}px;width:${pw}px;height:${PH}px`},h('div',{class:'fh'},h('span',{class:'ft'},title))));
+    return list.map((it,k)=>({...it,x:px+20+k*290,y:y+HEADH+14,w:250,h:90}))};
+  const aL=pool(actors.map(n=>({n,p:n.id})),AY,'👤 بازیگران','');
+  const pL=pool(pj,PY,'🤖 ایجنت‌های دیگر · MCP / REST','ext');
   world.append(svg);
   const am=new Map(aL.map(a=>[a.p,a])),pm=new Map(pL.map(a=>[a.p,a]));
   const projOf2=q=>{const sg=q.split('.');return sg.length>=2?sg[0]+'.'+sg[1]:null};
   const seen=new Set();
-  M.rels.forEach((r,i)=>{const fa=am.get(r.from.split('.')[0]),tb=mapEnd(r.to),fb=mapEnd(r.from),tp=pm.get(projOf2(r.to)||''),tc=vis.get(r.to.split('.')[0]);
-    let d=null,lab=r.label||'',a1,b1;
-    if(fa&&tb){const k=fa.p+'>'+tb.p+'|'+lab;if(seen.has(k))return;seen.add(k);a1=fa;b1=tb;d=`M${fa.x+fa.w} ${fa.y+fa.h/2}C${fa.x+fa.w+60} ${fa.y+fa.h/2} ${tb.x-60} ${tb.y+tb.h/2} ${tb.x} ${tb.y+tb.h/2}`}
-    else if(fb&&tp){const k=fb.p+'>'+tp.p+'|'+lab;if(seen.has(k))return;seen.add(k);d=`M${fb.x+fb.w} ${fb.y+fb.h/2}C${fb.x+fb.w+60} ${fb.y+fb.h/2} ${tp.x-60} ${tp.y+tp.h/2} ${tp.x} ${tp.y+tp.h/2}`;lab=(lab?lab+' · ':'')+'MCP'}
-    if(d)drawEdge(svg,d,{idx:i,label:lab,lx:(fa?fa.x+fa.w+14:fb.x+fb.w+14),ly:(fa?fa.y+fa.h/2:fb.y+fb.h/2)-7,anchor:'start',dash:fa?0:1,col:fa?undefined:'--proj'})});
+  const vt=(x1,y1,x2,y2)=>{const k=Math.max(Math.abs(y2-y1)/2,30)*(y2>y1?1:-1);return`M${x1} ${y1}C${x1} ${y1+k} ${x2} ${y2-k} ${x2} ${y2}`};
+  M.rels.forEach((r,i)=>{const fa=am.get(r.from.split('.')[0]),tb=mapEnd(r.to),fb=mapEnd(r.from),tp=pm.get(projOf2(r.to)||'');
+    let d=null,lab=r.label||'',lx,ly;
+    if(fa&&tb){const k=fa.p+'>'+tb.p+'|'+lab;if(seen.has(k))return;seen.add(k);d=vt(fa.x+fa.w/2,fa.y+fa.h,tb.x+tb.w/2,tb.y);lx=tb.x+tb.w/2;ly=tb.y-14}
+    else if(fb&&tp){const k=fb.p+'>'+tp.p+'|'+lab;if(seen.has(k))return;seen.add(k);d=vt(fb.x+fb.w/2,fb.y+fb.h,tp.x+tp.w/2,tp.y);lab=(lab?lab+' · ':'')+'MCP';lx=tp.x+tp.w/2;ly=tp.y-14}
+    if(d)drawEdge(svg,d,{idx:i,label:lab,lx,ly,anchor:'middle',dash:fa?0:1,col:fa?undefined:'--proj'})});
   aL.forEach(a=>world.append(nodeEl(a.n,a.p,a,false)));
   pL.forEach(a=>{const el=nodeEl(a.n,a.p,a,false);el.classList.add('ext');el.prepend(h('div',{class:'xb'},'ایجنت دیگر · '+(meta(a.n,'protocol')||'mcp').replace('+',' + ').toUpperCase()));world.append(el)});
   chain.forEach(n=>{const b=vis.get(n.id),el=nodeEl(n,n.id,b,true);
@@ -2092,12 +2095,12 @@ function renderNested(rid){
     const kids=n.children;
     if(!(EXP.has(p)&&kids.length)){const lane=['role','section','project','orgBox','flow'].includes(n.kind);return{n,p,w:LEAFW,h:(lane?64:(n.kind==='tool'?64:(isStep(n)&&n.kind!=='routeStep'?136+extraH(n):84)))+(kids.length?26:0),frame:false}}
     const ch=kids.map(k=>lay(k,p+'.'+k.id)),cw=Math.max(...ch.map(c=>c.w));
-    let hh=HEADH+14;ch.forEach(c=>hh+=c.h+GAP);hh+=-GAP+40;
-    const cc=corr(p,kids),padL=34+13*Math.min(cc.nL,8),padR=34+13*Math.min(cc.nR,8);
-    return{n,p,w:cw+padL+padR,h:hh,frame:true,ch,cw,padL,padR}};
+    // افقی چپ‌به‌راست مثل n8n (همهٔ نماها یک جهت دارند): فرزندان کنار هم، فاصلهٔ ۱۲۸ مثل NODE_X_SPACING
+    const HG=128,chH=Math.max(...ch.map(c=>c.h));let ww=0;ch.forEach(c=>ww+=c.w+HG);ww+=-HG+68;
+    return{n,p,w:Math.max(ww,LEAFW+68),h:HEADH+30+chH+70,frame:true,ch,cw,chH,padL:34,padR:34}};
   const vis=new Map(),groups=new Map();
   const put=(Lx,x,y,par,depth)=>{Lx.x=x;Lx.y=y;Lx.outY=y+Lx.h;Lx.par=par;Lx.depth=depth;vis.set(Lx.p,Lx);
-    if(Lx.frame){let cy=y+HEADH+14;Lx.ch.forEach(c=>{put(c,x+Lx.padL+(Lx.cw-c.w)/2,cy,Lx.p,depth+1);cy+=c.h+GAP});groups.set(Lx.p,Lx.ch)}};
+    if(Lx.frame){let cx=x+34;const cy=y+HEADH+30;Lx.ch.forEach(c=>{put(c,cx,cy+(Lx.chH-c.h)/2,Lx.p,depth+1);cx+=c.w+128});groups.set(Lx.p,Lx.ch)}};
   const sugN=(VER===4&&FOC&&FOC!==rid&&IDX.has(FOC)&&FOC.split('.')[0]===rid&&isStep(IDX.get(FOC)))?IDX.get(FOC):null,GW=270,LX=sugN?GW+70:0;
   const root=lay(IDX.get(rid),rid);put(root,70+LX,16,null,0);
   const EXTW=300,EXGAP=120;
@@ -2138,7 +2141,12 @@ function renderNested(rid){
   M.rels.forEach((r,i)=>{const a=mapv(r.from),b=mapv(r.to);if(!a||!b||a===b||isAnc(a,b)||isAnc(b,a))return;
     const key=a.p+'>'+b.p+'|'+(r.label||'');if(seen.has(key))return;seen.add(key);
     if(a.par&&a.par===b.par){if(!sib.has(a.par))sib.set(a.par,[]);sib.get(a.par).push({r,i,a,b})}else cross.push({r,i,a,b})});
-  sib.forEach((list,par)=>routeList(svg,list,groups.get(par),{base:16,stp:13}));
+  // یال‌های هم‌ردیف: جلو = منحنی bezier افقی؛ برگشت = خط‌چین نارنجی زیر گره‌ها (همان قرارداد قفل‌شدهٔ نمای n8n)
+  sib.forEach(list=>list.forEach(({r,i,a,b})=>{const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=(SEL||SELE!=null)&&!on;
+    const y1=a.y+a.h/2,y2=b.y+b.h/2;
+    if(b.x>=a.x+a.w-2){const x1=a.x+a.w,x2=b.x,k=Math.max((x2-x1)/2,30);drawEdge(svg,`M${x1} ${y1}C${x1+k} ${y1} ${x2-k} ${y2} ${x2} ${y2}`,{on,dim,idx:i,label:r.label,lx:(x1+x2)/2,ly:Math.min(y1,y2)-8,anchor:'middle'})}
+    else{const by=Math.max(a.y+a.h,b.y+b.h)+28,x1=a.x+a.w/2,x2=b.x+b.w/2,R=16;
+      drawEdge(svg,`M${x1} ${a.y+a.h}L${x1} ${by-R}Q${x1} ${by} ${x1-R} ${by}L${x2+R} ${by}Q${x2} ${by} ${x2} ${by-R}L${x2} ${b.y+b.h}`,{on,dim,idx:i,col:'--n8back',dash:1,label:'↩ برگشت به '+(b.n.title||'').slice(0,22),lx:(x1+x2)/2,ly:by-6,anchor:'middle'})}}));
   const hasSel=SEL||SELE!=null;
   cross.forEach(({r,i,a,b})=>{const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=hasSel&&!on,o={on,dim,idx:i,label:r.label,dash:1};
     const ax=a.x+a.w/2,bx=b.x+b.w/2;let d,lx,ly;
