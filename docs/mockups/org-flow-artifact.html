@@ -293,6 +293,7 @@ body.n8full .n8logs{display:flex;position:absolute;bottom:0;left:0;right:0;heigh
 body.n8full .node.n8 .n8l{color:#222}body.n8full .node.n8 .n8i{background:#fff!important}
 body.n8full #n8side{background:#2b2b38}
 body.n8full #n8mini{display:none}
+.node.n8 .n8x{font-size:10.5px;color:#6366f1;margin-top:2px}
 </style>
 <div id="app">
   <div class="top">
@@ -2651,7 +2652,10 @@ function renderN8n(rid){
   if(MACRO||!rid)ps=roots().map(n=>n.id);
   else{ps=[];const R=IDX.get(rid);const rec=(n,p)=>n.children.forEach(c=>{const q=p+'.'+c.id;if(isStep(c)||!c.children.length)ps.push(q);else{ps.push(q);rec(c,q)}});rec(R,rid);
     const st=ps.filter(q=>isStep(IDX.get(q)));if(st.length)ps=st.concat(ps.filter(q=>!isStep(IDX.get(q))&&!ps.some(o=>o.startsWith(q+'.')&&isStep(IDX.get(o)))))}
-  const set=new Set(ps),rels=[];M.rels.forEach((r,i)=>{if(set.has(r.from)&&set.has(r.to)&&r.from!==r.to)rels.push([r,i])});
+  const set=new Set(ps),rels=[],xref=new Map();
+  // مثل n8n فقط فلش‌های ترتیب اجرا (بین قدم‌های هم‌بخش) کشیده می‌شود؛ ارتباط بین بخش‌ها برچسب «↗» روی گره می‌شود
+  const same=r=>MACRO||!rid||parentPath(r.from)===parentPath(r.to)||N8LAY==='orig';
+  M.rels.forEach((r,i)=>{if(set.has(r.from)&&set.has(r.to)&&r.from!==r.to)rels.push([r,i])});
   // لایه‌بندی: طولانی‌ترین مسیر از شروع (بدون حلقه)
   const L=new Map(ps.map(q=>[q,0]));
   for(let k=0;k<ps.length;k++){let ch=false;rels.forEach(([r])=>{if(ps.indexOf(r.to)>ps.indexOf(r.from)||!rels.some(([b])=>b.from===r.to&&b.to===r.from)){const v=L.get(r.from)+1;if(v>L.get(r.to)&&v<ps.length){L.set(r.to,v);ch=true}}});if(!ch)break}
@@ -2696,6 +2700,7 @@ function renderN8n(rid){
   world.style.width=W+'px';world.style.height=H+'px';world.style.direction='ltr';world.append(svg);
   // فلش‌ها به سبک n8n: خروج از دستگیرهٔ راست، ورود به دستگیرهٔ چپ، منحنی بزیه با بازوی افقی؛
   // شاخه‌ها از دستگیره‌های جدا (یکی زیر دیگری) با برچسب کنار دستگیره؛ پس از اجرا سبز با «n مورد»
+  for(let k=rels.length-1;k>=0;k--){const [r]=rels[k];if(!same(r)&&B.get(r.to).x<=B.get(r.from).x){(xref.get(r.from)||xref.set(r.from,[]).get(r.from)).push(r.to);rels.splice(k,1)}}
   const run=N8.cur(),BX=96,HB=BX/2,cxn=b=>b.x+75,cyn=b=>b.y+HB;
   const outs=new Map();rels.forEach(([r])=>{(outs.get(r.from)||outs.set(r.from,[]).get(r.from)).push(r.to)});
   const ins=new Map();rels.forEach(([r])=>{(ins.get(r.to)||ins.set(r.to,[]).get(r.to)).push(r.from)});
@@ -2725,6 +2730,7 @@ function renderN8n(rid){
         ...Array.from({length:nOut},(_,k)=>h('i',{class:'hout',style:`top:${HB-8+(nOut>1?(k-(nOut-1)/2)*26:0)}px`})),
         lockedN(n)?h('span',{class:'lk'},'🔒'):null,kids?h('span',{class:'ct',title:'قدم‌های داخلی'},toFa(kids)):null,
         st&&st.s==='ok'?h('span',{class:'okc'},'✓'):null),
+      xref.get(q)?h('div',{class:'n8x',title:xref.get(q).map(nodeLabel).join('\n')},'↩ برگشت به '+(xref.get(q).length>1?toFa(xref.get(q).length)+' قدم':nodeLabel(xref.get(q)[0]).slice(0,22))):null,
       h('div',{class:'n8l'},titleName(n)),h('div',{class:'n8k'},(N8KIND[n.kind]||n.kind)+(n.tech&&!/—/.test(n.tech)?' · '+n.tech.replace(/^skill:\s*/,''):''))))});
   // مثل n8n: «+» بعد از آخرین گره‌ها برای افزودن قدم بعدی
   ps.filter(q=>!outs.has(q)&&isStep(IDX.get(q))).forEach(q=>{const b=B.get(q);const pp=parentPath(q);
