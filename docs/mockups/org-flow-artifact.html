@@ -2681,14 +2681,17 @@ function renderN8n(rid){
   const cols=new Map();ps.forEach(q=>{const c=L.get(q);(cols.get(c)||cols.set(c,[]).get(c)).push(q)});
   const G16=16,NSZ=G16*6,DX=NSZ+G16*8,DY=NSZ+G16*6+48,X0=G16*10,Y0=G16*8,B=new Map(),ck=[...cols.keys()].sort((a,b)=>a-b),NC=ck.length;
   const maxRows=Math.max(1,...[...cols.values()].map(a=>a.length));
-  let W,H,lanes=[],bandH=0,PER=NC;
+  let W,H,lanes=[],bandH=0,PER=NC,laneTop=[],laneH=[];
   if(N8LAY==='snake'){PER=Math.max(2,Math.min(6,Math.floor((($('#cv')||{}).clientWidth||1200)/230)));bandH=maxRows*DY+60;
     ck.forEach((c,ci)=>{const a=cols.get(c),bi=Math.floor(ci/PER),xi=ci%PER;a.forEach((q,j)=>B.set(q,{x:X0+xi*DX,y:Y0+bi*bandH+(j+(maxRows-a.length)/2)*DY,w:150,h:120,ci}))});
     W=X0+Math.min(NC,PER)*DX+40;H=Y0+Math.ceil(NC/PER)*bandH+40}
   else if(N8LAY==='lanes'){const ag=new Set(ps.map(q=>meta(IDX.get(q),'agent')).filter(Boolean)),key=q=>{const n=IDX.get(q);return(ag.size>1&&meta(n,'agent'))||N8KIND[n.kind]||n.kind};
     ps.forEach(q=>{if(!lanes.includes(key(q)))lanes.push(key(q))});
-    const used=new Map();ck.forEach((c,ci)=>cols.get(c).forEach(q=>{const li=lanes.indexOf(key(q)),k=li+':'+ci,o=used.get(k)||0;used.set(k,o+1);B.set(q,{x:X0+ci*DX+o*20,y:Y0+li*DY+o*14,w:150,h:120,ci})}));
-    W=X0+NC*DX+40;H=Y0+lanes.length*DY+20}
+    // هر ردیف (lane) به اندازهٔ بیشترین گره در یک ستون بلند می‌شود؛ گره‌ها روی هم نمی‌افتند
+    const cnt=new Map();ck.forEach((c,ci)=>cols.get(c).forEach(q=>{const k=lanes.indexOf(key(q))+':'+ci;cnt.set(k,(cnt.get(k)||0)+1)}));
+    const laneRows=lanes.map((_,li)=>Math.max(1,...ck.map((c,ci)=>cnt.get(li+':'+ci)||0)));laneTop=[];let acc=Y0;laneRows.forEach(r=>{laneTop.push(acc);acc+=r*DY});
+    const used=new Map();ck.forEach((c,ci)=>cols.get(c).forEach(q=>{const li=lanes.indexOf(key(q)),k=li+':'+ci,o=used.get(k)||0;used.set(k,o+1);B.set(q,{x:X0+ci*DX,y:laneTop[li]+o*DY,w:150,h:120,ci})}));
+    laneH=laneRows.map(r=>r*DY);W=X0+NC*DX+40;H=acc+20}
   else if(N8LAY==='stairs'){let i=0;ck.forEach((c,ci)=>cols.get(c).forEach(q=>{B.set(q,{x:X0+ci*DX,y:Y0+(i++)*110,w:150,h:120,ci})}));W=X0+NC*DX+40;H=Y0+ps.length*110+60}
   else if(N8LAY==='orig'&&ps.every(q=>meta(IDX.get(q),'n8n_pos'))){const P=ps.map(q=>meta(IDX.get(q),'n8n_pos').split(',').map(Number)),mx0=Math.min(...P.map(a=>a[0])),my0=Math.min(...P.map(a=>a[1]));
     ps.forEach((q,i)=>B.set(q,{x:X0+P[i][0]-mx0-27,y:Y0+P[i][1]-my0,w:150,h:120,ci:0}));W=X0+Math.max(...P.map(a=>a[0]))-mx0+260;H=Y0+Math.max(...P.map(a=>a[1]))-my0+200}
@@ -2703,6 +2706,9 @@ function renderN8n(rid){
       a.forEach((q,j)=>{let y=a.length===1?want[0]:cen+(j-(a.length-1)/2)*DY;Yc.set(q,snap(y))})});
     const minY=Math.min(...Yc.values());ps.forEach(q=>{const ci=ck.indexOf(L.get(q));B.set(q,{x:X0+ci*DX,y:Yc.get(q)-minY+Y0,w:150,h:120,ci})});
     W=X0+NC*DX+40;H=Y0+(Math.max(...Yc.values())-minY)+DY+80}
+  // محافظ استاندارد برخورد: اگر دو گره روی هم افتادند، دومی یک ردیف پایین می‌رود (برای همهٔ چیدمان‌ها)
+  {const arr=[...B.entries()].sort((a,b)=>a[1].x-b[1].x||a[1].y-b[1].y);for(let i=0;i<arr.length;i++)for(let j=0;j<i;j++){const A=arr[j][1],C=arr[i][1];if(Math.abs(A.x-C.x)<150&&Math.abs(A.y-C.y)<140){C.y=A.y+DY;j=-1}}
+   H=Math.max(H,Math.max(...[...B.values()].map(b=>b.y))+DY)}
   W=Math.max(600,W);H=Math.max(320,H);const svg=newSvg(W,H);
   // محور زمان: هر ستون یک مرحله؛ اگر قدم‌ها metadata duration (روز) داشته باشند، روز تجمعی هم نوشته می‌شود
   const dur=q=>parseFloat(meta(IDX.get(q),'duration')||meta(IDX.get(q),'sla')||'')||0;let acc=0;const dayAt=ck.map(c=>{acc+=Math.max(0,...cols.get(c).map(dur));return acc});
@@ -2712,8 +2718,8 @@ function renderN8n(rid){
       if(dayAt[NC-1]){const t2=sv('text',{x,y:y0+20,'text-anchor':'middle','font-size':11,style:'fill:var(--mute);font-family:var(--font)'});t2.textContent='تا روز '+toFa(dayAt[ci]);svg.append(t2)}}
     const lt=sv('text',{x:X0-30,y:y0+4,'text-anchor':'end','font-size':11,style:'fill:var(--mute);font-family:var(--font)'});lt.textContent='زمان →';svg.append(lt)};
   if(document.body.classList.contains('n8full')||N8LAY==='orig'){}else if(N8LAY==='snake'){for(let b=0;b*PER<NC;b++)axis(Y0-50+b*bandH,b*PER,Math.min(NC,(b+1)*PER))}else axis(Y0-50,0,NC);
-  if(N8LAY==='lanes')lanes.forEach((l,li)=>{const y=Y0+li*DY-18;svg.append(sv('rect',{x:10,y,width:W-20,height:DY-8,rx:8,style:'fill:var(--card);stroke:var(--line)','fill-opacity':.55}));
-    const t=sv('text',{x:20,y:y+DY/2,'font-size':12.5,style:'fill:var(--ink);font-family:var(--font);font-weight:700'});t.textContent=l.length>16?l.slice(0,15)+'…':l;svg.append(t)});
+  if(N8LAY==='lanes')lanes.forEach((l,li)=>{const y=laneTop[li]-18;svg.append(sv('rect',{x:10,y,width:W-20,height:laneH[li]-8,rx:8,style:'fill:var(--card);stroke:var(--line)','fill-opacity':.55}));
+    const t=sv('text',{x:20,y:y+laneH[li]/2,'font-size':12.5,style:'fill:var(--ink);font-family:var(--font);font-weight:700'});t.textContent=l.length>16?l.slice(0,15)+'…':l;svg.append(t)});
   world.style.width=W+'px';world.style.height=H+'px';world.style.direction='ltr';world.append(svg);
   // فلش‌ها به سبک n8n: خروج از دستگیرهٔ راست، ورود به دستگیرهٔ چپ، منحنی بزیه با بازوی افقی؛
   // شاخه‌ها از دستگیره‌های جدا (یکی زیر دیگری) با برچسب کنار دستگیره؛ پس از اجرا سبز با «n مورد»
