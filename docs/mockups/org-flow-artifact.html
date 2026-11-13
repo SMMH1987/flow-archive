@@ -2885,6 +2885,19 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.class
     side.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.k===TAB))};
 })();
 
+/* منوی «نما» ساده: ۳ نمای اصلی + ابزار؛ بقیه پشت «بیشتر» (calm-panels: یک انتخاب اصلی، بقیه پنهان) */
+{const _rv2=renderVers;renderVers=function(){_rv2();const V=$('#vers'),old=[...V.children];V.replaceChildren();
+  const set=(mode,lay,ver)=>{N8MODE=mode;if(lay){N8LAY=lay;try{localStorage.setItem('n8lay',lay)}catch(e){}}try{localStorage.setItem('n8mode',mode?'1':'0')}catch(e){}if(ver)VER=ver;NEEDFIT=true;renderVers();renderDia();renderInsp()};
+  const cur=!N8MODE?'classic':N8LAY==='journey'?'journey':'n8n';
+  const main=[['n8n','➡ فلو (مثل n8n)','ترتیب اجرا، چپ‌به‌راست؛ برای دیدن و اجرا',()=>set(true,'row')],
+    ['journey','🧭 سفر و مسئولیت','چه کسی کجا کار می‌کند، احساس و درد هر مرحله',()=>set(true,'journey')],
+    ['classic','✏️ ویرایش کامل','کارت‌های بزرگ با skill، ورودی و خروجی؛ برای ویرایش',()=>set(false,null,4)]];
+  V.append(h('h4',{},'نمای اصلی'),...main.map(([k,l,d,f])=>h('button',{class:cur===k?'on':'',onclick:f},h('b',{},l),h('br'),h('small',{},d))));
+  const fs=old.find(b=>/تمام‌صفحه/.test(b.textContent)),rv=old.find(b=>/بازبینی/.test(b.textContent)),hs=old.find(b=>/تاریخچه/.test(b.textContent));
+  if(fs)fs.classList.remove('pri');V.append(h('h4',{},'ابزار'),...[fs,rv,hs].filter(Boolean));
+  const more=old.filter(b=>![fs,rv,hs].includes(b)&&b.tagName==='BUTTON'&&!/حالت n8n/.test(b.textContent)&&!/^➡ یک خط|سفر \(Journey/.test(b.textContent));
+  V.append(h('details',{},h('summary',{style:'cursor:pointer;padding:6px 10px;color:var(--mute)'},'بیشتر: نسخه‌های قدیمی و چیدمان‌های دیگر'),h('div',{class:'vers'},...more)))}}
+
 /* ───────── شروع ───────── */
 (function init(){
   openDoc(DOC);$('#doc-name').textContent=DOCFILE();
