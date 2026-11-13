@@ -68,6 +68,34 @@ specification {
       color secondary
     }
   }
+  // ── امکانات n8n‌گونه (2026-11-13) — فقط نوع و تگ؛ وضعیت اجرا هرگز در این فایل نوشته نمی‌شود (runs JSON جدا)
+  // metadata قراردادی روی هر قدم: trigger 'form|schedule|webhook' · sla '3d' · credential 'نام کلید (هرگز مقدار)'
+  //   retry '3' · pin 'samples/x.json' · subflow 'شناسهٔ نما' · rule 'متن شرط (اجرا نمی‌شود)'
+  element triggerStep {
+    notation "trigger — شروع فلو با فرم، زمان‌بندی یا وب‌هوک"
+    style {
+      color amber
+      shape mobile
+    }
+  }
+  element subflowStep {
+    notation "subflow — فراخوانی فلوی دیگر؛ با navigateTo وارد شو"
+    style {
+      color sky
+      shape browser
+    }
+  }
+  element noteStep {
+    notation "یادداشت چسبان — اجرا نمی‌شود، فقط توضیح"
+    style {
+      color amber
+      shape rectangle
+      opacity 40%
+    }
+  }
+  tag onError
+  tag branch
+  tag loop
   tag locked
   tag designed
   tag unknownSkill

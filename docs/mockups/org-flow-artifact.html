@@ -171,6 +171,174 @@ button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover
 .mm .k-phase rect{stroke:var(--acc);stroke-width:2}
 .mm .mp{fill:none;stroke:var(--edge);stroke-width:1.5;opacity:.75}
 .mmbar{display:flex;gap:8px;align-items:center;margin:0 0 8px;flex-wrap:wrap}
+
+/* ── لایهٔ n8n‌گونه ── */
+.node.triggerStep{border-color:#f59e0b;border-radius:28px 10px 10px 28px}
+.node.noteStep,.node.note{background:#fde68a;color:#5b4708;border-color:#e0c75a}
+.node.subflowStep{border-style:double;border-width:4px}
+.n8c{position:absolute;bottom:-9px;left:6px;display:flex;gap:3px;z-index:3}
+.n8c span{font-size:10px;padding:0 5px;border-radius:8px;background:var(--panel,#fff);border:1px solid #bbb;white-space:nowrap}
+.n8b{position:absolute;top:-12px;left:calc(50% - 14px);min-width:28px;height:24px;box-shadow:0 0 0 2px #fff;font-weight:700;min-width:20px;height:20px;border-radius:10px;color:#fff;font-size:11px;display:grid;place-items:center;padding:0 4px;z-index:4}
+.n8b.ok{background:#16a34a}.n8b.err{background:#dc2626}.n8b.wait{background:#ea580c}.n8b.skip{background:#888}
+.node.n8step{box-shadow:0 0 0 4px #ea4b71!important}
+#n8mini{position:absolute;left:10px;bottom:10px;width:170px;height:110px;background:rgba(127,127,127,.12);border:1px solid #9995;border-radius:6px;overflow:hidden;z-index:5;pointer-events:none}
+#n8mini i{position:absolute;background:#6b7280;border-radius:1px}#n8mini i.ok{background:#16a34a}#n8mini i.err{background:#dc2626}#n8mini i.wait{background:#ea580c}
+#n8mini b{position:absolute;border:1.5px solid #ea4b71}
+.n8t{width:100%;border-collapse:collapse;font-size:.85rem}.n8t td,.n8t th{border-bottom:1px solid #9994;padding:4px 6px;text-align:right}
+.n8log{font-family:ui-monospace,monospace;font-size:.78rem;white-space:pre-wrap;direction:ltr;text-align:left;max-height:220px;overflow:auto;background:#8881;padding:8px;border-radius:6px}
+
+/* حالت افقی n8n */
+.node.n8{width:150px!important;height:auto!important;min-height:0!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;text-align:center;overflow:visible}
+.node.n8 .n8i{width:72px;height:72px;margin:0 auto;border-radius:14px;background:var(--panel,#fff);border:2.5px solid #94a3b8;display:grid;place-items:center;font-size:28px;position:relative}
+.node.n8.triggerStep .n8i{border-radius:36px 14px 14px 36px;border-color:#f59e0b}
+.node.n8.autoStep .n8i{border-color:#16a34a}.node.n8.askStep .n8i{border-color:#f59e0b}
+.node.n8.gateStep .n8i{border-color:#dc2626}.node.n8.routeStep .n8i{border-color:#6366f1}
+.node.n8.subflowStep .n8i{border-style:double;border-width:5px;border-color:#0ea5e9}
+.node.n8.orgBox .n8i{border-color:#475569;width:84px;height:84px}
+.node.n8.sel .n8i{box-shadow:0 0 0 4px #ea4b71}
+.node.n8 .n8l{font-size:12.5px;font-weight:600;margin-top:6px;line-height:1.45;max-height:4.4em;overflow:hidden}
+.node.n8 .n8k{font-size:10.5px;opacity:.65}
+.node.n8 .n8i .lk{position:absolute;top:-9px;right:-9px;font-size:13px}
+.node.n8 .n8i .ct{position:absolute;bottom:-9px;right:-9px;font-size:10px;background:#475569;color:#fff;border-radius:8px;padding:0 5px}
+.node.n8.n8step .n8i{box-shadow:0 0 0 5px #ea4b71}
+.node.n8.n8step{box-shadow:none!important}
+#n8mode.on{background:#ea4b71;color:#fff;border-color:#ea4b71}
+
+/* ── پوستهٔ n8n‌گونه ── */
+body{background:var(--bg)}
+#app{padding:0!important;min-height:100vh}
+body{padding-right:calc(56px + env(safe-area-inset-right,0px))}
+body.n8on #nav{display:none}
+body.n8on #cv{height:calc(100vh - 90px)!important;min-height:520px}
+#n8side{position:fixed;top:env(safe-area-inset-top,0px);bottom:0;right:0;width:56px;background:#1f1f2e;display:flex;flex-direction:column;align-items:center;gap:6px;padding-block:10px;z-index:30}
+#n8side .logo{width:34px;height:34px;border-radius:9px;background:#ea4b71;color:#fff;display:grid;place-items:center;font-weight:800;margin-bottom:10px}
+#n8side button{width:40px;height:40px;border:0;border-radius:8px;background:transparent;color:#c9c9d6;font-size:18px;padding:0;position:relative}
+#n8side button:hover,#n8side button.on{background:#34344a;color:#fff}
+#n8side button span{display:none;position:absolute;right:46px;top:8px;background:#34344a;color:#fff;font-size:12px;padding:2px 8px;border-radius:6px;white-space:nowrap}
+#n8side button:hover span{display:block}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--card);border-bottom:1px solid var(--line);padding:8px 16px;margin:0 0 10px!important;flex-wrap:nowrap!important;min-height:52px}
+.top h1{font-size:15px!important;flex:0 1 auto!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top h1 small{display:none}.top h1 .crumb{color:var(--mute);font-weight:400}
+.top .tabs{margin-inline:auto;background:var(--lane);border:1px solid var(--line);border-radius:8px;padding:2px;flex-wrap:nowrap}
+.top .tabs button{border:0;background:transparent;border-radius:6px;padding:3px 14px}
+.top .tabs button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px #0002}
+.top .tabs button.aux{display:none}
+.n8menu{position:relative}.n8menu>summary{list-style:none;cursor:pointer;border:1px solid var(--line);border-radius:8px;padding:3px 12px;background:var(--card);white-space:nowrap}
+.n8menu>summary::-webkit-details-marker{display:none}
+.n8menu[open]>summary{border-color:#ea4b71}
+.n8menu .dd{position:absolute;top:calc(100% + 6px);left:0;min-width:300px;max-width:min(520px,90vw);background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px #0003;padding:8px;display:flex;flex-direction:column;gap:4px;z-index:40}
+.n8menu .dd h4{margin:6px 6px 2px;font-size:11px;color:var(--mute);font-weight:600}
+.n8menu .dd button{text-align:right;border:0;justify-content:flex-start;width:100%;padding:6px 10px}
+.n8menu .dd button:hover{background:var(--lane)}
+.n8menu .dd .vers{flex-direction:column;align-items:stretch}
+.top .save{background:#ea4b71;border-color:#ea4b71;color:#fff;font-weight:600}
+#p-dia,#p-mind,#p-int,#p-out,#p-run{padding-inline:16px}
+#cv{background-color:var(--lane)}
+
+/* n8n نمای دقیق‌تر */
+:root{--n8e:#9aa1ab;--n8back:#e8590c}
+.node.n8.n8tgt .n8i{box-shadow:0 0 0 5px #e8590c66}
+.node.n8 .n8i{width:96px!important;height:96px!important;border-radius:8px!important;border:2px solid #c9ced6!important;background:var(--card)!important;box-shadow:0 1px 2px #0000000f}
+.node.n8 .n8i .ic{font-size:38px;line-height:1}
+.node.n8.triggerStep .n8i{border-radius:50px 8px 8px 50px!important}
+.node.n8.gateStep .n8i{border-color:#e7a1a1!important}.node.n8.askStep .n8i{border-color:#efc77a!important}.node.n8.routeStep .n8i{border-color:#b4b8f5!important}
+.node.n8.orgBox .n8i{border-color:#c9ced6!important}
+.node.n8.sel .n8i{border-color:#ea4b71!important;box-shadow:0 0 0 3px #ea4b7133}
+.node.n8.rs-ok .n8i{border-color:#16a34a!important}.node.n8.rs-wait .n8i{border-color:#ea580c!important}.node.n8.rs-err .n8i{border-color:#dc2626!important}.node.n8.rs-skip .n8i{opacity:.55}
+.node.n8 .hin{position:absolute;left:-7px;top:38px;width:8px;height:16px;border-radius:2px;background:#9aa1ab}
+.node.n8 .hout{position:absolute;right:-7px;width:12px;height:12px;border-radius:50%;background:#9aa1ab;border:2px solid var(--card)}
+.node.n8 .okc{position:absolute;right:6px;bottom:4px;color:#16a34a;font-weight:800;font-size:15px}
+.node.n8 .n8l{font-size:13px!important;margin-top:8px!important;max-width:150px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.node.n8.routeStep{clip-path:none!important;filter:none!important}.node.n8.routeStep::before{display:none!important}
+.node.n8::before,.node.n8::after{display:none!important}
+.node.n8 .n8k{display:block;font-size:11px!important;color:var(--mute);opacity:1!important;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* نقشهٔ سفر */
+.jm{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12.5px}
+.jr{display:flex;border-bottom:1px solid var(--line)}
+.jr.head{background:var(--lane);position:sticky;top:0}
+.jl{flex:0 0 170px;padding:10px;font-weight:700;border-inline-end:1px solid var(--line);display:flex;flex-direction:column;gap:2px;background:var(--lane)}
+.jl small{font-weight:400;font-size:10.5px}
+.jc{flex:0 0 210px;padding:8px;border-inline-end:1px dashed var(--line);display:flex;flex-direction:column;gap:4px;min-height:44px}
+.jc.jh{cursor:pointer}.jc.jh:hover{background:var(--accbg)}.jc.jh b{font-size:13px}
+.jchip{display:block;border:1.5px solid #c9ced6;border-radius:6px;padding:3px 6px;background:var(--card);cursor:pointer;line-height:1.45}
+.jchip.gateStep{border-color:#e7a1a1}.jchip.askStep{border-color:#efc77a}.jchip.autoStep{border-color:#9fd8b0}.jchip.routeStep{border-color:#b4b8f5}
+.jchip:hover{border-color:#ea4b71}
+.jtag{display:inline-block;font-size:11px;background:var(--lane);border-radius:10px;padding:1px 8px;margin:1px}
+.jline{border-top:2px dashed #ea4b71;border-bottom:1px solid var(--line);padding:2px 12px;font-size:11px;color:#ea4b71;background:var(--lane)}
+.jcurve{flex:0 0 auto}.jsm{font-size:11px;color:var(--mute)}
+.n8plus{position:absolute;width:28px;height:28px;padding:0;border:2px dashed var(--n8e);border-radius:6px;background:var(--card);color:var(--mute);font-size:18px;line-height:1;z-index:3}.n8plus:hover{border-color:#ea4b71;color:#ea4b71}
+
+/* نمای «داشبورد n8n»: تمام‌صفحه، مثل ویرایشگر n8n */
+body.n8full #app>*:not(#p-dia){display:none!important}
+body.n8full #p-dia{position:fixed;inset:0;inset-inline-end:56px;padding:0!important;display:block!important;z-index:25;background:#f5f5f5}
+body.n8full #p-dia>*{display:none!important}
+body.n8full #p-dia .n8cvhost{display:block!important;position:absolute;inset:0}
+body.n8full #cv{position:absolute!important;top:96px;left:0;right:0;bottom:36px;height:auto!important;border:0;border-radius:0;background-color:#f5f5f5;background-image:radial-gradient(#c8c8c8 1px,transparent 1px);background-size:16px 16px}
+body.n8full .cvtools,body.n8full .cvhint{display:none!important}
+.n8bar{display:none}
+body.n8full .n8bar{display:flex;position:absolute;left:0;right:0;align-items:center;gap:10px;padding:0 16px;background:#fff;border-bottom:1px solid #e3e3e3;direction:ltr;font-size:13px;color:#555;z-index:6}
+body.n8full .n8b1{top:0;height:52px}
+body.n8full .n8b2{top:52px;height:44px;justify-content:center;background:#f5f5f5;border:0}
+.n8bar .crumbs b{color:#222}.n8bar .sp{flex:1}
+.n8bar .pub{background:#ea4b71;color:#fff;border:0;border-radius:6px;padding:5px 14px;font-weight:600}
+.n8bar .seg{display:flex;background:#fff;border:1px solid #ddd;border-radius:6px;padding:2px}
+.n8bar .seg button{border:0;background:transparent;padding:3px 14px;border-radius:4px;color:#555}.n8bar .seg button.on{background:#ececec;color:#222;font-weight:600}
+.n8exec{display:none}
+body.n8full .n8exec{display:block;position:absolute;bottom:52px;left:50%;transform:translateX(-50%);background:#ea4b71;color:#fff;border:0;border-radius:8px;padding:9px 22px;font-weight:600;z-index:6;box-shadow:0 2px 8px #ea4b7144}
+.n8zoom{display:none}
+body.n8full .n8zoom{display:flex;flex-direction:column;gap:6px;position:absolute;left:14px;bottom:52px;z-index:6}
+.n8zoom button{width:34px;height:34px;padding:0;background:#fff;border:1px solid #ddd;border-radius:6px;color:#444}
+.n8logs{display:none}
+body.n8full .n8logs{display:flex;position:absolute;bottom:0;left:0;right:0;height:36px;background:#fff;border-top:1px solid #e3e3e3;align-items:center;padding:0 16px;direction:ltr;font-size:12.5px;color:#555;gap:10px;z-index:6}
+body.n8full .node.n8 .n8l{color:#222}body.n8full .node.n8 .n8i{background:#fff!important}
+body.n8full #n8side{background:#2b2b38}
+body.n8full #n8mini{display:none}
+.node.n8 .n8x{font-size:10.5px;color:#6366f1;margin-top:2px}
+
+/* آرام مثل n8n (calm-panels): بوم تمام‌عرض؛ پنل جزئیات فقط با انتخاب گره، کشویی از راست؛ درخت پشت دکمهٔ نوار کناری */
+body.n8on #p-dia{display:block!important}
+body.n8on #p-dia #tree{position:fixed;top:64px;left:16px;width:260px;max-height:calc(100vh - 80px);overflow:auto;z-index:22;box-shadow:0 10px 30px #0003}
+body.n8on:not(.treeopen) #p-dia #tree{display:none!important}
+body.n8on #p-dia #cv{height:calc(100vh - 90px)!important}
+body.n8on #insp{position:fixed;top:64px;bottom:12px;right:64px;width:380px;overflow:auto;z-index:21;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:-10px 0 30px #0002;transition:transform .2s}
+body.n8on:not(.inspopen) #insp{transform:translateX(120%);visibility:hidden}
+body.n8on .cvhint{display:none!important}
+
+
+.pnlh{display:flex;align-items:center;gap:10px;position:sticky;top:-10px;z-index:3;background:var(--card);border-bottom:1px solid var(--line);margin:-10px -10px 10px;padding:10px 12px;border-radius:12px 12px 0 0}
+.pnlh .ic svg{width:26px;height:26px}.pnlh .ic{font-size:20px;display:grid;place-items:center;width:36px;height:36px;border:1.5px solid var(--line);border-radius:8px}
+.pnlh .pt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}.pnlh .pt b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pnlh .pt small{font-size:11px}
+#n8mini::before{content:"نقشهٔ کوچک";position:absolute;bottom:2px;left:6px;font-size:10px;color:var(--mute);z-index:1}
+#inspx{display:block!important;position:static!important}
+
+.n8menu .dd button.vmi{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px}
+.vmi .vic{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;background:var(--lane);font-size:16px}
+.vmi .vtx{flex:1;display:flex;flex-direction:column;line-height:1.4;text-align:right}.vmi .vtx small{font-size:11px;color:var(--mute)}
+.vmi kbd{font-size:10.5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--mute);font-family:inherit}
+.navsel{padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card,#fff);color:var(--ink);font:inherit;margin-inline:6px}
+.vmi .vck{width:14px;color:#ea4b71;font-weight:800}
+.n8menu .dd button.vdots{display:flex;align-items:center;gap:8px;color:var(--mute);border:0;background:none;padding:6px 10px;border-radius:8px}.vdots span:first-child{font-size:18px;line-height:1;width:34px;text-align:center}.vdots small{margin-inline-start:auto;font-size:10.5px;border:1px solid var(--line);border-radius:10px;padding:0 6px}.n8menu .dd button.vdots:hover,.n8menu .dd button.vdots.on{background:var(--lane);color:var(--ink)}.vsep{border:0;border-top:1px solid var(--line);margin:6px 0}.vmore[hidden]{display:none}
+.n8menu .dd button.vmi.on{background:var(--lane)!important;color:var(--ink)!important;border:0}.vmi.on .vic{border-color:#ea4b71}
+
+/* Figma/n8n-style side panels */
+#insp .itabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:0 -4px 6px;position:sticky;top:46px;background:var(--bg);z-index:2}
+#insp .itabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;border-radius:0;padding:9px 4px;font-size:12.5px;color:var(--mute);font-weight:600}
+#insp .itabs button.on{color:var(--ink);border-bottom-color:#ea4b71}#insp .itabs small{margin-inline-start:4px;font-size:10px;background:var(--lane);border-radius:8px;padding:0 5px}
+#insp .panel[hidden]{display:none!important}
+#insp .panel.acc{background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;margin:0;padding:4px 4px 10px}
+#insp .acch{display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 4px;font-size:12.5px;font-weight:700;color:var(--ink);user-select:none}
+#insp .acch:hover{color:#ea4b71}#insp .acch .at{flex:1}
+#insp .acch .chev{display:inline-block;transform:rotate(90deg);transition:transform .15s;color:var(--mute);font-size:15px}
+#insp .panel.shut .acch .chev{transform:rotate(180deg)}
+#insp .panel.shut > :not(.acch){display:none!important}
+#insp .qm{width:20px;height:20px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--mute);font-size:11px;padding:0;line-height:1}
+#insp .acchelp{display:block;background:var(--lane);border-radius:8px;padding:8px 10px;margin:0 0 8px;font-size:11.5px;line-height:1.7}
+#insp .acchelp[hidden]{display:none}
+#tree .trq{width:calc(100% - 16px);margin:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--lane);font:inherit;font-size:12.5px;color:var(--ink)}
+#tree .tr{border-radius:6px;padding:5px 8px;margin:1px 6px;font-size:12.5px;cursor:pointer}#tree .tr:hover{background:var(--lane)}
+#tree .tr.cur{background:color-mix(in srgb,#ea4b71 12%,transparent);color:#ea4b71;font-weight:700}
+#tree .tr[hidden]{display:none}
 </style>
 <div id="app">
   <div class="top">
@@ -187,7 +355,7 @@ button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover
     <div style="min-width:0"><div id="nav" class="nav"></div>
     <div id="cv">
       <div id="world"></div>
-      <div class="cvtools">
+      <div class="cvtools"><button title="تمام‌صفحه مثل n8n" onclick="N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderDia()">⛶</button>
         <button id="zin" title="بزرگ‌نمایی">＋</button><button id="zout" title="کوچک‌نمایی">－</button>
         <button id="zfit" title="کل نمودار در یک نگاه">⤢</button>
         <button id="bconn" title="رسم فلش: اول مبدأ بعد مقصد">↔ فلش</button>
@@ -199,6 +367,7 @@ button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover
   <div id="p-mind" class="page" hidden></div>
   <div id="p-int" class="page" hidden></div>
   <div id="p-out" class="page" hidden></div>
+  <div id="p-run" class="page" hidden></div>
 </div>
 <script type="text/plain" id="base-c4">// نمونهٔ «سازمان کامل از یک ایده» — ایده: اتوماسیون کامل استخدام — 2026-11-06
 // هر بخش = یک نقش سازمانی · هر قدم: technology = skill · description = out · آیکون = وضعیت قفل
@@ -973,7 +1142,8 @@ const rootOfView=()=>VIEWP.startsWith('ov:')?VIEWP.slice(3):VIEWP.split('.')[0];
 function renderNav(){
   const nav=$('#nav');nav.replaceChildren();
   nav.append(h('button',{class:MACRO?'on':'',title:'کل فرایندها هر کدام یک نود',onclick:goMacro},'🗺 نقشهٔ کل'));
-  roots().filter(R=>!isStep(R)).forEach(R=>nav.append(h('button',{class:(!MACRO&&rootOfView()===R.id)?'on':'',onclick:()=>go('ov:'+R.id)},R.title.replace(/\s*\(.*$/,''))));
+  // به‌جای ۲۶ دکمه، یک فهرست کشویی مثل breadcrumb نرم‌افزارهای تجاری (همان فهرست بخش‌ها در ستون کنار هم هست)
+  {const sel=h('select',{class:'navsel',onchange:e=>{if(e.target.value)go('ov:'+e.target.value)}},h('option',{value:''},'بخش…'),...roots().filter(R=>!isStep(R)).map(R=>{const o=h('option',{value:R.id},R.title.replace(/\s*\(.*$/,''));if(!MACRO&&rootOfView()===R.id)o.selected=true;return o}));nav.append(sel)}
   if(MACRO){nav.append(h('button',{class:'sm',onclick:()=>autoOrder('')},'↧ ترتیب خودکار بر اساس فلش‌ها'),h('span',{class:'mac-note'},'  نقشهٔ کل: هر فرایند بزرگ یک نود است. قبل و بعدش نود تازه اضافه کن، با «＋ باز کردن» واردش شو.'));return}
   if(VER===2||VER===4){
     const rid=rootOfView();
@@ -1679,7 +1849,7 @@ function renderDia(){
   RV=REVIEW?reviewFind():new Map();
   renderNav();renderTree();
   LAST=MACRO?renderMacro():(VER===2||VER===4)?renderNested(rootOfView()):VIEWP.startsWith('ov:')?renderOverview(VIEWP.slice(3)):renderLane(VIEWP);
-  applyView();if(NEEDFIT&&!$('#p-dia').hidden)fit();if(REVIEW)renderVers()}
+  applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');if(LAST&&LAST.W>LAST.H){VIEW.k=Math.max(.55,Math.min(1,cv.clientHeight/(LAST.H+30)));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:10;VIEW.y=10;applyView();NEEDFIT=false}else fit()}if(REVIEW)renderVers()}
 const lastVis=()=>(LAST&&LAST.vis)||new Map();
 function expandTo(p){const s=p.split('.');for(let i=1;i<s.length;i++)EXP.add(s.slice(0,i).join('.'))}
 function fitTo(p){const v0=lastVis().get(p);if(!v0)return;const cv=$('#cv'),w=cv.clientWidth,hh=cv.clientHeight;if(!w)return;
@@ -1872,49 +2042,50 @@ function renderOverview(rid){
 
 /* نسخهٔ ۲: بازشدن درجا — کادرهای تو در تو در همان بوم باز و بسته می‌شوند */
 function renderMacro(){
+  // افقی چپ‌به‌راست مثل n8n و بقیهٔ نماها: بازیگران بالا، زنجیرهٔ فازها وسط، ایجنت‌های دیگر پایین
   const world=$('#world');world.replaceChildren();
-  const chain=M.nodes.filter(inChain),CW=330,X0=400,HEADH=38;
+  const chain=M.nodes.filter(inChain),CW=300,HG=128,HEADH=38;
   const nsteps=n=>n.children.reduce((a,c)=>a+(isStep(c)?1:0)+nsteps(c),0);
   const hOf=n=>isProc(n)?190:(isStep(n)?136+extraH(n)+(n.children.length?26:0):90);
   const grp=(dir)=>{const it=MACRO_SUG[dir];const rows=Math.ceil(it.length/2);return{it,rows,h:HEADH+12+rows*94+8}};
   const gB=grp('before'),gA=grp('after');
-  let y=16;const gBy=y;y+=gB.h+56;
-  const vis=new Map();chain.forEach(n=>{const hh=hOf(n);vis.set(n.id,{n,p:n.id,x:X0,y,w:CW,h:hh});y+=hh+56});
-  const gAy=y-56+56;const H=gAy+gA.h+40,W=1180;
+  const actors=M.nodes.filter(n=>n.kind==='actor'),pj=[];M.nodes.forEach(R=>{if(R.kind==='orgBox'&&R.children.some(c=>c.kind==='project'))R.children.forEach(c=>{if(c.kind==='project')pj.push({n:c,p:R.id+'.'+c.id})})});
+  const AY=16,PH=90+HEADH+30,CY=AY+(actors.length?PH+90:0),chH=Math.max(190,...chain.map(hOf));
+  let x=40;const gBx=x;x+=CW+24+HG;
+  const vis=new Map();chain.forEach(n=>{const hh=hOf(n);vis.set(n.id,{n,p:n.id,x,y:CY+(chH-hh)/2,w:CW,h:hh});x+=CW+HG});
+  const gAx=x;const W=gAx+CW+24+60,PY=CY+Math.max(chH,gB.h,gA.h)+110,H=PY+(pj.length?PH:0)+40;
   world.style.width=W+'px';world.style.height=H+'px';
   const svg=newSvg(W,H);
-  const mkGroup=(dir,g,gy)=>{
-    world.append(h('div',{class:'lanebox ghost',style:`left:${X0-12}px;top:${gy}px;width:${CW+24}px;height:${g.h}px`},h('div',{class:'fh'},h('span',{class:'ft'},dir==='before'?'💡 قبل از کل فرایند':'💡 بعد از کل فرایند'),h('span',{class:'cnt'},'پیشنهاد'))));
+  const mid=CY+chH/2;
+  const mkGroup=(dir,g,gx)=>{const gy=mid-g.h/2;
+    world.append(h('div',{class:'lanebox ghost',style:`left:${gx-12}px;top:${gy}px;width:${CW+24}px;height:${g.h}px`},h('div',{class:'fh'},h('span',{class:'ft'},dir==='before'?'💡 قبل از کل فرایند':'💡 بعد از کل فرایند'),h('span',{class:'cnt'},'پیشنهاد'))));
     g.it.forEach((x,k)=>{const tpl=x.tpl?allTpls().find(t=>t.id===x.tpl):null,title=x.blank?'نود خالی':(tpl?tpl.t:x.t),sub=x.blank?'خودت پر می‌کنی':(tpl?(tpl.kids.length+' زیرقدم (تمپلیت)'):x.out);
-      const cx=X0+(k%2)*(CW/2),cy=gy+HEADH+12+Math.floor(k/2)*94;
+      const cx=gx+(k%2)*(CW/2),cy=gy+HEADH+12+Math.floor(k/2)*94;
       world.append(h('div',{class:'ghostn',style:`left:${cx}px;top:${cy}px;width:${CW/2-10}px;height:84px`},h('b',{},title),h('small',{},sub),h('button',{class:'sm pri','data-msug':dir+':'+k},'＋ افزودن')))})};
-  mkGroup('before',gB,gBy);mkGroup('after',gA,gAy);
-  // chain edges
+  mkGroup('before',gB,gBx);mkGroup('after',gA,gAx);
   const mapEnd=q=>{const r0=q.split('.')[0];return vis.get(r0)||null};
-  const sd=new Set();
+  const hz=(x1,y1,x2,y2)=>{const k=Math.max((x2-x1)/2,30);return`M${x1} ${y1}C${x1+k} ${y1} ${x2-k} ${y2} ${x2} ${y2}`};
   const first=chain[0],last=chain[chain.length-1];
-  if(first)drawEdge(svg,`M${X0+CW/2} ${gBy+gB.h}L${X0+CW/2} ${vis.get(first.id).y}`,{col:'--e-x',dash:1,dim:1});
-  if(last)drawEdge(svg,`M${X0+CW/2} ${vis.get(last.id).y+vis.get(last.id).h}L${X0+CW/2} ${gAy}`,{col:'--e-x',dash:1,dim:1});
+  if(first)drawEdge(svg,hz(gBx+CW+12,mid,vis.get(first.id).x,mid),{col:'--e-x',dash:1,dim:1});
+  if(last){const l=vis.get(last.id);drawEdge(svg,hz(l.x+l.w,mid,gAx-12,mid),{col:'--e-x',dash:1,dim:1})}
   for(let i=0;i<chain.length-1;i++){const a=vis.get(chain[i].id),b=vis.get(chain[i+1].id);
     const ri=M.rels.findIndex(r=>mapEnd(r.from)===a&&mapEnd(r.to)===b);
-    drawEdge(svg,`M${X0+CW/2} ${a.y+a.h}L${X0+CW/2} ${b.y}`,{idx:ri>=0?ri:undefined,label:ri>=0?M.rels[ri].label:'بعد',lx:X0+CW/2+10,ly:(a.y+a.h+b.y)/2+4,anchor:'start'})}
-  // actors (left) and projects (right)
-  const actors=M.nodes.filter(n=>n.kind==='actor'),pj=[];M.nodes.forEach(R=>{if(R.kind==='orgBox'&&R.children.some(c=>c.kind==='project'))R.children.forEach(c=>{if(c.kind==='project')pj.push({n:c,p:R.id+'.'+c.id})})});
-  const cmid=chain.length?(vis.get(chain[0].id).y+vis.get(chain[chain.length-1].id).y+vis.get(chain[chain.length-1].id).h)/2:300;
-  const pool=(list,x,title,cls)=>{const ph=list.length*108+HEADH+14,py=Math.max(16,cmid-ph/2);
-    world.append(h('div',{class:'lanebox '+(cls||''),style:`left:${x-20}px;top:${py}px;width:290px;height:${ph}px`},h('div',{class:'fh'},h('span',{class:'ft'},title))));
-    return list.map((it,k)=>({...it,x,y:py+HEADH+14+k*108,w:250,h:90}))};
-  const aL=pool(actors.map(n=>({n,p:n.id})),50,'👤 بازیگران','');
-  const pL=pool(pj,X0+CW+110,'🤖 ایجنت‌های دیگر · MCP / REST','ext');
+    drawEdge(svg,hz(a.x+a.w,mid,b.x,mid),{idx:ri>=0?ri:undefined,label:ri>=0?M.rels[ri].label:'بعد',lx:(a.x+a.w+b.x)/2,ly:mid-8,anchor:'middle'})}
+  const pool=(list,y,title,cls)=>{if(!list.length)return[];const pw=list.length*(250+40)+20,px=Math.max(20,(W-pw)/2);
+    world.append(h('div',{class:'lanebox '+(cls||''),style:`left:${px}px;top:${y}px;width:${pw}px;height:${PH}px`},h('div',{class:'fh'},h('span',{class:'ft'},title))));
+    return list.map((it,k)=>({...it,x:px+20+k*290,y:y+HEADH+14,w:250,h:90}))};
+  const aL=pool(actors.map(n=>({n,p:n.id})),AY,'👤 بازیگران','');
+  const pL=pool(pj,PY,'🤖 ایجنت‌های دیگر · MCP / REST','ext');
   world.append(svg);
   const am=new Map(aL.map(a=>[a.p,a])),pm=new Map(pL.map(a=>[a.p,a]));
   const projOf2=q=>{const sg=q.split('.');return sg.length>=2?sg[0]+'.'+sg[1]:null};
   const seen=new Set();
-  M.rels.forEach((r,i)=>{const fa=am.get(r.from.split('.')[0]),tb=mapEnd(r.to),fb=mapEnd(r.from),tp=pm.get(projOf2(r.to)||''),tc=vis.get(r.to.split('.')[0]);
-    let d=null,lab=r.label||'',a1,b1;
-    if(fa&&tb){const k=fa.p+'>'+tb.p+'|'+lab;if(seen.has(k))return;seen.add(k);a1=fa;b1=tb;d=`M${fa.x+fa.w} ${fa.y+fa.h/2}C${fa.x+fa.w+60} ${fa.y+fa.h/2} ${tb.x-60} ${tb.y+tb.h/2} ${tb.x} ${tb.y+tb.h/2}`}
-    else if(fb&&tp){const k=fb.p+'>'+tp.p+'|'+lab;if(seen.has(k))return;seen.add(k);d=`M${fb.x+fb.w} ${fb.y+fb.h/2}C${fb.x+fb.w+60} ${fb.y+fb.h/2} ${tp.x-60} ${tp.y+tp.h/2} ${tp.x} ${tp.y+tp.h/2}`;lab=(lab?lab+' · ':'')+'MCP'}
-    if(d)drawEdge(svg,d,{idx:i,label:lab,lx:(fa?fa.x+fa.w+14:fb.x+fb.w+14),ly:(fa?fa.y+fa.h/2:fb.y+fb.h/2)-7,anchor:'start',dash:fa?0:1,col:fa?undefined:'--proj'})});
+  const vt=(x1,y1,x2,y2)=>{const k=Math.max(Math.abs(y2-y1)/2,30)*(y2>y1?1:-1);return`M${x1} ${y1}C${x1} ${y1+k} ${x2} ${y2-k} ${x2} ${y2}`};
+  M.rels.forEach((r,i)=>{const fa=am.get(r.from.split('.')[0]),tb=mapEnd(r.to),fb=mapEnd(r.from),tp=pm.get(projOf2(r.to)||'');
+    let d=null,lab=r.label||'',lx,ly;
+    if(fa&&tb){const k=fa.p+'>'+tb.p+'|'+lab;if(seen.has(k))return;seen.add(k);d=vt(fa.x+fa.w/2,fa.y+fa.h,tb.x+tb.w/2,tb.y);lx=tb.x+tb.w/2;ly=tb.y-14}
+    else if(fb&&tp){const k=fb.p+'>'+tp.p+'|'+lab;if(seen.has(k))return;seen.add(k);d=vt(fb.x+fb.w/2,fb.y+fb.h,tp.x+tp.w/2,tp.y);lab=(lab?lab+' · ':'')+'MCP';lx=tp.x+tp.w/2;ly=tp.y-14}
+    if(d)drawEdge(svg,d,{idx:i,label:lab,lx,ly,anchor:'middle',dash:fa?0:1,col:fa?undefined:'--proj'})});
   aL.forEach(a=>world.append(nodeEl(a.n,a.p,a,false)));
   pL.forEach(a=>{const el=nodeEl(a.n,a.p,a,false);el.classList.add('ext');el.prepend(h('div',{class:'xb'},'ایجنت دیگر · '+(meta(a.n,'protocol')||'mcp').replace('+',' + ').toUpperCase()));world.append(el)});
   chain.forEach(n=>{const b=vis.get(n.id),el=nodeEl(n,n.id,b,true);
@@ -1943,12 +2114,12 @@ function renderNested(rid){
     const kids=n.children;
     if(!(EXP.has(p)&&kids.length)){const lane=['role','section','project','orgBox','flow'].includes(n.kind);return{n,p,w:LEAFW,h:(lane?64:(n.kind==='tool'?64:(isStep(n)&&n.kind!=='routeStep'?136+extraH(n):84)))+(kids.length?26:0),frame:false}}
     const ch=kids.map(k=>lay(k,p+'.'+k.id)),cw=Math.max(...ch.map(c=>c.w));
-    let hh=HEADH+14;ch.forEach(c=>hh+=c.h+GAP);hh+=-GAP+40;
-    const cc=corr(p,kids),padL=34+13*Math.min(cc.nL,8),padR=34+13*Math.min(cc.nR,8);
-    return{n,p,w:cw+padL+padR,h:hh,frame:true,ch,cw,padL,padR}};
+    // افقی چپ‌به‌راست مثل n8n (همهٔ نماها یک جهت دارند): فرزندان کنار هم، فاصلهٔ ۱۲۸ مثل NODE_X_SPACING
+    const HG=128,chH=Math.max(...ch.map(c=>c.h));let ww=0;ch.forEach(c=>ww+=c.w+HG);ww+=-HG+68;
+    return{n,p,w:Math.max(ww,LEAFW+68),h:HEADH+30+chH+70,frame:true,ch,cw,chH,padL:34,padR:34}};
   const vis=new Map(),groups=new Map();
   const put=(Lx,x,y,par,depth)=>{Lx.x=x;Lx.y=y;Lx.outY=y+Lx.h;Lx.par=par;Lx.depth=depth;vis.set(Lx.p,Lx);
-    if(Lx.frame){let cy=y+HEADH+14;Lx.ch.forEach(c=>{put(c,x+Lx.padL+(Lx.cw-c.w)/2,cy,Lx.p,depth+1);cy+=c.h+GAP});groups.set(Lx.p,Lx.ch)}};
+    if(Lx.frame){let cx=x+34;const cy=y+HEADH+30;Lx.ch.forEach(c=>{put(c,cx,cy+(Lx.chH-c.h)/2,Lx.p,depth+1);cx+=c.w+128});groups.set(Lx.p,Lx.ch)}};
   const sugN=(VER===4&&FOC&&FOC!==rid&&IDX.has(FOC)&&FOC.split('.')[0]===rid&&isStep(IDX.get(FOC)))?IDX.get(FOC):null,GW=270,LX=sugN?GW+70:0;
   const root=lay(IDX.get(rid),rid);put(root,70+LX,16,null,0);
   const EXTW=300,EXGAP=120;
@@ -1989,7 +2160,12 @@ function renderNested(rid){
   M.rels.forEach((r,i)=>{const a=mapv(r.from),b=mapv(r.to);if(!a||!b||a===b||isAnc(a,b)||isAnc(b,a))return;
     const key=a.p+'>'+b.p+'|'+(r.label||'');if(seen.has(key))return;seen.add(key);
     if(a.par&&a.par===b.par){if(!sib.has(a.par))sib.set(a.par,[]);sib.get(a.par).push({r,i,a,b})}else cross.push({r,i,a,b})});
-  sib.forEach((list,par)=>routeList(svg,list,groups.get(par),{base:16,stp:13}));
+  // یال‌های هم‌ردیف: جلو = منحنی bezier افقی؛ برگشت = خط‌چین نارنجی زیر گره‌ها (همان قرارداد قفل‌شدهٔ نمای n8n)
+  sib.forEach(list=>list.forEach(({r,i,a,b})=>{const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=(SEL||SELE!=null)&&!on;
+    const y1=a.y+a.h/2,y2=b.y+b.h/2;
+    if(b.x>=a.x+a.w-2){const x1=a.x+a.w,x2=b.x,k=Math.max((x2-x1)/2,30);drawEdge(svg,`M${x1} ${y1}C${x1+k} ${y1} ${x2-k} ${y2} ${x2} ${y2}`,{on,dim,idx:i,label:r.label,lx:(x1+x2)/2,ly:Math.min(y1,y2)-8,anchor:'middle'})}
+    else{const by=Math.max(a.y+a.h,b.y+b.h)+28,x1=a.x+a.w/2,x2=b.x+b.w/2,R=16;
+      drawEdge(svg,`M${x1} ${a.y+a.h}L${x1} ${by-R}Q${x1} ${by} ${x1-R} ${by}L${x2+R} ${by}Q${x2} ${by} ${x2} ${by-R}L${x2} ${b.y+b.h}`,{on,dim,idx:i,col:'--n8back',dash:1,label:'↩ برگشت به '+(b.n.title||'').slice(0,22),lx:(x1+x2)/2,ly:by-6,anchor:'middle'})}}));
   const hasSel=SEL||SELE!=null;
   cross.forEach(({r,i,a,b})=>{const on=SELE===i||(SEL&&(r.from===SEL||r.to===SEL)),dim=hasSel&&!on,o={on,dim,idx:i,label:r.label,dash:1};
     const ax=a.x+a.w/2,bx=b.x+b.w/2;let d,lx,ly;
@@ -2411,13 +2587,13 @@ function downloadMM(){
   return t}
 const kindR=k=>k==='askStep'?14:k==='routeStep'?10:k==='gateStep'?3:5;
 
-const TABS=[['dia','فلوچارت سازمان'],['mind','ذهن‌نقشه'],['int','پروژه‌ها و interop'],['out','تغییرات و خروجی C4']];
+const TABS=[['dia','فلوچارت سازمان'],['mind','ذهن‌نقشه'],['int','پروژه‌ها و interop'],['out','تغییرات و خروجی C4'],['run','▶ اجراها (n8n)']];
 function showTab(){
   $('#p-dia').hidden=TAB!=='dia';$('#p-mind').hidden=TAB!=='mind';$('#p-int').hidden=TAB!=='int';$('#p-out').hidden=TAB!=='out';
   $('#tabs').replaceChildren(...TABS.map(([k,l])=>h('button',{class:TAB===k?'on':'',onclick:()=>{TAB=k;showTab()}},l)));
   if(TAB==='dia'){renderDia();renderInsp();if(NEEDFIT)requestAnimationFrame(fit)}
   if(TAB==='mind')renderMind();
-  if(TAB==='int')renderInt();if(TAB==='out')renderOut()}
+  if(TAB==='int')renderInt();if(TAB==='out')renderOut();$('#p-run').hidden=TAB!=='run';if(TAB==='run')N8.panel()}
 function refresh(){syncAuto();showTab()}
 $('#undo').onclick=undo;
 $('#reset').onclick=async()=>{if(await ask(DOC!=='org'?'همهٔ تغییرات این نقشه پاک شود و نمونهٔ اولیه برگردد؟':'همهٔ تغییرات پاک شود و نمونهٔ مخزن برگردد؟')){try{localStorage.removeItem(KEY())}catch(e){}openDoc(DOC);renderVers();refresh()}};
@@ -2425,6 +2601,374 @@ $('#load').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{const f=e.target.files[0];if(!f)return;const t=await f.text();
   try{G={};loadText(t,true);save();NEEDFIT=true;refresh()}catch(x){await ask('فایل خوانده نشد: '+x.message,{info:1})}e.target.value=''};
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();undo()}});
+
+/* ───────── لایهٔ n8n‌گونه: اجراها، وضعیت هر قدم، دیباگ، مینی‌مپ، گام‌به‌گام، خروجی n8n ─────────
+   منبع حقیقت همان .c4 است. وضعیت اجرا جدا نگه داشته می‌شود (runs JSON) و هرگز در .c4 نوشته نمی‌شود. */
+const N8=(()=>{
+  const RK=()=>'n8runs.'+(typeof DOC==='undefined'?'org':DOC);
+  let RUNS=[];try{RUNS=JSON.parse(localStorage.getItem(RK())||'[]')}catch(e){}
+  let CUR=RUNS[0]||null;
+  const persist=()=>{try{localStorage.setItem(RK(),JSON.stringify(RUNS.slice(0,20)))}catch(e){}};
+  const steps=()=>{const a=[];IDX.forEach((n,p)=>{if(isStep(n))a.push([p,n])});return a};
+  const order=root=>{ // ترتیب قدم‌ها با پیروی از رابطه‌ها
+    const st=steps().filter(([p])=>!root||p.split('.')[0]===root),set=new Set(st.map(x=>x[0]));
+    const nx=new Map(),indeg=new Map(st.map(([p])=>[p,0]));
+    M.rels.forEach(r=>{if(set.has(r.from)&&set.has(r.to)){(nx.get(r.from)||nx.set(r.from,[]).get(r.from)).push(r);indeg.set(r.to,indeg.get(r.to)+1)}});
+    return{st,nx,starts:st.filter(([p])=>!indeg.get(p)).map(x=>x[0])}};
+  function simulate(root){ // اجرای آزمایشی: auto=ok، ask=پاسخ نمونه، gate=منتظر، route=شاخهٔ اول، #onError=رد
+    const {nx,starts}=order(root),nodes={},edges={},log=[];let t=0;const seen=new Set();
+    const q=[...starts];
+    while(q.length){const p=q.shift();if(seen.has(p))continue;seen.add(p);const n=IDX.get(p);
+      const ts=new Date(Date.now()+t*1000).toISOString().slice(11,19);t+=1;
+      if(n.kind==='gateStep'){nodes[p]={s:'wait',n:1};log.push(`[${ts}] ${p} ⏸ منتظر تأیید انسان: ${titleName(n)}`);continue}
+      nodes[p]={s:'ok',n:1};log.push(`[${ts}] ${p} ✓ ${titleName(n)}${n.kind==='askStep'?' (پاسخ نمونه)':''}`);
+      let outs=(nx.get(p)||[]).filter(r=>!(IDX.get(r.to).tags||[]).includes('onError'));
+      if(n.kind==='routeStep')outs=outs.slice(0,1);
+      outs.forEach(r=>{edges[r.from+'>'+r.to]=(edges[r.from+'>'+r.to]||0)+1;q.push(r.to)})}
+    steps().forEach(([p])=>{if(!nodes[p]&&(!root||p.split('.')[0]===root))nodes[p]={s:'skip',n:0}});
+    return{id:'#'+(RUNS.length+1),at:new Date().toISOString(),mode:'آزمایشی',root:root||'همه',nodes,edges,log}}
+  const agg=p=>{const k=Object.entries(CUR.nodes).filter(([q])=>q.startsWith(p+'.')).map(x=>x[1]);if(!k.length)return null;
+    const s=k.some(r=>r.s==='err')?'err':k.some(r=>r.s==='wait')?'wait':k.every(r=>r.s==='skip')?'skip':'ok';return{s,n:k.filter(r=>r.s==='ok').length}};
+  function badges(){if(!$('#world'))return;
+    $('#world').querySelectorAll('.n8b,.n8c').forEach(x=>x.remove());
+    $('#world').querySelectorAll('.node[data-p]').forEach(el=>{const p=el.dataset.p,n=IDX.get(p);if(!n)return;if(el.classList.contains('n8')&&CUR&&CUR.nodes[p])return;
+      const r=CUR&&(CUR.nodes[p]||agg(p));if(r)el.append(h('span',{class:'n8b '+r.s,title:{ok:'موفق',err:'خطا',wait:'منتظر انسان',skip:'اجرا نشد'}[r.s]},r.s==='ok'?'✓'+(r.n>1?toFa(r.n):''):r.s==='err'?'✗':r.s==='wait'?'⏸':'–'));
+      const c=[meta(n,'trigger')&&'⚡ '+meta(n,'trigger'),meta(n,'sla')&&'⏱ '+meta(n,'sla'),meta(n,'credential')&&'🔑 '+meta(n,'credential'),meta(n,'retry')&&'↻ '+meta(n,'retry'),meta(n,'pin')&&'📌',meta(n,'subflow')&&'⧉ '+meta(n,'subflow'),(n.tags||[]).includes('onError')&&'🚨 مسیر خطا'].filter(Boolean);
+      if(c.length)el.append(h('div',{class:'n8c'},...c.map(x=>h('span',{},x))))});
+    mini()}
+  function mini(){const cv=$('#cv');if(!cv)return;let m=$('#n8mini');if(!m){m=h('div',{id:'n8mini',title:'مینی‌مپ'});cv.append(m)}
+    const ns=[...$('#world').querySelectorAll('.node[data-p]')];if(!ns.length){m.hidden=true;return}m.hidden=false;
+    const bx=ns.map(e=>({x:e.offsetLeft,y:e.offsetTop,w:e.offsetWidth,h:e.offsetHeight,p:e.dataset.p}));
+    const X=Math.min(...bx.map(b=>b.x)),Y=Math.min(...bx.map(b=>b.y)),W=Math.max(...bx.map(b=>b.x+b.w))-X,H=Math.max(...bx.map(b=>b.y+b.h))-Y,k=Math.min(166/W,106/H);
+    m.replaceChildren(...bx.map(b=>{const r=CUR&&(CUR.nodes[b.p]||agg(b.p));return h('i',{class:r?r.s:'',style:`left:${2+(b.x-X)*k}px;top:${2+(b.y-Y)*k}px;width:${Math.max(2,b.w*k)}px;height:${Math.max(2,b.h*k)}px`})}),
+      h('b',{style:`left:${2+(-VIEW.x/VIEW.k-X)*k}px;top:${2+(-VIEW.y/VIEW.k-Y)*k}px;width:${cv.clientWidth/VIEW.k*k}px;height:${cv.clientHeight/VIEW.k*k}px`}))}
+  let timer;function stepThrough(){clearInterval(timer);if(!CUR)return;TAB='dia';showTab();
+    const seq=CUR.log.map(l=>l.split(' ')[1]).filter(p=>IDX.has(p));let i=0;
+    timer=setInterval(()=>{document.querySelectorAll('.node.n8step').forEach(x=>x.classList.remove('n8step'));
+      if(i>=seq.length){clearInterval(timer);return}const p=seq[i++];if(p.split('.')[0]!==rootOfView()){go('ov:'+p.split('.')[0])}
+      const el=$('#world').querySelector(`.node[data-p="${p}"]`);if(el)el.classList.add('n8step')},800)}
+  function toN8n(){ // یک‌طرفه: .c4 → n8n (نسخهٔ پیش‌نویس، پیش از وارد کردن بازبینی شود)
+    const ty={triggerStep:'n8n-nodes-base.manualTrigger',gateStep:'n8n-nodes-base.wait',askStep:'n8n-nodes-base.form',routeStep:'n8n-nodes-base.switch',autoStep:'n8n-nodes-base.noOp',subflowStep:'n8n-nodes-base.executeWorkflow',noteStep:'n8n-nodes-base.stickyNote'};
+    const root=rootOfView(),{st}=order(root),name=p=>titleName(IDX.get(p)).slice(0,60)+' ('+p+')';
+    const nodes=st.map(([p,n],i)=>({id:p,name:name(p),type:ty[n.kind]||'n8n-nodes-base.noOp',typeVersion:1,position:[i*260,0],parameters:{},notes:outText(n)}));
+    const connections={};M.rels.forEach(r=>{if(st.some(x=>x[0]===r.from)&&st.some(x=>x[0]===r.to)){const k=name(r.from);(connections[k]=connections[k]||{main:[[]]}).main[0].push({node:name(r.to),type:'main',index:0})}});
+    return JSON.stringify({name:'from '+DOCFILE()+' / '+root,nodes,connections,settings:{}},null,2)}
+  function panel(){const P=$('#p-run'),root=rootOfView();
+    const tbl=CUR?h('table',{class:'n8t'},h('tr',{},h('th',{},'قدم'),h('th',{},'وضعیت'),h('th',{},'تعداد')),
+      ...Object.entries(CUR.nodes).map(([p,r])=>h('tr',{},h('td',{},h('a',{href:'#',onclick:e=>{e.preventDefault();TAB='dia';showTab();jump(p)}},nodeLabel(p))),h('td',{},{ok:'✓ موفق',err:'✗ خطا',wait:'⏸ منتظر انسان',skip:'– اجرا نشد'}[r.s]),h('td',{},toFa(r.n))))):h('p',{},'هنوز اجرایی نیست. «اجرای آزمایشی» را بزن یا فایل اجرای واقعی را بارگذاری کن.');
+    const edg=CUR&&Object.keys(CUR.edges).length?h('table',{class:'n8t'},h('tr',{},h('th',{},'سیم'),h('th',{},'شمار عبور')),...Object.entries(CUR.edges).map(([k,v])=>{const[a,b]=k.split('>');return h('tr',{},h('td',{},nodeLabel(a)+' ← '+nodeLabel(b)),h('td',{},toFa(v)))})):null;
+    const fi=h('input',{type:'file',accept:'.json',hidden:true,onchange:async e=>{const f=e.target.files[0];if(!f)return;try{const r=JSON.parse(await f.text());r.id=r.id||'#'+(RUNS.length+1);r.mode=r.mode||'واقعی';r.edges=r.edges||{};r.log=r.log||[];RUNS.unshift(r);CUR=r;persist();panel()}catch(x){await ask('فایل اجرا خوانده نشد: '+x.message,{info:1})}}});
+    const exp=h('textarea',{rows:8,class:'ltr',readonly:true,hidden:true});
+    P.replaceChildren(h('div',{class:'panel'},
+      h('h2',{},'▶ اجراها: وضعیت هر قدم مثل n8n'),
+      h('p',{},'وضعیت اجرا جدا از .c4 نگه داشته می‌شود و فقط روی نمودار نمایش داده می‌شود. در اجرای آزمایشی، قدم‌های ask با پاسخ نمونه جلو می‌روند و قدم‌های gate منتظر تأیید انسان می‌مانند.'),
+      h('div',{class:'row'},
+        h('button',{class:'pri',onclick:()=>{CUR=simulate(root);RUNS.unshift(CUR);persist();panel()}},'▶ اجرای آزمایشی «'+titleName(IDX.get(root))+'»'),
+        h('button',{onclick:stepThrough,disabled:!CUR},'⏯ نمایش گام‌به‌گام روی نمودار'),
+        h('button',{onclick:()=>fi.click()},'📂 بارگذاری اجرای واقعی (JSON)'),fi,
+        h('button',{onclick:()=>{CUR=null;panel()}},'پاک کردن نمایش'),
+        h('button',{onclick:async()=>{exp.value=toN8n();exp.hidden=false;try{await navigator.clipboard.writeText(exp.value)}catch(e){exp.select()}}},'⇢ خروجی ورک‌فلوی n8n (کپی)')),
+      exp,
+      h('h2',{},'تاریخچهٔ اجراها'),
+      h('div',{class:'row'},...RUNS.slice(0,10).map(r=>h('button',{class:'sm'+(r===CUR?' on':''),onclick:()=>{CUR=r;panel()}},`${r.id} · ${r.mode} · ${r.root} · ${r.at.slice(11,16)}`))),
+      CUR?h('h2',{},'وضعیت قدم‌ها در '+CUR.id):null,tbl,
+      edg?h('h2',{},'شمار عبور روی هر سیم'):null,edg,
+      CUR?h('h2',{},'پنل دیباگ (پیام هر قدم)'):null,CUR?h('div',{class:'n8log'},CUR.log.join('\n')):null,
+      h('h2',{},'قالب فایل اجرای واقعی'),
+      h('div',{class:'n8log'},'{ "mode":"واقعی", "root":"p0", "at":"2026-11-13T13:20:00Z",\n  "nodes": { "p0.c1": {"s":"ok","n":3}, "p0.c2": {"s":"wait","n":1}, "reg.c4": {"s":"err","n":1} },\n  "edges": { "p0.c1>p0.c2": 3 },\n  "log": ["[13:20:01] p0.c1 ✓ ..."] }')));
+  }
+  return{badges,panel,mini,cur:()=>CUR}})();
+{const _rd=renderDia;renderDia=function(){_rd();try{N8.badges()}catch(e){console.warn(e)}}}
+{const _av=applyView;applyView=function(){_av();try{N8.mini()}catch(e){}}}
+
+/* ───────── حالت افقی n8n: همهٔ نمودارها چپ‌به‌راست با گره‌های مربعی ───────── */
+let N8MODE=true,N8LAY='row';try{N8LAY=localStorage.getItem('n8lay')||'row'}catch(e){}
+let N8MODE_=0;try{const v=localStorage.getItem('n8mode');if(v!==null)N8MODE=v==='1'}catch(e){}
+const N8ICON={triggerStep:'⚡',autoStep:'⚙️',askStep:'💬',gateStep:'✋',routeStep:'🔀',subflowStep:'⧉',noteStep:'📌',orgBox:'📦',flow:'🔁',section:'🗂',role:'👤',tool:'🔧',project:'🧩',actor:'🙂'};
+const N8KIND={triggerStep:'شروع‌کننده',autoStep:'خودکار',askStep:'پرسش از انسان',gateStep:'تأیید انسان',routeStep:'شاخه',subflowStep:'زیرفلو',orgBox:'فاز',section:'بخش',flow:'فرایند',role:'نقش'};
+
+// آیکن‌های خطی Lucide (ISC) مثل سبک n8n
+const LUC={triggerStep:['#f59e0b','<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>'],
+ gateStep:['#dc2626','<path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/>'],
+ askStep:['#d97706','<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'],
+ autoStep:['#16a34a','<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>'],
+ routeStep:['#6366f1','<path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/>'],
+ subflowStep:['#0ea5e9','<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>'],
+ noteStep:['#ca8a04','<path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/>'],
+ orgBox:['#475569','<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>']};
+function lucide(kind){const L=LUC[kind]||LUC.orgBox,sp=document.createElement('span');sp.className='ic';
+  sp.innerHTML=`<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="${L[0]}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${L[1]}</svg>`;return sp}
+function renderN8n(rid){
+  const world=$('#world');world.replaceChildren();
+  let ps;
+  if(MACRO||!rid)ps=roots().map(n=>n.id);
+  else{ps=[];const R=IDX.get(rid);const rec=(n,p)=>n.children.forEach(c=>{const q=p+'.'+c.id;if(isStep(c)||!c.children.length)ps.push(q);else{ps.push(q);rec(c,q)}});rec(R,rid);
+    const st=ps.filter(q=>isStep(IDX.get(q)));if(st.length)ps=st.concat(ps.filter(q=>!isStep(IDX.get(q))&&!ps.some(o=>o.startsWith(q+'.')&&isStep(IDX.get(o)))))}
+  const set=new Set(ps),rels=[],xref=new Map();
+  // مثل n8n فقط فلش‌های ترتیب اجرا (بین قدم‌های هم‌بخش) کشیده می‌شود؛ ارتباط بین بخش‌ها برچسب «↗» روی گره می‌شود
+  const same=r=>MACRO||!rid||parentPath(r.from)===parentPath(r.to)||N8LAY==='orig';
+  M.rels.forEach((r,i)=>{if(set.has(r.from)&&set.has(r.to)&&r.from!==r.to)rels.push([r,i])});
+  // لایه‌بندی: طولانی‌ترین مسیر از شروع (بدون حلقه)
+  const L=new Map(ps.map(q=>[q,0]));
+  for(let k=0;k<ps.length;k++){let ch=false;rels.forEach(([r])=>{if(ps.indexOf(r.to)>ps.indexOf(r.from)||!rels.some(([b])=>b.from===r.to&&b.to===r.from)){const v=L.get(r.from)+1;if(v>L.get(r.to)&&v<ps.length){L.set(r.to,v);ch=true}}});if(!ch)break}
+  // قدم‌های بدون رابطه پشت سر هم
+  let mx=Math.max(0,...L.values());ps.forEach(q=>{if(!rels.some(([r])=>r.from===q||r.to===q)&&ps.length>1){L.set(q,++mx)}});
+  const cols=new Map();ps.forEach(q=>{const c=L.get(q);(cols.get(c)||cols.set(c,[]).get(c)).push(q)});
+  const G16=16,NSZ=G16*6,DX=NSZ+G16*8,DY=NSZ+G16*6+48,X0=G16*10,Y0=G16*8,B=new Map(),ck=[...cols.keys()].sort((a,b)=>a-b),NC=ck.length;
+  const maxRows=Math.max(1,...[...cols.values()].map(a=>a.length));
+  let W,H,lanes=[],bandH=0,PER=NC,laneTop=[],laneH=[];
+  if(N8LAY==='snake'){PER=Math.max(2,Math.min(6,Math.floor((($('#cv')||{}).clientWidth||1200)/230)));bandH=maxRows*DY+60;
+    ck.forEach((c,ci)=>{const a=cols.get(c),bi=Math.floor(ci/PER),xi=ci%PER;a.forEach((q,j)=>B.set(q,{x:X0+xi*DX,y:Y0+bi*bandH+(j+(maxRows-a.length)/2)*DY,w:150,h:120,ci}))});
+    W=X0+Math.min(NC,PER)*DX+40;H=Y0+Math.ceil(NC/PER)*bandH+40}
+  else if(N8LAY==='lanes'){const ag=new Set(ps.map(q=>meta(IDX.get(q),'agent')).filter(Boolean)),key=q=>{const n=IDX.get(q);return(ag.size>1&&meta(n,'agent'))||N8KIND[n.kind]||n.kind};
+    ps.forEach(q=>{if(!lanes.includes(key(q)))lanes.push(key(q))});
+    // هر ردیف (lane) به اندازهٔ بیشترین گره در یک ستون بلند می‌شود؛ گره‌ها روی هم نمی‌افتند
+    const cnt=new Map();ck.forEach((c,ci)=>cols.get(c).forEach(q=>{const k=lanes.indexOf(key(q))+':'+ci;cnt.set(k,(cnt.get(k)||0)+1)}));
+    const laneRows=lanes.map((_,li)=>Math.max(1,...ck.map((c,ci)=>cnt.get(li+':'+ci)||0)));laneTop=[];let acc=Y0;laneRows.forEach(r=>{laneTop.push(acc);acc+=r*DY});
+    const used=new Map();ck.forEach((c,ci)=>cols.get(c).forEach(q=>{const li=lanes.indexOf(key(q)),k=li+':'+ci,o=used.get(k)||0;used.set(k,o+1);B.set(q,{x:X0+ci*DX,y:laneTop[li]+o*DY,w:150,h:120,ci})}));
+    laneH=laneRows.map(r=>r*DY);W=X0+NC*DX+40;H=acc+20}
+  else if(N8LAY==='stairs'){let i=0;ck.forEach((c,ci)=>cols.get(c).forEach(q=>{B.set(q,{x:X0+ci*DX,y:Y0+(i++)*110,w:150,h:120,ci})}));W=X0+NC*DX+40;H=Y0+ps.length*110+60}
+  else if(N8LAY==='orig'&&ps.every(q=>meta(IDX.get(q),'n8n_pos'))){const P=ps.map(q=>meta(IDX.get(q),'n8n_pos').split(',').map(Number)),mx0=Math.min(...P.map(a=>a[0])),my0=Math.min(...P.map(a=>a[1]));
+    ps.forEach((q,i)=>B.set(q,{x:X0+P[i][0]-mx0-27,y:Y0+P[i][1]-my0,w:150,h:120,ci:0}));W=X0+Math.max(...P.map(a=>a[0]))-mx0+260;H=Y0+Math.max(...P.map(a=>a[1]))-my0+200}
+  else{const snap=v=>Math.round(v/G16)*G16,Yc=new Map(),mid=Y0+(maxRows-1)*DY/2;
+    // کاهش تقاطع (Sugiyama/dagre): چند دور مرتب‌سازی بر اساس میانگین جای همسایه‌ها، رفت و برگشت
+    const pos=new Map();ck.forEach(c=>cols.get(c).forEach((q,j)=>pos.set(q,j)));
+    const nb=(q,dir)=>rels.filter(([r])=>dir?r.to===q:r.from===q).map(([r])=>dir?r.from:r.to).filter(x=>pos.has(x));
+    for(let it=0;it<6;it++){const order=it%2?[...ck].reverse():ck;order.forEach(c=>{const a=cols.get(c),bcv=q=>{const n=nb(q,it%2===0);return n.length?n.reduce((x,y)=>x+pos.get(y),0)/n.length:pos.get(q)};
+      a.sort((x,y)=>bcv(x)-bcv(y));a.forEach((q,j)=>pos.set(q,j))})}
+    ck.forEach((c,ci)=>{const a=cols.get(c),bc=q=>{const pr=rels.filter(([r])=>r.to===q&&Yc.has(r.from)).map(([r])=>Yc.get(r.from));return pr.length?pr.reduce((x,y)=>x+y,0)/pr.length:mid};
+      const want0=a.map(bc);const want=a.map((q,j)=>want0[j]),cen=want.reduce((x,y)=>x+y,0)/a.length;
+      a.forEach((q,j)=>{let y=a.length===1?want[0]:cen+(j-(a.length-1)/2)*DY;Yc.set(q,snap(y))})});
+    const minY=Math.min(...Yc.values());ps.forEach(q=>{const ci=ck.indexOf(L.get(q));B.set(q,{x:X0+ci*DX,y:Yc.get(q)-minY+Y0,w:150,h:120,ci})});
+    W=X0+NC*DX+40;H=Y0+(Math.max(...Yc.values())-minY)+DY+80}
+  // محافظ استاندارد برخورد: اگر دو گره روی هم افتادند، دومی یک ردیف پایین می‌رود (برای همهٔ چیدمان‌ها)
+  {const arr=[...B.entries()].sort((a,b)=>a[1].x-b[1].x||a[1].y-b[1].y);for(let i=0;i<arr.length;i++)for(let j=0;j<i;j++){const A=arr[j][1],C=arr[i][1];if(Math.abs(A.x-C.x)<150&&Math.abs(A.y-C.y)<140){C.y=A.y+DY;j=-1}}
+   H=Math.max(H,Math.max(...[...B.values()].map(b=>b.y))+DY)}
+  W=Math.max(600,W);H=Math.max(320,H);const svg=newSvg(W,H);
+  // محور زمان: هر ستون یک مرحله؛ اگر قدم‌ها metadata duration (روز) داشته باشند، روز تجمعی هم نوشته می‌شود
+  const dur=q=>parseFloat(meta(IDX.get(q),'duration')||meta(IDX.get(q),'sla')||'')||0;let acc=0;const dayAt=ck.map(c=>{acc+=Math.max(0,...cols.get(c).map(dur));return acc});
+  const axis=(y0,from,to)=>{svg.append(sv('line',{x1:X0-20,y1:y0,x2:X0+(to-from)*DX+150,y2:y0,style:'stroke:var(--mute)','stroke-width':1.5,'marker-end':'url(#mkedge)'}));
+    for(let ci=from;ci<to;ci++){const x=X0+(ci-from)*DX+75;svg.append(sv('circle',{cx:x,cy:y0,r:5,style:'fill:#ea4b71'}));
+      const t=sv('text',{x,y:y0-12,'text-anchor':'middle','font-size':12,style:'fill:var(--ink);font-family:var(--font);font-weight:700'});t.textContent='مرحلهٔ '+toFa(ci+1);svg.append(t);
+      if(dayAt[NC-1]){const t2=sv('text',{x,y:y0+20,'text-anchor':'middle','font-size':11,style:'fill:var(--mute);font-family:var(--font)'});t2.textContent='تا روز '+toFa(dayAt[ci]);svg.append(t2)}}
+    const lt=sv('text',{x:X0-30,y:y0+4,'text-anchor':'end','font-size':11,style:'fill:var(--mute);font-family:var(--font)'});lt.textContent='زمان →';svg.append(lt)};
+  if(document.body.classList.contains('n8full')||N8LAY==='orig'){}else if(N8LAY==='snake'){for(let b=0;b*PER<NC;b++)axis(Y0-50+b*bandH,b*PER,Math.min(NC,(b+1)*PER))}else axis(Y0-50,0,NC);
+  if(N8LAY==='lanes')lanes.forEach((l,li)=>{const y=laneTop[li]-18;svg.append(sv('rect',{x:10,y,width:W-20,height:laneH[li]-8,rx:8,style:'fill:var(--card);stroke:var(--line)','fill-opacity':.55}));
+    const t=sv('text',{x:20,y:y+laneH[li]/2,'font-size':12.5,style:'fill:var(--ink);font-family:var(--font);font-weight:700'});t.textContent=l.length>16?l.slice(0,15)+'…':l;svg.append(t)});
+  world.style.width=W+'px';world.style.height=H+'px';world.style.direction='ltr';world.append(svg);
+  // فلش‌ها به سبک n8n: خروج از دستگیرهٔ راست، ورود به دستگیرهٔ چپ، منحنی بزیه با بازوی افقی؛
+  // شاخه‌ها از دستگیره‌های جدا (یکی زیر دیگری) با برچسب کنار دستگیره؛ پس از اجرا سبز با «n مورد»
+  for(let k=rels.length-1;k>=0;k--){const [r]=rels[k];if(false){(xref.get(r.from)||xref.set(r.from,[]).get(r.from)).push(r.to);rels.splice(k,1)}}
+  const run=N8.cur(),BX=96,HB=BX/2,cxn=b=>b.x+75,cyn=b=>b.y+HB;
+  const outs=new Map();rels.forEach(([r])=>{(outs.get(r.from)||outs.set(r.from,[]).get(r.from)).push(r.to)});
+  const ins=new Map();rels.forEach(([r])=>{(ins.get(r.to)||ins.set(r.to,[]).get(r.to)).push(r.from)});
+  const portY=(q,list,t,base)=>{const L=list.get(q)||[];const k=L.indexOf(t),n=L.length;return base+(n>1&&IDX.get(q).kind==='routeStep'?(k-(n-1)/2)*26:0)};
+  const marker=sv('marker',{id:'n8ar',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto'});marker.append(sv('path',{d:'M0 1L9 5L0 9z',style:'fill:var(--n8e)'}));
+  const markerG=sv('marker',{id:'n8arg',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto'});markerG.append(sv('path',{d:'M0 1L9 5L0 9z',style:'fill:#16a34a'}));
+  const markerB=sv('marker',{id:'n8arb',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto'});markerB.append(sv('path',{d:'M0 1L9 5L0 9z',style:'fill:var(--n8back)'}));
+  svg.querySelector('defs').append(marker,markerG,markerB);
+  rels.forEach(([r,i])=>{const A=B.get(r.from),Bb=B.get(r.to),isRoute=IDX.get(r.from).kind==='routeStep';
+    const x1=cxn(A)+HB+6,y1=portY(r.from,outs,r.to,cyn(A)),x2=cxn(Bb)-HB-6,y2=cyn(Bb);
+    let d;const dx=x2-x1;
+    if(x1-20<=x2){const c=dx>=0?dx/2:0.25*25*Math.sqrt(-dx);d=`M${x1} ${y1} C${x1+c} ${y1} ${x2-c} ${y2} ${x2} ${y2}`}
+    else{const R=16,P=40,yb=y1+130,ax=x1+P,bx=x2-P;
+      d=`M${x1} ${y1} L${ax-R} ${y1} Q${ax} ${y1} ${ax} ${y1+R} L${ax} ${yb-R} Q${ax} ${yb} ${ax-R} ${yb} L${bx+R} ${yb} Q${bx} ${yb} ${bx} ${yb-R} L${bx} ${y2+R*Math.sign(yb-y2)} Q${bx} ${y2} ${bx+R} ${y2} L${x2} ${y2}`}
+    const cnt=run&&run.edges[r.from+'>'+r.to],err=(IDX.get(r.to).tags||[]).includes('onError'),back=!(x1-20<=x2);
+    // برگشت (حلقه): نارنجی، خط‌چین، از زیر گره‌ها، با برچسب «↩ برگشت به …» روی پایین‌ترین بخش؛ با نشانگر موس پررنگ می‌شود
+    const col=cnt?'#16a34a':back?'var(--n8back)':err?'#dc2626':'var(--n8e)';
+    const pe=sv('path',{d,fill:'none',class:back?'n8bk':'',style:`stroke:${col}`,'stroke-width':cnt?2.6:2,'stroke-dasharray':back?'7 5':err?'6 5':'none','marker-end':`url(#${cnt?'n8arg':back?'n8arb':'n8ar'})`});svg.append(pe);
+    if(back){const yb=y1+130,tx=(x1+x2)/2,t=sv('text',{x:tx,y:yb+15,'text-anchor':'middle','font-size':11.5,style:'fill:var(--n8back);paint-order:stroke;stroke:var(--lane);stroke-width:5px;font-family:var(--font);font-weight:700'});
+      t.textContent='↩ برگشت به «'+titleName(IDX.get(r.to)).slice(0,24)+'»';svg.append(t)}
+    const hit=sv('path',{d,fill:'none',stroke:'transparent','stroke-width':16,class:'hit','data-e':i});hit.addEventListener('mouseenter',()=>{pe.style.strokeWidth=4;const a=$('#world').querySelector(`.node[data-p="${r.to}"]`);if(a)a.classList.add('n8tgt')});hit.addEventListener('mouseleave',()=>{pe.style.strokeWidth='';document.querySelectorAll('.n8tgt').forEach(e=>e.classList.remove('n8tgt'))});const tt=sv('title');tt.textContent='از «'+nodeLabel(r.from)+'» به «'+nodeLabel(r.to)+'»'+(r.label?' — '+r.label:'');hit.append(tt);svg.append(hit);
+    const lb=(isRoute||(r.label&&r.label!=='بعد'))?r.label:'';
+    const pill=(x,y,txt,col)=>{const t=sv('text',{x,y,'font-size':11.5,'text-anchor':'middle',style:`fill:${col};paint-order:stroke;stroke:var(--lane);stroke-width:5px;font-family:var(--font);font-weight:600`});t.textContent=txt;svg.append(t)};
+    if(lb)pill(x1+14+Math.min(60,lb.length*6.5)/2,y1+(y2<y1?-8:y2>y1?16:-8),lb.length>14?lb.slice(0,13)+'…':lb,'var(--mute)');
+    if(cnt)pill((x1+x2)/2,(y1+y2)/2-8,toFa(cnt)+' مورد','#16a34a')});
+  const vis=new Map();
+  ps.forEach(q=>{const n=IDX.get(q),b=B.get(q);vis.set(q,b);const kids=n.children.filter(isStep).length,st=run&&(run.nodes[q]||null);
+    const no=(outs.get(q)||[]),nOut=n.kind==='routeStep'?Math.max(1,no.length):1;
+    world.append(h('div',{class:`node n8 ${n.kind}${SEL===q?' sel':''}${lockedN(n)?' locked':''}${st?' rs-'+st.s:''}`,'data-p':q,style:`left:${b.x}px;top:${b.y}px`},
+      h('div',{class:'n8i'},lucide(n.kind),
+        n.kind!=='triggerStep'?h('i',{class:'hin'}):null,
+        ...Array.from({length:nOut},(_,k)=>h('i',{class:'hout',style:`top:${HB-8+(nOut>1?(k-(nOut-1)/2)*26:0)}px`})),
+        lockedN(n)?h('span',{class:'lk'},'🔒'):null,kids?h('span',{class:'ct',title:'قدم‌های داخلی'},toFa(kids)):null,
+        st&&st.s==='ok'?h('span',{class:'okc'},'✓'):null),
+      xref.get(q)?h('div',{class:'n8x',title:xref.get(q).map(nodeLabel).join('\n')},'↩ برگشت به '+(xref.get(q).length>1?toFa(xref.get(q).length)+' قدم':nodeLabel(xref.get(q)[0]).slice(0,22))):null,
+      h('div',{class:'n8l'},titleName(n)),h('div',{class:'n8k'},(N8KIND[n.kind]||n.kind)+(n.tech&&!/—/.test(n.tech)?' · '+n.tech.replace(/^skill:\s*/,''):''))))});
+  // مثل n8n: «+» بعد از آخرین گره‌ها برای افزودن قدم بعدی
+  ps.filter(q=>!outs.has(q)&&isStep(IDX.get(q))).forEach(q=>{const b=B.get(q);const pp=parentPath(q);
+    world.append(h('button',{class:'n8plus',title:'افزودن قدم بعدی',style:`left:${b.x+75+HB+44}px;top:${b.y+HB-14}px`,onclick:e=>{e.stopPropagation();addChild(pp)}},'+'));
+    svg.append(sv('path',{d:`M${b.x+75+HB+6} ${b.y+HB} L${b.x+75+HB+44} ${b.y+HB}`,style:'stroke:var(--n8e)','stroke-width':2}))});
+  if(!ps.length)world.append(h('div',{class:'empty'},'این بخش هنوز قدمی ندارد.'));
+  return{W:W+80,H,vis}}
+
+
+/* ───────── ورود ورک‌فلوی n8n (JSON) ← .c4 ─────────
+   نوع گره‌ها نگاشت می‌شود؛ مختصات اصلی n8n در metadata n8n_pos نگه داشته می‌شود تا هر دو چیدمان مقایسه شوند. */
+function n8nToC4(wf){
+  const spec=(BASE.match(/specification\s*\{/)?BASE.slice(BASE.indexOf('specification'),matchBrace(BASE,BASE.indexOf('{',BASE.indexOf('specification')))+1):'');
+  const kindOf=t=>/trigger|webhook|cron|schedule/i.test(t)?'triggerStep':/\.(if|switch|filter)$/i.test(t)?'routeStep':/\.(wait|form)$|sendAndWait/i.test(t)?'gateStep':/executeWorkflow/i.test(t)?'subflowStep':/stickyNote/i.test(t)?'noteStep':'autoStep';
+  const q=s=>"'"+String(s).replace(/\\/g,'').replace(/'/g,'’')+"'";
+  const ids=new Map();(wf.nodes||[]).forEach((n,i)=>ids.set(n.name,'n'+(i+1)));
+  const L=['model {','  wf = orgBox '+q(wf.name||'n8n workflow')+' {',"    description 'out: وارد شده از n8n'"];
+  (wf.nodes||[]).filter(n=>!/stickyNote/.test(n.type)).forEach(n=>{L.push(`    ${ids.get(n.name)} = ${kindOf(n.type)} ${q(n.name)} {`,`      technology ${q('n8n: '+n.type.replace(/^n8n-nodes-base\./,''))}`,`      metadata {`,`        n8n_pos ${q((n.position||[0,0]).join(','))}`,`      }`,`    }`)});
+  Object.entries(wf.connections||{}).forEach(([from,c])=>(c.main||[]).forEach((outs,oi)=>(outs||[]).forEach(o=>{if(ids.has(from)&&ids.has(o.node)){
+    const isIf=/\.if$/.test((wf.nodes.find(n=>n.name===from)||{}).type||''),lb=isIf?(oi===0?'true':'false'):((c.main.length>1)?'output '+oi:'بعد');
+    L.push(`    ${ids.get(from)} -> ${ids.get(o.node)} ${q(lb)}`)}})));
+  L.push('  }','}','','views {','  view index {','    include *','  }','  view wf of wf {','    include *','  }','}');
+  return spec+'\n\n'+L.join('\n')+'\n'}
+async function importN8n(){const fi=h('input',{type:'file',accept:'.json'});fi.onchange=async()=>{const f=fi.files[0];if(!f)return;
+  try{const wf=JSON.parse(await f.text());G={};loadText(n8nToC4(wf),true);save();N8MODE=true;NEEDFIT=true;TAB='dia';go('ov:wf');refresh()}catch(x){await ask('فایل n8n خوانده نشد: '+x.message,{info:1})}};fi.click()}
+
+/* ───────── نمای «سفر» (Customer Journey Map + Service Blueprint) ─────────
+   الگو: NN/g Journey Map (مرحله‌ها × کارها، فکرها، احساس، دردها، فرصت‌ها) و Service Blueprint
+   (کار مشتری | خط دید | پشت صحنه | سیستم‌ها). ستون = فاز یا قدم؛ ردیف‌ها از نوع و metadata ساخته می‌شوند. */
+function renderJourney(rid){
+  const world=$('#world');world.replaceChildren();world.style.direction='rtl';
+  const stages=MACRO||!rid?roots().filter(inChain).map(n=>[n.id,n]):(()=>{const a=[];const rec=(n,p)=>n.children.forEach(c=>{const q=p+'.'+c.id;if(isStep(c))a.push([q,c]);else rec(c,q)});rec(IDX.get(rid),rid);return a})();
+  const stepsOf=(q,n)=>{if(isStep(n))return[[q,n]];const a=[];const rec=(m,p)=>m.children.forEach(c=>{const qq=p+'.'+c.id;if(isStep(c))a.push([qq,c]);rec(c,qq)});rec(n,q);return a};
+  const human=k=>k==='askStep'||k==='gateStep'||k==='triggerStep';
+  const emo=(q,n)=>{const v=parseFloat(meta(n,'emotion'));if(!isNaN(v))return v;const st=stepsOf(q,n);if(!st.length)return 0;
+    return st.reduce((s,[,m])=>s+(m.kind==='gateStep'?-1:m.kind==='askStep'?-.3:m.kind==='autoStep'?.6:0)+((m.tags||[]).includes('unknownSkill')?-.4:0),0)/st.length};
+  const ROWS=[
+    ['🎯 مرحله',null],['🙋 کار انسان (پیش صحنه)','front'],['👁 خط دید',null],['🤖 پشت صحنه (ایجنت و خودکار)','back'],
+    ['🔌 سیستم‌ها و ابزار','sys'],['😊 احساس',null],['⚠️ درد و ریسک','pain'],['💡 فرصت','opp']];
+  const CW=210,LW=170,RH={front:120,back:120,sys:70,pain:90,opp:80},W=LW+stages.length*CW+20;
+  const table=h('div',{class:'jm',style:`width:${W}px`});
+  const row=(lbl,cells,cls)=>table.append(h('div',{class:'jr '+(cls||'')},h('div',{class:'jl'},lbl),...cells));
+  row('🎯 مرحله',stages.map(([q,n],i)=>h('div',{class:'jc jh','data-p':q,onclick:()=>{if(!isStep(n)){MACRO=false;go('ov:'+q)}else select(q)}},h('b',{},toFa(i+1)+'. '+titleName(n)),h('small',{},meta(n,'agent')||''))),'head');
+  const chips=(q,n,f)=>stepsOf(q,n).filter(([,m])=>f(m)).map(([qq,m])=>h('span',{class:'jchip '+m.kind,title:outText(m),onclick:e=>{e.stopPropagation();select(qq)}},(N8ICON[m.kind]||'')+' '+titleName(m)));
+  row('🙋 کار انسان (پیش صحنه)',stages.map(([q,n])=>h('div',{class:'jc'},...chips(q,n,m=>human(m.kind)))));
+  table.append(h('div',{class:'jline'},h('span',{},'خط دید: بالای خط را انسان می‌بیند و انجام می‌دهد، پایین خط را ایجنت‌ها')));
+  row('🤖 پشت صحنه (ایجنت و خودکار)',stages.map(([q,n])=>h('div',{class:'jc'},...chips(q,n,m=>!human(m.kind)))));
+  row('🔌 سیستم‌ها و ابزار',stages.map(([q,n])=>{const t=[...new Set(stepsOf(q,n).map(([,m])=>meta(m,'ext_tool')||(m.tech&&!/—/.test(m.tech)?m.tech.replace(/^skill:\s*/,''):'')).filter(Boolean))];return h('div',{class:'jc'},...t.slice(0,4).map(x=>h('span',{class:'jtag ltr'},x)))}));
+  // منحنی احساس
+  const EH=110,es=stages.map(([q,n])=>emo(q,n)),cv=newSvg(stages.length*CW,EH);cv.style.position='static';
+  const pts=es.map((v,i)=>[stages.length*CW-(i*CW+CW/2),EH/2-Math.max(-1.5,Math.min(1.5,v))*30]);
+  cv.append(sv('line',{x1:0,y1:EH/2,x2:stages.length*CW,y2:EH/2,style:'stroke:var(--line)','stroke-dasharray':'4 4'}));
+  if(pts.length>1){let d=`M${pts[0][0]} ${pts[0][1]}`;for(let i=1;i<pts.length;i++){const [x0,y0]=pts[i-1],[x,y]=pts[i],c=(x0-x)/2;d+=` C${x0-c} ${y0} ${x+c} ${y} ${x} ${y}`}cv.append(sv('path',{d,fill:'none',style:'stroke:#ea4b71','stroke-width':2.5}))}
+  pts.forEach(([x,y],i)=>{cv.append(sv('circle',{cx:x,cy:y,r:6,style:`fill:${es[i]>.2?'#16a34a':es[i]<-.2?'#dc2626':'#f59e0b'}`}));const t=sv('text',{x,y:y-12,'text-anchor':'middle','font-size':16});t.textContent=es[i]>.2?'🙂':es[i]<-.2?'😟':'😐';cv.append(t)});
+  table.append(h('div',{class:'jr'},h('div',{class:'jl'},'😊 احساس',h('small',{},'از نوع قدم‌ها؛ با metadata emotion از ۲- تا ۲ دقیقش کن')),h('div',{class:'jcurve'},cv)));
+  row('⚠️ درد و ریسک',stages.map(([q,n])=>{const st=stepsOf(q,n),g=st.filter(([,m])=>m.kind==='gateStep').length,u=st.filter(([,m])=>(m.tags||[]).includes('unknownSkill')).length;
+    return h('div',{class:'jc'},g?h('div',{},'⏸ '+toFa(g)+' انتظار برای تأیید'):null,u?h('div',{},'❓ '+toFa(u)+' قدم بدون skill'):null,meta(n,'must_not')?h('div',{class:'jsm'},'⛔ '+meta(n,'must_not').slice(0,80)):null)}));
+  row('💡 فرصت',stages.map(([q,n])=>{const st=stepsOf(q,n),a=st.filter(([,m])=>m.kind==='askStep').length,u=st.filter(([,m])=>(m.tags||[]).includes('unknownSkill')).length;
+    return h('div',{class:'jc'},u?h('div',{},'🔎 یافتن skill برای '+toFa(u)+' قدم'):null,a>1?h('div',{},'⚡ ادغام '+toFa(a)+' پرسش در یک فرم'):null)}));
+  world.append(table);world.style.width=W+'px';
+  requestAnimationFrame(()=>{world.style.height=table.offsetHeight+'px'});
+  return{W,H:900,vis:new Map()}}
+{const _rn=renderN8n;renderN8n=function(rid){if(N8LAY==='journey')return renderJourney(rid);$('#world').style.direction='ltr';return _rn(rid)}}
+
+/* ───────── نمای «داشبورد n8n» ───────── */
+function n8dashChrome(on){document.body.classList.toggle('n8full',on);const P=$('#p-dia');let host=P.querySelector('.n8cvhost');
+  if(on&&!host){host=h('div',{class:'n8cvhost'});const cv=$('#cv');host.dataset.home='1';cv._home=cv.parentNode;cv._next=cv.nextSibling;
+    const root=()=>IDX.get(rootOfView());
+    host.append(h('div',{class:'n8bar n8b1'},h('span',{class:'crumbs'},'Personal / ',h('b',{id:'n8title'},'')),h('span',{class:'sp'}),
+        h('span',{},'Inactive'),h('button',{class:'pub',onclick:()=>{TAB='out';N8LAY='row';try{localStorage.setItem('n8lay','row')}catch(e){}n8dashChrome(false);showTab()}},'Save (.c4)'),
+        h('button',{onclick:()=>{N8LAY='row';try{localStorage.setItem('n8lay','row')}catch(e){}n8dashChrome(false);NEEDFIT=true;renderVers();renderDia()}},'✕')),
+      h('div',{class:'n8bar n8b2'},h('div',{class:'seg'},h('button',{class:'on'},'Editor'),h('button',{onclick:()=>{n8dashChrome(false);N8LAY='row';TAB='run';showTab()}},'Executions'))),
+      cv,
+      h('button',{class:'n8exec',onclick:()=>{TAB='run';showTab();$('#p-run button.pri').click();TAB='dia';N8LAY='n8dash';showTab()}},'▶ Execute workflow'),
+      h('div',{class:'n8zoom'},h('button',{title:'fit',onclick:()=>{NEEDFIT=true;renderDia()}},'⤢'),h('button',{onclick:()=>{VIEW.k=Math.min(2,VIEW.k*1.2);applyView()}},'+'),h('button',{onclick:()=>{VIEW.k=Math.max(.3,VIEW.k/1.2);applyView()}},'−')),
+      h('div',{class:'n8logs'},h('b',{},'Logs'),h('span',{id:'n8loginfo'},'')));
+    P.append(host)}
+  if(!on&&host){const cv=$('#cv');cv._home.insertBefore(cv,cv._next);host.remove()}
+  if(on){$('#n8title').textContent=titleName(IDX.get(rootOfView()))||'';const c=N8.cur();$('#n8loginfo').textContent=c?`${c.id} · ${Object.values(c.nodes).filter(r=>r.s==='ok').length} ok · ${Object.values(c.nodes).filter(r=>r.s==='wait').length} waiting`:'No executions yet'}}
+{const _rn=renderN8n;renderN8n=function(rid){const dash=N8LAY==='n8dash';n8dashChrome(dash);if(dash){N8LAY='row';try{return _rn(rid)}finally{N8LAY='n8dash'}}return _rn(rid)}}
+{const _rd=renderDia;renderDia=function(){
+  document.body.classList.toggle('n8on',N8MODE);
+  if(!N8MODE){$('#world').style.direction='';return _rd()}
+  if(!VIEWP.startsWith('ov:')&&!IDX.has(VIEWP))VIEWP='ov:'+roots()[0].id;
+  RV=REVIEW?reviewFind():new Map();renderNav();renderTree();
+  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=N8LAY==='journey'?1:N8LAY==='n8dash'?Math.max(.3,Math.min(1,cv.clientWidth/(LAST.W+60),cv.clientHeight/(LAST.H+60))):Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:(N8LAY==='journey'?cv.clientWidth-LAST.W*VIEW.k-10:10);VIEW.y=10;applyView();NEEDFIT=false}
+  try{N8.badges()}catch(e){}}}
+{const _rv=renderVers;renderVers=function(){_rv();$('#vers').append(h('button',{id:'n8mode',class:N8MODE?'on':'',title:'نمایش همهٔ نمودارها افقی، مثل n8n',onclick:()=>{N8MODE=!N8MODE;try{localStorage.setItem('n8mode',N8MODE?'1':'0')}catch(e){}NEEDFIT=true;renderVers();renderDia()}},N8MODE?'⇄ حالت n8n: روشن':'⇄ حالت n8n'),
+  h('button',{class:'pri',onclick:()=>{N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderVers();renderDia()}},'⛶ تمام‌صفحه، دقیقاً مثل n8n'),h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['orig','📍 مختصات اصلی n8n (اگر از n8n وارد شده)'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)'],['journey','🧭 نقشهٔ سفر (Journey + Service Blueprint)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
+
+
+/* پنل کشویی: با انتخاب گره باز، با ✕ یا Esc بسته */
+{const _ri=renderInsp;renderInsp=function(){_ri();const I=$('#insp');document.body.classList.toggle('inspopen',!!SEL||!!SELE||HISTOPEN);
+  // سربرگ پنل مثل NDV در n8n و Inspector در Figma: آیکن نوع + نام + نوع + بستن
+  I.querySelector('.pnlh')?.remove();const n=SEL&&IDX.get(SEL);
+  I.prepend(h('div',{class:'pnlh'},n?lucide(n.kind):h('span',{class:'ic'},'⚙'),h('div',{class:'pt'},h('b',{},n?titleName(n):SELE!=null?'جزئیات فلش':'جزئیات'),h('small',{},n?(N8KIND[n.kind]||n.kind)+' · '+SEL:'ویرایش و تنظیمات')),
+    h('button',{id:'inspx',class:'sm',title:'بستن (Esc)',onclick:()=>{SEL=null;SELE=null;HISTOPEN=false;document.body.classList.remove('inspopen');renderDia()}},'✕')))}}
+{const _rt=renderTree;renderTree=function(){_rt();const T=$('#tree');if(!T.querySelector('.pnlh'))T.prepend(h('div',{class:'pnlh'},h('span',{class:'ic'},'🗂'),h('div',{class:'pt'},h('b',{},'فهرست بخش‌ها'),h('small',{},'برای رفتن به هر بخش کلیک کن')),h('button',{class:'sm',onclick:()=>document.body.classList.remove('treeopen')},'✕')))}}
+document.addEventListener('keydown',e=>{if(/^[1-4]$/.test(e.key)&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)&&TAB==='dia'){const b=document.querySelectorAll('#vers .vmi')[+e.key-1];if(b)b.click()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('inspopen')){SEL=null;SELE=null;document.body.classList.remove('inspopen');renderDia();renderInsp()}});
+
+/* ───────── پوستهٔ n8n: نوار کناری، منوی فایل و نما، زبانه‌های ویرایشگر و اجراها ───────── */
+(function n8shell(){
+  const top=$('.top'),tabs=$('#tabs'),vers=$('#vers');
+  const side=h('nav',{id:'n8side','aria-label':'بخش‌ها'},h('div',{class:'logo'},'س'));
+  side.append(h('button',{title:'فهرست بخش‌ها',onclick:()=>{document.body.classList.toggle('treeopen')}},'🗂',h('span',{},'فهرست بخش‌ها')));
+  const SB=[['dia','🗺','ویرایشگر فلو'],['run','▶','اجراها'],['mind','🧠','ذهن‌نقشه'],['int','🔗','پروژه‌ها و interop'],['out','📤','تغییرات و خروجی C4']];
+  SB.forEach(([k,i,l])=>side.append(h('button',{'data-k':k,title:l,onclick:()=>{TAB=k;showTab()}},i,h('span',{},l))));
+  document.body.prepend(side);
+  const h1=top.querySelector('h1');h1.insertBefore(h('span',{class:'crumb'},'فلوها / '),h1.firstChild);
+  const mk=(lbl,...kids)=>h('details',{class:'n8menu'},h('summary',{},lbl),h('div',{class:'dd'},...kids));
+  const fileDocs=h('div',{class:'vers'});
+  const fileM=mk('📁 فایل',h('h4',{},'جدید از قالب'),fileDocs,h('h4',{},'باز کردن و برگرداندن'),$('#load'),h('button',{onclick:()=>importN8n()},'📥 باز کردن ورک‌فلوی n8n (JSON)'),$('#reset'));
+  const viewM=mk('👁 نما',vers);
+  const undo=$('#undo');undo.textContent='↶';undo.title='برگشت (Ctrl+Z)';
+  const save=h('button',{class:'save',title:'متن کامل .c4 را در زبانهٔ خروجی ببین و کپی کن',onclick:()=>{TAB='out';showTab()}},'ذخیره (.c4)');
+  const full=h('button',{class:'save',style:'background:#1f1f2e;border-color:#1f1f2e',title:'تمام‌صفحه، دقیقاً مثل n8n',onclick:()=>{TAB='dia';showTab();N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderDia()}},'⛶ نمای n8n');
+  top.replaceChildren(h1,fileM,viewM,tabs,undo,save,$('#file'));
+  document.addEventListener('click',e=>document.querySelectorAll('.n8menu[open]').forEach(d=>{if(!d.contains(e.target))d.open=false}));
+  // دکمه‌های انتخاب نقشه (۳ تای اول #vers) به منوی فایل می‌روند
+  const _rv=renderVers;renderVers=function(){_rv();[...vers.children].slice(0,3).forEach(b=>fileDocs.append(b));
+    while(fileDocs.children.length>3)fileDocs.firstChild.remove()};
+  const _st=showTab;showTab=function(){_st();
+    tabs.querySelectorAll('button').forEach(b=>{const t=b.textContent;b.classList.toggle('aux',!/فلوچارت|اجراها/.test(t));if(/فلوچارت/.test(t))b.textContent='ویرایشگر';if(/اجراها/.test(t))b.textContent='اجراها'});
+    side.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.k===TAB))};
+})();
+
+/* منوی «نما» ساده: ۳ نمای اصلی + ابزار؛ بقیه پشت «بیشتر» (calm-panels: یک انتخاب اصلی، بقیه پنهان) */
+{const _rv2=renderVers;renderVers=function(){_rv2();const V=$('#vers'),old=[...V.children];V.replaceChildren();
+  const set=(mode,lay,ver)=>{N8MODE=mode;if(lay){N8LAY=lay;try{localStorage.setItem('n8lay',lay)}catch(e){}}try{localStorage.setItem('n8mode',mode?'1':'0')}catch(e){}if(ver)VER=ver;NEEDFIT=true;renderVers();renderDia();renderInsp()};
+  const cur=!N8MODE?'classic':N8LAY==='journey'?'journey':'n8n';
+  const main=[['n8n','➡ فلو (مثل n8n)','ترتیب اجرا، چپ‌به‌راست؛ برای دیدن و اجرا',()=>set(true,'row')],
+    ['journey','🧭 سفر و مسئولیت','چه کسی کجا کار می‌کند، احساس و درد هر مرحله',()=>set(true,'journey')],
+    ['classic','✏️ ویرایش کامل','کارت‌های بزرگ با skill، ورودی و خروجی؛ برای ویرایش',()=>set(false,null,4)]];
+  // مثل منوهای Figma/Linear: کاشی آیکن، عنوان، توضیح کوتاه، تیک انتخاب، میان‌بر صفحه‌کلید
+  main.push(['full','⛶ تمام‌صفحه (n8n)','فقط بوم، نوار اجرا و لاگ؛ دقیقاً مثل n8n',()=>{N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderVers();renderDia()}]);
+  const curK=N8LAY==='n8dash'?'full':cur;
+  V.append(h('h4',{},'نماها'),...main.map(([k,l,d,f],i)=>{const [ic,...t]=l.split(' ');return h('button',{class:'vmi'+(curK===k?' on':''),onclick:()=>{f();document.querySelectorAll('.n8menu[open]').forEach(x=>x.open=false)}},
+    h('span',{class:'vic'},ic),h('span',{class:'vtx'},h('b',{},t.join(' ')),h('small',{},d)),h('kbd',{},toFa(i+1)),h('span',{class:'vck'},curK===k?'✓':''))}));
+  const fs=null,fsOld=old.find(b=>/تمام‌صفحه/.test(b.textContent)),rv=old.find(b=>/بازبینی/.test(b.textContent)),hs=old.find(b=>/تاریخچه/.test(b.textContent));
+  V.append(h('h4',{},'ابزار'),...[rv,hs].filter(Boolean));
+  const more=old.filter(b=>![fsOld,rv,hs].includes(b)&&b.tagName==='BUTTON'&&!/حالت n8n/.test(b.textContent)&&!/^➡ یک خط|سفر \(Journey/.test(b.textContent));
+  // منوی سه‌نقطه (⋯) مثل Linear/Notion: گزینه‌های قدیمی حذف نشده‌اند، فقط با کلیک کاربر باز می‌شوند
+  const box=h('div',{class:'vers vmore',hidden:!window.__vmoreOpen},...more);
+  const dots=h('button',{class:'vdots',title:'گزینه‌های قدیمی',onclick:e=>{e.stopPropagation();window.__vmoreOpen=box.hidden;box.hidden=!box.hidden;dots.classList.toggle('on',!box.hidden)}},h('span',{},'⋯'),h('span',{},'گزینه‌های قدیمی'),h('small',{},toFa(more.length)));
+  if(!box.hidden)dots.classList.add('on');
+  V.append(h('hr',{class:'vsep'}),dots,box)}}
+
+/* پنل‌های کناری به سبک Figma / n8n NDV: بخش‌های تاشو، راهنما پشت «؟»، جست‌وجو در فهرست؛ بدون تغییر در منطق */
+window.__acc=window.__acc||(()=>{try{return JSON.parse(localStorage.getItem('acc')||'{}')}catch(e){return{}}})();
+const accSave=()=>{try{localStorage.setItem('acc',JSON.stringify(__acc))}catch(e){}};
+function proPanels(){const I=$('#insp');if(!I)return;let first=true;
+  I.querySelectorAll(':scope > .panel').forEach(P=>{const H=P.querySelector(':scope > h2');if(!H||P.classList.contains('acc'))return;
+    P.classList.add('acc');const key=H.textContent.replace(/[·\d۰-۹]+.*$/,'').trim();
+    const open=key in __acc?__acc[key]:first;first=false;P.classList.toggle('shut',!open);
+    const help=P.querySelector(':scope > small');
+    const head=h('div',{class:'acch'},h('span',{class:'chev'},'›'),h('span',{class:'at'},H.textContent));
+    if(help){help.classList.add('acchelp');help.hidden=true;head.append(h('button',{class:'qm',title:'راهنما',onclick:e=>{e.stopPropagation();help.hidden=!help.hidden}},'؟'))}
+    head.addEventListener('click',()=>{const sh=!P.classList.toggle('shut');__acc[key]=sh;accSave()});
+    H.replaceWith(head)})}
+function proTree(){const T=$('#tree');if(!T||T.querySelector('.trq'))return;
+  T.querySelector(':scope > h2')?.remove();
+  const q=h('input',{class:'trq',placeholder:'جست‌وجوی بخش…',oninput:()=>{const v=q.value.trim();T.querySelectorAll('.tr').forEach(r=>r.hidden=!!v&&!r.textContent.includes(v))}});
+  T.querySelector('.pnlh')?.after(q)}
+// تب‌های معنایی مثل پنل راست Figma (Design / Prototype / Inspect) و n8n (Parameters / Settings)
+window.__itab=window.__itab||'all';
+function proTabs(){const I=$('#insp');if(!I)return;const ps=[...I.querySelectorAll(':scope > .panel')];
+  const cat=P=>{const t=(P.querySelector('.acch .at')||P).textContent;return /گزارش|بازبینی|هشدار/.test(t)?'check':/طراح|تمپلیت/.test(t)?'build':/راهنما/.test(t)?'help':'detail'};
+  const T=[['detail','جزئیات'],['check','بررسی'],['build','ساخت'],['help','راهنما']].filter(([k])=>ps.some(P=>cat(P)===k));
+  if(T.length<2)return;if(!T.some(([k])=>k===__itab))__itab=T[0][0];
+  const bar=h('div',{class:'itabs',role:'tablist'},...T.map(([k,l])=>{const n=ps.filter(P=>cat(P)===k).length;return h('button',{role:'tab',class:k===__itab?'on':'',onclick:()=>{__itab=k;renderInsp()}},l,n>1?h('small',{},toFa(n)):null)}));
+  ps.forEach(P=>{P.hidden=cat(P)!==__itab;if(!P.hidden&&P.classList.contains('shut')&&ps.filter(x=>cat(x)===__itab).length===1)P.classList.remove('shut')});
+  (I.querySelector('.pnlh')||I.firstChild)?.after(bar)}
+{const _ri3=renderInsp;renderInsp=function(){_ri3();proPanels();proTabs()}}
+{const _rt3=renderTree;renderTree=function(){_rt3();proTree()}}
 
 /* ───────── شروع ───────── */
 (function init(){
