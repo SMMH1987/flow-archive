@@ -309,7 +309,7 @@ body.n8full #n8mini{display:none}
     <div style="min-width:0"><div id="nav" class="nav"></div>
     <div id="cv">
       <div id="world"></div>
-      <div class="cvtools">
+      <div class="cvtools"><button title="تمام‌صفحه مثل n8n" onclick="N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderDia()">⛶</button>
         <button id="zin" title="بزرگ‌نمایی">＋</button><button id="zout" title="کوچک‌نمایی">－</button>
         <button id="zfit" title="کل نمودار در یک نگاه">⤢</button>
         <button id="bconn" title="رسم فلش: اول مبدأ بعد مقصد">↔ فلش</button>
@@ -2788,7 +2788,7 @@ function n8dashChrome(on){document.body.classList.toggle('n8full',on);const P=$(
   LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=N8LAY==='journey'?1:N8LAY==='n8dash'?Math.max(.5,Math.min(1,cv.clientWidth/(LAST.W+60),cv.clientHeight/(LAST.H+60))):Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:(N8LAY==='journey'?cv.clientWidth-LAST.W*VIEW.k-10:10);VIEW.y=10;applyView();NEEDFIT=false}
   try{N8.badges()}catch(e){}}}
 {const _rv=renderVers;renderVers=function(){_rv();$('#vers').append(h('button',{id:'n8mode',class:N8MODE?'on':'',title:'نمایش همهٔ نمودارها افقی، مثل n8n',onclick:()=>{N8MODE=!N8MODE;try{localStorage.setItem('n8mode',N8MODE?'1':'0')}catch(e){}NEEDFIT=true;renderVers();renderDia()}},N8MODE?'⇄ حالت n8n: روشن':'⇄ حالت n8n'),
-  h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)'],['journey','🧭 نقشهٔ سفر (Journey + Service Blueprint)'],['n8ndash','🟥 داشبورد n8n (تمام‌صفحه)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
+  h('button',{class:'pri',onclick:()=>{N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderVers();renderDia()}},'⛶ تمام‌صفحه، دقیقاً مثل n8n'),h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)'],['journey','🧭 نقشهٔ سفر (Journey + Service Blueprint)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
 
 /* ───────── پوستهٔ n8n: نوار کناری، منوی فایل و نما، زبانه‌های ویرایشگر و اجراها ───────── */
 (function n8shell(){
