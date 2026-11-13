@@ -1,0 +1,2 @@
+{"name":"likec4-studio-sample","private":true,"type":"module","scripts":{"build":"bash build.sh"},
+ "dependencies":{"@likec4/language-services":"1.60.0"},"devDependencies":{"esbuild":"^0.25.0"}}
