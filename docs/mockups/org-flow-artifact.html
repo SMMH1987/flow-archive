@@ -1190,7 +1190,10 @@ function renderNav(){
       h('button',{class:'sm',onclick:()=>go(parentPath(VIEWP).includes('.')?parentPath(VIEWP):'ov:'+parentPath(VIEWP))},'↑ یک سطح بالا'))}}
 function applyView(){$('#world').style.transform=`translate(${VIEW.x}px,${VIEW.y}px) scale(${VIEW.k})`}
 function fit(all){if(!LAST)return;const cv=$('#cv'),w=cv.clientWidth,hh=cv.clientHeight;if(!w)return;
-  const kw=w/(LAST.W+30),k=all===true?Math.min(kw,hh/(LAST.H+30)):all==='ov'?Math.max(Math.min(kw,hh/(LAST.H+30)),.62):Math.min(kw,1.05);VIEW.k=Math.max(.2,k);VIEW.x=(w-LAST.W*VIEW.k)/2;VIEW.y=8;applyView();NEEDFIT=false}
+  const kw=w/(LAST.W+30),k=all===true?Math.min(kw,hh/(LAST.H+30)):all==='ov'?Math.max(Math.min(kw,hh/(LAST.H+30)),.62):Math.min(kw,1.05);VIEW.k=Math.max(.2,k);VIEW.x=(w-LAST.W*VIEW.k)/2;VIEW.y=8;
+  // نقشه‌های افقی پهن: زوم را برای خوانایی پایین‌تر از ۵۵٪ نبر؛ از ابتدای جریان (چپ) شروع کن، مثل n8n
+  if(all!==true&&LAST.W>LAST.H*1.5&&VIEW.k<.55){VIEW.k=Math.max(.55,Math.min(1,hh/(LAST.H+30)));VIEW.x=10;VIEW.y=Math.max(8,(hh-LAST.H*VIEW.k)/2-30)}
+  applyView();NEEDFIT=false}
 const polyD=pts=>pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join('');
 function relStyle(r,i,back,x){
   const e=SELE===i;let col='--e-seq';const fk=(IDX.get(r.from)||{}).kind;
