@@ -245,6 +245,9 @@ body.n8on #cv{height:calc(100vh - 90px)!important;min-height:520px}
 .node.n8.n8tgt .n8i{box-shadow:0 0 0 5px #e8590c66}
 .node.n8 .n8i{width:96px!important;height:96px!important;border-radius:8px!important;border:2px solid #c9ced6!important;background:var(--card)!important;box-shadow:0 1px 2px #0000000f}
 .node.n8 .n8i .ic{font-size:38px;line-height:1}
+.node.n8.orgBox .n8i[style*="--acc"]{border-color:var(--acc)!important;box-shadow:inset 0 4px 0 var(--acc),0 1px 2px #0000000f}
+.node.n8.orgBox .n8i[style*="--acc"] .ic{color:var(--acc)}.node.n8.orgBox .n8i[style*="--acc"] .ic svg{stroke:var(--acc)}
+@media(max-width:700px){#n8mini{display:none!important}.top{flex-wrap:wrap;row-gap:6px}}
 .node.n8.triggerStep .n8i{border-radius:50px 8px 8px 50px!important}
 .node.n8.gateStep .n8i{border-color:#e7a1a1!important}.node.n8.askStep .n8i{border-color:#efc77a!important}.node.n8.routeStep .n8i{border-color:#b4b8f5!important}
 .node.n8.orgBox .n8i{border-color:#c9ced6!important}
@@ -2527,7 +2530,7 @@ function focusOn(p){if(!IDX.has(p))return;if(p.split('.')[0]!==rootOfView()){go(
   FOC=p;expandTo(p);NEEDFIT=false;renderDia();if(p.includes('.')&&!lastVis().has(p)){}
   const tgt=lastVis().has(p)?p:null;if(tgt)fitTo(tgt)}
 function setVer(v){VER=v;NEEDFIT=true;renderVers();renderDia();renderInsp()}
-const APP_VER=26,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
+const APP_VER=27,APP_DATE='۱۴۰۵/۰۸/۱۶',APP_GREG='2026-11-07';
 const VIEW_VERS=[[1,'عبور','نمایش ۱','آرتیفکت v۴','۱۲:۵۹'],[2,'بازشدن درجا','نمایش ۲','آرتیفکت v۴','۱۲:۵۹'],[3,'درخت + کادرها','نمایش ۳','آرتیفکت v۴','۱۲:۵۹'],[4,'ترکیبی ۲+۳','نمایش ۴ (انتخاب تو)','آرتیفکت v۵','۱۳:۰۵']];
 const CHANGELOG=[
  [26,'ساخت فرایند','بخش تازهٔ ساخت فرایند طبق دستورالعمل: پرسشنامهٔ سازمان، پروفایل، فلوی ساخته‌شده با ردشده‌ها و دلیلشان؛ داده از agents/ تولید می‌شود','۲۰:۳۰'],
@@ -3542,10 +3545,12 @@ function renderN8n(rid){
     if(lb)pill(x1+14+Math.min(60,lb.length*6.5)/2,y1+(y2<y1?-8:y2>y1?16:-8),lb.length>14?lb.slice(0,13)+'…':lb,'var(--mute)');
     if(cnt)pill((x1+x2)/2,(y1+y2)/2-8,toFa(cnt)+' مورد','#16a34a')});
   const vis=new Map();
+  // مثل n8n/Linear: هر فاز یک رنگ ثابت تا در نقشهٔ بزرگ از هم جدا شوند
+  const PHCOL=['#2563eb','#7c3aed','#db2777','#ea580c','#ca8a04','#16a34a','#0891b2','#4f46e5','#be123c','#0d9488'];
   ps.forEach(q=>{const n=IDX.get(q),b=B.get(q);vis.set(q,b);const kids=n.children.filter(isStep).length,st=run&&(run.nodes[q]||null);
     const no=(outs.get(q)||[]),nOut=n.kind==='routeStep'?Math.max(1,no.length):1;
     world.append(h('div',{class:`node n8 ${n.kind}${SEL===q?' sel':''}${lockedN(n)?' locked':''}${st?' rs-'+st.s:''}`,'data-p':q,style:`left:${b.x}px;top:${b.y}px`},
-      h('div',{class:'n8i'},lucide(n.kind),
+      h('div',{class:'n8i',style:n.kind==='orgBox'?'--acc:'+PHCOL[ps.indexOf(q)%PHCOL.length]:''},lucide(n.kind),
         n.kind!=='triggerStep'?h('i',{class:'hin'}):null,
         ...Array.from({length:nOut},(_,k)=>h('i',{class:'hout',style:`top:${HB-8+(nOut>1?(k-(nOut-1)/2)*26:0)}px`})),
         lockedN(n)?h('span',{class:'lk'},'🔒'):null,kids?h('span',{class:'ct',title:'قدم‌های داخلی'},toFa(kids)):null,
@@ -3670,9 +3675,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.class
   const full=h('button',{class:'save',style:'background:#1f1f2e;border-color:#1f1f2e',title:'تمام‌صفحه، دقیقاً مثل n8n',onclick:()=>{TAB='dia';showTab();N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderDia()}},'⛶ نمای n8n');
   top.replaceChildren(h1,fileM,viewM,tabs,undo,save,$('#file'));
   document.addEventListener('click',e=>document.querySelectorAll('.n8menu[open]').forEach(d=>{if(!d.contains(e.target))d.open=false}));
-  // دکمه‌های انتخاب نقشه (۳ تای اول #vers) به منوی فایل می‌روند
-  const _rv=renderVers;renderVers=function(){_rv();[...vers.children].slice(0,3).forEach(b=>fileDocs.append(b));
-    while(fileDocs.children.length>3)fileDocs.firstChild.remove()};
+  // همهٔ دکمه‌های انتخاب نقشه (پیش از دکمه‌های «نسخه») به منوی فایل می‌روند
+  const _rv=renderVers;renderVers=function(){_rv();const all=[...vers.children],k=all.findIndex(b=>/^نسخه/.test(b.textContent));fileDocs.replaceChildren(...all.slice(0,k<0?all.length:k))};
   const _st=showTab;showTab=function(){_st();
     tabs.querySelectorAll('button').forEach(b=>{const t=b.textContent;b.classList.toggle('aux',!/فلوچارت|اجراها/.test(t));if(/فلوچارت/.test(t))b.textContent='ویرایشگر';if(/اجراها/.test(t))b.textContent='اجراها'});
     side.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.k===TAB))};
