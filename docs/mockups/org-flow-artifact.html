@@ -2804,7 +2804,8 @@ function n8dashChrome(on){document.body.classList.toggle('n8full',on);const P=$(
   const viewM=mk('👁 نما',vers);
   const undo=$('#undo');undo.textContent='↶';undo.title='برگشت (Ctrl+Z)';
   const save=h('button',{class:'save',title:'متن کامل .c4 را در زبانهٔ خروجی ببین و کپی کن',onclick:()=>{TAB='out';showTab()}},'ذخیره (.c4)');
-  top.replaceChildren(h1,fileM,viewM,tabs,undo,save,$('#file'));
+  const full=h('button',{class:'save',style:'background:#1f1f2e;border-color:#1f1f2e',title:'تمام‌صفحه، دقیقاً مثل n8n',onclick:()=>{TAB='dia';showTab();N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderDia()}},'⛶ نمای n8n');
+  top.replaceChildren(h1,fileM,viewM,tabs,full,undo,save,$('#file'));
   document.addEventListener('click',e=>document.querySelectorAll('.n8menu[open]').forEach(d=>{if(!d.contains(e.target))d.open=false}));
   // دکمه‌های انتخاب نقشه (۳ تای اول #vers) به منوی فایل می‌روند
   const _rv=renderVers;renderVers=function(){_rv();[...vers.children].slice(0,3).forEach(b=>fileDocs.append(b));
