@@ -66,7 +66,8 @@ input[type=checkbox],input[type=radio]{width:auto}
 .node.routeStep.sel{filter:drop-shadow(0 0 4px var(--acc))}
 .nb{display:inline-block;font-size:10px;border:1px solid var(--line);border-radius:8px;padding:0 5px;margin-inline-end:3px;background:var(--card);color:var(--mute)}
 .nb.red{background:var(--gate);border-color:var(--gate);color:var(--card)}
-.cvtools{position:absolute;top:8px;left:8px;z-index:5;display:flex;gap:4px;flex-direction:column;direction:rtl}
+.cvtools{position:absolute;bottom:10px;left:10px;z-index:5;display:flex;gap:2px;flex-direction:row;direction:ltr;background:var(--card,#fff);border:1px solid var(--line);border-radius:10px;padding:3px;box-shadow:0 4px 14px #0001}
+.cvtools button{min-width:30px;height:28px;padding:0 6px;border:0!important;background:none!important;border-radius:7px;box-shadow:none!important}.cvtools button:hover{background:var(--lane)!important}
 .cvhint{position:absolute;bottom:8px;right:10px;font-size:12px;color:var(--mute);pointer-events:none;direction:rtl;background:var(--bg);border-radius:8px;padding:0 8px;max-width:calc(100% - 80px)}
 .side{position:sticky;top:8px;display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 30px);overflow:auto}
 @media(max-width:960px){.side{position:static;max-height:none}#cv{height:70vh}}
@@ -181,7 +182,7 @@ button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover
 .n8b{position:absolute;top:-12px;left:calc(50% - 14px);min-width:28px;height:24px;box-shadow:0 0 0 2px #fff;font-weight:700;min-width:20px;height:20px;border-radius:10px;color:#fff;font-size:11px;display:grid;place-items:center;padding:0 4px;z-index:4}
 .n8b.ok{background:#16a34a}.n8b.err{background:#dc2626}.n8b.wait{background:#ea580c}.n8b.skip{background:#888}
 .node.n8step{box-shadow:0 0 0 4px #ea4b71!important}
-#n8mini{position:absolute;left:10px;bottom:10px;width:170px;height:110px;background:rgba(127,127,127,.12);border:1px solid #9995;border-radius:6px;overflow:hidden;z-index:5;pointer-events:none}
+#n8mini{position:absolute;right:10px;bottom:10px;width:170px;height:110px;background:rgba(127,127,127,.12);border:1px solid #9995;border-radius:6px;overflow:hidden;z-index:5;pointer-events:none}
 #n8mini i{position:absolute;background:#6b7280;border-radius:1px}#n8mini i.ok{background:#16a34a}#n8mini i.err{background:#dc2626}#n8mini i.wait{background:#ea580c}
 #n8mini b{position:absolute;border:1.5px solid #ea4b71}
 .n8t{width:100%;border-collapse:collapse;font-size:.85rem}.n8t td,.n8t th{border-bottom:1px solid #9994;padding:4px 6px;text-align:right}
@@ -356,7 +357,7 @@ body.n8on .cvhint{display:none!important}
     <nav class="tabs" id="tabs"></nav>
     <span class="vers" id="vers"></span>
     <button id="undo" title="برگشت (Ctrl+Z)">↶ برگشت</button>
-    <button id="load">بارگذاری .c4</button>
+    <button id="load">بارگذاری فایل <span class="ltr">.c4</span></button>
     <button id="reset">بازنشانی به نمونه</button>
     <input type="file" id="file" accept=".c4,.txt,text/plain" hidden>
   </div>
@@ -1085,7 +1086,7 @@ function emitC4(M){
   return pre+'model {\n'+lines.join('\n')+'\n}'+M.mid+viewsAdjust(M.views,idx,M)}
 
 /* ───────── حالت برنامه ───────── */
-const KEY=()=>(typeof DOC==='undefined'?'orgStudio.v1':({startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1'}[DOC]));
+const KEY=()=>(typeof DOC==='undefined'?'orgStudio.v1':({startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1',n8n:'orgStudio.n8n1'}[DOC]));
 const BASE=document.getElementById('base-c4').textContent;
 let M,BASEPARSE,BASETEXT,IDX=new Map(),SEL=null,TAB='dia',HIST=[],G={};
 const defaultG=()=>({cats:Object.fromEntries(CATS.map(c=>[c,c!=='read_or_draft'])),expires:24});
@@ -1616,9 +1617,11 @@ function phaseModel(PH,TITLE){
   m.views='views {\n  view index {\n    title '+q(TITLE)+'\n    include *\n  }\n'+m.nodes.map(n=>'\n  view '+n.id+' of '+n.id+' {\n    title '+q(n.title)+'\n    include *\n  }\n').join('')+'}';
   return m}
 const startupModel=()=>phaseModel(STARTUP,STARTUP_TITLE),studioModel=()=>phaseModel(STUDIO,STUDIO_TITLE);
-const DOCKEY={startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1'},BUILD={startup:startupModel,studio:studioModel};
-let DOC='studio';try{const d=localStorage.getItem('orgStudio.doc2');if(d==='org'||d==='startup')DOC=d}catch(e){}
-const DOCFILE=()=>({startup:'startup-talent.c4',studio:'startup-studio.c4',org:'recruitment.c4'}[DOC]);
+const DOCKEY={startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1',n8n:'orgStudio.n8n1'},BUILD={startup:startupModel,studio:studioModel,n8n:studioModel};
+// مهاجرت: اگر نقشهٔ سازمان قبلاً با ورک‌فلوی n8n بازنویسی شده، آن را به جای جدای خودش ببر و نقشهٔ اصلی را برگردان
+try{const o=localStorage.getItem('orgStudio.v1');if(o&&/n8n_pos/.test(o)&&!localStorage.getItem('orgStudio.n8n1')){localStorage.setItem('orgStudio.n8n1',o);localStorage.removeItem('orgStudio.v1')}}catch(e){}
+let DOC='studio';try{const d=localStorage.getItem('orgStudio.doc2');if(d==='org'||d==='startup'||d==='n8n')DOC=d}catch(e){}
+const DOCFILE=()=>({startup:'startup-talent.c4',studio:'startup-studio.c4',org:'recruitment.c4',n8n:'imported-n8n.c4'}[DOC]);
 function openDoc(d){
   DOC=d;try{localStorage.setItem('orgStudio.doc2',d)}catch(e){}
   let st=null;try{st=JSON.parse(localStorage.getItem(DOCKEY[d]))}catch(e){}
@@ -1628,7 +1631,7 @@ function openDoc(d){
     else if(d==='org')loadText(BASE,true);
     else{M=BUILD[d]();BASETEXT=emitC4(M);BASEPARSE=parseC4(BASETEXT);reindex();deriveG();HIST=[BASETEXT]}
   }catch(e){if(d==='org')loadText(BASE,true);else{M=BUILD[d]();BASETEXT=emitC4(M);BASEPARSE=parseC4(BASETEXT);reindex();deriveG();HIST=[BASETEXT]}}
-  SEL=null;SELE=null;FOC=null;EXP=new Set();MACRO=d!=='org';TAB='dia';NEEDFIT=true;
+  SEL=null;SELE=null;FOC=null;EXP=new Set();MACRO=d!=='org'&&d!=='n8n';TAB='dia';NEEDFIT=true;
   VIEWP='ov:'+roots()[0].id;
   save()}
 function switchDoc(d){if(d===DOC)return;save();openDoc(d);renderVers();showTab();$('#doc-name').textContent=DOCFILE()}
@@ -1906,6 +1909,7 @@ function histPanel(){return h('div',{class:'panel'},h('h2',{},'📜 تاریخچ
 function renderVers(){$('#vers').replaceChildren(
   h('button',{class:DOC==='studio'?'pri':'',title:'سازمان تازه: با دادن ایده یا پروژه و کد، ارزیابی، ساخت، حقوقی، ارزش‌گذاری، سرمایه‌گذار و فروش را پیش می‌برد',onclick:()=>switchDoc('studio')},'🏭 استودیوی استارتاپ‌ساز'),
   h('button',{class:DOC==='startup'?'pri':'',title:'نقشهٔ تازه از صفر: استارتاپ استعدادیابی، غربال، رزومه و استخدام؛ از نام‌گذاری تا تجاری‌سازی',onclick:()=>switchDoc('startup')},'🚀 استارتاپ استعدادیابی'),
+  (()=>{let has=false;try{has=!!localStorage.getItem('orgStudio.n8n1')}catch(e){}return has?h('button',{class:DOC==='n8n'?'pri':'',title:'آخرین ورک‌فلویی که از n8n وارد کردی',onclick:()=>switchDoc('n8n')},'📥 ورک‌فلوی واردشده از n8n'):null})(),
   h('button',{class:DOC==='org'?'pri':'',title:'نقشهٔ قبلی: سازمان اتوماسیون استخدام (recruitment.c4)',onclick:()=>switchDoc('org')},'🏢 نقشهٔ سازمان قبلی'),
 ...VIEW_VERS.map(([v,l,tag,av,tm])=>h('button',{class:VER===v?'on':'',title:tag+' · '+av+' · ساخته‌شده '+APP_DATE+' ساعت '+tm+' UTC',onclick:()=>setVer(v)},'نسخه '+toFa(v)+' · '+l+' ',h('small',{style:'opacity:.75'},av+' · '+APP_DATE))),
   h('button',{class:'sm'+(REVIEW?' pri':''),title:'قسمت‌های اضافه یا تکراری با کادر قرمز مشخص و حذف، ادغام یا ترتیب پیشنهاد می‌شود',onclick:()=>{REVIEW=!REVIEW;NEEDFIT=false;SEL=null;SELE=null;renderVers();renderDia();renderInsp()}},'🔍 بازبینی'+(REVIEW?' · '+toFa(RV.size):'')),
@@ -2804,7 +2808,7 @@ function renderN8n(rid){
         lockedN(n)?h('span',{class:'lk'},'🔒'):null,kids?h('span',{class:'ct',title:'قدم‌های داخلی'},toFa(kids)):null,
         st&&st.s==='ok'?h('span',{class:'okc'},'✓'):null),
       xref.get(q)?h('div',{class:'n8x',title:xref.get(q).map(nodeLabel).join('\n')},'↩ برگشت به '+(xref.get(q).length>1?toFa(xref.get(q).length)+' قدم':nodeLabel(xref.get(q)[0]).slice(0,22))):null,
-      h('div',{class:'n8l'},titleName(n)),h('div',{class:'n8k'},(N8KIND[n.kind]||n.kind)+(n.tech&&!/—/.test(n.tech)?' · '+n.tech.replace(/^skill:\s*/,''):''))))});
+      h('div',{class:'n8l'},titleName(n)),h('div',{class:'n8k'},(N8KIND[n.kind]||n.kind)+(n.children&&n.children.length&&!isStep(n)?' · '+toFa(n.children.length)+' قدم':'')+(n.tech&&!/—/.test(n.tech)?' · '+n.tech.replace(/^skill:\s*/,''):''))))});
   // مثل n8n: «+» بعد از آخرین گره‌ها برای افزودن قدم بعدی
   ps.filter(q=>!outs.has(q)&&isStep(IDX.get(q))).forEach(q=>{const b=B.get(q);const pp=parentPath(q);
     world.append(h('button',{class:'n8plus',title:'افزودن قدم بعدی',style:`left:${b.x+75+HB+44}px;top:${b.y+HB-14}px`,onclick:e=>{e.stopPropagation();addChild(pp)}},'+'));
@@ -2828,7 +2832,7 @@ function n8nToC4(wf){
   L.push('  }','}','','views {','  view index {','    include *','  }','  view wf of wf {','    include *','  }','}');
   return spec+'\n\n'+L.join('\n')+'\n'}
 async function importN8n(){const fi=h('input',{type:'file',accept:'.json'});fi.onchange=async()=>{const f=fi.files[0];if(!f)return;
-  try{const wf=JSON.parse(await f.text());G={};loadText(n8nToC4(wf),true);save();N8MODE=true;NEEDFIT=true;TAB='dia';go('ov:wf');refresh()}catch(x){await ask('فایل n8n خوانده نشد: '+x.message,{info:1})}};fi.click()}
+  try{const wf=JSON.parse(await f.text());DOC='n8n';try{localStorage.setItem('orgStudio.doc2','n8n')}catch(e){}G={};loadText(n8nToC4(wf),true);save();N8MODE=true;NEEDFIT=true;TAB='dia';go('ov:wf');refresh()}catch(x){await ask('فایل n8n خوانده نشد: '+x.message,{info:1})}};fi.click()}
 
 /* ───────── نمای «سفر» (Customer Journey Map + Service Blueprint) ─────────
    الگو: NN/g Journey Map (مرحله‌ها × کارها، فکرها، احساس، دردها، فرصت‌ها) و Service Blueprint
@@ -2889,7 +2893,7 @@ function n8dashChrome(on){document.body.classList.toggle('n8full',on);const P=$(
   if(!N8MODE){$('#world').style.direction='';return _rd()}
   if(!VIEWP.startsWith('ov:')&&!IDX.has(VIEWP))VIEWP='ov:'+roots()[0].id;
   RV=REVIEW?reviewFind():new Map();renderNav();renderTree();
-  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=N8LAY==='journey'?1:N8LAY==='n8dash'?Math.max(.3,Math.min(1,cv.clientWidth/(LAST.W+60),cv.clientHeight/(LAST.H+60))):Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:(N8LAY==='journey'?cv.clientWidth-LAST.W*VIEW.k-10:10);VIEW.y=10;applyView();NEEDFIT=false}
+  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=N8LAY==='journey'?1:N8LAY==='n8dash'?Math.max(.3,Math.min(1,cv.clientWidth/(LAST.W+60),cv.clientHeight/(LAST.H+60))):Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:(N8LAY==='journey'?cv.clientWidth-LAST.W*VIEW.k-10:10);VIEW.y=Math.max(10,(cv.clientHeight-LAST.H*VIEW.k)/2-40);applyView();NEEDFIT=false}
   try{N8.badges()}catch(e){}}}
 {const _rv=renderVers;renderVers=function(){_rv();$('#vers').append(h('button',{id:'n8mode',class:N8MODE?'on':'',title:'نمایش همهٔ نمودارها افقی، مثل n8n',onclick:()=>{N8MODE=!N8MODE;try{localStorage.setItem('n8mode',N8MODE?'1':'0')}catch(e){}NEEDFIT=true;renderVers();renderDia()}},N8MODE?'⇄ حالت n8n: روشن':'⇄ حالت n8n'),
   h('button',{class:'pri',onclick:()=>{N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderVers();renderDia()}},'⛶ تمام‌صفحه، دقیقاً مثل n8n'),h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['orig','📍 مختصات اصلی n8n (اگر از n8n وارد شده)'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)'],['journey','🧭 نقشهٔ سفر (Journey + Service Blueprint)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
@@ -2916,7 +2920,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.class
   const h1=top.querySelector('h1');h1.insertBefore(h('span',{class:'crumb'},'فلوها / '),h1.firstChild);
   const mk=(lbl,...kids)=>h('details',{class:'n8menu'},h('summary',{},lbl),h('div',{class:'dd'},...kids));
   const fileDocs=h('div',{class:'vers'});
-  const fileM=mk('📁 فایل',h('h4',{},'جدید از قالب'),fileDocs,h('h4',{},'باز کردن و برگرداندن'),$('#load'),h('button',{onclick:()=>importN8n()},'📥 باز کردن ورک‌فلوی n8n (JSON)'),$('#reset'));
+  const fileM=mk('📁 فایل',h('h4',{},'جدید از قالب'),fileDocs,h('h4',{},'باز کردن و برگرداندن'),$('#load'),h('button',{onclick:()=>importN8n()},'📥 وارد کردن از n8n'),$('#reset'));
   const viewM=mk('👁 نما',vers);
   const undo=$('#undo');undo.textContent='↶';undo.title='برگشت (Ctrl+Z)';
   const save=h('button',{class:'save',title:'متن کامل .c4 را در زبانهٔ خروجی ببین و کپی کن',onclick:()=>{TAB='out';showTab()}},'ذخیره (.c4)');
@@ -2995,7 +2999,7 @@ function proNode(){const I=$('#insp');const P=[...I.querySelectorAll(':scope > .
 /* نوار ابزار شناور گوشهٔ بوم مثل n8n / Miro: دکمه‌های سطح و چیدمان از بالای نقشه به یک قرص کوچک آیکنی منتقل می‌شوند */
 {const _rn=renderNav;renderNav=function(){_rn();const nav=$('#nav'),cv=$('#cv');if(!nav||!cv)return;cv.querySelector('.cvbar')?.remove();
   const IC=[[/^بستن همه/,'⊟'],[/یک سطح بازتر/,'＋'],[/یک سطح بسته/,'－'],[/^باز کردن همه/,'⊞'],[/ترتیب خودکار/,'↧'],[/جمع کردن کل/,'⇱'],[/سطح بالاتر/,'↑'],[/سطح پایین/,'↓'],[/باز کردن این/,'⊕'],[/نمایش این/,'⌖']];
-  const bs=[...nav.querySelectorAll(':scope > button.sm')];if(!bs.length)return;
+  const bs=[...nav.querySelectorAll(':scope > button.sm')];if(bs.length<2)return;
   const bar=h('div',{class:'cvbar'});let grp=0;
   bs.forEach((b,i)=>{const t=b.textContent.trim().replace(/^[^\p{L}]+/u,''),m=IC.find(([r])=>r.test(t));
     if(i&&/سطح بالاتر|ترتیب خودکار/.test(t))bar.append(h('span',{class:'sep'}));
