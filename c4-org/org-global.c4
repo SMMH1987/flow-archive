@@ -1,0 +1,468 @@
+// چارت سازمانی جهانی + لایهٔ مکانی ایران — یک مدل واحد (SSOT) — 2026-11-13
+// منابع (از حافظه، نیاز به بررسی): APQC PCF Cross-Industry v7.x (۱۳ دسته)، Porter Value Chain 1985، COSO ERM 2017، ISO 37000/31000/27001/9001، ITIL 4، SCOR
+// لایهٔ ایران = همان مدل + عناصر با تگ #loc_ir؛ هیچ بخشی کپی نشده. انتخاب لایه: org-global.rules.yaml
+// رنگ: ask نارنجی · auto سبز · gate قرمز. هر قدم external: yes|no|? صریح دارد. محتوای حقوقی ایران: تأییدنشده → پروژهٔ حق‌پرس
+
+specification {
+  element orgBox { style { color slate } }
+  element dept { style { color muted } }
+  element askStep { notation "after: ask" style { color amber } }
+  element autoStep { notation "after: auto" style { color green } }
+  element gateStep { notation "after: gate — پول/حقوقی/انتشار/غیرقابل‌برگشت" style { color red } }
+  tag loc_global
+  tag loc_ir
+  tag unverified
+  tag primary
+  tag support
+}
+
+model {
+  org = orgBox 'سازمان (نسخهٔ جهانی)' {
+    description 'سلسله‌مراتب: بخش → واحد. اولیه = زنجیرهٔ ارزش اصلی، پشتیبان = بقیه'
+    strategy = dept '۱. راهبرد و حاکمیت' {
+      #loc_global #support
+      technology 'APQC 1.0 + ISO 37000'
+      board = gateStep 'هیئت‌مدیره و کمیته‌ها' { #loc_global
+        description 'تصویب راهبرد، نظارت، کمیتهٔ حسابرسی و ریسک'
+        metadata { external '?' }
+      }
+      ceo = autoStep 'مدیرعامل / دفتر مدیرعامل' { #loc_global
+        description 'اجرای راهبرد، هماهنگی بخش‌ها'
+        metadata { external 'no' }
+      }
+      strategy_pmo = askStep 'برنامه‌ریزی راهبردی و PMO' { #loc_global
+        description 'OKR، بودجهٔ سالانه، سبد پروژه'
+        metadata { external 'no' }
+      }
+      corpdev = gateStep 'توسعهٔ کسب‌وکار و M&A' { #loc_global
+        description 'ادغام، خرید، سرمایه‌گذاری'
+        metadata { external '?' }
+      }
+    }
+    rnd = dept '۲. تحقیق و توسعه / محصول' {
+      #loc_global #primary
+      technology 'APQC 2.0 + Porter (Technology Dev.)'
+      product = askStep 'مدیریت محصول' { #loc_global
+        description 'نقشهٔ راه، نیازسنجی'
+        metadata { external 'no' }
+      }
+      research = askStep 'تحقیق و نوآوری' { #loc_global
+        description 'نمونه‌سازی، IP'
+        metadata { external 'no' }
+      }
+      design = autoStep 'طراحی (UX/صنعتی)' { #loc_global
+        description 'تجربهٔ کاربر'
+        metadata { external 'no' }
+      }
+      engineering = autoStep 'مهندسی / توسعهٔ نرم‌افزار' { #loc_global
+        description 'ساخت و تست'
+        metadata { external 'no' }
+      }
+    }
+    marketing = dept '۳. بازاریابی' {
+      #loc_global #primary
+      technology 'APQC 3.0 + Porter (Marketing & Sales)'
+      brand = gateStep 'برند و ارتباطات' { #loc_global
+        description 'هویت، روابط عمومی'
+        metadata { external 'yes' }
+      }
+      growth = gateStep 'بازاریابی دیجیتال و رشد' { #loc_global
+        description 'سئو، تبلیغات، کمپین'
+        metadata { external 'yes' }
+      }
+      market_research = autoStep 'تحقیقات بازار' { #loc_global
+        description 'رقبا، مشتری'
+        metadata { external 'no' }
+      }
+      pricing = gateStep 'قیمت‌گذاری' { #loc_global
+        description 'مدل درآمد، تخفیف'
+        metadata { external 'yes' }
+      }
+    }
+    sales = dept '۴. فروش' {
+      #loc_global #primary
+      technology 'APQC 3.0 + Porter'
+      bizdev = gateStep 'توسعهٔ فروش / B2B' { #loc_global
+        description 'قرارداد مشتری'
+        metadata { external 'yes' }
+      }
+      salesops = autoStep 'عملیات فروش و CRM' { #loc_global
+        description 'قیف فروش، پیش‌بینی'
+        metadata { external 'no' }
+      }
+      channel = gateStep 'کانال و شرکا' { #loc_global
+        description 'نمایندگی، همکاری'
+        metadata { external 'yes' }
+      }
+    }
+    ops = dept '۵. عملیات و زنجیره تأمین' {
+      #loc_global #primary
+      technology 'APQC 4.0 + SCOR + Porter (Inbound/Ops/Outbound)'
+      procurement = gateStep 'خرید و تدارکات' { #loc_global
+        description 'انتخاب تأمین‌کننده، سفارش'
+        metadata { external 'yes' }
+      }
+      production = autoStep 'تولید / ارائهٔ خدمت' { #loc_global
+        description 'اجرای کار اصلی'
+        metadata { external 'no' }
+      }
+      logistics = autoStep 'انبار و لجستیک' { #loc_global
+        description 'حمل، موجودی'
+        metadata { external 'no' }
+      }
+      quality = askStep 'کنترل کیفیت' { #loc_global
+        description 'ISO 9001'
+        metadata { external 'no' }
+      }
+    }
+    service = dept '۶. خدمات مشتری' {
+      #loc_global #primary
+      technology 'APQC 5.0–6.0 + Porter (Service)'
+      support = autoStep 'پشتیبانی و تیکت' { #loc_global
+        description 'پاسخ به مشتری'
+        metadata { external 'no' }
+      }
+      success = askStep 'موفقیت مشتری' { #loc_global
+        description 'نگهداشت، تمدید'
+        metadata { external 'no' }
+      }
+      complaints = gateStep 'رسیدگی به شکایات' { #loc_global
+        description 'ISO 10002'
+        metadata { external 'yes' }
+      }
+    }
+    hr = dept '۷. منابع انسانی' {
+      #loc_global #support
+      technology 'APQC 7.0 + Porter (HR Mgmt)'
+      recruit = gateStep 'جذب و استخدام' { #loc_global
+        description '→ recruitment.c4'
+        metadata { external 'yes' }
+      }
+      onboarding = autoStep 'ورود و آموزش' { #loc_global
+        description 'L&D'
+        metadata { external 'no' }
+      }
+      comp = gateStep 'حقوق، مزایا و پرداخت' { #loc_global
+        description 'payroll'
+        metadata { external 'yes' }
+      }
+      perf = askStep 'ارزیابی عملکرد' { #loc_global
+        description 'بازخورد، ارتقا'
+        metadata { external 'no' }
+      }
+      employee_rel = askStep 'روابط کار و فرهنگ' { #loc_global
+        description 'انضباط، رضایت'
+        metadata { external 'no' }
+      }
+      offboarding = gateStep 'خروج کارکنان' { #loc_global
+        description 'تسویه'
+        metadata { external 'yes' }
+      }
+    }
+    tech = dept '۸. فناوری اطلاعات' {
+      #loc_global #support
+      technology 'APQC 8.0 + ITIL 4'
+      infra = autoStep 'زیرساخت و ابر' { #loc_global
+        description 'شبکه، سرور'
+        metadata { external 'no' }
+      }
+      apps = autoStep 'سامانه‌های داخلی (ERP/CRM)' { #loc_global
+        description 'انتخاب و نگهداری'
+        metadata { external 'no' }
+      }
+      data = autoStep 'داده و هوش تجاری' { #loc_global
+        description 'گزارش، داشبورد'
+        metadata { external 'no' }
+      }
+      helpdesk = autoStep 'میز خدمت IT' { #loc_global
+        description 'پشتیبانی کارکنان'
+        metadata { external 'no' }
+      }
+    }
+    finance = dept '۹. مالی و حسابداری' {
+      #loc_global #support
+      technology 'APQC 9.0 + IFRS'
+      accounting = autoStep 'حسابداری عمومی' { #loc_global
+        description 'دفاتر، بستن ماه'
+        metadata { external 'no' }
+      }
+      ap_ar = gateStep 'پرداختنی / دریافتنی' { #loc_global
+        description 'فاکتور، وصول'
+        metadata { external 'yes' }
+      }
+      treasury = gateStep 'خزانه‌داری' { #loc_global
+        description 'نقدینگی، بانک'
+        metadata { external 'yes' }
+      }
+      fpa = askStep 'بودجه و تحلیل مالی (FP&A)' { #loc_global
+        description 'پیش‌بینی'
+        metadata { external 'no' }
+      }
+      tax = gateStep 'مالیات' { #loc_global
+        description 'اظهارنامه، برنامه‌ریزی مالیاتی'
+        metadata { external 'yes' }
+      }
+      audit_int = askStep 'حسابرسی داخلی' { #loc_global
+        description 'COSO'
+        metadata { external 'no' }
+      }
+      investor_rel = gateStep 'روابط سرمایه‌گذار' { #loc_global
+        description 'گزارش به سهام‌دار'
+        metadata { external 'yes' }
+      }
+    }
+    assets = dept '۱۰. دارایی و امکانات' {
+      #loc_global #support
+      technology 'APQC 10.0'
+      facilities = gateStep 'ساختمان و امکانات' { #loc_global
+        description 'اجاره، نگهداری'
+        metadata { external 'yes' }
+      }
+      fixed_assets = autoStep 'دارایی ثابت' { #loc_global
+        description 'ثبت، استهلاک'
+        metadata { external 'no' }
+      }
+    }
+    risk = dept '۱۱. ریسک، انطباق و امنیت' {
+      #loc_global #support
+      technology 'APQC 11.0 + COSO ERM + ISO 31000/27001'
+      erm = askStep 'مدیریت ریسک سازمانی' { #loc_global
+        description 'ثبت ریسک'
+        metadata { external 'no' }
+      }
+      compliance = askStep 'انطباق و اخلاق' { #loc_global
+        description 'کدهای رفتاری'
+        metadata { external 'no' }
+      }
+      infosec = gateStep 'امنیت اطلاعات' { #loc_global
+        description 'ISO 27001'
+        metadata { external 'yes' }
+      }
+      privacy = gateStep 'حریم خصوصی داده' { #loc_global
+        description 'GDPR-style'
+        metadata { external 'yes' }
+      }
+      bcp = askStep 'تداوم کسب‌وکار' { #loc_global
+        description 'ISO 22301'
+        metadata { external 'no' }
+      }
+      hse = askStep 'ایمنی، بهداشت، محیط زیست' { #loc_global
+        description 'ISO 45001/14001'
+        metadata { external 'no' }
+      }
+    }
+    legal = dept '۱۲. حقوقی و روابط خارجی' {
+      #loc_global #support
+      technology 'APQC 12.0'
+      contracts = gateStep 'قراردادها' { #loc_global
+        description 'تنظیم و بازبینی'
+        metadata { external 'yes' }
+      }
+      corp_legal = gateStep 'امور شرکتی و ثبت' { #loc_global
+        description 'صورت‌جلسات'
+        metadata { external 'yes' }
+      }
+      ip = gateStep 'مالکیت فکری' { #loc_global
+        description 'علامت تجاری، پتنت'
+        metadata { external 'yes' }
+      }
+      litigation = gateStep 'دعاوی' { #loc_global
+        description 'وکالت'
+        metadata { external 'yes' }
+      }
+      gov_rel = gateStep 'روابط با دولت و نهادها' { #loc_global
+        description 'مجوزها'
+        metadata { external 'yes' }
+      }
+      csr = gateStep 'مسئولیت اجتماعی / ESG' { #loc_global
+        description 'گزارش پایداری'
+        metadata { external 'yes' }
+      }
+    }
+    capability = dept '۱۳. توانمندی و بهبود سازمان' {
+      #loc_global #support
+      technology 'APQC 13.0 + Lean/ISO 9001'
+      process = autoStep 'مدیریت فرایند (BPM)' { #loc_global
+        description 'این مخزن: .c4'
+        metadata { external 'no' }
+      }
+      knowledge = autoStep 'مدیریت دانش' { #loc_global
+        description 'مستندسازی'
+        metadata { external 'no' }
+      }
+      change = askStep 'مدیریت تغییر' { #loc_global
+        description 'ADKAR'
+        metadata { external 'no' }
+      }
+    }
+  }
+
+  // ===== لایهٔ ایران (overlay): همان بخش‌ها گسترش می‌یابند =====
+  extend org.finance {
+    ir_tax_portal = gateStep '🇮🇷 سامانهٔ مؤدیان و صورتحساب الکترونیک' { #loc_ir #unverified
+      description 'ارسال فاکتور به سامانهٔ مؤدیان — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.finance {
+    ir_vat = gateStep '🇮🇷 ارزش افزوده (فصلی)' { #loc_ir #unverified
+      description 'اظهارنامهٔ VAT — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.finance {
+    ir_seasonal = gateStep '🇮🇷 گزارش معاملات فصلی' { #loc_ir #unverified
+      description 'ماده ۱۶۹ — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.finance {
+    ir_statutory_audit = gateStep '🇮🇷 حسابرس مستقل و بازرس قانونی' { #loc_ir #unverified
+      description 'عضو جامعهٔ حسابداران رسمی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.finance {
+    ir_banking = gateStep '🇮🇷 بانک، چک صیادی، ارز' { #loc_ir #unverified
+      description 'نقدینگی و محدودیت ارزی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.hr {
+    ir_tamin = gateStep '🇮🇷 بیمهٔ تأمین اجتماعی' { #loc_ir #unverified
+      description 'لیست ماهانهٔ بیمه — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.hr {
+    ir_labor_law = gateStep '🇮🇷 قانون کار و قرارداد کار' { #loc_ir #unverified
+      description 'فرم قرارداد، تسویه — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.hr {
+    ir_payroll_tax = gateStep '🇮🇷 مالیات حقوق' { #loc_ir #unverified
+      description 'فهرست ماهانه — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.hr {
+    ir_military = askStep '🇮🇷 وضعیت نظام‌وظیفه کارکنان' { #loc_ir #unverified
+      description 'بررسی مدارک — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external '?' }
+    }
+  }
+  extend org.legal {
+    ir_registration = gateStep '🇮🇷 ثبت شرکت (ایران‌من / ثبت شرکت‌ها)' { #loc_ir #unverified
+      description 'آگهی روزنامهٔ رسمی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.legal {
+    ir_enamad = gateStep '🇮🇷 اینماد و مجوزهای کسب‌وکار (درگاه مجوزها)' { #loc_ir #unverified
+      description 'مجوز فعالیت — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.legal {
+    ir_trademark = gateStep '🇮🇷 علامت تجاری ایران' { #loc_ir #unverified
+      description 'اظهارنامه — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.legal {
+    ir_knowledge_based = gateStep '🇮🇷 دانش‌بنیان / پارک علم و فناوری' { #loc_ir #unverified
+      description 'ارزیابی معاونت علمی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.legal {
+    ir_chamber = gateStep '🇮🇷 کارت بازرگانی / اتاق اصناف' { #loc_ir #unverified
+      description 'واردات/صادرات — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.tech {
+    ir_data_localization = gateStep '🇮🇷 میزبانی داخلی و دامنهٔ .ir' { #loc_ir #unverified
+      description 'ثبت دامنه، هاست — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.tech {
+    ir_sanctions_tools = askStep '🇮🇷 جایگزین ابزارهای تحریمی' { #loc_ir #unverified
+      description 'فهرست ابزار مجاز — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'no' }
+    }
+  }
+  extend org.risk {
+    ir_sanctions = askStep '🇮🇷 ریسک تحریم و ارز' { #loc_ir #unverified
+      description 'ارزیابی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'no' }
+    }
+  }
+  extend org.risk {
+    ir_fata = gateStep '🇮🇷 امنیت سایبری / الزامات افتا' { #loc_ir #unverified
+      description 'ارزیابی امنیتی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external '?' }
+    }
+  }
+  extend org.ops {
+    ir_standards = gateStep '🇮🇷 استاندارد ملی و نشان استاندارد' { #loc_ir #unverified
+      description 'مجوز کالا — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.ops {
+    ir_customs = gateStep '🇮🇷 گمرک و ثبت‌سفارش (سامانهٔ جامع تجارت)' { #loc_ir #unverified
+      description 'کوتاژ — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.marketing {
+    ir_ad_rules = gateStep '🇮🇷 مقررات تبلیغات و پیامک' { #loc_ir #unverified
+      description 'تأیید محتوا — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+
+  // جریان کار اصلی (زنجیرهٔ ارزش پورتر)
+  org.strategy -> org.rnd 'راهبرد → محصول'
+  org.rnd -> org.marketing 'محصول آماده'
+  org.marketing -> org.sales 'سرنخ'
+  org.sales -> org.ops 'سفارش'
+  org.ops -> org.service 'تحویل'
+  org.service -> org.rnd 'بازخورد'
+  org.sales -> org.finance 'فاکتور'
+  org.hr -> org.ops 'نیرو'
+  org.finance -> org.strategy 'گزارش مالی'
+  org.risk -> org.strategy 'گزارش ریسک'
+  org.legal -> org.sales 'قرارداد'
+  org.tech -> org.capability 'داده و ابزار'
+}
+
+views {
+  view world of org {
+    title 'چارت جهانی (بدون ماژول‌های ایران)'
+    include *
+    exclude element.tag = #loc_ir
+    autoLayout TopBottom
+  }
+  view iran_layer of org {
+    title 'چارت ایران = جهانی + ماژول‌های ایران'
+    include *
+    autoLayout TopBottom
+  }
+  view strategy_detail of org.strategy { title '۱. راهبرد و حاکمیت' include * autoLayout TopBottom }
+  view rnd_detail of org.rnd { title '۲. تحقیق و توسعه / محصول' include * autoLayout TopBottom }
+  view marketing_detail of org.marketing { title '۳. بازاریابی' include * autoLayout TopBottom }
+  view sales_detail of org.sales { title '۴. فروش' include * autoLayout TopBottom }
+  view ops_detail of org.ops { title '۵. عملیات و زنجیره تأمین' include * autoLayout TopBottom }
+  view service_detail of org.service { title '۶. خدمات مشتری' include * autoLayout TopBottom }
+  view hr_detail of org.hr { title '۷. منابع انسانی' include * autoLayout TopBottom }
+  view it_detail of org.tech { title '۸. فناوری اطلاعات' include * autoLayout TopBottom }
+  view finance_detail of org.finance { title '۹. مالی و حسابداری' include * autoLayout TopBottom }
+  view assets_detail of org.assets { title '۱۰. دارایی و امکانات' include * autoLayout TopBottom }
+  view risk_detail of org.risk { title '۱۱. ریسک، انطباق و امنیت' include * autoLayout TopBottom }
+  view legal_detail of org.legal { title '۱۲. حقوقی و روابط خارجی' include * autoLayout TopBottom }
+  view capability_detail of org.capability { title '۱۳. توانمندی و بهبود سازمان' include * autoLayout TopBottom }
+}
