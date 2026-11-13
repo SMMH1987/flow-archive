@@ -320,6 +320,25 @@ body.n8on .cvhint{display:none!important}
 .vmi .vck{width:14px;color:#ea4b71;font-weight:800}
 .n8menu .dd button.vdots{display:flex;align-items:center;gap:8px;color:var(--mute);border:0;background:none;padding:6px 10px;border-radius:8px}.vdots span:first-child{font-size:18px;line-height:1;width:34px;text-align:center}.vdots small{margin-inline-start:auto;font-size:10.5px;border:1px solid var(--line);border-radius:10px;padding:0 6px}.n8menu .dd button.vdots:hover,.n8menu .dd button.vdots.on{background:var(--lane);color:var(--ink)}.vsep{border:0;border-top:1px solid var(--line);margin:6px 0}.vmore[hidden]{display:none}
 .n8menu .dd button.vmi.on{background:var(--lane)!important;color:var(--ink)!important;border:0}.vmi.on .vic{border-color:#ea4b71}
+
+/* Figma/n8n-style side panels */
+#insp .itabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:0 -4px 6px;position:sticky;top:46px;background:var(--bg);z-index:2}
+#insp .itabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;border-radius:0;padding:9px 4px;font-size:12.5px;color:var(--mute);font-weight:600}
+#insp .itabs button.on{color:var(--ink);border-bottom-color:#ea4b71}#insp .itabs small{margin-inline-start:4px;font-size:10px;background:var(--lane);border-radius:8px;padding:0 5px}
+#insp .panel[hidden]{display:none!important}
+#insp .panel.acc{background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;margin:0;padding:4px 4px 10px}
+#insp .acch{display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 4px;font-size:12.5px;font-weight:700;color:var(--ink);user-select:none}
+#insp .acch:hover{color:#ea4b71}#insp .acch .at{flex:1}
+#insp .acch .chev{display:inline-block;transform:rotate(90deg);transition:transform .15s;color:var(--mute);font-size:15px}
+#insp .panel.shut .acch .chev{transform:rotate(180deg)}
+#insp .panel.shut > :not(.acch){display:none!important}
+#insp .qm{width:20px;height:20px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--mute);font-size:11px;padding:0;line-height:1}
+#insp .acchelp{display:block;background:var(--lane);border-radius:8px;padding:8px 10px;margin:0 0 8px;font-size:11.5px;line-height:1.7}
+#insp .acchelp[hidden]{display:none}
+#tree .trq{width:calc(100% - 16px);margin:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--lane);font:inherit;font-size:12.5px;color:var(--ink)}
+#tree .tr{border-radius:6px;padding:5px 8px;margin:1px 6px;font-size:12.5px;cursor:pointer}#tree .tr:hover{background:var(--lane)}
+#tree .tr.cur{background:color-mix(in srgb,#ea4b71 12%,transparent);color:#ea4b71;font-weight:700}
+#tree .tr[hidden]{display:none}
 </style>
 <div id="app">
   <div class="top">
@@ -2922,6 +2941,34 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.class
   const dots=h('button',{class:'vdots',title:'گزینه‌های قدیمی',onclick:e=>{e.stopPropagation();window.__vmoreOpen=box.hidden;box.hidden=!box.hidden;dots.classList.toggle('on',!box.hidden)}},h('span',{},'⋯'),h('span',{},'گزینه‌های قدیمی'),h('small',{},toFa(more.length)));
   if(!box.hidden)dots.classList.add('on');
   V.append(h('hr',{class:'vsep'}),dots,box)}}
+
+/* پنل‌های کناری به سبک Figma / n8n NDV: بخش‌های تاشو، راهنما پشت «؟»، جست‌وجو در فهرست؛ بدون تغییر در منطق */
+window.__acc=window.__acc||(()=>{try{return JSON.parse(localStorage.getItem('acc')||'{}')}catch(e){return{}}})();
+const accSave=()=>{try{localStorage.setItem('acc',JSON.stringify(__acc))}catch(e){}};
+function proPanels(){const I=$('#insp');if(!I)return;let first=true;
+  I.querySelectorAll(':scope > .panel').forEach(P=>{const H=P.querySelector(':scope > h2');if(!H||P.classList.contains('acc'))return;
+    P.classList.add('acc');const key=H.textContent.replace(/[·\d۰-۹]+.*$/,'').trim();
+    const open=key in __acc?__acc[key]:first;first=false;P.classList.toggle('shut',!open);
+    const help=P.querySelector(':scope > small');
+    const head=h('div',{class:'acch'},h('span',{class:'chev'},'›'),h('span',{class:'at'},H.textContent));
+    if(help){help.classList.add('acchelp');help.hidden=true;head.append(h('button',{class:'qm',title:'راهنما',onclick:e=>{e.stopPropagation();help.hidden=!help.hidden}},'؟'))}
+    head.addEventListener('click',()=>{const sh=!P.classList.toggle('shut');__acc[key]=sh;accSave()});
+    H.replaceWith(head)})}
+function proTree(){const T=$('#tree');if(!T||T.querySelector('.trq'))return;
+  T.querySelector(':scope > h2')?.remove();
+  const q=h('input',{class:'trq',placeholder:'جست‌وجوی بخش…',oninput:()=>{const v=q.value.trim();T.querySelectorAll('.tr').forEach(r=>r.hidden=!!v&&!r.textContent.includes(v))}});
+  T.querySelector('.pnlh')?.after(q)}
+// تب‌های معنایی مثل پنل راست Figma (Design / Prototype / Inspect) و n8n (Parameters / Settings)
+window.__itab=window.__itab||'all';
+function proTabs(){const I=$('#insp');if(!I)return;const ps=[...I.querySelectorAll(':scope > .panel')];
+  const cat=P=>{const t=(P.querySelector('.acch .at')||P).textContent;return /گزارش|بازبینی|هشدار/.test(t)?'check':/طراح|تمپلیت/.test(t)?'build':/راهنما/.test(t)?'help':'detail'};
+  const T=[['detail','جزئیات'],['check','بررسی'],['build','ساخت'],['help','راهنما']].filter(([k])=>ps.some(P=>cat(P)===k));
+  if(T.length<2)return;if(!T.some(([k])=>k===__itab))__itab=T[0][0];
+  const bar=h('div',{class:'itabs',role:'tablist'},...T.map(([k,l])=>{const n=ps.filter(P=>cat(P)===k).length;return h('button',{role:'tab',class:k===__itab?'on':'',onclick:()=>{__itab=k;renderInsp()}},l,n>1?h('small',{},toFa(n)):null)}));
+  ps.forEach(P=>{P.hidden=cat(P)!==__itab;if(!P.hidden&&P.classList.contains('shut')&&ps.filter(x=>cat(x)===__itab).length===1)P.classList.remove('shut')});
+  (I.querySelector('.pnlh')||I.firstChild)?.after(bar)}
+{const _ri3=renderInsp;renderInsp=function(){_ri3();proPanels();proTabs()}}
+{const _rt3=renderTree;renderTree=function(){_rt3();proTree()}}
 
 /* ───────── شروع ───────── */
 (function init(){
