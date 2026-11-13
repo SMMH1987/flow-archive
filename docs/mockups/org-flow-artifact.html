@@ -66,7 +66,8 @@ input[type=checkbox],input[type=radio]{width:auto}
 .node.routeStep.sel{filter:drop-shadow(0 0 4px var(--acc))}
 .nb{display:inline-block;font-size:10px;border:1px solid var(--line);border-radius:8px;padding:0 5px;margin-inline-end:3px;background:var(--card);color:var(--mute)}
 .nb.red{background:var(--gate);border-color:var(--gate);color:var(--card)}
-.cvtools{position:absolute;top:8px;left:8px;z-index:5;display:flex;gap:4px;flex-direction:column;direction:rtl}
+.cvtools{position:absolute;bottom:10px;left:10px;z-index:5;display:flex;gap:2px;flex-direction:row;direction:ltr;background:var(--card,#fff);border:1px solid var(--line);border-radius:10px;padding:3px;box-shadow:0 4px 14px #0001}
+.cvtools button{min-width:38px;height:36px;padding:0 8px;font-size:16px;border:0!important;background:none!important;border-radius:7px;box-shadow:none!important}.cvtools button:hover{background:var(--lane)!important}
 .cvhint{position:absolute;bottom:8px;right:10px;font-size:12px;color:var(--mute);pointer-events:none;direction:rtl;background:var(--bg);border-radius:8px;padding:0 8px;max-width:calc(100% - 80px)}
 .side{position:sticky;top:8px;display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 30px);overflow:auto}
 @media(max-width:960px){.side{position:static;max-height:none}#cv{height:70vh}}
@@ -117,6 +118,9 @@ pre{direction:ltr;text-align:left;max-height:60vh;overflow:auto;background:var(-
 .node[style*='height:36px'] .ns,.node[style*='height:28px'] .ns{display:none}.node[style*='height:36px'] .nt,.node[style*='height:28px'] .nt{font-size:11.5px;-webkit-line-clamp:1}.node[style*='height:36px'],.node[style*='height:28px']{padding:1px 8px}.node.routeStep[style*='height:36px']{padding:1px 18px}
 .vers{display:flex;gap:4px;flex-wrap:wrap}.vers button.on{background:var(--ask);border-color:var(--ask);color:var(--card);font-weight:600}
 #p-dia.v3{grid-template-columns:230px minmax(0,1fr) 340px}
+body:not(.n8on).treehide #p-dia #tree{display:none!important}body:not(.n8on).insphide #p-dia #insp{display:none!important}
+body:not(.n8on).treehide #p-dia.v3{grid-template-columns:minmax(0,1fr) 340px}body:not(.n8on).insphide #p-dia.v3{grid-template-columns:230px minmax(0,1fr)}body:not(.n8on).treehide.insphide #p-dia.v3{grid-template-columns:minmax(0,1fr)}
+body:not(.n8on).insphide #p-dia:not(.v3){grid-template-columns:minmax(0,1fr)!important}
 @media(max-width:1200px){#p-dia.v3{grid-template-columns:minmax(0,1fr) 340px}#p-dia.v3 #tree{grid-column:1/-1;max-height:200px}}
 @media(max-width:960px){#p-dia.v3{grid-template-columns:minmax(0,1fr)}}
 .fh{display:flex;align-items:center;gap:8px}.fh .ft{cursor:pointer;flex:1}.fh .ft:hover{text-decoration:underline}.lanebox.foc{outline:3px solid var(--acc);outline-offset:2px}.node.foc{outline:3px solid var(--acc);outline-offset:2px}.crumbs{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}
@@ -181,7 +185,7 @@ button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover
 .n8b{position:absolute;top:-12px;left:calc(50% - 14px);min-width:28px;height:24px;box-shadow:0 0 0 2px #fff;font-weight:700;min-width:20px;height:20px;border-radius:10px;color:#fff;font-size:11px;display:grid;place-items:center;padding:0 4px;z-index:4}
 .n8b.ok{background:#16a34a}.n8b.err{background:#dc2626}.n8b.wait{background:#ea580c}.n8b.skip{background:#888}
 .node.n8step{box-shadow:0 0 0 4px #ea4b71!important}
-#n8mini{position:absolute;left:10px;bottom:10px;width:170px;height:110px;background:rgba(127,127,127,.12);border:1px solid #9995;border-radius:6px;overflow:hidden;z-index:5;pointer-events:none}
+#n8mini{position:absolute;right:10px;bottom:10px;width:170px;height:110px;background:rgba(127,127,127,.12);border:1px solid #9995;border-radius:6px;overflow:hidden;z-index:5;pointer-events:none}
 #n8mini i{position:absolute;background:#6b7280;border-radius:1px}#n8mini i.ok{background:#16a34a}#n8mini i.err{background:#dc2626}#n8mini i.wait{background:#ea580c}
 #n8mini b{position:absolute;border:1.5px solid #ea4b71}
 .n8t{width:100%;border-collapse:collapse;font-size:.85rem}.n8t td,.n8t th{border-bottom:1px solid #9994;padding:4px 6px;text-align:right}
@@ -321,11 +325,21 @@ body.n8on .cvhint{display:none!important}
 .n8menu .dd button.vdots{display:flex;align-items:center;gap:8px;color:var(--mute);border:0;background:none;padding:6px 10px;border-radius:8px}.vdots span:first-child{font-size:18px;line-height:1;width:34px;text-align:center}.vdots small{margin-inline-start:auto;font-size:10.5px;border:1px solid var(--line);border-radius:10px;padding:0 6px}.n8menu .dd button.vdots:hover,.n8menu .dd button.vdots.on{background:var(--lane);color:var(--ink)}.vsep{border:0;border-top:1px solid var(--line);margin:6px 0}.vmore[hidden]{display:none}
 .n8menu .dd button.vmi.on{background:var(--lane)!important;color:var(--ink)!important;border:0}.vmi.on .vic{border-color:#ea4b71}
 
+/* floating canvas toolbar */
+#cv .cvbar{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:2px;background:var(--card,#fff);border:1px solid var(--line);border-radius:10px;padding:3px;box-shadow:0 4px 14px #0001}
+#cv .cvbar button{width:38px;height:36px;padding:0;border:0;background:none;border-radius:8px;font-size:18px;color:var(--ink);position:relative}
+#cv .cvbar button:hover:not(:disabled){background:var(--lane)}#cv .cvbar button:disabled{opacity:.35}
+#cv .cvbar button:hover::after{content:attr(data-tip);position:absolute;top:34px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#222;color:#fff;font-size:11px;padding:3px 7px;border-radius:5px;pointer-events:none}
+#cv .cvbar .sep{width:1px;height:18px;background:var(--line);margin:0 3px}
 /* Figma/n8n-style side panels */
 #insp .itabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:0 -4px 6px;position:sticky;top:46px;background:var(--bg);z-index:2}
 #insp .itabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;border-radius:0;padding:9px 4px;font-size:12.5px;color:var(--mute);font-weight:600}
 #insp .itabs button.on{color:var(--ink);border-bottom-color:#ea4b71}#insp .itabs small{margin-inline-start:4px;font-size:10px;background:var(--lane);border-radius:8px;padding:0 5px}
 #insp .panel[hidden]{display:none!important}
+#insp .acch .hic{background:none;border:1px solid transparent;border-radius:6px;padding:2px 7px;font-size:14px;color:var(--mute)}#insp .acch .hic:hover{border-color:var(--line);color:var(--ink)}
+#insp .hmenu{display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:8px;padding:4px;margin:0 0 8px;background:var(--card,#fff);box-shadow:0 8px 20px #0002}#insp .hmenu[hidden]{display:none}
+#insp .hmenu button{text-align:right;background:none;border:0;padding:6px 8px;border-radius:6px}#insp .hmenu button:hover{background:var(--lane)}
+#insp details.adv{margin:6px 0;border-top:1px dashed var(--line);padding-top:6px}#insp details.adv summary{cursor:pointer;font-size:12px;color:var(--mute)}
 #insp .panel.acc{background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;margin:0;padding:4px 4px 10px}
 #insp .acch{display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 4px;font-size:12.5px;font-weight:700;color:var(--ink);user-select:none}
 #insp .acch:hover{color:#ea4b71}#insp .acch .at{flex:1}
@@ -346,7 +360,7 @@ body.n8on .cvhint{display:none!important}
     <nav class="tabs" id="tabs"></nav>
     <span class="vers" id="vers"></span>
     <button id="undo" title="برگشت (Ctrl+Z)">↶ برگشت</button>
-    <button id="load">بارگذاری .c4</button>
+    <button id="load">بارگذاری فایل <span class="ltr">.c4</span></button>
     <button id="reset">بازنشانی به نمونه</button>
     <input type="file" id="file" accept=".c4,.txt,text/plain" hidden>
   </div>
@@ -1075,7 +1089,7 @@ function emitC4(M){
   return pre+'model {\n'+lines.join('\n')+'\n}'+M.mid+viewsAdjust(M.views,idx,M)}
 
 /* ───────── حالت برنامه ───────── */
-const KEY=()=>(typeof DOC==='undefined'?'orgStudio.v1':({startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1'}[DOC]));
+const KEY=()=>(typeof DOC==='undefined'?'orgStudio.v1':({startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1',n8n:'orgStudio.n8n1'}[DOC]));
 const BASE=document.getElementById('base-c4').textContent;
 let M,BASEPARSE,BASETEXT,IDX=new Map(),SEL=null,TAB='dia',HIST=[],G={};
 const defaultG=()=>({cats:Object.fromEntries(CATS.map(c=>[c,c!=='read_or_draft'])),expires:24});
@@ -1179,7 +1193,10 @@ function renderNav(){
       h('button',{class:'sm',onclick:()=>go(parentPath(VIEWP).includes('.')?parentPath(VIEWP):'ov:'+parentPath(VIEWP))},'↑ یک سطح بالا'))}}
 function applyView(){$('#world').style.transform=`translate(${VIEW.x}px,${VIEW.y}px) scale(${VIEW.k})`}
 function fit(all){if(!LAST)return;const cv=$('#cv'),w=cv.clientWidth,hh=cv.clientHeight;if(!w)return;
-  const kw=w/(LAST.W+30),k=all===true?Math.min(kw,hh/(LAST.H+30)):all==='ov'?Math.max(Math.min(kw,hh/(LAST.H+30)),.62):Math.min(kw,1.05);VIEW.k=Math.max(.2,k);VIEW.x=(w-LAST.W*VIEW.k)/2;VIEW.y=8;applyView();NEEDFIT=false}
+  const kw=w/(LAST.W+30),k=all===true?Math.min(kw,hh/(LAST.H+30)):all==='ov'?Math.max(Math.min(kw,hh/(LAST.H+30)),.62):Math.min(kw,1.05);VIEW.k=Math.max(.2,k);VIEW.x=(w-LAST.W*VIEW.k)/2;VIEW.y=8;
+  // نقشه‌های افقی پهن: زوم را برای خوانایی پایین‌تر از ۵۵٪ نبر؛ از ابتدای جریان (چپ) شروع کن، مثل n8n
+  if(all!==true&&LAST.W>LAST.H*1.5&&VIEW.k<.55){VIEW.k=Math.max(.55,Math.min(1,hh/(LAST.H+30)));VIEW.x=10;VIEW.y=Math.max(8,(hh-LAST.H*VIEW.k)/2-30)}
+  applyView();NEEDFIT=false}
 const polyD=pts=>pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join('');
 function relStyle(r,i,back,x){
   const e=SELE===i;let col='--e-seq';const fk=(IDX.get(r.from)||{}).kind;
@@ -1606,9 +1623,11 @@ function phaseModel(PH,TITLE){
   m.views='views {\n  view index {\n    title '+q(TITLE)+'\n    include *\n  }\n'+m.nodes.map(n=>'\n  view '+n.id+' of '+n.id+' {\n    title '+q(n.title)+'\n    include *\n  }\n').join('')+'}';
   return m}
 const startupModel=()=>phaseModel(STARTUP,STARTUP_TITLE),studioModel=()=>phaseModel(STUDIO,STUDIO_TITLE);
-const DOCKEY={startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1'},BUILD={startup:startupModel,studio:studioModel};
-let DOC='studio';try{const d=localStorage.getItem('orgStudio.doc2');if(d==='org'||d==='startup')DOC=d}catch(e){}
-const DOCFILE=()=>({startup:'startup-talent.c4',studio:'startup-studio.c4',org:'recruitment.c4'}[DOC]);
+const DOCKEY={startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1',n8n:'orgStudio.n8n1'},BUILD={startup:startupModel,studio:studioModel,n8n:studioModel};
+// مهاجرت: اگر نقشهٔ سازمان قبلاً با ورک‌فلوی n8n بازنویسی شده، آن را به جای جدای خودش ببر و نقشهٔ اصلی را برگردان
+try{const o=localStorage.getItem('orgStudio.v1');if(o&&/n8n_pos/.test(o)&&!localStorage.getItem('orgStudio.n8n1')){localStorage.setItem('orgStudio.n8n1',o);localStorage.removeItem('orgStudio.v1')}}catch(e){}
+let DOC='studio';try{const d=localStorage.getItem('orgStudio.doc2');if(d==='org'||d==='startup'||d==='n8n')DOC=d}catch(e){}
+const DOCFILE=()=>({startup:'startup-talent.c4',studio:'startup-studio.c4',org:'recruitment.c4',n8n:'imported-n8n.c4'}[DOC]);
 function openDoc(d){
   DOC=d;try{localStorage.setItem('orgStudio.doc2',d)}catch(e){}
   let st=null;try{st=JSON.parse(localStorage.getItem(DOCKEY[d]))}catch(e){}
@@ -1618,7 +1637,7 @@ function openDoc(d){
     else if(d==='org')loadText(BASE,true);
     else{M=BUILD[d]();BASETEXT=emitC4(M);BASEPARSE=parseC4(BASETEXT);reindex();deriveG();HIST=[BASETEXT]}
   }catch(e){if(d==='org')loadText(BASE,true);else{M=BUILD[d]();BASETEXT=emitC4(M);BASEPARSE=parseC4(BASETEXT);reindex();deriveG();HIST=[BASETEXT]}}
-  SEL=null;SELE=null;FOC=null;EXP=new Set();MACRO=d!=='org';TAB='dia';NEEDFIT=true;
+  SEL=null;SELE=null;FOC=null;EXP=new Set();MACRO=d!=='org'&&d!=='n8n';TAB='dia';NEEDFIT=true;
   VIEWP='ov:'+roots()[0].id;
   save()}
 function switchDoc(d){if(d===DOC)return;save();openDoc(d);renderVers();showTab();$('#doc-name').textContent=DOCFILE()}
@@ -1896,6 +1915,7 @@ function histPanel(){return h('div',{class:'panel'},h('h2',{},'📜 تاریخچ
 function renderVers(){$('#vers').replaceChildren(
   h('button',{class:DOC==='studio'?'pri':'',title:'سازمان تازه: با دادن ایده یا پروژه و کد، ارزیابی، ساخت، حقوقی، ارزش‌گذاری، سرمایه‌گذار و فروش را پیش می‌برد',onclick:()=>switchDoc('studio')},'🏭 استودیوی استارتاپ‌ساز'),
   h('button',{class:DOC==='startup'?'pri':'',title:'نقشهٔ تازه از صفر: استارتاپ استعدادیابی، غربال، رزومه و استخدام؛ از نام‌گذاری تا تجاری‌سازی',onclick:()=>switchDoc('startup')},'🚀 استارتاپ استعدادیابی'),
+  (()=>{let has=false;try{has=!!localStorage.getItem('orgStudio.n8n1')}catch(e){}return has?h('button',{class:DOC==='n8n'?'pri':'',title:'آخرین ورک‌فلویی که از n8n وارد کردی',onclick:()=>switchDoc('n8n')},'📥 ورک‌فلوی واردشده از n8n'):null})(),
   h('button',{class:DOC==='org'?'pri':'',title:'نقشهٔ قبلی: سازمان اتوماسیون استخدام (recruitment.c4)',onclick:()=>switchDoc('org')},'🏢 نقشهٔ سازمان قبلی'),
 ...VIEW_VERS.map(([v,l,tag,av,tm])=>h('button',{class:VER===v?'on':'',title:tag+' · '+av+' · ساخته‌شده '+APP_DATE+' ساعت '+tm+' UTC',onclick:()=>setVer(v)},'نسخه '+toFa(v)+' · '+l+' ',h('small',{style:'opacity:.75'},av+' · '+APP_DATE))),
   h('button',{class:'sm'+(REVIEW?' pri':''),title:'قسمت‌های اضافه یا تکراری با کادر قرمز مشخص و حذف، ادغام یا ترتیب پیشنهاد می‌شود',onclick:()=>{REVIEW=!REVIEW;NEEDFIT=false;SEL=null;SELE=null;renderVers();renderDia();renderInsp()}},'🔍 بازبینی'+(REVIEW?' · '+toFa(RV.size):'')),
@@ -2211,7 +2231,7 @@ function renderNested(rid){
     while(q){if(q!==p&&parentPath(q)===pp&&IDX.has(q)&&(pp||inChain(IDX.get(q))))break;q=q.includes('.')?q.slice(0,q.lastIndexOf('.')):''}
     if(!q)return null;return document.querySelector(`.node[data-p="${q}"],.lanebox[data-p0="${q}"]`)}
   cv.addEventListener('pointerdown',e=>{
-    if(e.target.closest('.cvtools'))return;
+    if(e.target.closest('.cvtools,.cvbar'))return;
     const gp=e.target.closest('[data-grip]');
     if(gp){const q=gp.getAttribute('data-grip');cv.setPointerCapture(e.pointerId);dnd={id:e.pointerId,p:q,moved:0,x:e.clientX,y:e.clientY,g:null,cand:null,dir:'after'};e.preventDefault();return}
     cv.setPointerCapture(e.pointerId);
@@ -2794,7 +2814,7 @@ function renderN8n(rid){
         lockedN(n)?h('span',{class:'lk'},'🔒'):null,kids?h('span',{class:'ct',title:'قدم‌های داخلی'},toFa(kids)):null,
         st&&st.s==='ok'?h('span',{class:'okc'},'✓'):null),
       xref.get(q)?h('div',{class:'n8x',title:xref.get(q).map(nodeLabel).join('\n')},'↩ برگشت به '+(xref.get(q).length>1?toFa(xref.get(q).length)+' قدم':nodeLabel(xref.get(q)[0]).slice(0,22))):null,
-      h('div',{class:'n8l'},titleName(n)),h('div',{class:'n8k'},(N8KIND[n.kind]||n.kind)+(n.tech&&!/—/.test(n.tech)?' · '+n.tech.replace(/^skill:\s*/,''):''))))});
+      h('div',{class:'n8l'},titleName(n)),h('div',{class:'n8k'},(N8KIND[n.kind]||n.kind)+(n.children&&n.children.length&&!isStep(n)?' · '+toFa(n.children.length)+' قدم':'')+(n.tech&&!/—/.test(n.tech)?' · '+n.tech.replace(/^skill:\s*/,''):''))))});
   // مثل n8n: «+» بعد از آخرین گره‌ها برای افزودن قدم بعدی
   ps.filter(q=>!outs.has(q)&&isStep(IDX.get(q))).forEach(q=>{const b=B.get(q);const pp=parentPath(q);
     world.append(h('button',{class:'n8plus',title:'افزودن قدم بعدی',style:`left:${b.x+75+HB+44}px;top:${b.y+HB-14}px`,onclick:e=>{e.stopPropagation();addChild(pp)}},'+'));
@@ -2818,7 +2838,7 @@ function n8nToC4(wf){
   L.push('  }','}','','views {','  view index {','    include *','  }','  view wf of wf {','    include *','  }','}');
   return spec+'\n\n'+L.join('\n')+'\n'}
 async function importN8n(){const fi=h('input',{type:'file',accept:'.json'});fi.onchange=async()=>{const f=fi.files[0];if(!f)return;
-  try{const wf=JSON.parse(await f.text());G={};loadText(n8nToC4(wf),true);save();N8MODE=true;NEEDFIT=true;TAB='dia';go('ov:wf');refresh()}catch(x){await ask('فایل n8n خوانده نشد: '+x.message,{info:1})}};fi.click()}
+  try{const wf=JSON.parse(await f.text());DOC='n8n';try{localStorage.setItem('orgStudio.doc2','n8n')}catch(e){}G={};loadText(n8nToC4(wf),true);save();N8MODE=true;NEEDFIT=true;TAB='dia';go('ov:wf');refresh()}catch(x){await ask('فایل n8n خوانده نشد: '+x.message,{info:1})}};fi.click()}
 
 /* ───────── نمای «سفر» (Customer Journey Map + Service Blueprint) ─────────
    الگو: NN/g Journey Map (مرحله‌ها × کارها، فکرها، احساس، دردها، فرصت‌ها) و Service Blueprint
@@ -2879,19 +2899,19 @@ function n8dashChrome(on){document.body.classList.toggle('n8full',on);const P=$(
   if(!N8MODE){$('#world').style.direction='';return _rd()}
   if(!VIEWP.startsWith('ov:')&&!IDX.has(VIEWP))VIEWP='ov:'+roots()[0].id;
   RV=REVIEW?reviewFind():new Map();renderNav();renderTree();
-  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=N8LAY==='journey'?1:N8LAY==='n8dash'?Math.max(.3,Math.min(1,cv.clientWidth/(LAST.W+60),cv.clientHeight/(LAST.H+60))):Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:(N8LAY==='journey'?cv.clientWidth-LAST.W*VIEW.k-10:10);VIEW.y=10;applyView();NEEDFIT=false}
+  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=N8LAY==='journey'?1:N8LAY==='n8dash'?Math.max(.3,Math.min(1,cv.clientWidth/(LAST.W+60),cv.clientHeight/(LAST.H+60))):Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:(N8LAY==='journey'?cv.clientWidth-LAST.W*VIEW.k-10:10);VIEW.y=Math.max(10,(cv.clientHeight-LAST.H*VIEW.k)/2-40);applyView();NEEDFIT=false}
   try{N8.badges()}catch(e){}}}
 {const _rv=renderVers;renderVers=function(){_rv();$('#vers').append(h('button',{id:'n8mode',class:N8MODE?'on':'',title:'نمایش همهٔ نمودارها افقی، مثل n8n',onclick:()=>{N8MODE=!N8MODE;try{localStorage.setItem('n8mode',N8MODE?'1':'0')}catch(e){}NEEDFIT=true;renderVers();renderDia()}},N8MODE?'⇄ حالت n8n: روشن':'⇄ حالت n8n'),
   h('button',{class:'pri',onclick:()=>{N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderVers();renderDia()}},'⛶ تمام‌صفحه، دقیقاً مثل n8n'),h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['orig','📍 مختصات اصلی n8n (اگر از n8n وارد شده)'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)'],['journey','🧭 نقشهٔ سفر (Journey + Service Blueprint)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
 
 
 /* پنل کشویی: با انتخاب گره باز، با ✕ یا Esc بسته */
-{const _ri=renderInsp;renderInsp=function(){_ri();const I=$('#insp');document.body.classList.toggle('inspopen',!!SEL||!!SELE||HISTOPEN);
+{const _ri=renderInsp;renderInsp=function(){_ri();const I=$('#insp');if(SEL||SELE!=null)document.body.classList.remove('insphide');document.body.classList.toggle('inspopen',!!SEL||!!SELE||HISTOPEN);
   // سربرگ پنل مثل NDV در n8n و Inspector در Figma: آیکن نوع + نام + نوع + بستن
   I.querySelector('.pnlh')?.remove();const n=SEL&&IDX.get(SEL);
   I.prepend(h('div',{class:'pnlh'},n?lucide(n.kind):h('span',{class:'ic'},'⚙'),h('div',{class:'pt'},h('b',{},n?titleName(n):SELE!=null?'جزئیات فلش':'جزئیات'),h('small',{},n?(N8KIND[n.kind]||n.kind)+' · '+SEL:'ویرایش و تنظیمات')),
-    h('button',{id:'inspx',class:'sm',title:'بستن (Esc)',onclick:()=>{SEL=null;SELE=null;HISTOPEN=false;document.body.classList.remove('inspopen');renderDia()}},'✕')))}}
-{const _rt=renderTree;renderTree=function(){_rt();const T=$('#tree');if(!T.querySelector('.pnlh'))T.prepend(h('div',{class:'pnlh'},h('span',{class:'ic'},'🗂'),h('div',{class:'pt'},h('b',{},'فهرست بخش‌ها'),h('small',{},'برای رفتن به هر بخش کلیک کن')),h('button',{class:'sm',onclick:()=>document.body.classList.remove('treeopen')},'✕')))}}
+    h('button',{id:'inspx',class:'sm',title:'بستن (Esc)',onclick:()=>{SEL=null;SELE=null;HISTOPEN=false;document.body.classList.remove('inspopen');if(!N8MODE)document.body.classList.add('insphide');renderDia();renderInsp()}},'✕')))}}
+{const _rt=renderTree;renderTree=function(){_rt();const T=$('#tree');if(!T.querySelector('.pnlh'))T.prepend(h('div',{class:'pnlh'},h('span',{class:'ic'},'🗂'),h('div',{class:'pt'},h('b',{},'فهرست بخش‌ها'),h('small',{},'برای رفتن به هر بخش کلیک کن')),h('button',{class:'sm',title:'بستن (با 🗂 در نوار کناری دوباره باز می‌شود)',onclick:()=>{document.body.classList.remove('treeopen');document.body.classList.add('treehide')}},'✕')))}}
 document.addEventListener('keydown',e=>{if(/^[1-4]$/.test(e.key)&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)&&TAB==='dia'){const b=document.querySelectorAll('#vers .vmi')[+e.key-1];if(b)b.click()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('inspopen')){SEL=null;SELE=null;document.body.classList.remove('inspopen');renderDia();renderInsp()}});
 
@@ -2899,14 +2919,14 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.class
 (function n8shell(){
   const top=$('.top'),tabs=$('#tabs'),vers=$('#vers');
   const side=h('nav',{id:'n8side','aria-label':'بخش‌ها'},h('div',{class:'logo'},'س'));
-  side.append(h('button',{title:'فهرست بخش‌ها',onclick:()=>{document.body.classList.toggle('treeopen')}},'🗂',h('span',{},'فهرست بخش‌ها')));
+  side.append(h('button',{title:'فهرست بخش‌ها',onclick:()=>{if(N8MODE)document.body.classList.toggle('treeopen');else document.body.classList.toggle('treehide')}},'🗂',h('span',{},'فهرست بخش‌ها')));
   const SB=[['dia','🗺','ویرایشگر فلو'],['run','▶','اجراها'],['mind','🧠','ذهن‌نقشه'],['int','🔗','پروژه‌ها و interop'],['out','📤','تغییرات و خروجی C4']];
   SB.forEach(([k,i,l])=>side.append(h('button',{'data-k':k,title:l,onclick:()=>{TAB=k;showTab()}},i,h('span',{},l))));
   document.body.prepend(side);
   const h1=top.querySelector('h1');h1.insertBefore(h('span',{class:'crumb'},'فلوها / '),h1.firstChild);
   const mk=(lbl,...kids)=>h('details',{class:'n8menu'},h('summary',{},lbl),h('div',{class:'dd'},...kids));
   const fileDocs=h('div',{class:'vers'});
-  const fileM=mk('📁 فایل',h('h4',{},'جدید از قالب'),fileDocs,h('h4',{},'باز کردن و برگرداندن'),$('#load'),h('button',{onclick:()=>importN8n()},'📥 باز کردن ورک‌فلوی n8n (JSON)'),$('#reset'));
+  const fileM=mk('📁 فایل',h('h4',{},'جدید از قالب'),fileDocs,h('h4',{},'باز کردن و برگرداندن'),$('#load'),h('button',{onclick:()=>importN8n()},'📥 وارد کردن از n8n'),$('#reset'));
   const viewM=mk('👁 نما',vers);
   const undo=$('#undo');undo.textContent='↶';undo.title='برگشت (Ctrl+Z)';
   const save=h('button',{class:'save',title:'متن کامل .c4 را در زبانهٔ خروجی ببین و کپی کن',onclick:()=>{TAB='out';showTab()}},'ذخیره (.c4)');
@@ -2948,7 +2968,7 @@ const accSave=()=>{try{localStorage.setItem('acc',JSON.stringify(__acc))}catch(e
 function proPanels(){const I=$('#insp');if(!I)return;let first=true;
   I.querySelectorAll(':scope > .panel').forEach(P=>{const H=P.querySelector(':scope > h2');if(!H||P.classList.contains('acc'))return;
     P.classList.add('acc');const key=H.textContent.replace(/[·\d۰-۹]+.*$/,'').trim();
-    const open=key in __acc?__acc[key]:first;first=false;P.classList.toggle('shut',!open);
+    const open=key in __acc?__acc[key]:(first&&!/فلش‌های این/.test(key));first=false;P.classList.toggle('shut',!open);
     const help=P.querySelector(':scope > small');
     const head=h('div',{class:'acch'},h('span',{class:'chev'},'›'),h('span',{class:'at'},H.textContent));
     if(help){help.classList.add('acchelp');help.hidden=true;head.append(h('button',{class:'qm',title:'راهنما',onclick:e=>{e.stopPropagation();help.hidden=!help.hidden}},'؟'))}
@@ -2961,14 +2981,37 @@ function proTree(){const T=$('#tree');if(!T||T.querySelector('.trq'))return;
 // تب‌های معنایی مثل پنل راست Figma (Design / Prototype / Inspect) و n8n (Parameters / Settings)
 window.__itab=window.__itab||'all';
 function proTabs(){const I=$('#insp');if(!I)return;const ps=[...I.querySelectorAll(':scope > .panel')];
-  const cat=P=>{const t=(P.querySelector('.acch .at')||P).textContent;return /گزارش|بازبینی|هشدار/.test(t)?'check':/طراح|تمپلیت/.test(t)?'build':/راهنما/.test(t)?'help':'detail'};
-  const T=[['detail','جزئیات'],['check','بررسی'],['build','ساخت'],['help','راهنما']].filter(([k])=>ps.some(P=>cat(P)===k));
+  const cat=P=>{const t=(P.querySelector('.acch .at')||P).textContent;return /گزارش|بازبینی|هشدار/.test(t)?'check':/طراح|تمپلیت/.test(t)?'build':/راهنما/.test(t)?'help':/ایجنت متخصص|ابزار بیرونی|CrewAI|توسعه با Claude/.test(t)?'ai':'detail'};
+  const T=[['detail','جزئیات'],['ai','دستیار'],['check','بررسی'],['build','ساخت'],['help','راهنما']].filter(([k])=>ps.some(P=>cat(P)===k));
   if(T.length<2)return;if(!T.some(([k])=>k===__itab))__itab=T[0][0];
   const bar=h('div',{class:'itabs',role:'tablist'},...T.map(([k,l])=>{const n=ps.filter(P=>cat(P)===k).length;return h('button',{role:'tab',class:k===__itab?'on':'',onclick:()=>{__itab=k;renderInsp()}},l,n>1?h('small',{},toFa(n)):null)}));
   ps.forEach(P=>{P.hidden=cat(P)!==__itab;if(!P.hidden&&P.classList.contains('shut')&&ps.filter(x=>cat(x)===__itab).length===1)P.classList.remove('shut')});
   (I.querySelector('.pnlh')||I.firstChild)?.after(bar)}
-{const _ri3=renderInsp;renderInsp=function(){_ri3();proPanels();proTabs()}}
+// پنل گره مثل n8n NDV: ورودی ← خروجی، کارهای کم‌کاربرد پشت ⋯، فیلدهای فنی زیر «پیشرفته»
+function proNode(){const I=$('#insp');const P=[...I.querySelectorAll(':scope > .panel.acc')].find(x=>/^›?\s*ویرایش/.test((x.querySelector('.acch .at')||{}).textContent||''));if(!P||P.dataset.pro)return;P.dataset.pro=1;
+  const head=P.querySelector('.acch');
+  const lock=[...P.querySelectorAll(':scope > button.sm')].find(b=>/قفل/.test(b.textContent)&&!b.classList.contains('pri'));
+  if(lock){lock.classList.add('hic');lock.title=lock.textContent.trim();lock.textContent=lock.textContent.includes('🔒')?'🔒':'🔓';lock.addEventListener('click',e=>e.stopPropagation(),true);head.append(lock)}
+  const rows=[...P.querySelectorAll(':scope > .row')];const fields=rows.find(r=>r.querySelector('input'));
+  const acts=rows.filter(r=>r!==fields&&r.querySelector('button'));
+  if(acts.length){const m=h('div',{class:'hmenu',hidden:true},...acts.flatMap(r=>[...r.children]));acts.forEach(r=>r.remove());
+    const dots=h('button',{class:'hic',title:'کارهای بیشتر',onclick:e=>{e.stopPropagation();m.hidden=!m.hidden}},'⋯');head.append(dots);head.after(m)}
+  if(fields){const d=h('details',{class:'adv'},h('summary',{},'پیشرفته'));fields.replaceWith(d);d.append(fields)}
+  const labs=[...P.querySelectorAll(':scope > label.f')],out=labs.find(l=>/خروجی/.test(l.textContent)),inp=labs.find(l=>/ورودی/.test(l.textContent));
+  if(out&&inp)out.before(inp)}
+{const _ri3=renderInsp;renderInsp=function(){_ri3();proPanels();proNode();proTabs()}}
 {const _rt3=renderTree;renderTree=function(){_rt3();proTree()}}
+
+/* نوار ابزار شناور گوشهٔ بوم مثل n8n / Miro: دکمه‌های سطح و چیدمان از بالای نقشه به یک قرص کوچک آیکنی منتقل می‌شوند */
+{const _rn=renderNav;renderNav=function(){_rn();const nav=$('#nav'),cv=$('#cv');if(!nav||!cv)return;cv.querySelector('.cvbar')?.remove();
+  const IC=[[/^بستن همه/,'⊟'],[/یک سطح بازتر/,'＋'],[/یک سطح بسته/,'－'],[/^باز کردن همه/,'⊞'],[/ترتیب خودکار/,'↧'],[/جمع کردن کل/,'⇱'],[/سطح بالاتر/,'↑'],[/سطح پایین/,'↓'],[/باز کردن این/,'⊕'],[/نمایش این/,'⌖']];
+  const bs=[...nav.querySelectorAll(':scope > button.sm')];if(bs.length<2)return;
+  const bar=h('div',{class:'cvbar'});let grp=0;
+  bs.forEach((b,i)=>{const t=b.textContent.trim().replace(/^[^\p{L}]+/u,''),m=IC.find(([r])=>r.test(t));
+    if(i&&/سطح بالاتر|ترتیب خودکار/.test(t))bar.append(h('span',{class:'sep'}));
+    b.title=t;b.dataset.tip=t;b.textContent=m?m[1]:t.slice(0,2);bar.append(b)});
+  nav.querySelectorAll(':scope > span.mute,.mac-note').forEach(x=>x.remove());
+  cv.append(bar)}}
 
 /* ───────── شروع ───────── */
 (function init(){
