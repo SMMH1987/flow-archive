@@ -267,6 +267,32 @@ body.n8on #cv{height:calc(100vh - 90px)!important;min-height:520px}
 .jline{border-top:2px dashed #ea4b71;border-bottom:1px solid var(--line);padding:2px 12px;font-size:11px;color:#ea4b71;background:var(--lane)}
 .jcurve{flex:0 0 auto}.jsm{font-size:11px;color:var(--mute)}
 .n8plus{position:absolute;width:28px;height:28px;padding:0;border:2px dashed var(--n8e);border-radius:6px;background:var(--card);color:var(--mute);font-size:18px;line-height:1;z-index:3}.n8plus:hover{border-color:#ea4b71;color:#ea4b71}
+
+/* نمای «داشبورد n8n»: تمام‌صفحه، مثل ویرایشگر n8n */
+body.n8full #app>*:not(#p-dia){display:none!important}
+body.n8full #p-dia{position:fixed;inset:0;inset-inline-end:56px;padding:0!important;display:block!important;z-index:25;background:#f5f5f5}
+body.n8full #p-dia>*{display:none!important}
+body.n8full #p-dia .n8cvhost{display:block!important;position:absolute;inset:0}
+body.n8full #cv{position:absolute!important;top:96px;left:0;right:0;bottom:36px;height:auto!important;border:0;border-radius:0;background-color:#f5f5f5;background-image:radial-gradient(#c8c8c8 1px,transparent 1px);background-size:16px 16px}
+body.n8full .cvtools,body.n8full .cvhint{display:none!important}
+.n8bar{display:none}
+body.n8full .n8bar{display:flex;position:absolute;left:0;right:0;align-items:center;gap:10px;padding:0 16px;background:#fff;border-bottom:1px solid #e3e3e3;direction:ltr;font-size:13px;color:#555;z-index:6}
+body.n8full .n8b1{top:0;height:52px}
+body.n8full .n8b2{top:52px;height:44px;justify-content:center;background:#f5f5f5;border:0}
+.n8bar .crumbs b{color:#222}.n8bar .sp{flex:1}
+.n8bar .pub{background:#ea4b71;color:#fff;border:0;border-radius:6px;padding:5px 14px;font-weight:600}
+.n8bar .seg{display:flex;background:#fff;border:1px solid #ddd;border-radius:6px;padding:2px}
+.n8bar .seg button{border:0;background:transparent;padding:3px 14px;border-radius:4px;color:#555}.n8bar .seg button.on{background:#ececec;color:#222;font-weight:600}
+.n8exec{display:none}
+body.n8full .n8exec{display:block;position:absolute;bottom:52px;left:50%;transform:translateX(-50%);background:#ea4b71;color:#fff;border:0;border-radius:8px;padding:9px 22px;font-weight:600;z-index:6;box-shadow:0 2px 8px #ea4b7144}
+.n8zoom{display:none}
+body.n8full .n8zoom{display:flex;flex-direction:column;gap:6px;position:absolute;left:14px;bottom:52px;z-index:6}
+.n8zoom button{width:34px;height:34px;padding:0;background:#fff;border:1px solid #ddd;border-radius:6px;color:#444}
+.n8logs{display:none}
+body.n8full .n8logs{display:flex;position:absolute;bottom:0;left:0;right:0;height:36px;background:#fff;border-top:1px solid #e3e3e3;align-items:center;padding:0 16px;direction:ltr;font-size:12.5px;color:#555;gap:10px;z-index:6}
+body.n8full .node.n8 .n8l{color:#222}body.n8full .node.n8 .n8i{background:#fff!important}
+body.n8full #n8side{background:#2b2b38}
+body.n8full #n8mini{display:none}
 </style>
 <div id="app">
   <div class="top">
@@ -2657,7 +2683,7 @@ function renderN8n(rid){
       const t=sv('text',{x,y:y0-12,'text-anchor':'middle','font-size':12,style:'fill:var(--ink);font-family:var(--font);font-weight:700'});t.textContent='مرحلهٔ '+toFa(ci+1);svg.append(t);
       if(dayAt[NC-1]){const t2=sv('text',{x,y:y0+20,'text-anchor':'middle','font-size':11,style:'fill:var(--mute);font-family:var(--font)'});t2.textContent='تا روز '+toFa(dayAt[ci]);svg.append(t2)}}
     const lt=sv('text',{x:X0-30,y:y0+4,'text-anchor':'end','font-size':11,style:'fill:var(--mute);font-family:var(--font)'});lt.textContent='زمان →';svg.append(lt)};
-  if(N8LAY==='snake'){for(let b=0;b*PER<NC;b++)axis(Y0-50+b*bandH,b*PER,Math.min(NC,(b+1)*PER))}else axis(Y0-50,0,NC);
+  if(document.body.classList.contains('n8full')){}else if(N8LAY==='snake'){for(let b=0;b*PER<NC;b++)axis(Y0-50+b*bandH,b*PER,Math.min(NC,(b+1)*PER))}else axis(Y0-50,0,NC);
   if(N8LAY==='lanes')lanes.forEach((l,li)=>{const y=Y0+li*DY-18;svg.append(sv('rect',{x:10,y,width:W-20,height:DY-8,rx:8,style:'fill:var(--card);stroke:var(--line)','fill-opacity':.55}));
     const t=sv('text',{x:20,y:y+DY/2,'font-size':12.5,style:'fill:var(--ink);font-family:var(--font);font-weight:700'});t.textContent=l.length>16?l.slice(0,15)+'…':l;svg.append(t)});
   world.style.width=W+'px';world.style.height=H+'px';world.style.direction='ltr';world.append(svg);
@@ -2737,15 +2763,32 @@ function renderJourney(rid){
   requestAnimationFrame(()=>{world.style.height=table.offsetHeight+'px'});
   return{W,H:900,vis:new Map()}}
 {const _rn=renderN8n;renderN8n=function(rid){if(N8LAY==='journey')return renderJourney(rid);$('#world').style.direction='ltr';return _rn(rid)}}
+
+/* ───────── نمای «داشبورد n8n» ───────── */
+function n8dashChrome(on){document.body.classList.toggle('n8full',on);const P=$('#p-dia');let host=P.querySelector('.n8cvhost');
+  if(on&&!host){host=h('div',{class:'n8cvhost'});const cv=$('#cv');host.dataset.home='1';cv._home=cv.parentNode;cv._next=cv.nextSibling;
+    const root=()=>IDX.get(rootOfView());
+    host.append(h('div',{class:'n8bar n8b1'},h('span',{class:'crumbs'},'Personal / ',h('b',{id:'n8title'},'')),h('span',{class:'sp'}),
+        h('span',{},'Inactive'),h('button',{class:'pub',onclick:()=>{TAB='out';N8LAY='row';try{localStorage.setItem('n8lay','row')}catch(e){}n8dashChrome(false);showTab()}},'Save (.c4)'),
+        h('button',{onclick:()=>{N8LAY='row';try{localStorage.setItem('n8lay','row')}catch(e){}n8dashChrome(false);NEEDFIT=true;renderVers();renderDia()}},'✕')),
+      h('div',{class:'n8bar n8b2'},h('div',{class:'seg'},h('button',{class:'on'},'Editor'),h('button',{onclick:()=>{n8dashChrome(false);N8LAY='row';TAB='run';showTab()}},'Executions'))),
+      cv,
+      h('button',{class:'n8exec',onclick:()=>{TAB='run';showTab();$('#p-run button.pri').click();TAB='dia';N8LAY='n8dash';showTab()}},'▶ Execute workflow'),
+      h('div',{class:'n8zoom'},h('button',{title:'fit',onclick:()=>{NEEDFIT=true;renderDia()}},'⤢'),h('button',{onclick:()=>{VIEW.k=Math.min(2,VIEW.k*1.2);applyView()}},'+'),h('button',{onclick:()=>{VIEW.k=Math.max(.3,VIEW.k/1.2);applyView()}},'−')),
+      h('div',{class:'n8logs'},h('b',{},'Logs'),h('span',{id:'n8loginfo'},'')));
+    P.append(host)}
+  if(!on&&host){const cv=$('#cv');cv._home.insertBefore(cv,cv._next);host.remove()}
+  if(on){$('#n8title').textContent=titleName(IDX.get(rootOfView()))||'';const c=N8.cur();$('#n8loginfo').textContent=c?`${c.id} · ${Object.values(c.nodes).filter(r=>r.s==='ok').length} ok · ${Object.values(c.nodes).filter(r=>r.s==='wait').length} waiting`:'No executions yet'}}
+{const _rn=renderN8n;renderN8n=function(rid){const dash=N8LAY==='n8dash';n8dashChrome(dash);if(dash){N8LAY='row';try{return _rn(rid)}finally{N8LAY='n8dash'}}return _rn(rid)}}
 {const _rd=renderDia;renderDia=function(){
   document.body.classList.toggle('n8on',N8MODE);
   if(!N8MODE){$('#world').style.direction='';return _rd()}
   if(!VIEWP.startsWith('ov:')&&!IDX.has(VIEWP))VIEWP='ov:'+roots()[0].id;
   RV=REVIEW?reviewFind():new Map();renderNav();renderTree();
-  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=N8LAY==='journey'?1:Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:(N8LAY==='journey'?cv.clientWidth-LAST.W*VIEW.k-10:10);VIEW.y=10;applyView();NEEDFIT=false}
+  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=N8LAY==='journey'?1:N8LAY==='n8dash'?Math.max(.5,Math.min(1,cv.clientWidth/(LAST.W+60),cv.clientHeight/(LAST.H+60))):Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:(N8LAY==='journey'?cv.clientWidth-LAST.W*VIEW.k-10:10);VIEW.y=10;applyView();NEEDFIT=false}
   try{N8.badges()}catch(e){}}}
 {const _rv=renderVers;renderVers=function(){_rv();$('#vers').append(h('button',{id:'n8mode',class:N8MODE?'on':'',title:'نمایش همهٔ نمودارها افقی، مثل n8n',onclick:()=>{N8MODE=!N8MODE;try{localStorage.setItem('n8mode',N8MODE?'1':'0')}catch(e){}NEEDFIT=true;renderVers();renderDia()}},N8MODE?'⇄ حالت n8n: روشن':'⇄ حالت n8n'),
-  h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)'],['journey','🧭 نقشهٔ سفر (Journey + Service Blueprint)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
+  h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)'],['journey','🧭 نقشهٔ سفر (Journey + Service Blueprint)'],['n8ndash','🟥 داشبورد n8n (تمام‌صفحه)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
 
 /* ───────── پوستهٔ n8n: نوار کناری، منوی فایل و نما، زبانه‌های ویرایشگر و اجراها ───────── */
 (function n8shell(){
