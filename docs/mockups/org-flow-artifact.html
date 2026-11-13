@@ -321,6 +321,12 @@ body.n8on .cvhint{display:none!important}
 .n8menu .dd button.vdots{display:flex;align-items:center;gap:8px;color:var(--mute);border:0;background:none;padding:6px 10px;border-radius:8px}.vdots span:first-child{font-size:18px;line-height:1;width:34px;text-align:center}.vdots small{margin-inline-start:auto;font-size:10.5px;border:1px solid var(--line);border-radius:10px;padding:0 6px}.n8menu .dd button.vdots:hover,.n8menu .dd button.vdots.on{background:var(--lane);color:var(--ink)}.vsep{border:0;border-top:1px solid var(--line);margin:6px 0}.vmore[hidden]{display:none}
 .n8menu .dd button.vmi.on{background:var(--lane)!important;color:var(--ink)!important;border:0}.vmi.on .vic{border-color:#ea4b71}
 
+/* floating canvas toolbar */
+#cv .cvbar{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:2px;background:var(--card,#fff);border:1px solid var(--line);border-radius:10px;padding:3px;box-shadow:0 4px 14px #0001}
+#cv .cvbar button{width:30px;height:28px;padding:0;border:0;background:none;border-radius:7px;font-size:14px;color:var(--ink);position:relative}
+#cv .cvbar button:hover:not(:disabled){background:var(--lane)}#cv .cvbar button:disabled{opacity:.35}
+#cv .cvbar button:hover::after{content:attr(data-tip);position:absolute;top:34px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#222;color:#fff;font-size:11px;padding:3px 7px;border-radius:5px;pointer-events:none}
+#cv .cvbar .sep{width:1px;height:18px;background:var(--line);margin:0 3px}
 /* Figma/n8n-style side panels */
 #insp .itabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:0 -4px 6px;position:sticky;top:46px;background:var(--bg);z-index:2}
 #insp .itabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;border-radius:0;padding:9px 4px;font-size:12.5px;color:var(--mute);font-weight:600}
@@ -2985,6 +2991,17 @@ function proNode(){const I=$('#insp');const P=[...I.querySelectorAll(':scope > .
   if(out&&inp)out.before(inp)}
 {const _ri3=renderInsp;renderInsp=function(){_ri3();proPanels();proNode();proTabs()}}
 {const _rt3=renderTree;renderTree=function(){_rt3();proTree()}}
+
+/* نوار ابزار شناور گوشهٔ بوم مثل n8n / Miro: دکمه‌های سطح و چیدمان از بالای نقشه به یک قرص کوچک آیکنی منتقل می‌شوند */
+{const _rn=renderNav;renderNav=function(){_rn();const nav=$('#nav'),cv=$('#cv');if(!nav||!cv)return;cv.querySelector('.cvbar')?.remove();
+  const IC=[[/^بستن همه/,'⊟'],[/یک سطح بازتر/,'＋'],[/یک سطح بسته/,'－'],[/^باز کردن همه/,'⊞'],[/ترتیب خودکار/,'↧'],[/جمع کردن کل/,'⇱'],[/سطح بالاتر/,'↑'],[/سطح پایین/,'↓'],[/باز کردن این/,'⊕'],[/نمایش این/,'⌖']];
+  const bs=[...nav.querySelectorAll(':scope > button.sm')];if(!bs.length)return;
+  const bar=h('div',{class:'cvbar'});let grp=0;
+  bs.forEach((b,i)=>{const t=b.textContent.trim().replace(/^[^\p{L}]+/u,''),m=IC.find(([r])=>r.test(t));
+    if(i&&/سطح بالاتر|ترتیب خودکار/.test(t))bar.append(h('span',{class:'sep'}));
+    b.title=t;b.dataset.tip=t;b.textContent=m?m[1]:t.slice(0,2);bar.append(b)});
+  nav.querySelectorAll(':scope > span.mute,.mac-note').forEach(x=>x.remove());
+  cv.append(bar)}}
 
 /* ───────── شروع ───────── */
 (function init(){
