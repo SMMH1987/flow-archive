@@ -395,6 +395,151 @@ body.n8on .cvhint{display:none!important}
   </div>
   <div id="p-mind" class="page" hidden></div>
   <div id="p-proc" class="page" hidden></div>
+<script type="text/plain" id="journey-c4">// مسیر سفارش تاج گل (نیلابا) — به سبک n8n روی LikeC4 — 2026-11-13
+// رنگ = نوع گره: ورود بنفش · ماژول سبز · بیرونی خاکستری · هسته (گل‌نامه) قرمز
+// نماهای dynamic = «اجرا»ی گام‌به‌گام مثل n8n (دکمهٔ پخش در LikeC4)
+specification {
+  element actor { style { shape person; color secondary } }
+  element stage { style { color muted } }
+  element trigger { notation "ورود (Trigger)"; style { color indigo; shape queue } }
+  element node { notation "ماژول نیلابا"; style { color green } }
+  element ext { notation "سرویس بیرونی"; style { color gray } }
+  element core { notation "هسته"; style { color red } }
+}
+model {
+  customer = actor 'مشتری'
+  operator = actor 'اپراتور'
+  entry = stage 'ورود' {
+    seo = trigger 'گوگل سئو' { technology 'onpage-seo'; description 'جست‌وجوی «تاج گل»' }
+    ads = trigger 'آگهی گوگل' { technology 'Google Ads'; description 'تبدیل: تماس و فرم' }
+    sms = trigger 'پیامک لینک‌دار' { technology 'sms'; description 'لینک کوتاه روی دامنهٔ خودمان' }
+    social = trigger 'شبکهٔ اجتماعی' { technology 'messenger'; description 'واتس‌اپ، بله، اینستاگرام' }
+  }
+  site = stage 'سایت' {
+    channels = node 'ثبت منبع' { technology 'channels' }
+    trust = node 'بنر اعتماد' { technology 'trust' }
+    product = ext 'صفحهٔ محصول' { technology 'WooCommerce' }
+    qadnama = node 'قدنما' { technology 'qadnama'; description 'اندازهٔ تاج گل کنار آدم' }
+    checkout = node 'فرم سفارش' { technology 'checkout'; description 'زمان، مناسبت، گیرنده' }
+    account = node 'ورود با موبایل' { technology 'account' }
+    coupon = node 'کد تخفیف / باشگاه' { technology 'coupon · club' }
+  }
+  pay = ext 'پرداخت زیبال' { technology 'Zibal'; description 'رویداد order.paid' }
+  golnameh = core 'گل‌نامه' { technology 'golnameh'; description 'صفحهٔ مشترک سفارش · ۱۰۵ اتصال' }
+  ops = stage 'ساخت و ارسال' {
+    hesab = node 'قیمت از تأمین‌کننده' { technology 'hesabnameh' }
+    make = node 'ساخت + عکس کارگاه' { technology 'golnameh · image' }
+    dispatch = node 'زمان‌بندی ارسال' { technology 'dispatch' }
+    snapp = ext 'اسنپ‌باکس' { technology 'snapp' }
+    smsout = node 'پیامک وضعیت' { technology 'sms' }
+    desk = node 'میز اپراتور' { technology 'calm · opqueue · pulse' }
+  }
+  after = stage 'بعد از تحویل' {
+    deliver = node 'تحویل + عکس' { technology 'photo-review' }
+    review = node 'نظر' { technology 'rezayat' }
+    reward = node 'امتیاز و کد تشکر' { technology 'club · rezayat-x-coupon' }
+    maps = node 'نظر در گوگل‌مپ' { technology 'maps' }
+    ledger = node 'حساب و KPI' { technology 'hesabnameh · sheets · kpi · bitrix' }
+    remind = node 'یادآور سال بعد' { technology 'reminder' }
+  }
+  customer -> entry 'جست‌وجو یا کلیک'
+  entry.seo -> site.channels
+  entry.ads -> site.channels
+  entry.sms -> site.channels
+  entry.social -> site.channels
+  site.channels -> site.product
+  site.trust -> site.product
+  site.product -> site.qadnama
+  site.product -> site.checkout
+  site.checkout -> site.account
+  site.account -> site.coupon
+  site.checkout -> pay
+  pay -> golnameh 'order.paid'
+  golnameh -> ops.hesab 'درخواست قیمت'
+  ops.hesab -> ops.make
+  golnameh -> ops.smsout 'stage'
+  golnameh -> ops.desk 'استثناها'
+  operator -> ops.desk
+  ops.make -> ops.dispatch 'made'
+  ops.dispatch -> ops.snapp 'بی‌راننده'
+  ops.dispatch -> after.deliver 'handover'
+  after.deliver -> after.review 'delivered'
+  after.review -> after.reward
+  after.review -> after.maps
+  after.deliver -> after.ledger
+  after.reward -> after.remind
+  after.remind -> entry.sms 'سال بعد ← برگشت'
+}
+views {
+  view index {
+    title 'نقشهٔ کلی مسیر سفارش'
+    include *
+    include entry, site, ops, after
+    autoLayout LeftRight
+  }
+  view site of site {
+    title 'سایت'
+    include *
+    autoLayout LeftRight
+  }
+  view ops of ops {
+    title 'ساخت و ارسال'
+    include *
+    autoLayout LeftRight
+  }
+  view after of after {
+    title 'بعد از تحویل'
+    include *
+    autoLayout LeftRight
+  }
+  view golnameh of golnameh {
+    title 'گل‌نامه و همسایه‌ها'
+    include *, -> golnameh ->
+    autoLayout LeftRight
+  }
+
+  dynamic view run_seo {
+    title '▶ اجرا: ورود از گوگل سئو'
+    customer -> entry.seo 'جست‌وجو'
+    entry.seo -> site.channels 'منبع = seo'
+    site.channels -> site.product
+    site.product -> site.qadnama 'دیدن اندازه'
+    site.product -> site.checkout
+    site.checkout -> site.account 'کد پیامکی'
+    site.checkout -> pay
+    pay -> golnameh 'order.paid'
+    golnameh -> ops.smsout 'پیامک لینک گل‌نامه'
+    golnameh -> ops.hesab 'قیمت'
+    ops.hesab -> ops.make
+    ops.make -> ops.dispatch 'made'
+    ops.dispatch -> after.deliver 'handover'
+    after.deliver -> after.review 'delivered'
+    after.review -> after.maps
+    after.review -> after.reward
+    after.reward -> after.remind
+    autoLayout LeftRight
+  }
+  dynamic view run_sms {
+    title '▶ اجرا: برگشت با پیامک یادآور'
+    after.remind -> entry.sms 'سال بعد'
+    customer -> entry.sms 'کلیک لینک'
+    entry.sms -> site.channels 'منبع = sms'
+    site.channels -> site.product
+    site.product -> site.checkout
+    site.checkout -> site.account
+    site.account -> site.coupon 'کد هدیه'
+    site.checkout -> pay
+    pay -> golnameh 'order.paid'
+    golnameh -> ops.desk 'میز'
+    operator -> ops.desk
+    ops.make -> ops.dispatch
+    ops.dispatch -> ops.snapp 'بی‌راننده'
+    ops.dispatch -> after.deliver
+    after.deliver -> after.ledger
+    autoLayout LeftRight
+  }
+}
+</script>
 <script type="application/json" id="agents-data">{"source":"agents/ (generated by tools/embed_agents.py)","agents":{"hr-recruit":{"name":"ایجنت استخدام","flow":[{"id":"writeAd","kind":"step","title":"نوشتن آگهی","skill":"job-ad-writer","external":"no","gate_tag":false},{"id":"ad","kind":"decision","title":"جدول: کانال آگهی","table":"ad_channel","gate_tag":false},{"id":"screen","kind":"step","title":"غربال رزومه","skill":"cv-screener","external":"no","gate_tag":false},{"id":"pre","kind":"decision","title":"جدول: پیش از مصاحبه","table":"pre_interview","gate_tag":false},{"id":"interview","kind":"step","title":"مصاحبه","skill":"interview-scheduler","external":"no","gate_tag":false},{"id":"post","kind":"decision","title":"جدول: پس از مصاحبه","table":"post_interview","gate_tag":false},{"id":"offer","kind":"step","title":"ارسال پیشنهاد","gate":"send_offer","external":"yes","gate_tag":true}],"subflows":{"visa":{"name":"ویزا و مدارک خارجی","flow":[{"id":"docs","kind":"step","title":"جمع‌آوری مدارک","external":"no","gate_tag":false},{"id":"apply","kind":"step","title":"درخواست ویزا","gate":"visa_apply","external":"yes","gate_tag":true},{"id":"relocate","kind":"step","title":"برنامهٔ انتقال","external":"no","gate_tag":false}]}},"rules":{"ad_channel":{"hit_policy":"FIRST","rules":[{"when":{"org.uses_paid_ads":"== no"},"then":{"step":"آگهی رایگان (دانشگاه/شبکه)","gate":"publish_ad"}},{"when":{"budget_eur":"== 0"},"then":{"step":"آگهی رایگان (دانشگاه/شبکه)","gate":"publish_ad"}},{"when":{"budget_eur":"> 0"},"then":{"step":"آگهی پولی جابینجا","gate":"publish_ad"}}]},"pre_interview":{"hit_policy":"COLLECT","rules":[{"when":{"role":"== Python"},"then":{"step":"آزمون برنامه‌نویسی","skill":"code-test"}},{"when":{"role":"== SEO"},"then":{"step":"نمونه‌کار سئو","skill":"seo-portfolio"}}]},"post_interview":{"hit_policy":"COLLECT","rules":[{"when":{"level":"== senior","org.reference_check":"== yes"},"then":{"step":"بررسی رفرنس","skill":"reference-check"}},{"when":{"country":"!= org.country"},"then":{"step":"subflow:visa"}}]}},"questions":[{"id":"country","ask":"سازمان در کدام کشور است؟","type":"text"},{"id":"uses_paid_ads","ask":"برای آگهی استخدام هزینه می‌کنید؟","type":"yes_no"},{"id":"reference_check","ask":"برای نیروی ارشد بررسی رفرنس لازم است؟","type":"yes_no"}],"orgs":{"sample-small-ngo":{"org":"sample-small-ngo","country":"IR","uses_paid_ads":"no","reference_check":"no"},"sample-startup-ir":{"org":"sample-startup-ir","country":"IR","uses_paid_ads":"yes","reference_check":"yes"}},"profiles":{"foreign-dev":{"profile":"foreign-dev","role":"Python","level":"senior","country":"DE","budget_eur":300},"intern":{"profile":"intern","role":"Python","level":"junior","country":"IR","budget_eur":0},"seo-specialist":{"profile":"seo-specialist","role":"SEO","level":"senior","country":"IR","budget_eur":150}}}}}</script>
   <div id="p-int" class="page" hidden></div>
   <div id="p-out" class="page" hidden></div>
@@ -1640,11 +1785,13 @@ function phaseModel(PH,TITLE){
   m.views='views {\n  view index {\n    title '+q(TITLE)+'\n    include *\n  }\n'+m.nodes.map(n=>'\n  view '+n.id+' of '+n.id+' {\n    title '+q(n.title)+'\n    include *\n  }\n').join('')+'}';
   return m}
 const startupModel=()=>phaseModel(STARTUP,STARTUP_TITLE),studioModel=()=>phaseModel(STUDIO,STUDIO_TITLE);
-const DOCKEY={startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1',n8n:'orgStudio.n8n1'},BUILD={startup:startupModel,studio:studioModel,n8n:studioModel};
+// نسخهٔ فقط‌خواندنی از c4-journey/journey.c4 (پروژهٔ تاج گل)؛ منبع همان‌جاست
+const JTEXT=(document.getElementById('journey-c4')||{}).textContent||'';
+const DOCKEY={startup:'orgStudio.startup1',studio:'orgStudio.studio1',org:'orgStudio.v1',n8n:'orgStudio.n8n1',journey:'orgStudio.journey1'},BUILD={startup:startupModel,studio:studioModel,n8n:studioModel,journey:()=>parseC4(JTEXT)};
 // مهاجرت: اگر نقشهٔ سازمان قبلاً با ورک‌فلوی n8n بازنویسی شده، آن را به جای جدای خودش ببر و نقشهٔ اصلی را برگردان
 try{const o=localStorage.getItem('orgStudio.v1');if(o&&/n8n_pos/.test(o)&&!localStorage.getItem('orgStudio.n8n1')){localStorage.setItem('orgStudio.n8n1',o);localStorage.removeItem('orgStudio.v1')}}catch(e){}
-let DOC='studio';try{const d=localStorage.getItem('orgStudio.doc2');if(d==='org'||d==='startup'||d==='n8n')DOC=d}catch(e){}
-const DOCFILE=()=>({startup:'startup-talent.c4',studio:'startup-studio.c4',org:'recruitment.c4',n8n:'imported-n8n.c4'}[DOC]);
+let DOC='studio';try{const d=localStorage.getItem('orgStudio.doc2');if(d==='org'||d==='startup'||d==='n8n'||d==='journey')DOC=d}catch(e){}
+const DOCFILE=()=>({startup:'startup-talent.c4',studio:'startup-studio.c4',org:'recruitment.c4',n8n:'imported-n8n.c4',journey:'journey.c4'}[DOC]);
 function openDoc(d){
   DOC=d;try{localStorage.setItem('orgStudio.doc2',d)}catch(e){}
   let st=null;try{st=JSON.parse(localStorage.getItem(DOCKEY[d]))}catch(e){}
@@ -1654,7 +1801,7 @@ function openDoc(d){
     else if(d==='org')loadText(BASE,true);
     else{M=BUILD[d]();BASETEXT=emitC4(M);BASEPARSE=parseC4(BASETEXT);reindex();deriveG();HIST=[BASETEXT]}
   }catch(e){if(d==='org')loadText(BASE,true);else{M=BUILD[d]();BASETEXT=emitC4(M);BASEPARSE=parseC4(BASETEXT);reindex();deriveG();HIST=[BASETEXT]}}
-  SEL=null;SELE=null;FOC=null;EXP=new Set();MACRO=d!=='org'&&d!=='n8n';TAB='dia';NEEDFIT=true;
+  SEL=null;SELE=null;FOC=null;EXP=new Set();MACRO=d!=='org'&&d!=='n8n'&&d!=='journey';TAB='dia';NEEDFIT=true;
   VIEWP='ov:'+roots()[0].id;
   save()}
 function switchDoc(d){if(d===DOC)return;save();openDoc(d);renderVers();showTab();$('#doc-name').textContent=DOCFILE()}
@@ -1934,6 +2081,7 @@ function renderVers(){$('#vers').replaceChildren(
   h('button',{class:DOC==='studio'?'pri':'',title:'سازمان تازه: با دادن ایده یا پروژه و کد، ارزیابی، ساخت، حقوقی، ارزش‌گذاری، سرمایه‌گذار و فروش را پیش می‌برد',onclick:()=>switchDoc('studio')},'🏭 استودیوی استارتاپ‌ساز'),
   h('button',{class:DOC==='startup'?'pri':'',title:'نقشهٔ تازه از صفر: استارتاپ استعدادیابی، غربال، رزومه و استخدام؛ از نام‌گذاری تا تجاری‌سازی',onclick:()=>switchDoc('startup')},'🚀 استارتاپ استعدادیابی'),
   (()=>{let has=false;try{has=!!localStorage.getItem('orgStudio.n8n1')}catch(e){}return has?h('button',{class:DOC==='n8n'?'pri':'',title:'آخرین ورک‌فلویی که از n8n وارد کردی',onclick:()=>switchDoc('n8n')},'📥 ورک‌فلوی واردشده از n8n'):null})(),
+  h('button',{class:DOC==='journey'?'pri':'',title:'مسیر سفارش تاج گل (نیلابا) از c4-journey/journey.c4؛ فایل مال پروژهٔ تاج گل است و این‌جا فقط نمایش داده می‌شود',onclick:()=>switchDoc('journey')},'💐 مسیر سفارش تاج گل'),
   h('button',{class:DOC==='org'?'pri':'',title:'نقشهٔ قبلی: سازمان اتوماسیون استخدام (recruitment.c4)',onclick:()=>switchDoc('org')},'🏢 نقشهٔ سازمان قبلی'),
 ...VIEW_VERS.map(([v,l,tag,av,tm])=>h('button',{class:VER===v?'on':'',title:tag+' · '+av+' · ساخته‌شده '+APP_DATE+' ساعت '+tm+' UTC',onclick:()=>setVer(v)},'نسخه '+toFa(v)+' · '+l+' ',h('small',{style:'opacity:.75'},av+' · '+APP_DATE))),
   h('button',{class:'sm'+(REVIEW?' pri':''),title:'قسمت‌های اضافه یا تکراری با کادر قرمز مشخص و حذف، ادغام یا ترتیب پیشنهاد می‌شود',onclick:()=>{REVIEW=!REVIEW;NEEDFIT=false;SEL=null;SELE=null;renderVers();renderDia();renderInsp()}},'🔍 بازبینی'+(REVIEW?' · '+toFa(RV.size):'')),
@@ -2733,6 +2881,15 @@ const N8=(()=>{
       outs.forEach(r=>{edges[r.from+'>'+r.to]=(edges[r.from+'>'+r.to]||0)+1;q.push(r.to)})}
     steps().forEach(([p])=>{if(!nodes[p]&&(!root||p.split('.')[0]===root))nodes[p]={s:'skip',n:0}});
     return{id:'#'+(RUNS.length+1),at:new Date().toISOString(),mode:'آزمایشی',root:root||'همه',nodes,edges,log}}
+  // نماهای dynamic در LikeC4 = اجرای گام‌به‌گام؛ از متن پایهٔ همین سند خوانده می‌شوند
+  function dynViews(){const out=[],re=/dynamic\s+view\s+(\w+)\s*\{([\s\S]*?)\n\s*\}/g;let m;
+    while((m=re.exec(BASETEXT||''))){const b=m[2],t=(b.match(/title\s+'([^']*)'/)||[])[1]||m[1];
+      const st=[...b.matchAll(/^\s*([\w.]+)\s*->\s*([\w.]+)(?:\s+'([^']*)')?/gm)].map(x=>({a:x[1],b:x[2],l:x[3]||''}));out.push({id:m[1],title:t,st})}return out}
+  function fromDyn(v){const nodes={},edges={},log=[];let t=0;
+    v.st.forEach(s=>{[s.a,s.b].forEach(p=>{if(!IDX.has(p)||nodes[p])return;const n=IDX.get(p),ext=n.kind==='ext'&&/زیبال|Zibal|پرداخت/.test(n.title+(n.tech||''));
+        nodes[p]={s:'ok',n:1};log.push(`[${String(t++).padStart(2,'0')}] ${p} ✓ ${titleName(n)}${ext?' ⚠ بدون gate (پول، سرویس بیرونی)':''}`)});
+      edges[s.a+'>'+s.b]=(edges[s.a+'>'+s.b]||0)+1});
+    return{id:'#'+(RUNS.length+1),at:new Date().toISOString(),mode:'dynamic view',root:v.id,nodes,edges,log}}
   const agg=p=>{const k=Object.entries(CUR.nodes).filter(([q])=>q.startsWith(p+'.')).map(x=>x[1]);if(!k.length)return null;
     const s=k.some(r=>r.s==='err')?'err':k.some(r=>r.s==='wait')?'wait':k.every(r=>r.s==='skip')?'skip':'ok';return{s,n:k.filter(r=>r.s==='ok').length}};
   function badges(){if(!$('#world'))return;
@@ -2768,6 +2925,8 @@ const N8=(()=>{
     P.replaceChildren(h('div',{class:'panel'},
       h('h2',{},'▶ اجراها: وضعیت هر قدم مثل n8n'),
       h('p',{},'وضعیت اجرا جدا از .c4 نگه داشته می‌شود و فقط روی نمودار نمایش داده می‌شود. در اجرای آزمایشی، قدم‌های ask با پاسخ نمونه جلو می‌روند و قدم‌های gate منتظر تأیید انسان می‌مانند.'),
+      DOC==='journey'?h('div',{class:'row'},...dynViews().map(v=>h('button',{class:'pri',onclick:()=>{CUR=fromDyn(v);RUNS.unshift(CUR);persist();panel();stepThrough()}},v.title))):null,
+      DOC==='journey'?h('p',{style:'color:#dc2626'},'⚠ ضعف شناخته‌شده: قدم «پرداخت زیبال» (سرویس بیرونی و پول) gate ندارد؛ طبق قاعده باید تأیید انسان یا قانون روشن داشته باشد. در اجرا با ⚠ نشان داده می‌شود.'):null,
       h('div',{class:'row'},
         h('button',{class:'pri',onclick:()=>{CUR=simulate(root);RUNS.unshift(CUR);persist();panel()}},'▶ اجرای آزمایشی «'+titleName(IDX.get(root))+'»'),
         h('button',{onclick:stepThrough,disabled:!CUR},'⏯ نمایش گام‌به‌گام روی نمودار'),
