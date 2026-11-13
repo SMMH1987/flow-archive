@@ -295,6 +295,16 @@ body.n8full .node.n8 .n8l{color:#222}body.n8full .node.n8 .n8i{background:#fff!i
 body.n8full #n8side{background:#2b2b38}
 body.n8full #n8mini{display:none}
 .node.n8 .n8x{font-size:10.5px;color:#6366f1;margin-top:2px}
+
+/* آرام مثل n8n (calm-panels): بوم تمام‌عرض؛ پنل جزئیات فقط با انتخاب گره، کشویی از راست؛ درخت پشت دکمهٔ نوار کناری */
+body.n8on #p-dia{display:block!important}
+body.n8on #p-dia #tree{position:fixed;top:64px;right:64px;width:260px;max-height:calc(100vh - 80px);overflow:auto;z-index:22;box-shadow:0 10px 30px #0003}
+body.n8on:not(.treeopen) #p-dia #tree{display:none!important}
+body.n8on #p-dia #cv{height:calc(100vh - 90px)!important}
+body.n8on #insp{position:fixed;top:64px;bottom:12px;right:64px;width:380px;overflow:auto;z-index:21;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:-10px 0 30px #0002;transition:transform .2s}
+body.n8on:not(.inspopen) #insp{transform:translateX(120%);visibility:hidden}
+body.n8on .cvhint{display:none!important}
+#inspx{display:none}body.n8on #inspx{display:block;position:sticky;top:0;margin-inline-start:auto;z-index:2}
 </style>
 <div id="app">
   <div class="top">
@@ -2827,10 +2837,17 @@ function n8dashChrome(on){document.body.classList.toggle('n8full',on);const P=$(
 {const _rv=renderVers;renderVers=function(){_rv();$('#vers').append(h('button',{id:'n8mode',class:N8MODE?'on':'',title:'نمایش همهٔ نمودارها افقی، مثل n8n',onclick:()=>{N8MODE=!N8MODE;try{localStorage.setItem('n8mode',N8MODE?'1':'0')}catch(e){}NEEDFIT=true;renderVers();renderDia()}},N8MODE?'⇄ حالت n8n: روشن':'⇄ حالت n8n'),
   h('button',{class:'pri',onclick:()=>{N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderVers();renderDia()}},'⛶ تمام‌صفحه، دقیقاً مثل n8n'),h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['orig','📍 مختصات اصلی n8n (اگر از n8n وارد شده)'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)'],['journey','🧭 نقشهٔ سفر (Journey + Service Blueprint)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
 
+
+/* پنل کشویی: با انتخاب گره باز، با ✕ یا Esc بسته */
+{const _ri=renderInsp;renderInsp=function(){_ri();const I=$('#insp');document.body.classList.toggle('inspopen',!!SEL||!!SELE||HISTOPEN);
+  if(!I.querySelector('#inspx'))I.prepend(h('button',{id:'inspx',class:'sm',title:'بستن (Esc)',onclick:()=>{SEL=null;SELE=null;HISTOPEN=false;document.body.classList.remove('inspopen');renderDia()}},'✕ بستن'))}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('inspopen')){SEL=null;SELE=null;document.body.classList.remove('inspopen');renderDia();renderInsp()}});
+
 /* ───────── پوستهٔ n8n: نوار کناری، منوی فایل و نما، زبانه‌های ویرایشگر و اجراها ───────── */
 (function n8shell(){
   const top=$('.top'),tabs=$('#tabs'),vers=$('#vers');
   const side=h('nav',{id:'n8side','aria-label':'بخش‌ها'},h('div',{class:'logo'},'س'));
+  side.append(h('button',{title:'فهرست بخش‌ها',onclick:()=>{document.body.classList.toggle('treeopen')}},'🗂',h('span',{},'فهرست بخش‌ها')));
   const SB=[['dia','🗺','ویرایشگر فلو'],['run','▶','اجراها'],['mind','🧠','ذهن‌نقشه'],['int','🔗','پروژه‌ها و interop'],['out','📤','تغییرات و خروجی C4']];
   SB.forEach(([k,i,l])=>side.append(h('button',{'data-k':k,title:l,onclick:()=>{TAB=k;showTab()}},i,h('span',{},l))));
   document.body.prepend(side);
