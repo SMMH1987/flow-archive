@@ -311,6 +311,13 @@ body.n8on .cvhint{display:none!important}
 .pnlh .pt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}.pnlh .pt b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pnlh .pt small{font-size:11px}
 #n8mini::before{content:"نقشهٔ کوچک";position:absolute;bottom:2px;left:6px;font-size:10px;color:var(--mute);z-index:1}
 #inspx{display:block!important;position:static!important}
+
+.n8menu .dd button.vmi{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px}
+.vmi .vic{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;background:var(--lane);font-size:16px}
+.vmi .vtx{flex:1;display:flex;flex-direction:column;line-height:1.4;text-align:right}.vmi .vtx small{font-size:11px;color:var(--mute)}
+.vmi kbd{font-size:10.5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--mute);font-family:inherit}
+.vmi .vck{width:14px;color:#ea4b71;font-weight:800}
+.n8menu .dd button.vmi.on{background:var(--lane)!important;color:var(--ink)!important;border:0}.vmi.on .vic{border-color:#ea4b71}
 </style>
 <div id="app">
   <div class="top">
@@ -2857,6 +2864,7 @@ function n8dashChrome(on){document.body.classList.toggle('n8full',on);const P=$(
   I.prepend(h('div',{class:'pnlh'},n?lucide(n.kind):h('span',{class:'ic'},'⚙'),h('div',{class:'pt'},h('b',{},n?titleName(n):SELE!=null?'جزئیات فلش':'جزئیات'),h('small',{},n?(N8KIND[n.kind]||n.kind)+' · '+SEL:'ویرایش و تنظیمات')),
     h('button',{id:'inspx',class:'sm',title:'بستن (Esc)',onclick:()=>{SEL=null;SELE=null;HISTOPEN=false;document.body.classList.remove('inspopen');renderDia()}},'✕')))}}
 {const _rt=renderTree;renderTree=function(){_rt();const T=$('#tree');if(!T.querySelector('.pnlh'))T.prepend(h('div',{class:'pnlh'},h('span',{class:'ic'},'🗂'),h('div',{class:'pt'},h('b',{},'فهرست بخش‌ها'),h('small',{},'برای رفتن به هر بخش کلیک کن')),h('button',{class:'sm',onclick:()=>document.body.classList.remove('treeopen')},'✕')))}}
+document.addEventListener('keydown',e=>{if(/^[1-4]$/.test(e.key)&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)&&TAB==='dia'){const b=document.querySelectorAll('#vers .vmi')[+e.key-1];if(b)b.click()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('inspopen')){SEL=null;SELE=null;document.body.classList.remove('inspopen');renderDia();renderInsp()}});
 
 /* ───────── پوستهٔ n8n: نوار کناری، منوی فایل و نما، زبانه‌های ویرایشگر و اجراها ───────── */
@@ -2875,7 +2883,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.class
   const undo=$('#undo');undo.textContent='↶';undo.title='برگشت (Ctrl+Z)';
   const save=h('button',{class:'save',title:'متن کامل .c4 را در زبانهٔ خروجی ببین و کپی کن',onclick:()=>{TAB='out';showTab()}},'ذخیره (.c4)');
   const full=h('button',{class:'save',style:'background:#1f1f2e;border-color:#1f1f2e',title:'تمام‌صفحه، دقیقاً مثل n8n',onclick:()=>{TAB='dia';showTab();N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderDia()}},'⛶ نمای n8n');
-  top.replaceChildren(h1,fileM,viewM,tabs,full,undo,save,$('#file'));
+  top.replaceChildren(h1,fileM,viewM,tabs,undo,save,$('#file'));
   document.addEventListener('click',e=>document.querySelectorAll('.n8menu[open]').forEach(d=>{if(!d.contains(e.target))d.open=false}));
   // دکمه‌های انتخاب نقشه (۳ تای اول #vers) به منوی فایل می‌روند
   const _rv=renderVers;renderVers=function(){_rv();[...vers.children].slice(0,3).forEach(b=>fileDocs.append(b));
@@ -2892,10 +2900,14 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.class
   const main=[['n8n','➡ فلو (مثل n8n)','ترتیب اجرا، چپ‌به‌راست؛ برای دیدن و اجرا',()=>set(true,'row')],
     ['journey','🧭 سفر و مسئولیت','چه کسی کجا کار می‌کند، احساس و درد هر مرحله',()=>set(true,'journey')],
     ['classic','✏️ ویرایش کامل','کارت‌های بزرگ با skill، ورودی و خروجی؛ برای ویرایش',()=>set(false,null,4)]];
-  V.append(h('h4',{},'نمای اصلی'),...main.map(([k,l,d,f])=>h('button',{class:cur===k?'on':'',onclick:f},h('b',{},l),h('br'),h('small',{},d))));
-  const fs=old.find(b=>/تمام‌صفحه/.test(b.textContent)),rv=old.find(b=>/بازبینی/.test(b.textContent)),hs=old.find(b=>/تاریخچه/.test(b.textContent));
-  if(fs)fs.classList.remove('pri');V.append(h('h4',{},'ابزار'),...[fs,rv,hs].filter(Boolean));
-  const more=old.filter(b=>![fs,rv,hs].includes(b)&&b.tagName==='BUTTON'&&!/حالت n8n/.test(b.textContent)&&!/^➡ یک خط|سفر \(Journey/.test(b.textContent));
+  // مثل منوهای Figma/Linear: کاشی آیکن، عنوان، توضیح کوتاه، تیک انتخاب، میان‌بر صفحه‌کلید
+  main.push(['full','⛶ تمام‌صفحه (n8n)','فقط بوم، نوار اجرا و لاگ؛ دقیقاً مثل n8n',()=>{N8LAY='n8dash';N8MODE=true;NEEDFIT=true;renderVers();renderDia()}]);
+  const curK=N8LAY==='n8dash'?'full':cur;
+  V.append(h('h4',{},'نماها'),...main.map(([k,l,d,f],i)=>{const [ic,...t]=l.split(' ');return h('button',{class:'vmi'+(curK===k?' on':''),onclick:()=>{f();document.querySelectorAll('.n8menu[open]').forEach(x=>x.open=false)}},
+    h('span',{class:'vic'},ic),h('span',{class:'vtx'},h('b',{},t.join(' ')),h('small',{},d)),h('kbd',{},toFa(i+1)),h('span',{class:'vck'},curK===k?'✓':''))}));
+  const fs=null,fsOld=old.find(b=>/تمام‌صفحه/.test(b.textContent)),rv=old.find(b=>/بازبینی/.test(b.textContent)),hs=old.find(b=>/تاریخچه/.test(b.textContent));
+  V.append(h('h4',{},'ابزار'),...[rv,hs].filter(Boolean));
+  const more=old.filter(b=>![fsOld,rv,hs].includes(b)&&b.tagName==='BUTTON'&&!/حالت n8n/.test(b.textContent)&&!/^➡ یک خط|سفر \(Journey/.test(b.textContent));
   V.append(h('details',{},h('summary',{style:'cursor:pointer;padding:6px 10px;color:var(--mute)'},'بیشتر: نسخه‌های قدیمی و چیدمان‌های دیگر'),h('div',{class:'vers'},...more)))}}
 
 /* ───────── شروع ───────── */
