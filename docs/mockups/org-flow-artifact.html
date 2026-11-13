@@ -2570,7 +2570,8 @@ const N8=(()=>{
 {const _av=applyView;applyView=function(){_av();try{N8.mini()}catch(e){}}}
 
 /* ───────── حالت افقی n8n: همهٔ نمودارها چپ‌به‌راست با گره‌های مربعی ───────── */
-let N8MODE=true;try{const v=localStorage.getItem('n8mode');if(v!==null)N8MODE=v==='1'}catch(e){}
+let N8MODE=true,N8LAY='row';try{N8LAY=localStorage.getItem('n8lay')||'row'}catch(e){}
+let N8MODE_=0;try{const v=localStorage.getItem('n8mode');if(v!==null)N8MODE=v==='1'}catch(e){}
 const N8ICON={triggerStep:'⚡',autoStep:'⚙️',askStep:'💬',gateStep:'✋',routeStep:'🔀',subflowStep:'⧉',noteStep:'📌',orgBox:'📦',flow:'🔁',section:'🗂',role:'👤',tool:'🔧',project:'🧩',actor:'🙂'};
 const N8KIND={triggerStep:'شروع‌کننده',autoStep:'خودکار',askStep:'پرسش از انسان',gateStep:'تأیید انسان',routeStep:'شاخه',subflowStep:'زیرفلو',orgBox:'فاز',section:'بخش',flow:'فرایند',role:'نقش'};
 function renderN8n(rid){
@@ -2586,13 +2587,32 @@ function renderN8n(rid){
   // قدم‌های بدون رابطه پشت سر هم
   let mx=Math.max(0,...L.values());ps.forEach(q=>{if(!rels.some(([r])=>r.from===q||r.to===q)&&ps.length>1){L.set(q,++mx)}});
   const cols=new Map();ps.forEach(q=>{const c=L.get(q);(cols.get(c)||cols.set(c,[]).get(c)).push(q)});
-  const DX=230,DY=170,X0=40,Y0=60,B=new Map();const maxRows=Math.max(1,...[...cols.values()].map(a=>a.length));
-  const PER=Math.max(2,Math.min(6,Math.floor((($('#cv')||{}).clientWidth||1200)/230))),bands=Math.ceil(cols.size/PER),bandH=maxRows*DY+60;
-  [...cols.keys()].sort((a,b)=>a-b).forEach((c,ci)=>{const a=cols.get(c),bi=Math.floor(ci/PER),xi=ci%PER;a.forEach((q,j)=>B.set(q,{x:X0+xi*DX,y:Y0+bi*bandH+(j+(maxRows-a.length)/2)*DY,w:150,h:120}))});
-  const W=Math.max(600,X0*2+Math.min(cols.size,PER)*DX),H=Math.max(320,Y0*2+bands*bandH),svg=newSvg(W,H);
+  const DX=230,DY=165,X0=150,Y0=110,B=new Map(),ck=[...cols.keys()].sort((a,b)=>a-b),NC=ck.length;
+  const maxRows=Math.max(1,...[...cols.values()].map(a=>a.length));
+  let W,H,lanes=[],bandH=0,PER=NC;
+  if(N8LAY==='snake'){PER=Math.max(2,Math.min(6,Math.floor((($('#cv')||{}).clientWidth||1200)/230)));bandH=maxRows*DY+60;
+    ck.forEach((c,ci)=>{const a=cols.get(c),bi=Math.floor(ci/PER),xi=ci%PER;a.forEach((q,j)=>B.set(q,{x:X0+xi*DX,y:Y0+bi*bandH+(j+(maxRows-a.length)/2)*DY,w:150,h:120,ci}))});
+    W=X0+Math.min(NC,PER)*DX+40;H=Y0+Math.ceil(NC/PER)*bandH+40}
+  else if(N8LAY==='lanes'){const ag=new Set(ps.map(q=>meta(IDX.get(q),'agent')).filter(Boolean)),key=q=>{const n=IDX.get(q);return(ag.size>1&&meta(n,'agent'))||N8KIND[n.kind]||n.kind};
+    ps.forEach(q=>{if(!lanes.includes(key(q)))lanes.push(key(q))});
+    const used=new Map();ck.forEach((c,ci)=>cols.get(c).forEach(q=>{const li=lanes.indexOf(key(q)),k=li+':'+ci,o=used.get(k)||0;used.set(k,o+1);B.set(q,{x:X0+ci*DX+o*20,y:Y0+li*DY+o*14,w:150,h:120,ci})}));
+    W=X0+NC*DX+40;H=Y0+lanes.length*DY+20}
+  else if(N8LAY==='stairs'){let i=0;ck.forEach((c,ci)=>cols.get(c).forEach(q=>{B.set(q,{x:X0+ci*DX,y:Y0+(i++)*110,w:150,h:120,ci})}));W=X0+NC*DX+40;H=Y0+ps.length*110+60}
+  else{ck.forEach((c,ci)=>{const a=cols.get(c);a.forEach((q,j)=>B.set(q,{x:X0+ci*DX,y:Y0+(j+(maxRows-a.length)/2)*DY,w:150,h:120,ci}))});W=X0+NC*DX+40;H=Y0+maxRows*DY+40}
+  W=Math.max(600,W);H=Math.max(320,H);const svg=newSvg(W,H);
+  // محور زمان: هر ستون یک مرحله؛ اگر قدم‌ها metadata duration (روز) داشته باشند، روز تجمعی هم نوشته می‌شود
+  const dur=q=>parseFloat(meta(IDX.get(q),'duration')||meta(IDX.get(q),'sla')||'')||0;let acc=0;const dayAt=ck.map(c=>{acc+=Math.max(0,...cols.get(c).map(dur));return acc});
+  const axis=(y0,from,to)=>{svg.append(sv('line',{x1:X0-20,y1:y0,x2:X0+(to-from)*DX+150,y2:y0,style:'stroke:var(--mute)','stroke-width':1.5,'marker-end':'url(#mkedge)'}));
+    for(let ci=from;ci<to;ci++){const x=X0+(ci-from)*DX+75;svg.append(sv('circle',{cx:x,cy:y0,r:5,style:'fill:#ea4b71'}));
+      const t=sv('text',{x,y:y0-12,'text-anchor':'middle','font-size':12,style:'fill:var(--ink);font-family:var(--font);font-weight:700'});t.textContent='مرحلهٔ '+toFa(ci+1);svg.append(t);
+      if(dayAt[NC-1]){const t2=sv('text',{x,y:y0+20,'text-anchor':'middle','font-size':11,style:'fill:var(--mute);font-family:var(--font)'});t2.textContent='تا روز '+toFa(dayAt[ci]);svg.append(t2)}}
+    const lt=sv('text',{x:X0-30,y:y0+4,'text-anchor':'end','font-size':11,style:'fill:var(--mute);font-family:var(--font)'});lt.textContent='زمان →';svg.append(lt)};
+  if(N8LAY==='snake'){for(let b=0;b*PER<NC;b++)axis(Y0-50+b*bandH,b*PER,Math.min(NC,(b+1)*PER))}else axis(Y0-50,0,NC);
+  if(N8LAY==='lanes')lanes.forEach((l,li)=>{const y=Y0+li*DY-18;svg.append(sv('rect',{x:10,y,width:W-20,height:DY-8,rx:8,style:'fill:var(--card);stroke:var(--line)','fill-opacity':.55}));
+    const t=sv('text',{x:20,y:y+DY/2,'font-size':12.5,style:'fill:var(--ink);font-family:var(--font);font-weight:700'});t.textContent=l.length>16?l.slice(0,15)+'…':l;svg.append(t)});
   world.style.width=W+'px';world.style.height=H+'px';world.style.direction='ltr';world.append(svg);
   rels.forEach(([r,i])=>{const a=B.get(r.from),b=B.get(r.to);const x1=a.x+75+38,y1=a.y+36,x2=b.x+75-38,y2=b.y+36;
-    let d;if(b.y>a.y+100&&x2<x1){const ym=a.y+120;d=`M${x1} ${y1} C${x1+50} ${y1} ${x1+50} ${ym} ${x1} ${ym} L${x2} ${ym+20} C${x2-50} ${ym+20} ${x2-50} ${y2} ${x2} ${y2}`}else if(x2>x1)d=`M${x1} ${y1} C${x1+60} ${y1} ${x2-60} ${y2} ${x2} ${y2}`;else{const yy=Math.max(a.y,b.y)+130;d=`M${x1} ${y1} C${x1+70} ${y1} ${x1+70} ${yy} ${(x1+x2)/2} ${yy} S${x2-70} ${y2} ${x2} ${y2}`}
+    let d;if(N8LAY==='snake'&&b.y>a.y+100&&x2<x1){const ym=a.y+120;d=`M${x1} ${y1} C${x1+50} ${y1} ${x1+50} ${ym} ${x1} ${ym} L${x2} ${ym+20} C${x2-50} ${ym+20} ${x2-50} ${y2} ${x2} ${y2}`}else if(x2>x1)d=`M${x1} ${y1} C${x1+60} ${y1} ${x2-60} ${y2} ${x2} ${y2}`;else{const yy=Math.max(a.y,b.y)+130;d=`M${x1} ${y1} C${x1+70} ${y1} ${x1+70} ${yy} ${(x1+x2)/2} ${yy} S${x2-70} ${y2} ${x2} ${y2}`}
     const lb=(IDX.get(r.from).kind==='routeStep'||(r.label&&r.label!=='بعد'))?r.label:'';
     drawEdge(svg,d,{idx:i,label:lb,lx:(x1+x2)/2,ly:(y1+y2)/2-10,dash:(IDX.get(r.to).tags||[]).includes('onError')})});
   const vis=new Map();
@@ -2607,9 +2627,10 @@ function renderN8n(rid){
   if(!N8MODE){$('#world').style.direction='';return _rd()}
   if(!VIEWP.startsWith('ov:')&&!IDX.has(VIEWP))VIEWP='ov:'+roots()[0].id;
   RV=REVIEW?reviewFind():new Map();renderNav();renderTree();
-  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=Math.max(.7,Math.min(1,cv.clientWidth/(LAST.W+30),cv.clientHeight/(LAST.H+30)));VIEW.x=Math.max(10,(cv.clientWidth-LAST.W*VIEW.k)/2);VIEW.y=10;applyView();NEEDFIT=false}
+  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=Math.max(.6,Math.min(1,cv.clientHeight/(LAST.H+30),N8LAY==='snake'?cv.clientWidth/(LAST.W+30):1));VIEW.x=LAST.W*VIEW.k<cv.clientWidth?(cv.clientWidth-LAST.W*VIEW.k)/2:10;VIEW.y=10;applyView();NEEDFIT=false}
   try{N8.badges()}catch(e){}}}
-{const _rv=renderVers;renderVers=function(){_rv();$('#vers').append(h('button',{id:'n8mode',class:N8MODE?'on':'',title:'نمایش همهٔ نمودارها افقی، مثل n8n',onclick:()=>{N8MODE=!N8MODE;try{localStorage.setItem('n8mode',N8MODE?'1':'0')}catch(e){}NEEDFIT=true;renderVers();renderDia()}},N8MODE?'⇄ حالت n8n: روشن':'⇄ حالت n8n'))}}
+{const _rv=renderVers;renderVers=function(){_rv();$('#vers').append(h('button',{id:'n8mode',class:N8MODE?'on':'',title:'نمایش همهٔ نمودارها افقی، مثل n8n',onclick:()=>{N8MODE=!N8MODE;try{localStorage.setItem('n8mode',N8MODE?'1':'0')}catch(e){}NEEDFIT=true;renderVers();renderDia()}},N8MODE?'⇄ حالت n8n: روشن':'⇄ حالت n8n'),
+  h('h4',{},'چیدمان خودکار افقی'),...[['row','➡ یک خط افقی با محور زمان'],['lanes','🏊 ستون‌های افقی بر اساس ایجنت (Swimlane)'],['stairs','📶 پلکانی (هر قدم یک ردیف، مثل گانت)'],['snake','↩ چندردیفه (شکستن مسیر بلند)']].map(([k,l])=>h('button',{class:N8LAY===k?'on':'',onclick:()=>{N8LAY=k;N8MODE=true;try{localStorage.setItem('n8lay',k)}catch(e){}NEEDFIT=true;renderVers();renderDia()}},l)))}}
 
 /* ───────── پوستهٔ n8n: نوار کناری، منوی فایل و نما، زبانه‌های ویرایشگر و اجراها ───────── */
 (function n8shell(){
