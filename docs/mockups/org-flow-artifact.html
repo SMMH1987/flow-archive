@@ -186,6 +186,54 @@ button.danger{border-color:var(--e-back);color:var(--e-back)}button.danger:hover
 #n8mini b{position:absolute;border:1.5px solid #ea4b71}
 .n8t{width:100%;border-collapse:collapse;font-size:.85rem}.n8t td,.n8t th{border-bottom:1px solid #9994;padding:4px 6px;text-align:right}
 .n8log{font-family:ui-monospace,monospace;font-size:.78rem;white-space:pre-wrap;direction:ltr;text-align:left;max-height:220px;overflow:auto;background:#8881;padding:8px;border-radius:6px}
+
+/* حالت افقی n8n */
+.node.n8{width:150px!important;height:auto!important;min-height:0!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;text-align:center;overflow:visible}
+.node.n8 .n8i{width:72px;height:72px;margin:0 auto;border-radius:14px;background:var(--panel,#fff);border:2.5px solid #94a3b8;display:grid;place-items:center;font-size:28px;position:relative}
+.node.n8.triggerStep .n8i{border-radius:36px 14px 14px 36px;border-color:#f59e0b}
+.node.n8.autoStep .n8i{border-color:#16a34a}.node.n8.askStep .n8i{border-color:#f59e0b}
+.node.n8.gateStep .n8i{border-color:#dc2626}.node.n8.routeStep .n8i{border-color:#6366f1}
+.node.n8.subflowStep .n8i{border-style:double;border-width:5px;border-color:#0ea5e9}
+.node.n8.orgBox .n8i{border-color:#475569;width:84px;height:84px}
+.node.n8.sel .n8i{box-shadow:0 0 0 4px #ea4b71}
+.node.n8 .n8l{font-size:12.5px;font-weight:600;margin-top:6px;line-height:1.45;max-height:4.4em;overflow:hidden}
+.node.n8 .n8k{font-size:10.5px;opacity:.65}
+.node.n8 .n8i .lk{position:absolute;top:-9px;right:-9px;font-size:13px}
+.node.n8 .n8i .ct{position:absolute;bottom:-9px;right:-9px;font-size:10px;background:#475569;color:#fff;border-radius:8px;padding:0 5px}
+.node.n8.n8step .n8i{box-shadow:0 0 0 5px #ea4b71}
+.node.n8.n8step{box-shadow:none!important}
+#n8mode.on{background:#ea4b71;color:#fff;border-color:#ea4b71}
+
+/* ── پوستهٔ n8n‌گونه ── */
+body{background:var(--bg)}
+#app{padding:0!important;min-height:100vh}
+body{padding-right:calc(56px + env(safe-area-inset-right,0px))}
+body.n8on #nav{display:none}
+body.n8on #cv{height:calc(100vh - 90px)!important;min-height:520px}
+#n8side{position:fixed;top:env(safe-area-inset-top,0px);bottom:0;right:0;width:56px;background:#1f1f2e;display:flex;flex-direction:column;align-items:center;gap:6px;padding-block:10px;z-index:30}
+#n8side .logo{width:34px;height:34px;border-radius:9px;background:#ea4b71;color:#fff;display:grid;place-items:center;font-weight:800;margin-bottom:10px}
+#n8side button{width:40px;height:40px;border:0;border-radius:8px;background:transparent;color:#c9c9d6;font-size:18px;padding:0;position:relative}
+#n8side button:hover,#n8side button.on{background:#34344a;color:#fff}
+#n8side button span{display:none;position:absolute;right:46px;top:8px;background:#34344a;color:#fff;font-size:12px;padding:2px 8px;border-radius:6px;white-space:nowrap}
+#n8side button:hover span{display:block}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--card);border-bottom:1px solid var(--line);padding:8px 16px;margin:0 0 10px!important;flex-wrap:nowrap!important;min-height:52px}
+.top h1{font-size:15px!important;flex:0 1 auto!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top h1 small{display:none}.top h1 .crumb{color:var(--mute);font-weight:400}
+.top .tabs{margin-inline:auto;background:var(--lane);border:1px solid var(--line);border-radius:8px;padding:2px;flex-wrap:nowrap}
+.top .tabs button{border:0;background:transparent;border-radius:6px;padding:3px 14px}
+.top .tabs button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px #0002}
+.top .tabs button.aux{display:none}
+.n8menu{position:relative}.n8menu>summary{list-style:none;cursor:pointer;border:1px solid var(--line);border-radius:8px;padding:3px 12px;background:var(--card);white-space:nowrap}
+.n8menu>summary::-webkit-details-marker{display:none}
+.n8menu[open]>summary{border-color:#ea4b71}
+.n8menu .dd{position:absolute;top:calc(100% + 6px);left:0;min-width:300px;max-width:min(520px,90vw);background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px #0003;padding:8px;display:flex;flex-direction:column;gap:4px;z-index:40}
+.n8menu .dd h4{margin:6px 6px 2px;font-size:11px;color:var(--mute);font-weight:600}
+.n8menu .dd button{text-align:right;border:0;justify-content:flex-start;width:100%;padding:6px 10px}
+.n8menu .dd button:hover{background:var(--lane)}
+.n8menu .dd .vers{flex-direction:column;align-items:stretch}
+.top .save{background:#ea4b71;border-color:#ea4b71;color:#fff;font-weight:600}
+#p-dia,#p-mind,#p-int,#p-out,#p-run{padding-inline:16px}
+#cv{background-color:var(--lane)}
 </style>
 <div id="app">
   <div class="top">
@@ -2520,6 +2568,72 @@ const N8=(()=>{
   return{badges,panel,mini}})();
 {const _rd=renderDia;renderDia=function(){_rd();try{N8.badges()}catch(e){console.warn(e)}}}
 {const _av=applyView;applyView=function(){_av();try{N8.mini()}catch(e){}}}
+
+/* ───────── حالت افقی n8n: همهٔ نمودارها چپ‌به‌راست با گره‌های مربعی ───────── */
+let N8MODE=true;try{const v=localStorage.getItem('n8mode');if(v!==null)N8MODE=v==='1'}catch(e){}
+const N8ICON={triggerStep:'⚡',autoStep:'⚙️',askStep:'💬',gateStep:'✋',routeStep:'🔀',subflowStep:'⧉',noteStep:'📌',orgBox:'📦',flow:'🔁',section:'🗂',role:'👤',tool:'🔧',project:'🧩',actor:'🙂'};
+const N8KIND={triggerStep:'شروع‌کننده',autoStep:'خودکار',askStep:'پرسش از انسان',gateStep:'تأیید انسان',routeStep:'شاخه',subflowStep:'زیرفلو',orgBox:'فاز',section:'بخش',flow:'فرایند',role:'نقش'};
+function renderN8n(rid){
+  const world=$('#world');world.replaceChildren();
+  let ps;
+  if(MACRO||!rid)ps=roots().map(n=>n.id);
+  else{ps=[];const R=IDX.get(rid);const rec=(n,p)=>n.children.forEach(c=>{const q=p+'.'+c.id;if(isStep(c)||!c.children.length)ps.push(q);else{ps.push(q);rec(c,q)}});rec(R,rid);
+    const st=ps.filter(q=>isStep(IDX.get(q)));if(st.length)ps=st.concat(ps.filter(q=>!isStep(IDX.get(q))&&!ps.some(o=>o.startsWith(q+'.')&&isStep(IDX.get(o)))))}
+  const set=new Set(ps),rels=[];M.rels.forEach((r,i)=>{if(set.has(r.from)&&set.has(r.to)&&r.from!==r.to)rels.push([r,i])});
+  // لایه‌بندی: طولانی‌ترین مسیر از شروع (بدون حلقه)
+  const L=new Map(ps.map(q=>[q,0]));
+  for(let k=0;k<ps.length;k++){let ch=false;rels.forEach(([r])=>{if(ps.indexOf(r.to)>ps.indexOf(r.from)||!rels.some(([b])=>b.from===r.to&&b.to===r.from)){const v=L.get(r.from)+1;if(v>L.get(r.to)&&v<ps.length){L.set(r.to,v);ch=true}}});if(!ch)break}
+  // قدم‌های بدون رابطه پشت سر هم
+  let mx=Math.max(0,...L.values());ps.forEach(q=>{if(!rels.some(([r])=>r.from===q||r.to===q)&&ps.length>1){L.set(q,++mx)}});
+  const cols=new Map();ps.forEach(q=>{const c=L.get(q);(cols.get(c)||cols.set(c,[]).get(c)).push(q)});
+  const DX=230,DY=170,X0=40,Y0=60,B=new Map();const maxRows=Math.max(1,...[...cols.values()].map(a=>a.length));
+  const PER=Math.max(2,Math.min(6,Math.floor((($('#cv')||{}).clientWidth||1200)/230))),bands=Math.ceil(cols.size/PER),bandH=maxRows*DY+60;
+  [...cols.keys()].sort((a,b)=>a-b).forEach((c,ci)=>{const a=cols.get(c),bi=Math.floor(ci/PER),xi=ci%PER;a.forEach((q,j)=>B.set(q,{x:X0+xi*DX,y:Y0+bi*bandH+(j+(maxRows-a.length)/2)*DY,w:150,h:120}))});
+  const W=Math.max(600,X0*2+Math.min(cols.size,PER)*DX),H=Math.max(320,Y0*2+bands*bandH),svg=newSvg(W,H);
+  world.style.width=W+'px';world.style.height=H+'px';world.style.direction='ltr';world.append(svg);
+  rels.forEach(([r,i])=>{const a=B.get(r.from),b=B.get(r.to);const x1=a.x+75+38,y1=a.y+36,x2=b.x+75-38,y2=b.y+36;
+    let d;if(b.y>a.y+100&&x2<x1){const ym=a.y+120;d=`M${x1} ${y1} C${x1+50} ${y1} ${x1+50} ${ym} ${x1} ${ym} L${x2} ${ym+20} C${x2-50} ${ym+20} ${x2-50} ${y2} ${x2} ${y2}`}else if(x2>x1)d=`M${x1} ${y1} C${x1+60} ${y1} ${x2-60} ${y2} ${x2} ${y2}`;else{const yy=Math.max(a.y,b.y)+130;d=`M${x1} ${y1} C${x1+70} ${y1} ${x1+70} ${yy} ${(x1+x2)/2} ${yy} S${x2-70} ${y2} ${x2} ${y2}`}
+    const lb=(IDX.get(r.from).kind==='routeStep'||(r.label&&r.label!=='بعد'))?r.label:'';
+    drawEdge(svg,d,{idx:i,label:lb,lx:(x1+x2)/2,ly:(y1+y2)/2-10,dash:(IDX.get(r.to).tags||[]).includes('onError')})});
+  const vis=new Map();
+  ps.forEach(q=>{const n=IDX.get(q),b=B.get(q);vis.set(q,b);const kids=n.children.filter(isStep).length;
+    world.append(h('div',{class:`node n8 ${n.kind}${SEL===q?' sel':''}${lockedN(n)?' locked':''}`,'data-p':q,style:`left:${b.x}px;top:${b.y}px`},
+      h('div',{class:'n8i'},N8ICON[n.kind]||'◻️',lockedN(n)?h('span',{class:'lk'},'🔒'):null,kids?h('span',{class:'ct',title:'قدم‌های داخلی'},toFa(kids)):null),
+      h('div',{class:'n8l'},titleName(n)),h('div',{class:'n8k'},(N8KIND[n.kind]||n.kind)+(n.tech&&!/—/.test(n.tech)?' · '+n.tech.replace(/^skill:\s*/,''):''))))});
+  if(!ps.length)world.append(h('div',{class:'empty'},'این بخش هنوز قدمی ندارد.'));
+  return{W,H,vis}}
+{const _rd=renderDia;renderDia=function(){
+  document.body.classList.toggle('n8on',N8MODE);
+  if(!N8MODE){$('#world').style.direction='';return _rd()}
+  if(!VIEWP.startsWith('ov:')&&!IDX.has(VIEWP))VIEWP='ov:'+roots()[0].id;
+  RV=REVIEW?reviewFind():new Map();renderNav();renderTree();
+  LAST=renderN8n(MACRO?null:rootOfView());applyView();if(NEEDFIT&&!$('#p-dia').hidden){const cv=$('#cv');VIEW.k=Math.max(.7,Math.min(1,cv.clientWidth/(LAST.W+30),cv.clientHeight/(LAST.H+30)));VIEW.x=Math.max(10,(cv.clientWidth-LAST.W*VIEW.k)/2);VIEW.y=10;applyView();NEEDFIT=false}
+  try{N8.badges()}catch(e){}}}
+{const _rv=renderVers;renderVers=function(){_rv();$('#vers').append(h('button',{id:'n8mode',class:N8MODE?'on':'',title:'نمایش همهٔ نمودارها افقی، مثل n8n',onclick:()=>{N8MODE=!N8MODE;try{localStorage.setItem('n8mode',N8MODE?'1':'0')}catch(e){}NEEDFIT=true;renderVers();renderDia()}},N8MODE?'⇄ حالت n8n: روشن':'⇄ حالت n8n'))}}
+
+/* ───────── پوستهٔ n8n: نوار کناری، منوی فایل و نما، زبانه‌های ویرایشگر و اجراها ───────── */
+(function n8shell(){
+  const top=$('.top'),tabs=$('#tabs'),vers=$('#vers');
+  const side=h('nav',{id:'n8side','aria-label':'بخش‌ها'},h('div',{class:'logo'},'س'));
+  const SB=[['dia','🗺','ویرایشگر فلو'],['run','▶','اجراها'],['mind','🧠','ذهن‌نقشه'],['int','🔗','پروژه‌ها و interop'],['out','📤','تغییرات و خروجی C4']];
+  SB.forEach(([k,i,l])=>side.append(h('button',{'data-k':k,title:l,onclick:()=>{TAB=k;showTab()}},i,h('span',{},l))));
+  document.body.prepend(side);
+  const h1=top.querySelector('h1');h1.insertBefore(h('span',{class:'crumb'},'فلوها / '),h1.firstChild);
+  const mk=(lbl,...kids)=>h('details',{class:'n8menu'},h('summary',{},lbl),h('div',{class:'dd'},...kids));
+  const fileDocs=h('div',{class:'vers'});
+  const fileM=mk('📁 فایل',h('h4',{},'جدید از قالب'),fileDocs,h('h4',{},'باز کردن و برگرداندن'),$('#load'),$('#reset'));
+  const viewM=mk('👁 نما',vers);
+  const undo=$('#undo');undo.textContent='↶';undo.title='برگشت (Ctrl+Z)';
+  const save=h('button',{class:'save',title:'متن کامل .c4 را در زبانهٔ خروجی ببین و کپی کن',onclick:()=>{TAB='out';showTab()}},'ذخیره (.c4)');
+  top.replaceChildren(h1,fileM,viewM,tabs,undo,save,$('#file'));
+  document.addEventListener('click',e=>document.querySelectorAll('.n8menu[open]').forEach(d=>{if(!d.contains(e.target))d.open=false}));
+  // دکمه‌های انتخاب نقشه (۳ تای اول #vers) به منوی فایل می‌روند
+  const _rv=renderVers;renderVers=function(){_rv();[...vers.children].slice(0,3).forEach(b=>fileDocs.append(b));
+    while(fileDocs.children.length>3)fileDocs.firstChild.remove()};
+  const _st=showTab;showTab=function(){_st();
+    tabs.querySelectorAll('button').forEach(b=>{const t=b.textContent;b.classList.toggle('aux',!/فلوچارت|اجراها/.test(t));if(/فلوچارت/.test(t))b.textContent='ویرایشگر';if(/اجراها/.test(t))b.textContent='اجراها'});
+    side.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.k===TAB))};
+})();
 
 /* ───────── شروع ───────── */
 (function init(){
