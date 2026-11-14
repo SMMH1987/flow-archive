@@ -1,0 +1,94 @@
+<!doctype html><html lang="fa"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مرکز فرماندهی پروژه‌ها</title>
+<style>
+/* layout: one infinite n8n-like canvas; top bar, floating zoom, slide-in drawer for details and critique */
+:root{--bg:#eef1f0;--grid:#c9d1cd;--panel:#ffffff;--ink:#17201c;--mute:#5d6b65;--line:#b9c4bf;--acc:#0f7a5c;--warn:#b7791f;--bad:#b4233a;--ok:#1f8a4c;--frame:#ffffffaa;
+--fa:'Vazirmatn',Tahoma,sans-serif;--mono:'JetBrains Mono',Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141816;--grid:#2c3531;--panel:#1d2421;--ink:#e3ebe7;--mute:#93a39c;--line:#3c4a44;--acc:#3cc59a;--warn:#e0a84a;--bad:#ef6b7f;--ok:#56c987;--frame:#1d242188;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141816;--grid:#2c3531;--panel:#1d2421;--ink:#e3ebe7;--mute:#93a39c;--line:#3c4a44;--acc:#3cc59a;--warn:#e0a84a;--bad:#ef6b7f;--ok:#56c987;--frame:#1d242188;color-scheme:dark}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--fa);overflow:hidden}
+.top{position:fixed;inset:0 0 auto;z-index:5;display:flex;gap:8px;align-items:center;flex-wrap:wrap;direction:rtl;background:var(--panel);border-bottom:1px solid var(--line);padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:calc(8px + env(safe-area-inset-top,0px))}
+.top b{font-weight:800}.top .sp{flex:1}
+button{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer}
+button:focus-visible{outline:2px solid var(--acc)}
+#vp{position:fixed;inset:0;cursor:grab;touch-action:none;background-image:radial-gradient(var(--grid) 1.2px,transparent 1.2px);background-size:20px 20px}
+#vp.drag{cursor:grabbing}
+#world{position:absolute;left:0;top:0;transform-origin:0 0}
+.frame{position:absolute;border:1.5px dashed var(--line);border-radius:14px;background:var(--frame);direction:rtl}
+.fh{display:flex;gap:10px;align-items:center;padding:8px 12px;font-weight:600}
+.thumb{width:74px;height:44px;border-radius:6px;border:1px solid var(--line);background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--acc) 14%,transparent) 0 6px,transparent 6px 12px);font-size:9px;color:var(--mute);display:grid;place-items:center;text-align:center}
+.pill{font-size:11px;padding:0 8px;border-radius:10px;border:1px solid currentColor;font-weight:400}
+.ver{font-family:var(--mono);font-size:11px;color:var(--mute)}
+.node{position:absolute;width:96px;height:96px;border-radius:12px;background:var(--panel);border:2px solid var(--line);display:grid;place-items:center;font-size:30px;cursor:pointer;z-index:2;box-shadow:0 1px 3px #0002}
+.node.ok{border-color:var(--ok)}.node.gate{border-color:var(--warn)}.node.bad{border-color:var(--bad)}.node.sel{outline:3px solid var(--acc);outline-offset:3px}
+.node .lb{position:absolute;top:102px;width:150px;left:-27px;text-align:center;font-size:12px;line-height:1.4;direction:rtl}
+.node .st{position:absolute;top:-9px;right:-9px;font-size:12px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--panel);border:1px solid var(--line)}
+svg#edges{position:absolute;left:0;top:0;z-index:1;overflow:visible;pointer-events:none}
+svg text{fill:var(--acc);font-family:var(--fa);font-size:12px}
+.zoom{position:fixed;left:calc(16px + env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5;display:flex;gap:4px}
+.legend{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5;direction:rtl;font-size:12px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:flex;gap:10px;flex-wrap:wrap;max-width:calc(100% - 140px)}
+#drawer{position:fixed;top:0;bottom:0;right:0;z-index:6;width:min(420px,100%);background:var(--panel);border-left:1px solid var(--line);direction:rtl;overflow:auto;padding:16px;padding-top:calc(56px + env(safe-area-inset-top,0px));box-sizing:border-box;line-height:1.7;box-shadow:-4px 0 20px #0003}
+#crit{position:fixed;inset:0;z-index:7;background:var(--bg);overflow:auto;direction:rtl;line-height:1.7;padding-block:calc(20px + env(safe-area-inset-top,0px)) 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mut{color:var(--mute)}.mono{font-family:var(--mono);direction:ltr;unicode-bidi:isolate}
+h2{font-size:1.15rem;margin-block:24px 8px;text-wrap:balance}
+table{border-collapse:collapse;width:100%;font-size:.85rem;min-width:760px}
+th,td{border-bottom:1px solid var(--line);padding:6px;text-align:right;vertical-align:top}th{color:var(--mute)}
+.wrap{overflow-x:auto}.y{color:var(--ok)}.p{color:var(--warn)}.n{color:var(--bad)}
+.rec{border:2px solid var(--acc);border-radius:8px;padding:12px 16px;background:var(--panel)}
+p,li{max-width:75ch}a{color:var(--acc)}
+</style><style>.thumb img{width:100%;height:100%;object-fit:cover;border-radius:6px}.err{color:var(--bad)}.ok{color:var(--ok)}</style></head><body>
+<div class="top"><b>مرکز فرماندهی</b><span class="mut" id="sum" style="font-size:12px">در حال خواندن پروژه‌ها…</span><span class="sp"></span>
+<select id="jump" aria-label="رفتن به پروژه"></select><button id="reload">↻ تازه‌سازی</button></div>
+<div id="vp"><div id="world"><svg id="edges" width="1" height="1"></svg></div></div>
+<div class="zoom"><button id="zi">+</button><button id="zo">−</button><button id="fit">⛶ همه</button></div>
+<div class="legend"><span style="color:var(--ok)">■ انجام‌شده</span><span style="color:var(--warn)">■ منتظر تأیید</span><span style="color:var(--bad)">■ خراب</span><span style="color:var(--acc)">┅ ارتباط بین پروژه‌ها</span></div>
+<aside id="drawer" hidden></aside>
+<script>
+const vp=document.getElementById('vp'),W=document.getElementById('world'),E=document.getElementById('edges'),dw=document.getElementById('drawer');
+let P=[],s=.7,tx=40,ty=80,BW=0,BH=0;
+const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function load(){P=await (await fetch('/api/projects')).json();draw()}
+function draw(){
+ W.querySelectorAll('.frame,.node').forEach(e=>e.remove());const pos={};let eh='<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="var(--line)"/></marker></defs>';
+ P.forEach((f,k)=>{const n=(f.steps||[]).length,w=Math.max(420,n*170+60),x=0,y=k*330;f._x=x;f._y=y;f._w=w;f._h=250;BW=Math.max(BW,w);BH=y+250;
+  const d=document.createElement('div');d.className='frame';Object.assign(d.style,{left:x+'px',top:y+'px',width:w+'px',height:'250px'});
+  const v=(f.versions||[])[0];
+  d.innerHTML=`<div class="fh"><div class="thumb">${f.shot_url?`<img src="${f.shot_url}" alt="">`:'بدون عکس'}</div><div>${esc(f.name)} <span class="pill">${esc(f.status||'')}</span> ${f.dirty?`<span class="pill" style="color:var(--warn)">${f.dirty} تغییر ذخیره‌نشده</span>`:''}${f.error?`<span class="err">${esc(f.error)}</span>`:''}<div class="ver">${v?esc(v.hash+' · '+v.date+' · '+v.msg.slice(0,50)):''}</div></div></div>`;
+  d.querySelector('.fh').onclick=e=>{e.stopPropagation();showProj(f)};W.appendChild(d);
+  (f.steps||[]).forEach((st,i)=>{const nx=x+w-60-96-i*170,ny=y+100;pos[f.id+':'+st.id]=[nx,ny];
+   const el=document.createElement('div');el.className='node '+(st.state||'');Object.assign(el.style,{left:nx+'px',top:ny+'px'});
+   el.innerHTML=esc(st.icon||'▢')+`<span class="st">${st.state=='ok'?'✓':st.state=='gate'?'⏸':st.state=='bad'?'✗':'·'}</span><span class="lb">${esc(st.title)}</span>`;
+   el.onclick=e=>{e.stopPropagation();if(st.url)window.open(st.url,'_blank');else showProj(f,st)};W.appendChild(el);
+   if(i>0){const [px,py]=pos[f.id+':'+f.steps[i-1].id];eh+=`<path d="M${px} ${py+48} H${nx+96}" stroke="var(--line)" stroke-width="2" fill="none" marker-end="url(#ar)"/>`}});
+ });
+ let li=0;P.forEach(f=>(f.links||[]).forEach(l=>{li++;const a=pos[f.id+':'+l.from],b=pos[l.to];
+  if(!a||!b){return}const ax=a[0]+48,bx=b[0]+48,down=b[1]>a[1],sy=down?a[1]+96:a[1],ey=down?b[1]:b[1]+96,my=(sy+ey)/2;
+  eh+=`<path d="M${ax} ${sy} C${ax} ${my} ${bx} ${my} ${bx} ${ey}" stroke="var(--acc)" stroke-width="2" stroke-dasharray="6 5" fill="none"/><text x="${(ax+bx)/2+6}" y="${my-4+li*18-18}">${esc(l.label)} · ${esc(l.via||'')}</text>`}));
+ E.innerHTML=eh;
+ document.getElementById('sum').textContent=`${P.length} پروژه · ${P.reduce((a,f)=>a+(f.links||[]).length,0)} ارتباط · دادهٔ زنده از دیسک و git`;
+ const j=document.getElementById('jump');j.innerHTML='<option>رفتن به پروژه…</option>'+P.map((f,i)=>`<option value="${i}">${esc(f.name)}</option>`).join('');
+ fit();}
+function showProj(f,st){dw.hidden=false;dw.innerHTML=`<button onclick="drawer.hidden=true">✕</button><h2>${esc(f.name)}${st?' › '+esc(st.title):''}</h2><p class="mut">${esc(f.role||'')}</p>
+ <p>🔑 رمزهای لازم: ${(f.secrets||[]).length?f.secrets.map(x=>`<span class="mono">${esc(x)}</span>`).join(' '):'—'} <span class="mut">(فقط نام؛ مقدار در گاوصندوق)</span></p>
+ <h3>⏱ نسخه‌ها</h3>${(f.versions||[]).map(v=>`<p><span class="mono">${esc(v.hash)}</span> ${esc(v.date)} — ${esc(v.msg.slice(0,60))} <button data-h="${esc(v.hash)}">↩ برگرداندن این تغییر</button></p>`).join('')}
+ <div id="conf"></div>
+ <h3>🔒 قفل فایل</h3><p>قفل‌ها: ${f.locks.length?f.locks.map(x=>`<span class="mono">${esc(x)}</span> <button data-u="${esc(x)}">باز کردن</button>`).join(' '):'—'}</p>
+ <p><input id="lp" placeholder="مسیر فایل، مثلاً c4-org/recruitment.c4" style="font:inherit;width:100%"> <button id="lb">قفل کن</button></p><p id="msg"></p>`;
+ dw.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{document.getElementById('conf').innerHTML=`<p style="color:var(--warn)">تغییر ${esc(b.dataset.h)} برگردانده شود؟ (یک کامیت تازه ساخته می‌شود؛ تاریخچه پاک نمی‌شود) <button id="yes">بله، برگردان</button></p>`;
+  document.getElementById('yes').onclick=()=>post('/api/rollback',{project:f.id,hash:b.dataset.h})});
+ dw.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>post('/api/lock',{project:f.id,path:b.dataset.u,unlock:true}));
+ document.getElementById('lb').onclick=()=>post('/api/lock',{project:f.id,path:document.getElementById('lp').value});}
+async function post(u,b){const r=await (await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})).json();
+ await load();const f=P.find(x=>x.id==b.project);showProj(f);document.getElementById('msg').innerHTML=`<span class="${r.status=='done'?'ok':'err'}">${esc(r.message_fa||'انجام شد')}</span>`}
+function ap(){W.style.transform=`translate(${tx}px,${ty}px) scale(${s})`}
+function fit(){const r=vp.getBoundingClientRect();s=Math.min((r.width-40)/BW,(r.height-140)/BH,1);tx=(r.width-BW*s)/2;ty=70;ap()}
+let dr=null;vp.onpointerdown=e=>{if(e.target.closest('.node,.fh'))return;dr=[e.clientX-tx,e.clientY-ty];vp.classList.add('drag')};
+vp.onpointermove=e=>{if(dr){tx=e.clientX-dr[0];ty=e.clientY-dr[1];ap()}};vp.onpointerup=()=>{dr=null;vp.classList.remove('drag')};
+vp.onwheel=e=>{e.preventDefault();const k=e.deltaY<0?1.1:1/1.1,ns=Math.min(2,Math.max(.2,s*k));tx=e.clientX-(e.clientX-tx)*ns/s;ty=e.clientY-(e.clientY-ty)*ns/s;s=ns;ap()};
+const z=k=>{const r=vp.getBoundingClientRect(),cx=r.width/2,cy=r.height/2,ns=Math.min(2,Math.max(.2,s*k));tx=cx-(cx-tx)*ns/s;ty=cy-(cy-ty)*ns/s;s=ns;ap()};
+zi.onclick=()=>z(1.2);zo.onclick=()=>z(1/1.2);document.getElementById('fit').onclick=fit;reload.onclick=load;
+vp.addEventListener('click',()=>dw.hidden=true);
+jump.onchange=()=>{const f=P[jump.value];if(!f)return;const r=vp.getBoundingClientRect();s=Math.min((r.width-40)/f._w,1);tx=(r.width-f._w*s)/2;ty=80-f._y*s;ap()};
+load();
+</script></body></html>

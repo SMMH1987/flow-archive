@@ -1,0 +1,13 @@
+# Same file runs on the laptop and on a server: only CODE_ROOT changes (.env).
+services:
+  command-center:
+    build: .
+    ports: ["127.0.0.1:8090:8090"]
+    volumes:
+      - ${CODE_ROOT:-../../..}:/projects
+    environment:
+      - GIT_AUTHOR_NAME=command-center
+      - GIT_AUTHOR_EMAIL=cc@localhost
+      - GIT_COMMITTER_NAME=command-center
+      - GIT_COMMITTER_EMAIL=cc@localhost
+    restart: unless-stopped

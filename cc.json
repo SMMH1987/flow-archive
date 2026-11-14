@@ -1,0 +1,17 @@
+{
+  "name": "flow-archive",
+  "role": "استاندارد، فلوها، استودیو",
+  "status": "active",
+  "shot": "docs/mockups/cc-shot.png",
+  "steps": [
+    {"id": "idea", "icon": "💡", "title": "ایده", "state": "ok"},
+    {"id": "flow", "icon": "🗺️", "title": "فلوی .c4", "state": "ok"},
+    {"id": "rules", "icon": "📏", "title": "قوانین", "state": "ok"},
+    {"id": "build", "icon": "🧩", "title": "ساخت فرایند", "state": "ok"},
+    {"id": "studio", "icon": "🖼️", "title": "استودیو", "state": "", "url": "https://claude.ai/artifact/174VnmUnyAaEQNMCF7y2xE"}
+  ],
+  "links": [
+    {"from": "flow", "to": "vakil_agent:case", "label": "فلو و استاندارد", "via": "file"}
+  ],
+  "secrets": []
+}
