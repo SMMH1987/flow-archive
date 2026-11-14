@@ -13,9 +13,9 @@ LOCKS = ".cc-locks"
 HOOK = "#!/bin/sh\n# cc-lock: refuse commits that touch locked files\n[ -f .cc-locks ] || exit 0\nfor f in $(git diff --cached --name-only); do\n  if grep -qxF \"$f\" .cc-locks; then echo \"LOCKED: $f (unlock in command center)\"; exit 1; fi\ndone\n"
 
 
-def git(path, *args):
+def git(path, *args, stdout_only=False):
     r = subprocess.run(["git", "-C", path, *args], capture_output=True, text=True)
-    return r.returncode, (r.stdout + r.stderr).strip()
+    return r.returncode, (r.stdout if stdout_only else r.stdout + r.stderr).strip()
 
 
 def projects():
@@ -31,9 +31,9 @@ def projects():
             out.append({"id": name, "name": name, "error": f"cc.json خراب است: {e}"})
             continue
         c["id"] = name
-        code, log = git(p, "log", "-8", "--format=%h|%ad|%an|%s", "--date=short")
+        code, log = git(p, "log", "-8", "--format=%h|%ad|%an|%s", "--date=short", stdout_only=True)
         c["versions"] = [dict(zip(["hash", "date", "author", "msg"], l.split("|", 3))) for l in log.splitlines()] if code == 0 else []
-        code, st = git(p, "status", "--porcelain")
+        code, st = git(p, "status", "--porcelain", stdout_only=True)
         c["dirty"] = len(st.splitlines()) if code == 0 else None
         lk = os.path.join(p, LOCKS)
         c["locks"] = open(lk, encoding="utf-8").read().split() if os.path.isfile(lk) else []
