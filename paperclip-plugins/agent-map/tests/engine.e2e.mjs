@@ -1,4 +1,4 @@
-// v0.2.0 · 2026-11-21 17:35 Berlin. Real-browser test of the UI engine that the plugin mounts (src/ui/mount.ts).
+// v0.3.0 · 2026-11-21 21:45 Berlin. +commercial-look checks (skin.ts). v0.2.0 · 2026-11-21 17:35 Berlin. Real-browser test of the UI engine that the plugin mounts (src/ui/mount.ts).
 // Run: node tests/engine.e2e.mjs   (needs playwright's chromium; prints PASS/FAIL per check, exit 1 on any failure)
 import esbuild from "esbuild"; import { createRequire } from "node:module"; const { chromium } = createRequire(import.meta.url)(process.env.PW || "playwright"); import fs from "node:fs";
 const org = JSON.parse(fs.readFileSync(new URL("../src/generated/org.json", import.meta.url)));
@@ -40,6 +40,24 @@ ok((await p.textContent("#mk-det .top")).includes("راستی‌آزمای من�
 await p.selectOption("#mk-wfs", "-1").catch(() => {}); await p.waitForTimeout(200);
 ok((await p.textContent("#grd-b")).includes("سالم"), "guard: healthy");
 ok(await p.$eval("#mm-cv", (c) => !c.hidden && c.width > 0), "minimap drawn");
+// 0.9.0 commercial look: real controls inside one top bar
+ok((await p.$$(".amx-tb")).length === 1 && await p.isVisible("#mk-q") && await p.isVisible("#mk-wfs"), "look: one top bar holds search and workflow menu");
+ok(!(await p.isVisible("#mk-leg")) && !(await p.isVisible(".am-hd")), "look: department chips and old header no longer on screen");
+await p.click(".amx-vb"); ok((await p.$$(".amx-vp [data-v]")).length === 8, "look: «نما» popover lists all 8 views");
+await p.click('.amx-vp [data-v="mm"]'); await p.waitForTimeout(300);
+ok(await p.$eval("#mk-v", (s) => s.value) === "mm" && (await p.textContent(".amx-vb")).includes("نقشهٔ ذهنی") && await p.isHidden(".amx-vp"), "look: choosing a view switches the real view and closes the menu");
+await p.click(".amx-vb"); await p.click('.amx-vp [data-v="org"]'); await p.waitForTimeout(300);
+await p.click(".amx-cb"); await p.click('.amx-cp [data-c="status"]'); await p.waitForTimeout(300);
+ok(await p.$eval('#mk-in [data-s="hr_recruiter"]', (c) => c.style.getPropertyValue("--cc").includes("0 70% 52%")).catch(() => false), "look: colour by status paints the error agent red");
+await p.click(".amx-cb"); await p.click('.amx-cp [data-c="dept"]'); await p.waitForTimeout(300);
+ok((await p.$$(".amx-kp > *")).length === 4 && (await p.textContent(".amx-kp .need b")) === "2", "look: 4 summary numbers, 2 need you (CEO budget, recruiter error)");
+ok(((await p.textContent('#mk-in [data-s="hr_recruiter"] .amx-flag').catch(() => "")) || "").includes("خطا"), "look: problem flag only on the card with a problem");
+ok((await p.$$("#mk-in .amx-flag")).length === 2, "look: healthy cards stay quiet (2 flags)");
+await p.click(".amx-kp .need"); await p.click('.amx-np [data-go="hr_recruiter"]'); await p.waitForTimeout(300);
+ok((await p.textContent("#mk-det")).includes("کارشناس جذب"), "look: «نیاز به تو» jumps to the agent and opens its panel");
+await p.click(".amx-more-b"); ok(await p.isVisible("#grd-b") && await p.isVisible("#mk-ex"), "look: ⋯ menu holds guard, refresh and CSV");
+await p.keyboard.press("Escape"); ok(await p.isHidden(".amx-mp"), "look: Esc closes the menu");
+await p.click(".amx-fb"); ok(await p.isVisible("#mk-leg") && await p.isVisible("#mk-co"), "look: filter popover holds departments and source");
 await p.selectOption("#mk-co", "live"); await p.waitForTimeout(400);
 await p.click('[data-z="all"]').catch(() => {}); await p.waitForTimeout(200);
 ok((await p.$$eval("#mk-in [data-s]", (x) => x.map((y) => y.dataset.s).sort().join(","))) === "L1,L2,L3", "live-only view shows the 3 real Paperclip agents");

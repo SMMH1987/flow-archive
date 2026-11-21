@@ -1,4 +1,4 @@
-// v0.6.0 · 2026-11-21 20:45 Berlin. +run view checks (0.8.0). v0.5.1 · 2026-11-21 20:05 Berlin. +canvas-height check (0.7.1). v0.5.0 · 2026-11-21 18:00 Berlin. +step 0 intent brief; idea 2 trace. Full page test: the real React UI (src/ui/index.tsx) + the real worker (test harness) in Chromium.
+// v0.7.0 · 2026-11-21 21:45 Berlin. CSV now lives in the ⋯ menu (0.9.0 look). v0.6.0 · 2026-11-21 20:45 Berlin. +run view checks (0.8.0). v0.5.1 · 2026-11-21 20:05 Berlin. +canvas-height check (0.7.1). v0.5.0 · 2026-11-21 18:00 Berlin. +step 0 intent brief; idea 2 trace. Full page test: the real React UI (src/ui/index.tsx) + the real worker (test harness) in Chromium.
 // Run: npm run test:ui   — prints PASS/FAIL per check, exit 1 on failure. Build output goes to tests/.tmp (git-ignored).
 import esbuild from "esbuild"; import fs from "node:fs"; import { createRequire } from "node:module";
 const { chromium } = createRequire(import.meta.url)(process.env.PW || "playwright");
@@ -30,7 +30,7 @@ let fail = 0; const ok = (c, m) => { console.log((c ? "PASS " : "FAIL ") + m); i
 ok((await p.textContent("#amx-live")).includes("3 ایجنت در Paperclip · 3 با چارت جور شد"), "page mounted, 3 live agents matched");
 ok(((await p.textContent("#amx-warn").catch(() => "")) || "").includes("مدیرعامل"), "idea 4: budget alert for CEO at 84%");
 ok(await p.$eval('#mk-in [data-s="ceo"]', (c) => c.classList.contains("am-over")).catch(() => false), "idea 4: red ring on the CEO card");
-const dl = p.waitForEvent("download"); await p.click("#mk-ex"); const d = await dl; const csv = fs.readFileSync(await d.path(), "utf8");
+await p.click(".amx-more-b"); const dl = p.waitForEvent("download"); await p.click("#mk-ex"); const d = await dl; const csv = fs.readFileSync(await d.path(), "utf8");
 ok(csv.split("\n").length === 119 && csv.includes('"hr_recruiter","کارشناس جذب"') && csv.includes('"error"'), "idea 8: CSV export, 118 rows with live status");
 const fill = async (lab, v) => { const l = p.locator(".amx-q label", { hasText: lab }); const sel = l.locator("select"); if (await sel.count()) await sel.selectOption(v); else await l.locator("input").fill(v); };
 ok(((await p.textContent(".amx-pl")) || "").includes("برنامه بعد از تأیید خلاصهٔ نیت ساخته می‌شود"), "step 0: planner hidden until the intent brief is approved");

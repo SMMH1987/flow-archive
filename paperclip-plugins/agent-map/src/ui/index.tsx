@@ -1,4 +1,4 @@
-// v0.6.0 · 2026-11-21 20:45 Berlin. +live cases inside the «اجرای پرونده» view (portal). v0.5.0 · 2026-11-21 17:55 Berlin. +step 0 intent brief (intake) before the planner; v0.4 run trace; v0.3 templates + scenario. Agent Map page: full engine (chart, mind map, list, workflows, instructions, guard, Ctrl+K)
+// v0.7.0 · 2026-11-21 21:55 Berlin. Commercial look: page wrapper .amx-page, case list like a CI run page (one line per step, answer on click), colours from tokens. v0.6.0 · 2026-11-21 20:45 Berlin. +live cases inside the «اجرای پرونده» view (portal). v0.5.0 · 2026-11-21 17:55 Berlin. +step 0 intent brief (intake) before the planner; v0.4 run trace; v0.3 templates + scenario. Agent Map page: full engine (chart, mind map, list, workflows, instructions, guard, Ctrl+K)
 // + dynamic case planner. Tasks are created only after the human ticks "approve" (action approvePlan).
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -36,7 +36,7 @@ function Planner({ companyId, cases }: { companyId: string; cases: Record<string
       <label>پرونده <select value={cid} onChange={(e) => { setCid(e.target.value); setAns({}); setIntake({}); setBriefOk(false); }}>{ids.map((i) => <option key={i} value={i}>{cases[i].name}</option>)}</select></label>
       {c.presets && <div className="amx-pre" style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}><span className="am-muted">پیش‌تنظیم:</span>
         {Object.entries(c.presets).map(([k, pr]) => <button type="button" key={k} data-preset={k} onClick={() => { setIntake({ ...(pr.intake ?? {}) }); setAns({ ...(pr.answers ?? {}) } as any); setBriefOk(false); setOk(false); }}>{pr.name}</button>)}</div>}
-      {hasIntake && <div className="amx-in" style={{ display: "grid", gap: 6, border: "1px solid hsl(220 15% 85%)", borderRadius: 8, padding: 10 }}>
+      {hasIntake && <div className="amx-in" style={{ display: "grid", gap: 6, border: "1px solid var(--line)", borderRadius: 8, padding: 10 }}>
         <b>قدم ۰: روشن کردن نیت (ایجنت روشن‌کنندهٔ نیت)</b>
         <div className="am-muted">جواب خالی یا «پیش‌فرض» = پیش‌فرض و در خلاصه «فرض» علامت می‌خورد. جواب مبهم یک سؤال تکمیلی می‌گیرد (حداکثر {c.intake?.max_rounds ?? 3} دور).</div>
         {brief && <div className="amx-card" style={{ display: "grid", gap: 2, fontWeight: 600 }}>{brief.card.map((x) => <div key={x}>{x}</div>)}</div>}
@@ -48,7 +48,7 @@ function Planner({ companyId, cases }: { companyId: string; cases: Record<string
             <input value={intake[q.id] ?? ""} placeholder={q.default ?? q.suggest ?? ""} onChange={(e) => setI(q.id, e.target.value)} />
             {l?.cite && <span className="amx-cite" style={{ color: "#2f9e44" }}>{l.a} · {l.cite}</span>}
             {l?.unclear && <span style={{ color: "#e8590c" }}>{l.unclear}</span>}{l?.source === "missing" && <span style={{ color: "#c92a2a" }}>بی‌جواب و بدون پیش‌فرض</span>}</label>); })}
-        {brief && <pre className="amx-brief" style={{ whiteSpace: "pre-wrap", background: "hsl(220 20% 97%)", padding: 8, borderRadius: 6, margin: 0 }}>{brief.text}</pre>}
+        {brief && <pre className="amx-brief" style={{ whiteSpace: "pre-wrap", background: "var(--chip)", padding: 8, borderRadius: 6, margin: 0 }}>{brief.text}</pre>}
         <label><input type="checkbox" className="amx-brief-ok" checked={briefOk} disabled={!brief?.ready} onChange={(e) => setBriefOk(e.target.checked)} /> خلاصهٔ نیت را تأیید می‌کنم {brief && !brief.ready ? `(اول ${brief.missing.length} بی‌جواب و ${brief.unclear.length} مبهم را روشن کنید)` : ""}</label>
       </div>}
       {hasIntake && !briefOk ? <div className="am-muted amx-wait">برنامه بعد از تأیید خلاصهٔ نیت ساخته می‌شود.</div> : <>
@@ -120,34 +120,32 @@ function Trace({ companyId, live, org }: { companyId: string; live: LiveAgent[];
 
 type RunStep = { id: string; identifier: string | null; title: string; status: string; agent: string | null; answer: { body: string; by: string; at: string; count: number } | null; older: { body: string; at: string }[]; hidden: number };
 const ST: Record<string, [string, string]> = { backlog: ["در صف", "#868e96"], todo: ["آماده", "#1c7ed6"], in_progress: ["در حال کار", "#f08c00"], in_review: ["بازبینی", "#7048e8"], blocked: ["گیر کرده", "#e03131"], done: ["انجام شد", "#2f9e44"], cancelled: ["لغو", "#868e96"] };
+const ICON: Record<string, string> = { done: "✓", in_progress: "●", in_review: "◐", blocked: "!", todo: "○", backlog: "○", cancelled: "×" };
 function CaseRuns({ companyId }: { companyId: string }) {
   const r = usePluginData<{ cases: { id: string; identifier: string | null; title: string; status: string; steps: RunStep[] }[] }>("caseRuns", { companyId });
   const [open, setOpen] = useState<Record<string, boolean>>({});
   if (r.loading) return null;
-  if (r.error) return <section className="amx-runs" dir="rtl" style={{ padding: 16 }}>پاسخ مراحل در دسترس نیست: {r.error.message}</section>;
+  if (r.error) return <section className="amx-runs" dir="rtl">پاسخ مراحل در دسترس نیست: {r.error.message}</section>;
   const cs = r.data?.cases ?? [];
   return (
-    <section className="amx-runs" dir="rtl" style={{ padding: 16, display: "grid", gap: 10 }}>
-      <div style={{ display: "flex", gap: 8, alignItems: "center" }}><h3 style={{ margin: 0 }}>پرونده‌ها: هر مرحله با پاسخش</h3><button type="button" className="amx-runs-rf" onClick={() => r.refresh()}>تازه‌سازی</button></div>
-      <div className="am-muted">فقط خواندنی. آخرین خروجی هر مرحله باز است و نسخه‌های قبلی بسته. پیام‌های کوتاه (سؤال یا «گیر کردم») پنهان‌اند و فقط تعدادشان دیده می‌شود.</div>
+    <section className="amx-runs" dir="rtl">
+      <div className="amx-sh"><h3>پرونده‌ها</h3><span className="am-muted">هر قدم یک خط؛ برای دیدن جواب ایجنت رویش بزن</span><span className="sp" /><button type="button" className="amx-b amx-runs-rf" onClick={() => r.refresh()}>⟳ تازه‌سازی</button></div>
       {!cs.length && <div className="am-muted">هنوز پرونده‌ای ساخته نشده.</div>}
-      {cs.map((c) => (
-        <div key={c.id} data-case={c.id} style={{ border: "1px solid hsl(220 15% 85%)", borderRadius: 8, padding: 8 }}>
-          <b>{c.identifier ? c.identifier + " · " : ""}{c.title}</b> <span className="am-muted">· {c.steps.filter((s) => s.status === "done").length} از {c.steps.length} انجام شد</span>
-          <div style={{ display: "grid", gap: 6, marginTop: 6 }}>
-            {c.steps.map((s) => { const st = ST[s.status] ?? [s.status, "#868e96"]; const long = (s.answer?.body.length ?? 0) > 400; return (
-              <div key={s.id} data-step={s.id} style={{ display: "grid", gridTemplateColumns: "minmax(180px, 1fr) 2fr", gap: 10, alignItems: "start", borderTop: "1px dashed hsl(220 15% 88%)", paddingTop: 6 }}>
-                <div><div>{s.title}</div><span style={{ background: st[1], color: "#fff", borderRadius: 10, padding: "0 8px", fontSize: 12 }}>{st[0]}</span> <span className="am-muted" style={{ fontSize: 12 }}>{s.agent ?? "بدون مسئول"}{s.identifier ? " · " + s.identifier : ""}</span></div>
-                <div className="amx-ans" style={{ fontSize: 13, whiteSpace: "pre-wrap" }}>{s.answer ? <>
-                  <span className="am-muted" style={{ fontSize: 12 }}>{s.answer.by} · {s.answer.at ? new Date(s.answer.at).toLocaleString("fa-IR") : ""}{s.answer.count > 1 ? ` · ${s.answer.count} خروجی، آخری نشان داده شده` : ""}</span>{"\n"}
-                  {long && !open[s.id] ? s.answer.body.slice(0, 400) + "…" : s.answer.body}
-                  {long && <button type="button" onClick={() => setOpen((o) => ({ ...o, [s.id]: !o[s.id] }))} style={{ marginInlineStart: 6 }}>{open[s.id] ? "کمتر" : "بیشتر"}</button>}
-                  {s.older.map((o, i) => <details key={i}><summary className="am-muted">نسخهٔ قبلی · {o.at ? new Date(o.at).toLocaleString("fa-IR") : ""}</summary>{o.body}</details>)}
-                </> : <span className="am-muted">{s.status === "backlog" ? "هنوز اجرا نشده" : "خروجی متنی ثبت نشده"}</span>}
-                {s.hidden > 0 && <div className="am-muted" style={{ fontSize: 12 }}>{s.hidden} پیام کوتاه دیگر پنهان است</div>}</div>
-              </div>); })}
-          </div>
-        </div>))}
+      {cs.map((c) => { const done = c.steps.filter((s) => s.status === "done").length; const pct = c.steps.length ? Math.round((100 * done) / c.steps.length) : 0; return (
+        <div key={c.id} data-case={c.id} className="amx-case">
+          <div className="amx-ch"><b>{c.identifier ? c.identifier + " · " : ""}{c.title}</b><span className="am-muted">{done} از {c.steps.length} انجام شد</span><span className="bar"><i style={{ width: pct + "%" }} /></span></div>
+          {c.steps.map((s, i) => { const st = ST[s.status] ?? [s.status, "#868e96"]; const long = (s.answer?.body.length ?? 0) > 400; return (
+            <details key={s.id} data-step={s.id} className="amx-step" open={i === 0 && !!s.answer}>
+              <summary><span className="ic" style={{ color: st[1] }}>{ICON[s.status] ?? "○"}</span><span className="tt">{s.title}</span><span className="who">{s.agent ?? "بدون مسئول"}{s.identifier ? " · " + s.identifier : ""}</span><span className="chip" style={{ color: st[1], borderColor: st[1] }}>{st[0]}</span></summary>
+              <div className="amx-ans">{s.answer ? <>
+                <span className="am-muted">{s.answer.by} · {s.answer.at ? new Date(s.answer.at).toLocaleString("fa-IR") : ""}{s.answer.count > 1 ? ` · ${s.answer.count} خروجی، آخری نشان داده شده` : ""}</span>{"\n"}
+                {long && !open[s.id] ? s.answer.body.slice(0, 400) + "…" : s.answer.body}
+                {long && <button type="button" className="amx-b" onClick={() => setOpen((o) => ({ ...o, [s.id]: !o[s.id] }))} style={{ marginInlineStart: 6 }}>{open[s.id] ? "کمتر" : "بیشتر"}</button>}
+                {s.older.map((o, k) => <details key={k}><summary className="am-muted">نسخهٔ قبلی · {o.at ? new Date(o.at).toLocaleString("fa-IR") : ""}</summary>{o.body}</details>)}
+              </> : <span className="am-muted">{s.status === "backlog" ? "هنوز اجرا نشده" : "خروجی متنی ثبت نشده"}</span>}
+              {s.hidden > 0 && <div className="am-muted">{s.hidden} پیام کوتاه دیگر پنهان است</div>}</div>
+            </details>); })}
+        </div>); })}
     </section>);
 }
 
@@ -171,7 +169,7 @@ export function AgentMapPage(_props: PluginPageProps) {
   }, [org.data]);
   if (org.error) return <div dir="rtl">خطا: {org.error.message}</div>;
   const runs = host.companyId ? <CaseRuns companyId={host.companyId} /> : null;
-  return <div><div ref={ref}>{org.loading ? "در حال بارگذاری…" : null}</div>{slot && runs ? createPortal(runs, slot) : runs}{org.data && host.companyId ? <Planner companyId={host.companyId} cases={org.data.cases} /> : null}{org.data ? <Scenario org={org.data} live={agents} /> : null}{org.data && host.companyId ? <Trace companyId={host.companyId} live={agents} org={org.data} /> : null}</div>;
+  return <div className="amx-page" dir="rtl"><div ref={ref}>{org.loading ? "در حال بارگذاری…" : null}</div>{slot && runs ? createPortal(runs, slot) : runs}{org.data && host.companyId ? <Planner companyId={host.companyId} cases={org.data.cases} /> : null}{org.data ? <Scenario org={org.data} live={agents} /> : null}{org.data && host.companyId ? <Trace companyId={host.companyId} live={agents} org={org.data} /> : null}</div>;
 }
 
 export function AgentMapSidebarLink(_props: PluginSidebarProps) {
