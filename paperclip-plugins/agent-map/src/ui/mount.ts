@@ -1,4 +1,4 @@
-// v0.4.1 · 2026-11-21 20:50 Berlin. Popups (#in-bk, Ctrl+K) are appended to <body>, outside .amx: give them the colour tokens too (they were transparent). v0.4.0: live case slot for the «اجرای پرونده» view. v0.3.1 · 2026-11-21 20:05 Berlin. +canvas height fits its content (Siax 18:54 UTC: endless empty canvas). v0.3.0: budget alerts (idea 4), CSV export (idea 8). Mounts the agent-map engine (generated from the hub artifact's «موکاپ افزونه» tab) into a host element.
+// v0.4.2 · 2026-11-21 21:10 Berlin. Guard: steps from imported .mmd flows name a lane («§…»), not an agent; no longer counted red. v0.4.1 · 2026-11-21 20:50 Berlin. Popups (#in-bk, Ctrl+K) are appended to <body>, outside .amx: give them the colour tokens too (they were transparent). v0.4.0: live case slot for the «اجرای پرونده» view. v0.3.1 · 2026-11-21 20:05 Berlin. +canvas height fits its content (Siax 18:54 UTC: endless empty canvas). v0.3.0: budget alerts (idea 4), CSV export (idea 8). Mounts the agent-map engine (generated from the hub artifact's «موکاپ افزونه» tab) into a host element.
 // Pure DOM, no React, so the same code runs in the plugin and in the browser test (tests/engine.e2e.mjs).
 import ENGINE from "../generated/engine.json" with { type: "json" };
 import { overBudget } from "../shared/scenario.js";
@@ -43,6 +43,7 @@ export function mountEngine(host: HTMLElement, data: OrgPayload, live: LiveAgent
   const RUN_IFRAME = /'\+?'?<div class="am-muted"[^']*?<\/div><iframe title="اجرای پرونده"[^']*?<\/iframe>'/;
   let js = E.js.replace(HOOK, "window.__amLive&&window.__amLive(A,st);" + HOOK);
   if (RUN_IFRAME.test(js)) js = js.replace(RUN_IFRAME, `'<div id="amx-run-slot"></div>'`);
+  js = js.replace("w.s.forEach(function(x,i){if(!by[x[0]])", "w.s.forEach(function(x,i){if(!by[x[0]]&&String(x[0]).charAt(0)!=='§')");
   new Function(js)();
   // idea 4: budget alert — red ring on every card at >=80% of its monthly budget, count in the top bar
   const over = new Set<string>();
