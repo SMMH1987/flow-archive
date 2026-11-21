@@ -1,4 +1,4 @@
-# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 6.2 — 2026-11-21 17:50 برلین: + intake_clarifier (قدم صفر هر پرونده)؛ 6.1 اولویت و اثر حذف هر قدم: + بهینه‌ساز هزینه و فرایند (cost_optimizer) با ۳ سناریوی کم/متوسط/حداکثر و ورک‌فلو «بهینه‌سازی هزینه با سه سناریو»؛ نسخه 5: میز تحقیق داخلی
+# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 6.3 — 2026-11-21 18:45 برلین: intake_clarifier به فایل اصلی ترجیحات ارجاع می‌دهد؛ 6.2 — 17:50: + intake_clarifier (قدم صفر هر پرونده)؛ 6.1 اولویت و اثر حذف هر قدم: + بهینه‌ساز هزینه و فرایند (cost_optimizer) با ۳ سناریوی کم/متوسط/حداکثر و ورک‌فلو «بهینه‌سازی هزینه با سه سناریو»؛ نسخه 5: میز تحقیق داخلی
 # ساختار: مدیریت ارشد (board → ceo → سرپرست‌های h_*) → بخش (div) → دپارتمان (unit = واحد در org-global.c4) → ایجنت.
 # محتوا از تحقیق ۴ پژوهشگر (research/paperclip/global-org/part-a..d.json، ۲۱ نوامبر) + کاتالوگ ۴۴۵ ایجنت Paperclip؛ هر ایجنت sources دارد.
 # سیاست مدل (تأیید Siax، 2026-11-21 12:54 UTC): فقط ceo روی Opus؛ سرپرست‌ها Sonnet؛ کار ساده مستقیم به کارگر Haiku؛ برنامه‌ریز پویا فقط یک بار در شروع فکر می‌کند.
@@ -1657,7 +1657,7 @@ agents:
   inputs: [ceo, h_hr]
   outputs: [h_hr, cost_optimizer]
   skills: [intake-interview]
-  rules: [سؤال تازه بیرون از فهرست پرونده فقط به‌صورت پیگیری جواب مبهم, هیچ جواب را حدس نمی‌زند؛ پیش‌فرض را «فرض» علامت می‌زند]
+  rules: [ترجیحات فقط از فایل اصلی PREFERENCES.md (لپ‌تاپ D:\AI\Claude-Ai 1\Code\PREFERENCES.md، کپی /mnt/project-files/interop/PREFERENCES.md)؛ جوابی که آنجاست پرسیده نمی‌شود, سؤال تازه بیرون از فهرست پرونده فقط به‌صورت پیگیری جواب مبهم, هیچ جواب را حدس نمی‌زند؛ پیش‌فرض را «فرض» علامت می‌زند]
   sources: ['https://docs.nvidia.com/aiq-blueprint/2.2.1/architecture/agents/clarifier.html', 'https://www.greenhouse.com/blog/how-to-source-top-talent-questions-to-ask-hiring-managers', 'https://arxiv.org/html/2602.03468v1']
 workflows:
 - name: بهینه‌سازی هزینه با سه سناریو
