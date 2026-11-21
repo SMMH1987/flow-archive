@@ -1,10 +1,15 @@
 // v1 · 2026-11-21 17:10 Berlin. Port of flow-archive tools/plan_case.py (same rules, same results; see tests).
 // Dry planner: picks only the case's allowed tasks, orders them by prerequisites, checks owner/gate/budget.
-export type CaseTask = { id: string; n: string; agent: string; mode: "auto" | "ask" | "gate"; m: string; est: number; after: string[]; when?: string; external?: string | boolean };
+export type CaseTask = { id: string; n: string; agent: string; mode: "auto" | "ask" | "gate"; m?: string; difficulty?: "simple" | "medium" | "hard"; why_hard?: string; est: number; after: string[]; when?: string; external?: string | boolean };
 export type CaseDef = { intake?: import("./intake.js").IntakeDef; presets?: Record<string, { name: string; intake?: Record<string, string>; answers?: Record<string, string | number> }>; case: string; name: string; owner?: string; budget_cap_usd?: number; questionnaire?: { id: string; q: string; options?: string[]; example?: unknown }[]; tasks: CaseTask[] };
 export type Answers = Record<string, string | number | boolean>;
-export type PlanStep = { n: number; id: string; task: string; agent: string; mode: string; model: string; gate: boolean; after: string[] };
-export type Plan = { case: string; status: "needs_input" | "error" | "needs_input:approve_plan"; answers: Answers; steps: PlanStep[]; skipped: { id: string; why: string }[]; ask: { id: string; why: string }[]; gates: number; est_usd: number; cap_usd: number; errors: string[] };
+// v0.6.0 · 2026-11-21 18:50 Berlin: model per task from its difficulty (Siax rule 17:43 Berlin, DECISIONS v1.9), not from the agent role; unknown → Sonnet, said in the plan.
+export const MODEL_BY_DIFF: Record<string, string> = { simple: "Haiku", medium: "Sonnet", hard: "Opus" };
+export type PlanStep = { n: number; id: string; task: string; agent: string; mode: string; difficulty: string; model: string; gate: boolean; after: string[] };
+// Opus very rarely (Siax 2026-11-21 17:44 Berlin, DECISIONS v2.0): a "hard" task runs on Sonnet unless the human approves Opus for that task separately.
+export const OPUS_COST_FACTOR = 5 / 3; // assumed Opus/Sonnet price ratio for the estimate shown to the human (unverified)
+export type OpusRequest = { id: string; task: string; why: string; est_sonnet: number; est_opus: number; approved: boolean };
+export type Plan = { opus: OpusRequest[]; case: string; status: "needs_input" | "error" | "needs_input:approve_plan"; answers: Answers; steps: PlanStep[]; skipped: { id: string; why: string }[]; ask: { id: string; why: string }[]; gates: number; est_usd: number; cap_usd: number; errors: string[] };
 
 class Need extends Error { constructor(public key: string) { super(key); } }
 /** Safe evaluator for the small condition language used in cases/*.yaml: a == 'x', !=, <, >, <=, >=, and, or, not. No eval. */
@@ -39,7 +44,11 @@ export function evalWhen(expr: string, ans: Answers): boolean {
   return truthy(or());
 }
 
-export function planCase(c: CaseDef, ans: Answers, agentIds: Set<string>): Plan {
+// Correction (Siax 2026-11-21 17:45 Berlin): NO per-task model switching. The model stays on the agent, chosen by the difficulty of that agent's usual work;
+// task difficulty is shown for information. An agent on Opus still needs separate approval per task, else Sonnet. Per-task model = IDEA-BANK idea 5.
+export function planCase(c: CaseDef, ans: Answers, agentIds: Set<string>, opusOk: string[] = [], agentModel: Record<string, string> = {}): Plan {
+  const am = (t: CaseTask) => agentModel[t.agent] ?? MODEL_BY_DIFF[t.difficulty ?? ""] ?? "Sonnet";
+  const isOpus = (t: CaseTask) => /opus/i.test(am(t));
   const tasks = new Map(c.tasks.map((t) => [t.id, t]));
   const keep: string[] = [], skipped: Plan["skipped"] = [], ask: Plan["ask"] = [], errors: string[] = [];
   for (const t of c.tasks) {
@@ -59,6 +68,7 @@ export function planCase(c: CaseDef, ans: Answers, agentIds: Set<string>): Plan 
   for (const id of order) {
     const t = tasks.get(id)!;
     if (!agentIds.has(t.agent)) errors.push(`${id}: ایجنت ناشناخته ${t.agent}`);
+    if (isOpus(t) && !t.why_hard) errors.push(`${id}: Opus بدون دلیل ثبت‌شده (why_hard)`);
     if ((t.external === "yes" || t.external === true) && t.mode !== "gate") errors.push(`${id}: کار بیرونی بدون gate`);
   }
   const est = Math.round(order.reduce((s, id) => s + tasks.get(id)!.est, 0) * 1000) / 1000;
@@ -67,7 +77,8 @@ export function planCase(c: CaseDef, ans: Answers, agentIds: Set<string>): Plan 
   const status = ask.length ? "needs_input" : errors.length ? "error" : "needs_input:approve_plan";
   return {
     case: c.case, status, answers: ans,
-    steps: order.map((id, k) => { const t = tasks.get(id)!; return { n: k + 1, id, task: t.n, agent: t.agent, mode: t.mode, model: t.m, gate: t.mode === "gate", after: t.after.filter((d) => kept.has(d)) }; }),
-    skipped, ask, gates: order.filter((id) => tasks.get(id)!.mode === "gate").length, est_usd: est, cap_usd: cap, errors,
+    steps: order.map((id, k) => { const t = tasks.get(id)!; return { n: k + 1, id, task: t.n, agent: t.agent, mode: t.mode, difficulty: t.difficulty ?? "unknown", model: isOpus(t) && !opusOk.includes(id) ? "Sonnet" : am(t), gate: t.mode === "gate", after: t.after.filter((d) => kept.has(d)) }; }),
+    opus: order.filter((id) => isOpus(tasks.get(id)!)).map((id) => { const t = tasks.get(id)!; return { id, task: t.n, why: t.why_hard ?? "", est_sonnet: t.est, est_opus: Math.round(t.est * OPUS_COST_FACTOR * 100) / 100, approved: opusOk.includes(id) }; }),
+    skipped, ask, gates: order.filter((id) => tasks.get(id)!.mode === "gate").length, est_usd: Math.round((est + order.filter((id) => isOpus(tasks.get(id)!) && opusOk.includes(id)).reduce((x, id) => x + tasks.get(id)!.est * (OPUS_COST_FACTOR - 1), 0)) * 100) / 100, cap_usd: cap, errors,
   };
 }

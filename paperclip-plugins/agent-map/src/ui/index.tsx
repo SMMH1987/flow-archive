@@ -13,13 +13,14 @@ function Planner({ companyId, cases }: { companyId: string; cases: Record<string
   const [cid, setCid] = useState(ids[0] ?? "");
   const [ans, setAns] = useState<Record<string, string | number>>({});
   const [ok, setOk] = useState(false);
+  const [opusOk, setOpusOk] = useState<string[]>([]);
   const [intake, setIntake] = useState<Record<string, string>>({});
   const [briefOk, setBriefOk] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const { data: brief } = usePluginData<Brief | null>("brief", { caseId: cid, intake, companyId });
   const [res, setRes] = useState<string>("");
   const c = cases[cid];
-  const { data: plan } = usePluginData<Plan>("plan", { caseId: cid, answers: ans });
+  const { data: plan } = usePluginData<Plan>("plan", { caseId: cid, answers: ans, opusOk });
   const approve = usePluginAction("approvePlan");
   const tpl = usePluginData<Template[]>("templates", { companyId });
   if (!c) return null;
@@ -59,12 +60,16 @@ function Planner({ companyId, cases }: { companyId: string; cases: Record<string
       </div>
       {plan && <div>
         <b>{plan.steps.length} قدم · {plan.gates} تأیید انسانی · برآورد {plan.est_usd}$ از سقف {plan.cap_usd}$</b>
-        <ol style={{ margin: "6px 0" }}>{plan.steps.map((s) => <li key={s.id}>{s.gate ? "🔒 " : ""}{s.task} <span className="am-muted">← {s.agent} · {s.model}</span></li>)}</ol>
+        <ol style={{ margin: "6px 0" }}>{plan.steps.map((s) => <li key={s.id}>{s.gate ? "🔒 " : ""}{s.task} <span className="am-muted">← {s.agent} ({s.model}، مدل خود ایجنت) · سختی کار: {({ simple: "ساده", medium: "متوسط", hard: "سخت" } as any)[s.difficulty] ?? "نامعلوم"}</span></li>)}</ol>
+        {plan.opus.length > 0 && <div className="amx-opus" style={{ border: "1px solid #e8590c", borderRadius: 6, padding: 8, display: "grid", gap: 4 }}>
+          <b>درخواست Opus (جدا از برنامه؛ بدون تأیید شما این کارها با Sonnet اجرا می‌شوند)</b>
+          {plan.opus.map((o) => <label key={o.id} data-opus={o.id}><input type="checkbox" checked={o.approved} onChange={(e) => { setOk(false); setOpusOk((x) => e.target.checked ? [...x, o.id] : x.filter((y) => y !== o.id)); }} /> {o.task} · دلیل: {o.why || "ثبت نشده"} · Sonnet {o.est_sonnet}$ ← Opus حدود {o.est_opus}$ (برآورد)</label>)}
+        </div>}
         {plan.ask.map((a) => <div key={a.id} className="am-muted">? {a.id}: {a.why}</div>)}
         {plan.errors.map((e) => <div key={e} style={{ color: "hsl(0 65% 50%)" }}>خطا: {e}</div>)}
       </div>}
       <label><input type="checkbox" className="amx-plan-ok" checked={ok} onChange={(e) => setOk(e.target.checked)} disabled={plan?.status !== "needs_input:approve_plan"} /> این برنامه را تأیید می‌کنم؛ تسک‌ها در backlog ساخته شوند (هیچ ایجنتی خودکار شروع نمی‌کند)</label>
-      <button type="button" disabled={!ok} onClick={async () => { try { const r: any = await approve({ companyId, caseId: cid, answers: ans, approved: true, intake, briefApproved: briefOk }); tpl.refresh(); setRes(`${r.created.length} تسک ساخته شد و برنامه به‌عنوان الگو ذخیره شد${r.unmapped.length ? ` · بدون مسئول: ${r.unmapped.join("، ")}` : ""}`); setOk(false); } catch (e) { setRes(String((e as Error).message ?? e)); } }}>ساخت تسک‌ها</button>
+      <button type="button" disabled={!ok} onClick={async () => { try { const r: any = await approve({ companyId, caseId: cid, answers: ans, approved: true, intake, briefApproved: briefOk, opusOk }); tpl.refresh(); setRes(`${r.created.length} تسک ساخته شد و برنامه به‌عنوان الگو ذخیره شد${r.unmapped.length ? ` · بدون مسئول: ${r.unmapped.join("، ")}` : ""}`); setOk(false); } catch (e) { setRes(String((e as Error).message ?? e)); } }}>ساخت تسک‌ها</button>
       </>}
       {res && <div>{res}</div>}
     </section>

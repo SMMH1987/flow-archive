@@ -22,6 +22,7 @@ export type OrgData = { org: { cats: Record<string, [string, number]>; order: st
 export const DATA = ORGDATA as unknown as OrgData;
 const ORG_BY = new Map(DATA.org.agents.map((a) => [a.id, a]));
 const ORG_IDS = new Set(DATA.org.agents.map((a) => a.id));
+const ORG_MODEL: Record<string, string> = Object.fromEntries(DATA.org.agents.map((a: any) => [a.id, a.m ?? "Sonnet"]));
 
 function modelOf(cfg: Record<string, unknown> | null | undefined): string | null {
   const m = cfg && (cfg["model"] ?? cfg["modelId"]);
@@ -105,7 +106,7 @@ const plugin = definePlugin({
     ctx.data.register("plan", async (params) => {
       const c = DATA.cases[String(params?.caseId ?? "")];
       if (!c) return { error: "پرونده پیدا نشد" };
-      return planCase(c, (params?.answers ?? {}) as Answers, ORG_IDS);
+      return planCase(c, (params?.answers ?? {}) as Answers, ORG_IDS, ((params as any)?.opusOk ?? []) as string[], ORG_MODEL);
     });
     // Human-approved plan -> tasks. Never runs without approved:true; refuses plans with errors or open questions.
     ctx.actions.register("approvePlan", async (params) => {
@@ -116,7 +117,7 @@ const plugin = definePlugin({
       const brief = buildBrief(c.intake, (params?.intake ?? {}) as Record<string, unknown>, c.name, await pastCases(ctx, companyId, c.case));
       if (c.intake && params?.briefApproved !== true) throw new Error("اول خلاصهٔ نیت باید تأیید شود (قدم صفر)");
       if (c.intake && !brief.ready) throw new Error("خلاصهٔ نیت کامل نیست: " + [...brief.missing.map((m) => m + " بی‌جواب"), ...brief.unclear.map((u) => u + " مبهم")].join("، "));
-      const plan: Plan = planCase(c, (params?.answers ?? {}) as Answers, ORG_IDS);
+      const plan: Plan = planCase(c, (params?.answers ?? {}) as Answers, ORG_IDS, (params?.opusOk ?? []) as string[], ORG_MODEL);
       if (plan.status !== "needs_input:approve_plan") throw new Error("برنامه آماده نیست: " + [...plan.errors, ...plan.ask.map((x) => x.why)].join("؛ "));
       const live = await liveAgents(ctx, companyId);
       const map = new Map<string, string>();
@@ -132,7 +133,7 @@ const plugin = definePlugin({
         const issue = await ctx.issues.create({
           companyId, parentId: parent.id, status: "backlog",
           title: `${s.n}. ${s.gate ? "🔒 " : ""}${s.task}`,
-          description: `مسئول: ${ORG_BY.get(s.agent)?.n ?? s.agent} · مدل: ${s.model} · حالت: ${s.mode}${s.gate ? "\nقبل از هر قدم بیرونی تأیید انسان لازم است." : ""}${agentId ? "" : "\nایجنت این نقش در Paperclip پیدا نشد؛ تسک بدون مسئول ماند."}`,
+          description: `مسئول: ${ORG_BY.get(s.agent)?.n ?? s.agent} · مدل ایجنت: ${s.model} · سختی کار: ${s.difficulty} · حالت: ${s.mode}${s.gate ? "\nقبل از هر قدم بیرونی تأیید انسان لازم است." : ""}${agentId ? "" : "\nایجنت این نقش در Paperclip پیدا نشد؛ تسک بدون مسئول ماند."}`,
           ...(agentId ? { assigneeAgentId: agentId } : {}),
           blockedByIssueIds: s.after.map((d) => ids.get(d)).filter((x): x is string => !!x),
         });

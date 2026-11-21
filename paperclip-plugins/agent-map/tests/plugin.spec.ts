@@ -25,7 +25,7 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 describe("manifest", () => {
   it("asks only for read + create-task + page/sidebar", () => {
     expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.5.0");
+    expect(manifest.version).toBe("0.6.2");
   });
 });
 
@@ -39,9 +39,21 @@ describe("org data (bundled from flow-archive)", () => {
     for (const w of DATA.org.workflows) for (const s of w.s) expect(IDS.has(s[0]), `${w.n}: ${s[0]}`).toBe(true);
     for (const t of hire.tasks) expect(IDS.has(t.agent), t.id).toBe(true);
   });
-  it("model policy: only the CEO on Opus", () => {
-    const opus = DATA.org.agents.filter((a) => /opus/i.test(a.m ?? "")).map((a) => a.id);
-    expect(opus).toEqual(["ceo"]);
+  it("model rule (v1.9–v2.1): model from the agent (or task difficulty when no agent model); Opus only with reason + separate approval, else Sonnet", () => {
+    const tasks = (DATA.cases.hire as any).tasks;
+    expect(tasks.every((t: any) => ["simple", "medium", "hard"].includes(t.difficulty))).toBe(true);
+    expect(tasks.some((t: any) => "m" in t)).toBe(false);
+    const p = planCase({ ...(DATA.cases.hire as any), tasks: tasks.map((t: any) => t.id === "offer" ? { ...t, difficulty: "hard" } : t) }, { country: "IR", seniority: "mid", ad_budget_toman: 0, gender_any: "yes" }, IDS);
+    expect(p.errors.join()).toMatch(/Opus بدون دلیل/);
+    const q = planCase({ ...(DATA.cases.hire as any), tasks: tasks.map((t: any) => t.id === "offer" ? { ...t, difficulty: "hard", why_hard: "پیشنهاد مالی برگشت‌ناپذیر" } : t.id === "job_desc" ? { ...t, difficulty: undefined } : t) }, { country: "IR", seniority: "mid", ad_budget_toman: 0, gender_any: "yes" }, IDS);
+    expect(q.steps.find((s) => s.id === "offer")!.model).toBe("Sonnet"); // hard without separate approval → Sonnet (DECISIONS v2.0)
+    expect(q.opus).toMatchObject([{ id: "offer", why: "پیشنهاد مالی برگشت‌ناپذیر", approved: false }]);
+    const tasks2 = tasks.map((t: any) => t.id === "offer" ? { ...t, difficulty: "hard", why_hard: "x" } : t);
+    const r = planCase({ ...(DATA.cases.hire as any), tasks: tasks2 }, { country: "IR", seniority: "mid", ad_budget_toman: 0, gender_any: "yes" }, IDS, ["offer"]);
+    expect(r.steps.find((s) => s.id === "offer")!.model).toBe("Opus");
+    expect(r.est_usd).toBeGreaterThan(q.est_usd);
+    expect(q.steps.find((s) => s.id === "job_desc")).toMatchObject({ difficulty: "unknown", model: "Sonnet" });
+    expect(q.steps.find((s) => s.id === "cv_screen")!.model).toBe("Haiku");
   });
 });
 
