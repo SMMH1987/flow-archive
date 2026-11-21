@@ -1,7 +1,7 @@
 // v1 · 2026-11-21 17:10 Berlin. Port of flow-archive tools/plan_case.py (same rules, same results; see tests).
 // Dry planner: picks only the case's allowed tasks, orders them by prerequisites, checks owner/gate/budget.
 export type CaseTask = { id: string; n: string; agent: string; mode: "auto" | "ask" | "gate"; m: string; est: number; after: string[]; when?: string; external?: string | boolean };
-export type CaseDef = { case: string; name: string; owner?: string; budget_cap_usd?: number; questionnaire?: { id: string; q: string; options?: string[]; example?: unknown }[]; tasks: CaseTask[] };
+export type CaseDef = { intake?: import("./intake.js").IntakeDef; presets?: Record<string, { name: string; intake?: Record<string, string>; answers?: Record<string, string | number> }>; case: string; name: string; owner?: string; budget_cap_usd?: number; questionnaire?: { id: string; q: string; options?: string[]; example?: unknown }[]; tasks: CaseTask[] };
 export type Answers = Record<string, string | number | boolean>;
 export type PlanStep = { n: number; id: string; task: string; agent: string; mode: string; model: string; gate: boolean; after: string[] };
 export type Plan = { case: string; status: "needs_input" | "error" | "needs_input:approve_plan"; answers: Answers; steps: PlanStep[]; skipped: { id: string; why: string }[]; ask: { id: string; why: string }[]; gates: number; est_usd: number; cap_usd: number; errors: string[] };

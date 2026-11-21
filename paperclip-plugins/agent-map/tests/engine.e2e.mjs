@@ -15,7 +15,7 @@ await p.setContent(html); await p.waitForTimeout(600);
 let fail = 0; const ok = (c, m) => { console.log((c ? "PASS " : "FAIL ") + m); if (!c) fail++; };
 ok((await p.textContent("#amx-live")).includes("3 ایجنت در Paperclip · 2 با چارت جور شد"), "live agents matched to chart (2 of 3)");
 await p.click('[data-z="all"]'); await p.waitForTimeout(400);
-ok((await p.$$eval("#mk-in .am-cd[data-s]", (x) => x.length)) === 116, "org chart shows all 116 agents after «باز کردن همه»");
+ok((await p.$$eval("#mk-in .am-cd[data-s]", (x) => x.length)) === 118, "org chart shows all 118 agents after «باز کردن همه»");
 await p.click('#mk-in [data-s="hr_recruiter"]'); await p.waitForTimeout(300);
 const det = await p.textContent("#mk-det");
 ok(det.includes("خطا") && det.includes("claude-haiku-5-5"), "live overlay: recruiter shows real status (error) and real model");

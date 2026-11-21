@@ -1,0 +1,14 @@
+{
+  "_": "v1 · 2026-11-21 18:05 Berlin. Test set for ambiguity detection (laptop research: models are weak at it, Ambig-SWE). Each case = intake answers + expected missing/unclear ids. Base = CEO-assistant preset unless 'empty'.",
+  "cases": [
+    { "name": "complete preset", "base": "preset", "patch": {}, "missing": [], "unclear": [], "ready": true },
+    { "name": "all empty", "base": "empty", "patch": {}, "missing": ["why_now", "success_90", "daily_tasks", "must_skills", "pay_range"], "unclear": [], "ready": false },
+    { "name": "says 'I don't know'", "base": "preset", "patch": { "pay_range": "نمی‌دانم" }, "missing": [], "unclear": ["pay_range"], "ready": false },
+    { "name": "answer is a question", "base": "preset", "patch": { "work_mode": "شاید دورکار؟" }, "missing": [], "unclear": ["work_mode"], "ready": false },
+    { "name": "dash only", "base": "preset", "patch": { "must_skills": "-" }, "missing": [], "unclear": ["must_skills"], "ready": false },
+    { "name": "explicit default word", "base": "preset", "patch": { "start_by": "پیش‌فرض" }, "missing": [], "unclear": [], "ready": true },
+    { "name": "'default' on a no-default question", "base": "preset", "patch": { "why_now": "پیش‌فرض" }, "missing": ["why_now"], "unclear": [], "ready": false },
+    { "name": "short but clear", "base": "preset", "patch": { "work_mode": "دورکار" }, "missing": [], "unclear": [], "ready": true },
+    { "name": "six problems → only 4 asked this turn", "base": "empty", "patch": { "red_flags": "هرچی" }, "missing": ["why_now", "success_90", "daily_tasks", "must_skills", "pay_range"], "unclear": ["red_flags"], "ready": false, "nextAskLen": 4 }
+  ]
+}

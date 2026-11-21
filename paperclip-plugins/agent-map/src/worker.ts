@@ -1,4 +1,4 @@
-// v0.4.1 · 2026-11-21 17:35 Berlin. Agent Map worker. +0.3 plan templates; +0.4 run trace (read-only).
+// v0.5.0 · 2026-11-21 17:55 Berlin. Agent Map worker. +0.5 step 0 intent brief (intake) before any plan; +0.4 run trace (off until DB permission); +0.3 plan templates.
 // Reads live agents (agents.read). Serves our org chart, workflows and cases (bundled from flow-archive, see tools/sync_data.py).
 // Creates tasks ONLY after a human approves a plan (issues.create), and only in "backlog" so no agent wakes up by itself.
 import manifest from "./manifest.js";
@@ -6,6 +6,7 @@ import { definePlugin, runWorker } from "@paperclipai/plugin-sdk";
 import { categorize, type CatKey } from "./shared/categories.js";
 import { planCase, type Answers, type CaseDef, type Plan } from "./shared/planner.js";
 import { aggregateTrace, RUNS_SQL, COSTS_SQL, type RunRow, type CostRow } from "./shared/trace.js";
+import { buildBrief } from "./shared/intake.js";
 import { buildInstructions, type OrgAgent } from "./shared/instructions.js";
 import ORGDATA from "./generated/org.json" with { type: "json" };
 
@@ -14,7 +15,7 @@ export type MapAgent = {
   status: string; adapterType: string; model: string | null; skills: string[];
   spentMonthlyCents: number; budgetMonthlyCents: number; cat: CatKey; orgId: string | null;
 };
-export type Template = { caseId: string; name: string; answers: Answers; steps: number; gates: number; est_usd: number; parentId: string; at: string };
+export type Template = { caseId: string; name: string; answers: Answers; intake?: Record<string, unknown>; steps: number; gates: number; est_usd: number; parentId: string; at: string };
 export type AgentMapData = { companyId: string; agents: MapAgent[]; loadedAt: string };
 export type OrgData = { org: { cats: Record<string, [string, number]>; order: string[]; agents: OrgAgent[]; workflows: { n: string; s: string[][] }[] }; cases: Record<string, CaseDef> };
 
@@ -52,6 +53,13 @@ async function liveAgents(ctx: any, companyId: string) {
   return all.filter((a) => a.status !== "terminated");
 }
 
+// The user's own past cases of this kind (plugin state only; reading Paperclip issues would need issues.read, not approved yet)
+async function pastCases(ctx: any, companyId: string, caseId: string) {
+  if (!companyId) return [];
+  const t = ((await ctx.state.get({ scopeKind: "company", scopeId: companyId, stateKey: "templates" })) as Template[] | null) ?? [];
+  return t.filter((x) => x.caseId === caseId && x.intake).slice(0, 3).map((x) => ({ at: x.at, intake: x.intake! }));
+}
+
 const plugin = definePlugin({
   async setup(ctx) {
     ctx.data.register("agents", async (params) => {
@@ -68,6 +76,12 @@ const plugin = definePlugin({
       return { companyId, agents, loadedAt: new Date().toISOString() } satisfies AgentMapData;
     });
     ctx.data.register("org", async () => DATA);
+    // Step 0 (Siax rule 2026-11-21): intent brief from the case's fixed intake questions
+    ctx.data.register("brief", async (params) => {
+      const c = DATA.cases[String((params as any)?.caseId ?? "")];
+      if (!c) return null;
+      return buildBrief(c.intake, ((params as any)?.intake ?? {}) as Record<string, unknown>, c.name, await pastCases(ctx, String((params as any)?.companyId ?? ""), c.case));
+    });
     // Idea 2 (Siax approved 2026-11-21 16:11 UTC): read-only run trace from heartbeat_runs + cost_events, last 30 days
     ctx.data.register("traces", async (params) => {
       const companyId = String((params as any)?.companyId ?? "");
@@ -99,6 +113,9 @@ const plugin = definePlugin({
       const c = DATA.cases[String(params?.caseId ?? "")];
       if (!companyId || !c) throw new Error("companyId و caseId لازم است");
       if (params?.approved !== true) throw new Error("بدون تأیید انسان تسکی ساخته نمی‌شود");
+      const brief = buildBrief(c.intake, (params?.intake ?? {}) as Record<string, unknown>, c.name, await pastCases(ctx, companyId, c.case));
+      if (c.intake && params?.briefApproved !== true) throw new Error("اول خلاصهٔ نیت باید تأیید شود (قدم صفر)");
+      if (c.intake && !brief.ready) throw new Error("خلاصهٔ نیت کامل نیست: " + [...brief.missing.map((m) => m + " بی‌جواب"), ...brief.unclear.map((u) => u + " مبهم")].join("، "));
       const plan: Plan = planCase(c, (params?.answers ?? {}) as Answers, ORG_IDS);
       if (plan.status !== "needs_input:approve_plan") throw new Error("برنامه آماده نیست: " + [...plan.errors, ...plan.ask.map((x) => x.why)].join("؛ "));
       const live = await liveAgents(ctx, companyId);
@@ -106,7 +123,7 @@ const plugin = definePlugin({
       for (const a of live) { const o = orgIdOf(a); if (o && !map.has(o)) map.set(o, a.id); }
       const parent = await ctx.issues.create({
         companyId, status: "backlog", title: `پرونده: ${c.name}`,
-        description: `برنامهٔ تأییدشده (${plan.steps.length} قدم، ${plan.gates} تأیید انسانی، برآورد ${plan.est_usd}$ از سقف ${plan.cap_usd}$).\nپاسخ‌ها: ${JSON.stringify(plan.answers)}\nهمهٔ تسک‌ها در backlog ساخته شدند؛ هیچ ایجنتی خودکار شروع نمی‌کند.`,
+        description: `${c.intake ? brief.text + "\n\n(خلاصهٔ نیت با تیک انسان تأیید شد)\n\n" : ""}برنامهٔ تأییدشده (${plan.steps.length} قدم، ${plan.gates} تأیید انسانی، برآورد ${plan.est_usd}$ از سقف ${plan.cap_usd}$).\nپاسخ‌ها: ${JSON.stringify(plan.answers)}\nهمهٔ تسک‌ها در backlog ساخته شدند؛ هیچ ایجنتی خودکار شروع نمی‌کند.`,
       });
       const ids = new Map<string, string>(), created: { step: string; issueId: string; assigned: boolean }[] = [], unmapped: string[] = [];
       for (const s of plan.steps) {
@@ -123,7 +140,7 @@ const plugin = definePlugin({
       }
       const key = { scopeKind: "company" as const, scopeId: companyId, stateKey: "templates" };
       const old = ((await ctx.state.get(key)) as Template[] | null) ?? [];
-      const t: Template = { caseId: c.case, name: c.name, answers: plan.answers, steps: plan.steps.length, gates: plan.gates, est_usd: plan.est_usd, parentId: parent.id, at: new Date().toISOString() };
+      const t: Template = { caseId: c.case, name: c.name, answers: plan.answers, intake: Object.fromEntries(brief.lines.filter((l) => l.a).map((l) => [l.id, l.a])), steps: plan.steps.length, gates: plan.gates, est_usd: plan.est_usd, parentId: parent.id, at: new Date().toISOString() };
       await ctx.state.set(key, [t, ...old].slice(0, 20));
       return { parentId: parent.id, created, unmapped: [...new Set(unmapped)], plan, template: t };
     });

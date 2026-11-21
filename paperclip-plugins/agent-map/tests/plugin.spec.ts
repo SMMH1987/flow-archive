@@ -6,11 +6,13 @@ import plugin, { DATA, orgIdOf } from "../src/worker.js";
 import { categorize } from "../src/shared/categories.js";
 import { evalWhen, planCase } from "../src/shared/planner.js";
 import { buildInstructions } from "../src/shared/instructions.js";
+import { buildBrief, unclearWhy } from "../src/shared/intake.js";
 import { aggregateTrace, RUNS_SQL, COSTS_SQL } from "../src/shared/trace.js";
 import { scenario, overBudget, monthlyUsd } from "../src/shared/scenario.js";
 
 const IDS = new Set(DATA.org.agents.map((a) => a.id));
 const hire = DATA.cases.hire;
+const OKI = { intake: (hire as any).presets.ceo_assistant.intake, briefApproved: true };
 const base = { companyId: "c1", urlKey: "", icon: null, status: "idle", capabilities: null, adapterType: "claude_local", runtimeConfig: {}, budgetMonthlyCents: 1000, spentMonthlyCents: 81, pauseReason: null, pausedAt: null, permissions: {}, lastHeartbeatAt: null, metadata: null, createdAt: new Date(), updatedAt: new Date() } as any;
 async function boot(agents: any[] = [], extra: string[] = []) {
   // extra caps only let the TEST read back what was created; the plugin itself never gets them
@@ -23,14 +25,14 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 describe("manifest", () => {
   it("asks only for read + create-task + page/sidebar", () => {
     expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.4.1");
+    expect(manifest.version).toBe("0.5.0");
   });
 });
 
 describe("org data (bundled from flow-archive)", () => {
-  it("has 116 agents, 24 workflows, hire case", () => {
-    expect(DATA.org.agents).toHaveLength(116);
-    expect(DATA.org.workflows).toHaveLength(24);
+  it("has 118 agents, 25 workflows, hire case", () => {
+    expect(DATA.org.agents).toHaveLength(118);
+    expect(DATA.org.workflows).toHaveLength(25);
     expect(hire.tasks).toHaveLength(17);
   });
   it("every workflow step and case task points to an existing agent", () => {
@@ -116,11 +118,11 @@ describe("approvePlan (creates tasks only after approval)", () => {
   });
   it("refuses a plan with open questions", async () => {
     const h = await boot(live);
-    await expect(h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: { country: "IR" }, approved: true })).rejects.toThrow(/آماده نیست/);
+    await expect(h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: { country: "IR" }, approved: true, ...OKI })).rejects.toThrow(/آماده نیست/);
   });
   it("creates 1 parent + 15 backlog tasks, links prerequisites, assigns matched agents", async () => {
     const h = await boot(live, ["issues.read", "issue.relations.read"]);
-    const r = await h.performAction<any>("approvePlan", { companyId: "c1", caseId: "hire", answers: ans, approved: true });
+    const r = await h.performAction<any>("approvePlan", { companyId: "c1", caseId: "hire", answers: ans, approved: true, ...OKI });
     expect(r.created).toHaveLength(15);
     const issues = await h.ctx.issues.list({ companyId: "c1", limit: 100, offset: 0 } as any);
     expect(issues).toHaveLength(16);
@@ -147,8 +149,8 @@ describe("idea 5: saved plan templates", () => {
     const h = await boot(live);
     expect(await h.getData<any[]>("templates", { companyId: "c1" })).toEqual([]);
     const a1 = { country: "IR", seniority: "mid", ad_budget_toman: 0, gender_any: "yes" }, a2 = { country: "other", seniority: "senior", ad_budget_toman: 5000000, gender_any: "no" };
-    await h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: a1, approved: true });
-    await h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: a2, approved: true });
+    await h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: a1, approved: true, ...OKI });
+    await h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: a2, approved: true, ...OKI });
     const t = await h.getData<any[]>("templates", { companyId: "c1" });
     expect(t.map((x) => [x.steps, x.gates, x.est_usd])).toEqual([[14, 5, 0.44], [15, 4, 0.45]]);
     expect(t[1].answers).toEqual(a1);
@@ -158,9 +160,9 @@ describe("idea 5: saved plan templates", () => {
 
 describe("idea 1 + 4: scenario and budget alert", () => {
   const all = DATA.org.agents.map((a: any) => ({ id: a.id, k: a.k, m: a.m }));
-  it("current org: 116 agents, cost from model defaults", () => {
+  it("current org: 118 agents, cost from model defaults", () => {
     const r = scenario(all, new Set());
-    expect(r.agents).toBe(116);
+    expect(r.agents).toBe(118);
     expect(r.delta).toEqual({ agents: 0, usd: 0 });
     expect(monthlyUsd({ id: "x", k: "x", m: "Opus" })).toBe(20);
     expect(monthlyUsd({ id: "x", k: "x", m: "Haiku" }, 250)).toBe(2.5);
@@ -168,7 +170,7 @@ describe("idea 1 + 4: scenario and budget alert", () => {
   it("switching a department off and adding 3 Haiku agents changes count and cost exactly", () => {
     const hr = all.filter((a) => a.k === "hr"), hrUsd = hr.reduce((s, a) => s + monthlyUsd(a), 0);
     const r = scenario(all, new Set(["hr"]), { marketing: { n: 3, m: "Haiku" } });
-    expect(r.agents).toBe(116 - hr.length + 3);
+    expect(r.agents).toBe(118 - hr.length + 3);
     expect(r.delta.usd).toBeCloseTo(-hrUsd + 3, 2);
     expect(r.byDept.hr).toBeUndefined();
   });
@@ -202,5 +204,75 @@ describe("idea 2: run trace (read-only)", () => {
     const h = await boot();
     const r: any = await h.getData("traces", { companyId: "c1" });
     expect(r.reason).toContain("database.namespace.read");
+  });
+});
+
+describe("step 0: intent brief before any plan (Siax rule 2026-11-21)", () => {
+  const live = [{ ...base, id: "L1", name: "مدیر منابع انسانی", role: "manager", title: "", reportsTo: null, adapterConfig: {} }];
+  const ans = { country: "IR", seniority: "mid", ad_budget_toman: 0, gender_any: "yes" };
+  it("hire case has 16 intake questions, each with a why", () => {
+    const q = (hire as any).intake.questions;
+    expect(q).toHaveLength(16);
+    expect(q.every((x: any) => x.why && x.src)).toBe(true);
+    expect(q.every((x: any) => x.default || x.suggest)).toBe(true);
+  });
+  it("empty answers use the default and are marked as assumptions; no default = missing", () => {
+    const b = buildBrief((hire as any).intake, {}, "x");
+    expect(b.ready).toBe(false);
+    expect(b.missing).toEqual(["why_now", "success_90", "daily_tasks", "must_skills", "pay_range"]);
+    expect(b.assumptions.length).toBe(11);
+  });
+  it("vague answers are flagged for a follow-up question", () => {
+    expect(unclearWhy("نمی‌دانم")).toBeTruthy(); expect(unclearWhy("شاید تهران؟")).toBeTruthy(); expect(unclearWhy("تهران")).toBeNull();
+    const b = buildBrief((hire as any).intake, { ...OKI.intake, work_mode: "?" }, "x");
+    expect(b.unclear).toEqual(["work_mode"]); expect(b.ready).toBe(false);
+  });
+  it("CEO-assistant preset gives a complete brief", async () => {
+    const h = await boot();
+    const b: any = await h.getData("brief", { caseId: "hire", intake: OKI.intake });
+    expect(b.ready).toBe(true); expect(b.text).toContain("وقت مدیرعامل");
+  });
+  it("planner refuses without an approved brief, and with an incomplete one", async () => {
+    const h = await boot(live);
+    await expect(h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: ans, approved: true, intake: OKI.intake })).rejects.toThrow(/خلاصهٔ نیت/);
+    await expect(h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: ans, approved: true, intake: {}, briefApproved: true })).rejects.toThrow(/کامل نیست/);
+  });
+  it("approved brief is written into the case's parent task", async () => {
+    const h = await boot(live, ["issues.read"]);
+    await h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: ans, approved: true, ...OKI });
+    const iss = await h.ctx.issues.list({ companyId: "c1", limit: 100, offset: 0 } as any);
+    const parent = iss.find((i: any) => i.title.startsWith("پرونده"))!;
+    expect(parent.description).toContain("خلاصهٔ نیت"); expect(parent.description).toContain("گزارش هفتگی فروش");
+  });
+});
+
+import CASES from "./fixtures/intake-cases.json" with { type: "json" };
+describe("step 0: ambiguity test set (fixtures/intake-cases.json)", () => {
+  for (const tc of (CASES as any).cases) it(tc.name, () => {
+    const base = tc.base === "preset" ? (hire as any).presets.ceo_assistant.intake : {};
+    const b = buildBrief((hire as any).intake, { ...base, ...tc.patch }, "x");
+    expect(b.missing).toEqual(tc.missing); expect(b.unclear).toEqual(tc.unclear); expect(b.ready).toBe(tc.ready);
+    if (tc.nextAskLen) expect(b.nextAsk).toHaveLength(tc.nextAskLen);
+    expect(b.card).toHaveLength(4);
+  });
+});
+
+describe("step 0: suggestions from the user's own past cases first", () => {
+  const q = (hire as any).intake;
+  it("past answer is used and cited instead of asking; two disagreeing past cases trigger a question", () => {
+    const b = buildBrief(q, {}, "x", [{ at: "2026-11-20T10:00:00Z", intake: { why_now: "کمبود وقت مدیرعامل" } }]);
+    const l = b.lines.find((x) => x.id === "why_now")!;
+    expect(l).toMatchObject({ source: "past", a: "کمبود وقت مدیرعامل", cite: "از پروندهٔ 2026-11-20" });
+    expect(b.missing).not.toContain("why_now");
+    const c = buildBrief(q, {}, "x", [{ at: "2026-11-20", intake: { work_mode: "تهران" } }, { at: "2026-11-19", intake: { work_mode: "دورکار" } }]);
+    expect(c.unclear).toContain("work_mode");
+  });
+  it("an approved case stores its intake and the next brief reuses it", async () => {
+    const live = [{ ...base, id: "L1", name: "مدیر منابع انسانی", role: "manager", title: "", reportsTo: null, adapterConfig: {} }];
+    const h = await boot(live);
+    await h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: { country: "IR", seniority: "mid", ad_budget_toman: 0, gender_any: "yes" }, approved: true, ...OKI });
+    const b: any = await h.getData("brief", { caseId: "hire", intake: {}, companyId: "c1" });
+    expect(b.ready).toBe(true);
+    expect(b.lines.find((x: any) => x.id === "why_now").cite).toMatch(/^از پروندهٔ /);
   });
 });
