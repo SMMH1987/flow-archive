@@ -80,6 +80,34 @@ const plugin = definePlugin({
       return { companyId, agents, loadedAt: new Date().toISOString() } satisfies AgentMapData;
     });
     ctx.data.register("org", async () => DATA);
+    // 0.7 (Siax 2026-11-21 18:37 UTC «تمام پاسخ های مراحل - کنار مراحل تولید بشه»): each case step with its status and the agent's latest answer beside it.
+    // Read-only: issues.read + issue.comments.read.
+    const SHORT_NOTE = 120; // shorter comments are questions or "blocked" notes: hidden, only counted
+    ctx.data.register("caseRuns", async (params) => {
+      const companyId = String((params as any)?.companyId ?? "");
+      if (!companyId) return { cases: [] };
+      const all = await ctx.issues.list({ companyId, limit: 500, offset: 0 });
+      const parents = all.filter((i: any) => !i.parentId && String(i.title).startsWith("پرونده:"))
+        .sort((a: any, b: any) => String(b.createdAt).localeCompare(String(a.createdAt))).slice(0, Number((params as any)?.limit ?? 5));
+      const names = new Map((await liveAgents(ctx, companyId)).map((a) => [a.id, a.name]));
+      const num = (t: string) => Number((/^(\d+)\./.exec(t) ?? [])[1] ?? 999);
+      const cases = [];
+      for (const p of parents as any[]) {
+        const kids = all.filter((i: any) => i.parentId === p.id).sort((a: any, b: any) => num(a.title) - num(b.title));
+        const steps = [];
+        for (const k of kids as any[]) {
+          const cs = (await ctx.issues.listComments(k.id, companyId)).filter((c: any) => c.body).reverse() // newest first; stable sort keeps this order for equal times
+            .sort((a: any, b: any) => String(b.createdAt).localeCompare(String(a.createdAt)));
+          const docs = cs.filter((c: any) => String(c.body).length >= SHORT_NOTE);
+          const last: any = docs[0];
+          steps.push({ id: k.id, identifier: k.identifier ?? null, title: k.title, status: k.status, agent: k.assigneeAgentId ? names.get(k.assigneeAgentId) ?? k.assigneeAgentId : null,
+            answer: last ? { body: String(last.body).slice(0, 4000), by: last.authorAgentId ? names.get(last.authorAgentId) ?? "ایجنت" : "انسان", at: last.createdAt, count: docs.length } : null,
+            older: docs.slice(1, 4).map((c: any) => ({ body: String(c.body).slice(0, 4000), at: c.createdAt })), hidden: cs.length - docs.length });
+        }
+        cases.push({ id: p.id, identifier: p.identifier ?? null, title: p.title, status: p.status, createdAt: p.createdAt, steps });
+      }
+      return { cases };
+    });
     // Step 0 (Siax rule 2026-11-21): intent brief from the case's fixed intake questions
     ctx.data.register("brief", async (params) => {
       const c = DATA.cases[String((params as any)?.caseId ?? "")];

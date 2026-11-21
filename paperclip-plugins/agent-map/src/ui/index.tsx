@@ -117,6 +117,39 @@ function Trace({ companyId, live, org }: { companyId: string; live: LiveAgent[];
     </section>);
 }
 
+type RunStep = { id: string; identifier: string | null; title: string; status: string; agent: string | null; answer: { body: string; by: string; at: string; count: number } | null; older: { body: string; at: string }[]; hidden: number };
+const ST: Record<string, [string, string]> = { backlog: ["در صف", "#868e96"], todo: ["آماده", "#1c7ed6"], in_progress: ["در حال کار", "#f08c00"], in_review: ["بازبینی", "#7048e8"], blocked: ["گیر کرده", "#e03131"], done: ["انجام شد", "#2f9e44"], cancelled: ["لغو", "#868e96"] };
+function CaseRuns({ companyId }: { companyId: string }) {
+  const r = usePluginData<{ cases: { id: string; identifier: string | null; title: string; status: string; steps: RunStep[] }[] }>("caseRuns", { companyId });
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  if (r.loading) return null;
+  if (r.error) return <section className="amx-runs" dir="rtl" style={{ padding: 16 }}>پاسخ مراحل در دسترس نیست: {r.error.message}</section>;
+  const cs = r.data?.cases ?? [];
+  return (
+    <section className="amx-runs" dir="rtl" style={{ padding: 16, display: "grid", gap: 10 }}>
+      <div style={{ display: "flex", gap: 8, alignItems: "center" }}><h3 style={{ margin: 0 }}>پرونده‌ها: هر مرحله با پاسخش</h3><button type="button" className="amx-runs-rf" onClick={() => r.refresh()}>تازه‌سازی</button></div>
+      <div className="am-muted">فقط خواندنی. آخرین خروجی هر مرحله باز است و نسخه‌های قبلی بسته. پیام‌های کوتاه (سؤال یا «گیر کردم») پنهان‌اند و فقط تعدادشان دیده می‌شود.</div>
+      {!cs.length && <div className="am-muted">هنوز پرونده‌ای ساخته نشده.</div>}
+      {cs.map((c) => (
+        <div key={c.id} data-case={c.id} style={{ border: "1px solid hsl(220 15% 85%)", borderRadius: 8, padding: 8 }}>
+          <b>{c.identifier ? c.identifier + " · " : ""}{c.title}</b> <span className="am-muted">· {c.steps.filter((s) => s.status === "done").length} از {c.steps.length} انجام شد</span>
+          <div style={{ display: "grid", gap: 6, marginTop: 6 }}>
+            {c.steps.map((s) => { const st = ST[s.status] ?? [s.status, "#868e96"]; const long = (s.answer?.body.length ?? 0) > 400; return (
+              <div key={s.id} data-step={s.id} style={{ display: "grid", gridTemplateColumns: "minmax(180px, 1fr) 2fr", gap: 10, alignItems: "start", borderTop: "1px dashed hsl(220 15% 88%)", paddingTop: 6 }}>
+                <div><div>{s.title}</div><span style={{ background: st[1], color: "#fff", borderRadius: 10, padding: "0 8px", fontSize: 12 }}>{st[0]}</span> <span className="am-muted" style={{ fontSize: 12 }}>{s.agent ?? "بدون مسئول"}{s.identifier ? " · " + s.identifier : ""}</span></div>
+                <div className="amx-ans" style={{ fontSize: 13, whiteSpace: "pre-wrap" }}>{s.answer ? <>
+                  <span className="am-muted" style={{ fontSize: 12 }}>{s.answer.by} · {s.answer.at ? new Date(s.answer.at).toLocaleString("fa-IR") : ""}{s.answer.count > 1 ? ` · ${s.answer.count} خروجی، آخری نشان داده شده` : ""}</span>{"\n"}
+                  {long && !open[s.id] ? s.answer.body.slice(0, 400) + "…" : s.answer.body}
+                  {long && <button type="button" onClick={() => setOpen((o) => ({ ...o, [s.id]: !o[s.id] }))} style={{ marginInlineStart: 6 }}>{open[s.id] ? "کمتر" : "بیشتر"}</button>}
+                  {s.older.map((o, i) => <details key={i}><summary className="am-muted">نسخهٔ قبلی · {o.at ? new Date(o.at).toLocaleString("fa-IR") : ""}</summary>{o.body}</details>)}
+                </> : <span className="am-muted">{s.status === "backlog" ? "هنوز اجرا نشده" : "خروجی متنی ثبت نشده"}</span>}
+                {s.hidden > 0 && <div className="am-muted" style={{ fontSize: 12 }}>{s.hidden} پیام کوتاه دیگر پنهان است</div>}</div>
+              </div>); })}
+          </div>
+        </div>))}
+    </section>);
+}
+
 export function AgentMapPage(_props: PluginPageProps) {
   const host = useHostContext();
   const org = usePluginData<OrgPayload & { cases: Record<string, CaseDef> }>("org", {});
@@ -128,7 +161,7 @@ export function AgentMapPage(_props: PluginPageProps) {
     return mountEngine(ref.current, org.data, agents, host.companyPrefix ?? "Paperclip");
   }, [org.data, agents, host.companyPrefix]);
   if (org.error) return <div dir="rtl">خطا: {org.error.message}</div>;
-  return <div><div ref={ref}>{org.loading ? "در حال بارگذاری…" : null}</div>{org.data && host.companyId ? <Planner companyId={host.companyId} cases={org.data.cases} /> : null}{org.data ? <Scenario org={org.data} live={agents} /> : null}{org.data && host.companyId ? <Trace companyId={host.companyId} live={agents} org={org.data} /> : null}</div>;
+  return <div><div ref={ref}>{org.loading ? "در حال بارگذاری…" : null}</div>{host.companyId ? <CaseRuns companyId={host.companyId} /> : null}{org.data && host.companyId ? <Planner companyId={host.companyId} cases={org.data.cases} /> : null}{org.data ? <Scenario org={org.data} live={agents} /> : null}{org.data && host.companyId ? <Trace companyId={host.companyId} live={agents} org={org.data} /> : null}</div>;
 }
 
 export function AgentMapSidebarLink(_props: PluginSidebarProps) {

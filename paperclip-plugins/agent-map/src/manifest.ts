@@ -1,15 +1,15 @@
 import type { PaperclipPluginManifestV1 } from "@paperclipai/plugin-sdk";
 
-// v0.6.4 · 2026-11-21 19:40 Berlin. No new capabilities. Sidebar link always renders (prefix from URL); stricter broken-encoding filter (also ??? text). 0.6.3: prerequisite links, broken templates hidden.
+// v0.7.0 · 2026-11-21 19:45 Berlin. NEW read-only capabilities issues.read + issue.comments.read: case steps show status and the agent's latest answer beside each step. Needs Siax's OK before install.
 const manifest: PaperclipPluginManifestV1 = {
   id: "agent-map",
   apiVersion: 1,
-  version: "0.6.4",
+  version: "0.7.0",
   displayName: "Agent Map · نقشهٔ ایجنت‌ها",
   description: "Live org chart and semantic mind map of the company's agents ; dynamic case planner that creates backlog tasks only after human approval.",
   author: "Siax",
   categories: ["ui"],
-  capabilities: ["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "ui.page.register", "ui.sidebar.register"],
+  capabilities: ["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "issues.read", "issue.comments.read", "ui.page.register", "ui.sidebar.register"],
   entrypoints: { worker: "./dist/worker.js", ui: "./dist/ui" },
   ui: {
     slots: [

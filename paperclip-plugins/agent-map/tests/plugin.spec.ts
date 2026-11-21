@@ -24,8 +24,8 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 
 describe("manifest", () => {
   it("asks only for read + create-task + page/sidebar", () => {
-    expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.6.4");
+    expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "issues.read", "issue.comments.read", "ui.page.register", "ui.sidebar.register"]);
+    expect(manifest.version).toBe("0.7.0");
   });
 });
 
@@ -321,5 +321,33 @@ describe("real hire test fixes (2026-11-21)", () => {
     await h.ctx.state.set({ scopeKind: "company", scopeId: "c1", stateKey: "templates" }, [{ caseId: "hire", name: "x", intake: { why_now: "Ø¯Ø³ØªÛŒØ§Ø±" }, answers: {}, steps: 1, gates: 0, est_usd: 0, parentId: "a", at: "2026-11-21" }, { caseId: "hire", name: "y", intake: { work_mode: "?????" }, answers: {}, steps: 1, gates: 0, est_usd: 0, parentId: "b", at: "2026-11-21" }]);
     const b: any = await h.getData("brief", { caseId: "hire", intake: {}, companyId: "c1" });
     expect(b.lines.some((l: any) => l.source === "past")).toBe(false);
+  });
+});
+
+describe("0.7: case steps with their answers (read-only)", () => {
+  const live = [{ ...base, id: "L1", name: "مدیر منابع انسانی", role: "manager", title: "", reportsTo: null, adapterConfig: {} }, { ...base, id: "L2", name: "کارشناس جذب", role: "general", title: "", reportsTo: "L1", adapterConfig: {} }];
+  it("lists each step in order with status and the latest comment beside it", async () => {
+    const h = await boot(live, ["issue.comments.create", "issues.update"]);
+    await h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: { country: "IR", seniority: "mid", ad_budget_toman: 0, gender_any: "yes" }, approved: true, ...OKI });
+    const iss = await h.ctx.issues.list({ companyId: "c1", limit: 100, offset: 0 } as any);
+    const jd = iss.find((i: any) => i.title.includes("نوشتن شرح شغل"))!;
+    const long = (t: string) => t + " " + "متن کامل خروجی ایجنت. ".repeat(8);
+    await h.ctx.issues.createComment(jd.id, long("پیش‌نویس اول"), "c1");
+    await h.ctx.issues.createComment(jd.id, "سؤال کوتاه: عنوان دقیق؟", "c1");
+    await h.ctx.issues.createComment(jd.id, long("شرح شغل نهایی: دستیار مدیرعامل…"), "c1");
+    await h.ctx.issues.update(jd.id, { status: "done" } as any, "c1");
+    const r: any = await h.getData("caseRuns", { companyId: "c1" });
+    expect(r.cases).toHaveLength(1);
+    const steps = r.cases[0].steps;
+    expect(steps).toHaveLength(15);
+    expect(steps.map((s: any) => parseInt(s.title))).toEqual([...Array(15)].map((_, i) => i + 1));
+    const s2 = steps.find((s: any) => s.id === jd.id);
+    expect(s2).toMatchObject({ status: "done", agent: "کارشناس جذب" });
+    expect(s2.answer.body.startsWith("شرح شغل نهایی")).toBe(true);
+    expect(s2.answer.count).toBe(2); expect(s2.older[0].body.startsWith("پیش‌نویس اول")).toBe(true); expect(s2.hidden).toBe(1);
+    expect(steps.filter((s: any) => s.answer).length).toBe(1);
+  });
+  it("only reads (no create/update capability added for this)", () => {
+    expect(manifest.capabilities.filter((c) => /update|write|comments.create/.test(c))).toEqual(["plugin.state.write"]);
   });
 });

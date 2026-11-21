@@ -6,7 +6,7 @@ const { createTestHarness } = await import("@paperclipai/plugin-sdk/testing");
 const tmp = new URL("./.tmp/", import.meta.url); fs.mkdirSync(tmp, { recursive: true });
 await esbuild.build({ entryPoints: ["src/worker.ts", "src/manifest.ts"], bundle: true, platform: "node", format: "esm", outdir: tmp.pathname, packages: "external", logLevel: "error" });
 const manifest = (await import(new URL("manifest.js", tmp))).default, plugin = (await import(new URL("worker.js", tmp))).default;
-const H = createTestHarness({ manifest, capabilities: [...manifest.capabilities, "issues.read"] });
+const H = createTestHarness({ manifest, capabilities: [...manifest.capabilities, "issues.read", "issue.comments.create", "issues.update"] });
 const base = { companyId: "c1", urlKey: "", icon: null, capabilities: null, adapterType: "claude_local", runtimeConfig: {}, pauseReason: null, pausedAt: null, permissions: {}, lastHeartbeatAt: null, metadata: null, createdAt: new Date(), updatedAt: new Date() };
 H.seed({ agents: [
   { ...base, id: "L1", name: "مدیرعامل", role: "ceo", title: "Chief Executive Officer", reportsTo: null, status: "running", adapterConfig: { model: "claude-opus-5-5" }, budgetMonthlyCents: 5000, spentMonthlyCents: 4200 },
@@ -62,6 +62,11 @@ const sum1 = await p.textContent(".amx-sc-sum");
 ok(/سناریو: 11[0-9] ایجنت/.test(sum1) && sum1 !== sum0, "idea 1: HR off + 3 Haiku in marketing changes totals: " + sum1);
 const tr = await p.textContent(".amx-tr").catch(() => "");
 ok(tr.includes("در دسترس نیست"), "idea 2 (0.4.1): trace panel says unavailable without DB permission, page still works");
+const jd = (await H.ctx.issues.list({ companyId: "c1", limit: 100, offset: 0 })).find((i) => i.title.includes("نوشتن شرح شغل"));
+await H.ctx.issues.createComment(jd.id, "شرح شغل: دستیار مدیرعامل، ترکیبی تهران. " + "کارهای اصلی: هماهنگی جلسات، پیگیری تیم‌ها، گزارش هفتگی فروش. ".repeat(3), "c1"); await H.ctx.issues.createComment(jd.id, "سؤال: عنوان دقیق؟", "c1"); await H.ctx.issues.update(jd.id, { status: "done" }, "c1");
+await p.click(".amx-runs-rf"); await p.waitForTimeout(800);
+const runs = (await p.textContent(".amx-runs").catch(() => "")) || "";
+ok(runs.includes("شرح شغل: دستیار مدیرعامل") && runs.includes("انجام شد") && runs.includes("1 از 15") && runs.includes("1 پیام کوتاه دیگر پنهان است"), "0.7: each step shows its status and the agent's answer beside it");
 await p.screenshot({ path: "tests/ui-e2e.png", fullPage: true });
 ok(errs.length === 0, "no page errors " + errs.join(" | "));
 await br.close(); console.log(fail ? `${fail} FAILED` : "ALL PASS"); process.exit(fail ? 1 : 0);
