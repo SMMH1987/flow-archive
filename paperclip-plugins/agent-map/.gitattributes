@@ -1,0 +1,2 @@
+# v1 · 2026-11-21 21:10 Berlin. Fixtures must stay LF on Windows checkouts (test compares exact text).
+tests/fixtures/** text eol=lf
