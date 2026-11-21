@@ -4215,6 +4215,107 @@
    ],
    "lvl": "agent",
    "cc": null
+  },
+  {
+   "id": "wf_researcher",
+   "n": "پژوهشگر ورک‌فلو",
+   "t": "Workflow Researcher",
+   "tm": "مدیریت فرایند (BPM)",
+   "r": "h_capability",
+   "k": "capability",
+   "mode": "auto",
+   "m": "Sonnet",
+   "ir": false,
+   "s": [
+    "apqc-pcf",
+    "deep-research",
+    "bpmn"
+   ],
+   "tasks": [
+    "جمع‌آوری الگوی جهانی هر ورک‌فلو از APQC، SCOR و ITIL",
+    "افزودن نسخهٔ ایران با منبع رسمی یا علامت «تأییدنشده»",
+    "ثبت در c4-org/workflow-catalog.yaml"
+   ],
+   "inp": [
+    "h_capability",
+    "process_improver"
+   ],
+   "outp": [
+    "process_modeler",
+    "wf_agent_mapper"
+   ],
+   "src": [
+    "https://www.apqc.org/process-frameworks",
+    "catalog:agency-agents/Trend Researcher"
+   ],
+   "lvl": "agent",
+   "cc": null
+  },
+  {
+   "id": "wf_agent_mapper",
+   "n": "نگاشت قدم به ایجنت",
+   "t": "Workflow-to-Agent Mapper",
+   "tm": "مدیریت فرایند (BPM)",
+   "r": "h_capability",
+   "k": "capability",
+   "mode": "auto",
+   "m": "Haiku",
+   "ir": false,
+   "s": [
+    "bpmn",
+    "likec4"
+   ],
+   "tasks": [
+    "هر قدم ورک‌فلو را به یک ایجنت org-agents.yaml وصل می‌کند (Lane)",
+    "ایجنت کم یا تکراری را گزارش می‌دهد"
+   ],
+   "inp": [
+    "wf_researcher",
+    "process_modeler"
+   ],
+   "outp": [
+    "bpmn_validator",
+    "agent_governor"
+   ],
+   "src": [
+    "catalog:agency-agents/Agents Orchestrator"
+   ],
+   "lvl": "agent",
+   "cc": null
+  },
+  {
+   "id": "bpmn_validator",
+   "n": "بازبین BPMN",
+   "t": "BPMN Style Validator",
+   "tm": "مدیریت فرایند (BPM)",
+   "r": "h_capability",
+   "k": "capability",
+   "mode": "ask",
+   "m": "Haiku",
+   "ir": false,
+   "s": [
+    "bpmn",
+    "flow-rules-check"
+   ],
+   "tasks": [
+    "بررسی ۱۰ قاعدهٔ docs/STANDARD-BPMN.md (فعل+مفعول، gate بیرونی، مالک، End)",
+    "فقط گزارش؛ تغییر نمی‌دهد"
+   ],
+   "inp": [
+    "wf_agent_mapper",
+    "process_modeler"
+   ],
+   "outp": [
+    "h_capability",
+    "process_improver"
+   ],
+   "src": [
+    "https://www.omg.org/spec/BPMN/2.0.2/",
+    "Bruce Silver, BPMN Method and Style (2nd ed.)",
+    "catalog:agency-agents/Spec Compliance Analyst"
+   ],
+   "lvl": "agent",
+   "cc": null
   }
  ],
  "workflows": [

@@ -1,4 +1,4 @@
-# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 2 — 2026-11-21 12:50 UTC (13:50 برلین)
+# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 3 — 2026-11-21 12:55 UTC (13:55 برلین): + ۳ ایجنت طراح ورک‌فلو
 # ساختار: مدیریت ارشد (board → ceo → سرپرست‌های h_*) → بخش (div) → دپارتمان (unit = واحد در org-global.c4) → ایجنت.
 # محتوا از تحقیق ۴ پژوهشگر (research/paperclip/global-org/part-a..d.json، ۲۱ نوامبر) + کاتالوگ ۴۴۵ ایجنت Paperclip؛ هر ایجنت sources دارد.
 # مدل سرپرست‌ها Sonnet (پژوهش Opus پیشنهاد داده بود؛ هزینه: Opus ≈170× Haiku) — فقط ceo روی Opus.
@@ -1531,6 +1531,48 @@ agents:
   outputs: [h_hr, kb_curator, change_manager]
   skills: [instructional-design, enablement]
   sources: ['catalog:agency-agents/Corporate Training Designer', 'https://www.prosci.com/methodology/adkar']
+- id: wf_researcher
+  div: capability
+  unit: process
+  n: پژوهشگر ورک‌فلو
+  en: Workflow Researcher
+  r: h_capability
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [جمع‌آوری الگوی جهانی هر ورک‌فلو از APQC، SCOR و ITIL, افزودن نسخهٔ ایران با منبع رسمی یا علامت «تأییدنشده», ثبت در c4-org/workflow-catalog.yaml]
+  inputs: [h_capability, process_improver]
+  outputs: [process_modeler, wf_agent_mapper]
+  skills: [apqc-pcf, deep-research, bpmn]
+  sources: ['https://www.apqc.org/process-frameworks', 'catalog:agency-agents/Trend Researcher']
+- id: wf_agent_mapper
+  div: capability
+  unit: process
+  n: نگاشت قدم به ایجنت
+  en: Workflow-to-Agent Mapper
+  r: h_capability
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [هر قدم ورک‌فلو را به یک ایجنت org-agents.yaml وصل می‌کند (Lane), ایجنت کم یا تکراری را گزارش می‌دهد]
+  inputs: [wf_researcher, process_modeler]
+  outputs: [bpmn_validator, agent_governor]
+  skills: [bpmn, likec4]
+  sources: ['catalog:agency-agents/Agents Orchestrator']
+- id: bpmn_validator
+  div: capability
+  unit: process
+  n: بازبین BPMN
+  en: BPMN Style Validator
+  r: h_capability
+  mode: ask
+  m: Haiku
+  ir: false
+  tasks: [بررسی ۱۰ قاعدهٔ docs/STANDARD-BPMN.md (فعل+مفعول، gate بیرونی، مالک، End), فقط گزارش؛ تغییر نمی‌دهد]
+  inputs: [wf_agent_mapper, process_modeler]
+  outputs: [h_capability, process_improver]
+  skills: [bpmn, flow-rules-check]
+  sources: ['https://www.omg.org/spec/BPMN/2.0.2/', 'Bruce Silver, BPMN Method and Style (2nd ed.)', 'catalog:agency-agents/Spec Compliance Analyst']
 workflows:
 - name: چرخهٔ برنامهٔ سالانه و OKR
   dept: strategy
