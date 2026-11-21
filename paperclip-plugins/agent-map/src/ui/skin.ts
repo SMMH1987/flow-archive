@@ -80,6 +80,7 @@ export const SKIN_CSS = `
 `;
 
 const VDESC: Record<string, string> = { org: "چه کسی زیر دست کیست", mm: "دپارتمان‌ها و نقش‌ها، شاخه‌ای", ls: "جدول قابل مرتب‌کردن، با هزینه", wf: "مسیر کار با درگاه‌های تأیید", wv: "فلوچارت قدم‌به‌قدم", bl: "چه کسی در هر قدم چه می‌کند", px: "وضعیت ایجنت‌ها به شکل دفتر", run: "پرونده‌های زنده، هر قدم با جواب ایجنت" };
+const VNAME: Record<string, string> = { wf: "ورک‌فلو BPMN", wv: "ورک‌فلو عمودی", bl: "جدول نقش × قدم", px: "دفتر پیکسلی", run: "اجرای پرونده" };
 const GROUP_START = new Set(["wf", "run"]);
 const COLORS: Record<string, [string, string]> = { dept: ["دپارتمان", "رنگ هر دپارتمان"], status: ["وضعیت", "در حال کار، آماده، متوقف، خطا"], model: ["مدل", "Opus، Sonnet، Haiku"], cost: ["هزینه", "سهم مصرف از بودجهٔ ماه"] };
 const STC: Record<string, string> = { running: "hsl(150 55% 40%)", idle: "hsl(215 70% 55%)", error: "hsl(0 70% 52%)", paused: "hsl(220 8% 58%)" };
@@ -124,7 +125,7 @@ export function applySkin(host: HTMLElement, data: OrgPayload, live: LiveAgent[]
   // «نما» popover drives the real select
   const vp = tb.querySelector<HTMLElement>(".amx-vp")!, vb = tb.querySelector<HTMLButtonElement>(".amx-vb")!;
   const opts = vsel ? Array.from(vsel.options) : [];
-  vp.innerHTML = opts.map((o, i) => { const t = o.text.trim(), ic = t.split(" ")[0], nm = t.slice(ic.length).replace(/\s*\(.*\)$/, "").trim();
+  vp.innerHTML = opts.map((o, i) => { const t = o.text.trim(), ic = t.split(" ")[0], nm = VNAME[o.value] ?? t.slice(ic.length).replace(/\s*\(.*\)$/, "").trim();
     return `${i && GROUP_START.has(o.value) ? "<hr>" : ""}<button type="button" role="menuitem" data-v="${o.value}"><i>${ic}</i>${nm}<small>${VDESC[o.value] ?? ""}</small></button>`; }).join("");
   const vName = () => { const b = vp.querySelector<HTMLElement>(`[data-v="${vsel?.value}"]`); vp.querySelectorAll("[data-v]").forEach((x) => x.toggleAttribute("aria-current", x === b)); vb.textContent = "نما: " + (b ? b.childNodes[1].textContent!.trim() : "") + " ▾"; };
   vp.addEventListener("click", (e) => { const b = (e.target as HTMLElement).closest<HTMLElement>("[data-v]"); if (!b || !vsel) return; vsel.value = b.dataset.v!; vsel.dispatchEvent(new Event("change", { bubbles: true })); close(); vName(); });
@@ -174,7 +175,10 @@ export function applySkin(host: HTMLElement, data: OrgPayload, live: LiveAgent[]
   // popovers: one open at a time, Esc and outside click close
   const pairs = Array.from(host.querySelectorAll<HTMLElement>(".amx-pw")).map((w) => [w.querySelector<HTMLElement>("button")!, w.querySelector<HTMLElement>(".amx-pop")!] as const);
   function close() { pairs.forEach(([b, p]) => { p.hidden = true; b.setAttribute("aria-expanded", "false"); }); }
-  pairs.forEach(([b, p]) => b.addEventListener("click", (e) => { e.stopPropagation(); const o = p.hidden; close(); p.hidden = !o; b.setAttribute("aria-expanded", String(o)); }));
+  const place = (p: HTMLElement) => { p.style.right = ""; p.style.left = ""; const r = p.getBoundingClientRect(), w = document.documentElement.clientWidth;
+    if (r.left < 4) { p.style.right = "auto"; p.style.left = "0"; } else if (r.right > w - 4) { p.style.left = "auto"; p.style.right = "0"; }
+    const r2 = p.getBoundingClientRect(); if (r2.left < 4 || r2.right > w - 4) { p.style.position = "fixed"; p.style.left = "8px"; p.style.right = "8px"; p.style.top = Math.round(r2.top) + "px"; } else p.style.position = ""; };
+  pairs.forEach(([b, p]) => b.addEventListener("click", (e) => { e.stopPropagation(); const o = p.hidden; close(); p.hidden = !o; b.setAttribute("aria-expanded", String(o)); if (o) place(p); }));
   const onDoc = (e: MouseEvent) => { if (!(e.target as HTMLElement).closest?.(".amx-pw")) close(); };
   const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") close(); };
   mp.addEventListener("click", (e) => { if ((e.target as HTMLElement).closest("button")) setTimeout(close, 0); });
