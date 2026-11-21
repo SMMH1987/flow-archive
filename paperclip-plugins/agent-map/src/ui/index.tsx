@@ -133,6 +133,8 @@ export function AgentMapPage(_props: PluginPageProps) {
 
 export function AgentMapSidebarLink(_props: PluginSidebarProps) {
   const host = useHostContext();
-  if (!host.companyPrefix) return null;
-  return <a href={`/${host.companyPrefix}/agent-map`} dir="rtl" style={{ display: "block", padding: "4px 8px", color: "inherit", textDecoration: "none" }}>🗺️ نقشهٔ ایجنت‌ها</a>;
+  // Real server check 2026-11-21: the link did not show. Likely cause: companyPrefix is empty in the sidebar context, so we returned null.
+  // Fall back to the first path segment of the current URL (e.g. /SMMA/...), and always render.
+  const prefix = host.companyPrefix || (typeof window !== "undefined" ? window.location.pathname.split("/").filter(Boolean)[0] : "") || "";
+  return <a href={prefix ? `/${prefix}/agent-map` : "agent-map"} className="amx-side" dir="rtl" style={{ display: "block", padding: "4px 8px", color: "inherit", textDecoration: "none" }}>🗺️ نقشهٔ ایجنت‌ها</a>;
 }

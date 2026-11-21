@@ -25,7 +25,7 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 describe("manifest", () => {
   it("asks only for read + create-task + page/sidebar", () => {
     expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.6.3");
+    expect(manifest.version).toBe("0.6.4");
   });
 });
 
@@ -315,5 +315,11 @@ describe("real hire test fixes (2026-11-21)", () => {
     await h.ctx.state.set({ scopeKind: "company", scopeId: "c1", stateKey: "templates" }, [{ caseId: "hire", name: "Ø§Ø³ØªØ®Ø¯Ø§Ù…", answers: {}, steps: 15, gates: 4, est_usd: 0.45, parentId: "p", at: "2026-11-21" }, { caseId: "hire", name: "استخدام یک نفر", answers: {}, steps: 15, gates: 4, est_usd: 0.45, parentId: "q", at: "2026-11-21" }]);
     const t: any = await h.getData("templates", { companyId: "c1" });
     expect(t.map((x: any) => x.parentId)).toEqual(["q"]);
+  });
+  it("the intent card never cites a broken past case (also ??? text)", async () => {
+    const h = await boot();
+    await h.ctx.state.set({ scopeKind: "company", scopeId: "c1", stateKey: "templates" }, [{ caseId: "hire", name: "x", intake: { why_now: "Ø¯Ø³ØªÛŒØ§Ø±" }, answers: {}, steps: 1, gates: 0, est_usd: 0, parentId: "a", at: "2026-11-21" }, { caseId: "hire", name: "y", intake: { work_mode: "?????" }, answers: {}, steps: 1, gates: 0, est_usd: 0, parentId: "b", at: "2026-11-21" }]);
+    const b: any = await h.getData("brief", { caseId: "hire", intake: {}, companyId: "c1" });
+    expect(b.lines.some((l: any) => l.source === "past")).toBe(false);
   });
 });

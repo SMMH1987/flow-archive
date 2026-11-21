@@ -56,7 +56,7 @@ async function liveAgents(ctx: any, companyId: string) {
 
 // The user's own past cases of this kind (plugin state only; reading Paperclip issues would need issues.read, not approved yet)
 // Real test 2026-11-21: a saved template came back with broken encoding (mojibake). Hide such entries instead of showing them.
-export const brokenText = (v: unknown) => /\uFFFD|Ã.|Ø[\u0080-\u00FF]|Ù[\u0080-\u00FF]/.test(JSON.stringify(v ?? ""));
+export const brokenText = (v: unknown) => { const t = JSON.stringify(v ?? ""); return /\uFFFD|Ã.|Ø[\u0080-\u00FF]|Ù[\u0080-\u00FF]|\?{3,}/.test(t) || /[\u00C0-\u00FF]{3,}/.test(t); };
 export const cleanTemplates = (t: Template[]) => t.filter((x) => x && typeof x.caseId === "string" && !brokenText(x));
 async function pastCases(ctx: any, companyId: string, caseId: string) {
   if (!companyId) return [];
