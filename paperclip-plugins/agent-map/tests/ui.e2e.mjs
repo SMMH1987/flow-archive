@@ -49,8 +49,7 @@ await p.uncheck('.amx-sc tr[data-dept="hr"] input[type=checkbox]'); await p.fill
 const sum1 = await p.textContent(".amx-sc-sum");
 ok(/سناریو: 11[0-9] ایجنت/.test(sum1) && sum1 !== sum0, "idea 1: HR off + 3 Haiku in marketing changes totals: " + sum1);
 const tr = await p.textContent(".amx-tr").catch(() => "");
-ok(tr.includes("مدیرعامل") && tr.includes("0.81") && tr.includes("120.0k") && tr.includes("rate limit"), "idea 2: trace table shows CEO $0.81, 120k tokens, recruiter error");
-ok((await p.$$('.amx-tr tr[data-agent]')).length === 2, "idea 2: one row per agent with runs or costs");
+ok(tr.includes("در دسترس نیست"), "idea 2 (0.4.1): trace panel says unavailable without DB permission, page still works");
 await p.screenshot({ path: "tests/ui-e2e.png", fullPage: true });
 ok(errs.length === 0, "no page errors " + errs.join(" | "));
 await br.close(); console.log(fail ? `${fail} FAILED` : "ALL PASS"); process.exit(fail ? 1 : 0);

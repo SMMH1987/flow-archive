@@ -22,8 +22,8 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 
 describe("manifest", () => {
   it("asks only for read + create-task + page/sidebar", () => {
-    expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "database.namespace.read", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.4.0");
+    expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "ui.page.register", "ui.sidebar.register"]);
+    expect(manifest.version).toBe("0.4.1");
   });
 });
 
@@ -193,15 +193,14 @@ describe("idea 2: run trace (read-only)", () => {
   });
   it("queries only read-only SELECTs on the two whitelisted tables", async () => {
     for (const q of [RUNS_SQL, COSTS_SQL]) { expect(q.startsWith("SELECT")).toBe(true); expect(/insert|update|delete|drop/i.test(q)).toBe(false); }
-    expect(manifest.database?.coreReadTables).toEqual(["heartbeat_runs", "cost_events"]);
+    expect((manifest as any).database).toBeUndefined();
     const h = await boot();
     const r: any = await h.getData("traces", { companyId: "c1" });
-    expect(r.ok).toBe(true);
-    expect(h.dbQueries.length).toBe(2); expect(h.dbQueries[0].params).toEqual(["c1"]);
+    expect(r.ok).toBe(false); expect(h.dbQueries.length).toBe(0);
   });
   it("reports unavailable instead of crashing when the database read fails", async () => {
-    const h = await boot(); (h.ctx.db as any).query = async () => { throw new Error("column x does not exist"); };
+    const h = await boot();
     const r: any = await h.getData("traces", { companyId: "c1" });
-    expect(r).toMatchObject({ ok: false, reason: "column x does not exist" });
+    expect(r.reason).toContain("database.namespace.read");
   });
 });

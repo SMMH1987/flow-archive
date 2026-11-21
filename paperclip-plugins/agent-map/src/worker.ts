@@ -1,6 +1,7 @@
-// v0.4.0 · 2026-11-21 19:30 Berlin. Agent Map worker. +0.3 plan templates; +0.4 run trace (read-only).
+// v0.4.1 · 2026-11-21 17:35 Berlin. Agent Map worker. +0.3 plan templates; +0.4 run trace (read-only).
 // Reads live agents (agents.read). Serves our org chart, workflows and cases (bundled from flow-archive, see tools/sync_data.py).
 // Creates tasks ONLY after a human approves a plan (issues.create), and only in "backlog" so no agent wakes up by itself.
+import manifest from "./manifest.js";
 import { definePlugin, runWorker } from "@paperclipai/plugin-sdk";
 import { categorize, type CatKey } from "./shared/categories.js";
 import { planCase, type Answers, type CaseDef, type Plan } from "./shared/planner.js";
@@ -71,6 +72,7 @@ const plugin = definePlugin({
     ctx.data.register("traces", async (params) => {
       const companyId = String((params as any)?.companyId ?? "");
       if (!companyId) return { ok: false, reason: "no company", traces: {} };
+      if (!(manifest.capabilities as string[]).includes("database.namespace.read")) return { ok: false, reason: "نیاز به اجازهٔ خواندن پایگاه‌داده (database.namespace.read + migrate) که هنوز تأیید نشده", traces: {} };
       try {
         const [runs, costs] = await Promise.all([ctx.db.query<RunRow>(RUNS_SQL, [companyId]), ctx.db.query<CostRow>(COSTS_SQL, [companyId])]);
         return { ok: true, traces: aggregateTrace(runs, costs) };
