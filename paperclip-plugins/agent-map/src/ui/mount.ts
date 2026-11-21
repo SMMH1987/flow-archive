@@ -1,6 +1,7 @@
-// v0.2.0 · 2026-11-21 17:20 Berlin. Mounts the agent-map engine (generated from the hub artifact's «موکاپ افزونه» tab) into a host element.
+// v0.3.0 · 2026-11-21 18:15 Berlin. +budget alerts (idea 4), CSV export (idea 8). Mounts the agent-map engine (generated from the hub artifact's «موکاپ افزونه» tab) into a host element.
 // Pure DOM, no React, so the same code runs in the plugin and in the browser test (tests/engine.e2e.mjs).
 import ENGINE from "../generated/engine.json" with { type: "json" };
+import { overBudget } from "../shared/scenario.js";
 
 export type LiveAgent = { id: string; name: string; title: string | null; reportsTo: string | null; status: string; model: string | null; skills: string[]; spentMonthlyCents: number; budgetMonthlyCents: number; cat: string; orgId: string | null };
 export type OrgPayload = { org: { cats: unknown; order: string[]; agents: unknown[]; workflows: unknown[] } };
@@ -9,6 +10,7 @@ const TOKENS = `.amx{--bg:#f7f5f2;--card:#fff;--fg:#1d2230;--muted:#606a7a;--lin
 @media (prefers-color-scheme:dark){.amx{--bg:#13161c;--card:#1b2029;--fg:#e8eaf0;--muted:#9ba4b4;--line:#2d3440;--you:#e47aa0;--boss:#a08bff;--chip:#242a34}}
 .amx .amx-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 16px 0}.amx select{font:inherit;padding:3px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg)}
 .amx .am-view{height:calc(100vh - 220px);min-height:480px;max-height:none;cursor:grab}.amx .am-view{padding-top:64px}
+.amx .am-over{box-shadow:0 0 0 2.5px hsl(0 70% 52%)!important}.amx .amx-warn{color:hsl(0 70% 48%);font-weight:700}
 .amx .am-stage>.am-bar{position:absolute;top:10px;right:10px;left:10px;z-index:6;pointer-events:none}.amx .am-stage>.am-bar>*{pointer-events:auto}`;
 const HOOK = "by={};kids={};A.forEach(function(a){by[a.id]=a});";
 
@@ -39,5 +41,26 @@ export function mountEngine(host: HTMLElement, data: OrgPayload, live: LiveAgent
   (window as any).__amWF = data.org.workflows;
   const js = E.js.replace(HOOK, "window.__amLive&&window.__amLive(A,st);" + HOOK);
   new Function(js)();
-  return () => { host.innerHTML = ""; delete (window as any).__amLive; };
+  // idea 4: budget alert — red ring on every card at >=80% of its monthly budget, count in the top bar
+  const over = new Set<string>();
+  for (const l of live) if (overBudget(l.spentMonthlyCents, l.budgetMonthlyCents)) { over.add(l.id); if (l.orgId) over.add(l.orgId); }
+  const warn = live.filter((l) => overBudget(l.spentMonthlyCents, l.budgetMonthlyCents));
+  const top = host.querySelector("#amx-live");
+  if (top && warn.length) top.insertAdjacentHTML("afterend", `<span class="amx-warn" id="amx-warn">⚠ ${warn.length} ایجنت بالای ۸۰٪ بودجهٔ ماه: ${warn.map((w) => w.name).join("، ")}</span>`);
+  const inn = host.querySelector("#mk-in");
+  const mark = () => inn?.querySelectorAll<HTMLElement>("[data-s]").forEach((c) => c.classList.toggle("am-over", over.has(c.dataset.s ?? "")));
+  const mo = inn ? new MutationObserver(mark) : null; mo?.observe(inn!, { childList: true, subtree: true }); mark();
+  // idea 8: the export button really exports (CSV of the chart with live status)
+  const ex = host.querySelector<HTMLButtonElement>("#mk-ex");
+  const onEx = (e: Event) => { e.stopImmediatePropagation(); e.preventDefault(); const csv = toCsv(data, live); const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv" })); a.download = "agent-map.csv"; a.click(); (window as any).__amLastCsv = csv; };
+  if (ex) { ex.textContent = "⤓ خروجی CSV"; ex.addEventListener("click", onEx, true); }
+  return () => { mo?.disconnect(); host.innerHTML = ""; delete (window as any).__amLive; };
+}
+
+export function toCsv(data: OrgPayload, live: LiveAgent[]): string {
+  const m = new Map(live.filter((l) => l.orgId).map((l) => [l.orgId as string, l]));
+  const q = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const rows = [["id", "name", "title", "reportsTo", "department", "model", "mode", "live_status", "spent_usd", "budget_usd"]];
+  for (const a of data.org.agents as any[]) { const l = m.get(a.id); rows.push([a.id, a.n, a.t ?? "", a.r ?? "", a.k, l?.model ?? a.m ?? "", a.mode ?? "", l?.status ?? "not in Paperclip", l ? (l.spentMonthlyCents / 100).toFixed(2) : "", l ? (l.budgetMonthlyCents / 100).toFixed(2) : ""]); }
+  return rows.map((r) => r.map(q).join(",")).join("\n");
 }

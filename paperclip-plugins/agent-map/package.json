@@ -1,6 +1,6 @@
 {
   "name": "agent-map",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "private": true,
   "description": "Live org chart and semantic mind map of agents",
@@ -12,6 +12,7 @@
     "test": "vitest run --config ./vitest.config.ts",
     "typecheck": "tsc --noEmit",
     "test:e2e": "node tests/engine.e2e.mjs",
+    "test:ui": "node tests/ui.e2e.mjs",
     "sync": "python3 tools/sync_data.py ../../what-is-paperclip.html ../../../../flow-archive"
   },
   "paperclipPlugin": {

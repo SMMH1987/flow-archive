@@ -1,4 +1,4 @@
-// v0.2.0 · 2026-11-21 17:15 Berlin. Agent Map worker.
+// v0.3.0 · 2026-11-21 18:10 Berlin. Agent Map worker. +0.3: successful-plan templates (plugin state).
 // Reads live agents (agents.read). Serves our org chart, workflows and cases (bundled from flow-archive, see tools/sync_data.py).
 // Creates tasks ONLY after a human approves a plan (issues.create), and only in "backlog" so no agent wakes up by itself.
 import { definePlugin, runWorker } from "@paperclipai/plugin-sdk";
@@ -12,6 +12,7 @@ export type MapAgent = {
   status: string; adapterType: string; model: string | null; skills: string[];
   spentMonthlyCents: number; budgetMonthlyCents: number; cat: CatKey; orgId: string | null;
 };
+export type Template = { caseId: string; name: string; answers: Answers; steps: number; gates: number; est_usd: number; parentId: string; at: string };
 export type AgentMapData = { companyId: string; agents: MapAgent[]; loadedAt: string };
 export type OrgData = { org: { cats: Record<string, [string, number]>; order: string[]; agents: OrgAgent[]; workflows: { n: string; s: string[][] }[] }; cases: Record<string, CaseDef> };
 
@@ -65,6 +66,12 @@ const plugin = definePlugin({
       return { companyId, agents, loadedAt: new Date().toISOString() } satisfies AgentMapData;
     });
     ctx.data.register("org", async () => DATA);
+    // idea 5: approved plans are saved per company and can be reused without planning again
+    ctx.data.register("templates", async (params) => {
+      const companyId = String(params?.companyId ?? "");
+      if (!companyId) return [];
+      return ((await ctx.state.get({ scopeKind: "company", scopeId: companyId, stateKey: "templates" })) as Template[] | null) ?? [];
+    });
     ctx.data.register("instructions", async (params) => {
       const a = ORG_BY.get(String(params?.agentId ?? ""));
       return a ? { agentId: a.id, text: buildInstructions(a, ORG_BY) } : { agentId: null, text: "" };
@@ -102,7 +109,11 @@ const plugin = definePlugin({
         });
         ids.set(s.id, issue.id); created.push({ step: s.id, issueId: issue.id, assigned: !!agentId });
       }
-      return { parentId: parent.id, created, unmapped: [...new Set(unmapped)], plan };
+      const key = { scopeKind: "company" as const, scopeId: companyId, stateKey: "templates" };
+      const old = ((await ctx.state.get(key)) as Template[] | null) ?? [];
+      const t: Template = { caseId: c.case, name: c.name, answers: plan.answers, steps: plan.steps.length, gates: plan.gates, est_usd: plan.est_usd, parentId: parent.id, at: new Date().toISOString() };
+      await ctx.state.set(key, [t, ...old].slice(0, 20));
+      return { parentId: parent.id, created, unmapped: [...new Set(unmapped)], plan, template: t };
     });
   },
   async onHealth() {

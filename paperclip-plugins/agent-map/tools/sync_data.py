@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""v1 · 2026-11-21 17:05 Berlin. Copies the engine and data into src/generated/ (never hand-edit those files).
+"""v2 · 2026-11-21 18:45 Berlin (yes/no kept as words). Copies the engine and data into src/generated/ (never hand-edit those files).
   engine: the «موکاپ افزونه» tab of the main Paperclip artifact source (HTML pane, mk-css, mk-js, ag-data)
   data:   flow-archive c4-org/generated/org-agents.json + c4-org/cases/*.yaml
 Usage: python tools/sync_data.py <artifact.html> <flow-archive dir>"""
@@ -17,6 +17,12 @@ co = re.search(r'<select id="mk-co">.*?</select>', s, re.S).group(0)
 eng = {'css': css, 'js': js, 'html': html, 'select': co}
 (out / 'engine.json').write_text(json.dumps(eng, ensure_ascii=False), encoding='utf-8')
 org = json.loads((repo / 'c4-org/generated/org-agents.json').read_text(encoding='utf-8'))
-cases = {p.stem: yaml.safe_load(p.read_text(encoding='utf-8')) for p in sorted((repo / 'c4-org/cases').glob('*.yaml'))}
+def _yn(v):
+    # YAML 1.1 reads yes/no as booleans; the case files mean the words
+    if isinstance(v, bool): return 'yes' if v else 'no'
+    if isinstance(v, list): return [_yn(x) for x in v]
+    if isinstance(v, dict): return {k: _yn(x) for k, x in v.items()}
+    return v
+cases = {p.stem: _yn(yaml.safe_load(p.read_text(encoding='utf-8'))) for p in sorted((repo / 'c4-org/cases').glob('*.yaml'))}
 (out / 'org.json').write_text(json.dumps({'org': org, 'cases': cases}, ensure_ascii=False), encoding='utf-8')
 print('engine', len(js), 'js chars ·', len(org['agents']), 'agents ·', len(org['workflows']), 'workflows ·', len(cases), 'cases')

@@ -1,4 +1,4 @@
-// v0.2.0 · 2026-11-21 17:30 Berlin
+// v0.3.0 · 2026-11-21 18:25 Berlin
 import { describe, expect, it } from "vitest";
 import { createTestHarness } from "@paperclipai/plugin-sdk/testing";
 import manifest from "../src/manifest.js";
@@ -6,6 +6,7 @@ import plugin, { DATA, orgIdOf } from "../src/worker.js";
 import { categorize } from "../src/shared/categories.js";
 import { evalWhen, planCase } from "../src/shared/planner.js";
 import { buildInstructions } from "../src/shared/instructions.js";
+import { scenario, overBudget, monthlyUsd } from "../src/shared/scenario.js";
 
 const IDS = new Set(DATA.org.agents.map((a) => a.id));
 const hire = DATA.cases.hire;
@@ -20,8 +21,8 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 
 describe("manifest", () => {
   it("asks only for read + create-task + page/sidebar", () => {
-    expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.2.0");
+    expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "ui.page.register", "ui.sidebar.register"]);
+    expect(manifest.version).toBe("0.3.0");
   });
 });
 
@@ -136,5 +137,46 @@ describe("approvePlan (creates tasks only after approval)", () => {
     const want = ["job_desc", "salary_check"].map((k) => r.created.find((c: any) => c.step === k).issueId).sort();
     expect(JSON.stringify(rel)).toContain(want[0]);
     expect(JSON.stringify(rel)).toContain(want[1]);
+  });
+});
+
+describe("idea 5: saved plan templates", () => {
+  it("approved plan is saved per company and listed, newest first", async () => {
+    const live = [{ ...base, id: "L1", name: "مدیر منابع انسانی", role: "manager", title: "", reportsTo: null, adapterConfig: {} }];
+    const h = await boot(live);
+    expect(await h.getData<any[]>("templates", { companyId: "c1" })).toEqual([]);
+    const a1 = { country: "IR", seniority: "mid", ad_budget_toman: 0, gender_any: "yes" }, a2 = { country: "other", seniority: "senior", ad_budget_toman: 5000000, gender_any: "no" };
+    await h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: a1, approved: true });
+    await h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: a2, approved: true });
+    const t = await h.getData<any[]>("templates", { companyId: "c1" });
+    expect(t.map((x) => [x.steps, x.gates, x.est_usd])).toEqual([[14, 5, 0.44], [15, 4, 0.45]]);
+    expect(t[1].answers).toEqual(a1);
+    expect(await h.getData<any[]>("templates", { companyId: "other" })).toEqual([]);
+  });
+});
+
+describe("idea 1 + 4: scenario and budget alert", () => {
+  const all = DATA.org.agents.map((a: any) => ({ id: a.id, k: a.k, m: a.m }));
+  it("current org: 116 agents, cost from model defaults", () => {
+    const r = scenario(all, new Set());
+    expect(r.agents).toBe(116);
+    expect(r.delta).toEqual({ agents: 0, usd: 0 });
+    expect(monthlyUsd({ id: "x", k: "x", m: "Opus" })).toBe(20);
+    expect(monthlyUsd({ id: "x", k: "x", m: "Haiku" }, 250)).toBe(2.5);
+  });
+  it("switching a department off and adding 3 Haiku agents changes count and cost exactly", () => {
+    const hr = all.filter((a) => a.k === "hr"), hrUsd = hr.reduce((s, a) => s + monthlyUsd(a), 0);
+    const r = scenario(all, new Set(["hr"]), { marketing: { n: 3, m: "Haiku" } });
+    expect(r.agents).toBe(116 - hr.length + 3);
+    expect(r.delta.usd).toBeCloseTo(-hrUsd + 3, 2);
+    expect(r.byDept.hr).toBeUndefined();
+  });
+  it("live budget overrides the model default", () => {
+    expect(scenario([{ id: "ceo", k: "exec", m: "Opus" }], new Set(), {}, { ceo: 500 }).usd).toBe(5);
+  });
+  it("budget alert at 80%", () => {
+    expect(overBudget(400, 500)).toBe(true);
+    expect(overBudget(399, 500)).toBe(false);
+    expect(overBudget(10, 0)).toBe(false);
   });
 });
