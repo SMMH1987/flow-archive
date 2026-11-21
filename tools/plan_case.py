@@ -5,6 +5,8 @@
 این اسکریپت خشک است (هیچ ایجنتی اجرا نمی‌شود). ایجنت برنامه‌ریز (LLM) فقط می‌تواند خروجی همین را ببیند یا از میان همین کارها انتخاب کند.
   python tools/plan_case.py c4-org/cases/hire.yaml --answers '{"country":"IR","seniority":"mid","ad_budget_toman":0,"gender_any":"yes"}'
 """
+# v2 · 2026-11-21 18:50 Berlin: model per task from its difficulty (Siax rule, DECISIONS v1.9), not from the agent role
+MODEL_BY_DIFF = {"simple": "Haiku", "medium": "Sonnet", "hard": "Opus"}
 import json, sys, pathlib, argparse, yaml
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
@@ -36,6 +38,7 @@ def plan(case, ans):
     for i in order:
         t = tasks[i]
         if t['agent'] not in agents: err.append(f'{i}: ایجنت ناشناخته {t["agent"]}')
+        if t.get('difficulty') == 'hard' and not t.get('why_hard'): err.append(f'{i}: Opus بدون دلیل ثبت‌شده (why_hard)')
         if t.get('external') == 'yes' or t.get('external') is True:
             if t['mode'] != 'gate': err.append(f'{i}: کار بیرونی بدون gate')
     cost = round(sum(tasks[i]['est'] for i in order), 3)
@@ -44,7 +47,7 @@ def plan(case, ans):
     status = 'needs_input' if need else ('error' if err else 'needs_input:approve_plan')
     return dict(case=case['case'], status=status, answers=ans,
                 steps=[dict(n=k + 1, id=i, task=tasks[i]['n'], agent=tasks[i]['agent'], mode=tasks[i]['mode'],
-                            model=tasks[i]['m'], gate=tasks[i]['mode'] == 'gate') for k, i in enumerate(order)],
+                            difficulty=tasks[i].get('difficulty') or 'unknown', model=MODEL_BY_DIFF.get(tasks[i].get('difficulty'), 'Sonnet'), gate=tasks[i]['mode'] == 'gate') for k, i in enumerate(order)],
                 skipped=[dict(id=i, why=w) for i, w in skip], ask=[dict(id=i, why=w) for i, w in need],
                 gates=sum(tasks[i]['mode'] == 'gate' for i in order), est_usd=cost, cap_usd=cap, errors=err)
 
@@ -54,7 +57,7 @@ if __name__ == '__main__':
     r = plan(case, json.loads(a.answers))
     if a.json: print(json.dumps(r, ensure_ascii=False, indent=1)); sys.exit(0)
     print(f"پرونده: {case['name']} · وضعیت: {r['status']} · {len(r['steps'])} قدم · {r['gates']} تأیید انسانی · برآورد {r['est_usd']}$ از سقف {r['cap_usd']}$")
-    for s in r['steps']: print(f"  {s['n']:>2}. {s['task']}  ← {s['agent']} ({s['model']}){'  [تأیید تو]' if s['gate'] else ''}")
+    for s in r['steps']: print(f"  {s['n']:>2}. {s['task']}  ← {s['agent']} ({s['difficulty']} → {s['model']}{' (سختی نامعلوم)' if s['difficulty'] == 'unknown' else ''}){'  [تأیید تو]' if s['gate'] else ''}")
     for s in r['skipped']: print(f"  ✗ {s['id']}: {s['why']}")
     for s in r['ask']: print(f"  ? {s['id']}: {s['why']}")
     for e in r['errors']: print('  خطا:', e)
