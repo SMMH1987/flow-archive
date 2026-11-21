@@ -1,4 +1,4 @@
-"""ساخت دادهٔ «سازمان جهانی + ایجنت‌ها» از c4-org/org-global.c4 + c4-org/org-agents.yaml
+"""ساخت دادهٔ «سازمان جهانی + ایجنت‌ها» از c4-org/org-structure.yaml + c4-org/org-agents.yaml
 نسخه 4 — 2026-11-21 12:45 UTC (رنگ ثابت هر دپارتمان). خروجی فقط‌خواندنی؛ دستی ویرایش نشود.
   python tools/build_org_agents.py          → c4-org/generated/org-agents.json
   python tools/build_org_agents.py --check  → فقط بررسی (واحد/رئیس/ورک‌فلو/ارتباط ناشناخته)
@@ -15,14 +15,11 @@ CSUITE = {'rnd': 'CPO', 'marketing': 'CMO', 'sales': 'CRO', 'ops': 'COO', 'servi
           'finance': 'CFO', 'assets': 'CAO', 'risk': 'CRO/CISO', 'legal': 'CLO', 'capability': 'CTrO'}
 
 def parse_c4():
-    depts, units, cur = {}, {}, None
-    for l in C4.read_text(encoding='utf-8').splitlines():
-        m = re.match(r"\s*(\w+) = dept '(.+?)'", l)
-        if m: cur = m.group(1); depts[cur] = re.sub(r'^[۰-۹]+\.\s*', '', m.group(2)); continue
-        m = re.match(r"\s*extend org\.(\w+)", l)
-        if m: cur = m.group(1); continue
-        m = re.match(r"\s*(\w+) = (ask|auto|gate)Step '(.+?)'", l)
-        if m and cur: units[m.group(1)] = dict(n=m.group(3), mode=m.group(2), k=cur)
+    """ساختار از c4-org/org-structure.yaml (منبع از 2026-11-21؛ org-global.c4 از آن ساخته می‌شود)"""
+    import re
+    st = yaml.safe_load((ROOT/'c4-org/org-structure.yaml').read_text(encoding='utf-8'))
+    depts = {d['id']: re.sub(r'^[۰-۹]+\.\s*', '', d['n']) for d in st['departments']}
+    units = {u['id']: dict(n=u['n'], mode=u['mode'], k=d['id']) for d in st['departments'] for u in d['units']}
     return depts, units
 
 def build():

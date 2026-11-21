@@ -1,0 +1,161 @@
+# ساختار سازمان جهانی + لایهٔ ایران — منبع واحد (SSOT) — نسخه 1 — 2026-11-21 13:10 UTC (14:10 برلین)
+# تأیید Siax 2026-11-21 13:03 UTC: منبع yaml است؛ c4-org/org-global.c4 فقط خودکار از این فایل ساخته می‌شود (python tools/build_org_c4.py) و دستی ویرایش نمی‌شود.
+# بخش (department) → واحد (unit). mode: ask/auto/gate · external: yes/no/? · ir: true = فقط لایهٔ ایران (#loc_ir، تأییدنشده → حق‌پرس)
+# منابع: APQC PCF Cross-Industry 7.x، Porter Value Chain، COSO ERM، ISO 37000/31000/27001/9001، ITIL 4، SCOR (از حافظه، بررسی‌نشده)
+# ایجنت‌های هر واحد: c4-org/org-agents.yaml
+departments:
+- id: strategy
+  n: ۱. راهبرد و حاکمیت
+  units:
+  - {id: board, mode: gate, n: هیئت‌مدیره و کمیته‌ها, ir: false, desc: تصویب راهبرد، نظارت، کمیتهٔ حسابرسی و ریسک, external: '?'}
+  - {id: ceo, mode: auto, n: مدیرعامل / دفتر مدیرعامل, ir: false, desc: اجرای راهبرد، هماهنگی بخش‌ها, external: 'no'}
+  - {id: strategy_pmo, mode: ask, n: برنامه‌ریزی راهبردی و PMO, ir: false, desc: OKR، بودجهٔ سالانه، سبد پروژه, external: 'no'}
+  - {id: corpdev, mode: gate, n: توسعهٔ کسب‌وکار و M&A, ir: false, desc: ادغام، خرید، سرمایه‌گذاری, external: '?'}
+  group: support
+  std: APQC 1.0 + ISO 37000
+- id: rnd
+  n: ۲. تحقیق و توسعه / محصول
+  units:
+  - {id: product, mode: ask, n: مدیریت محصول, ir: false, desc: نقشهٔ راه، نیازسنجی, external: 'no'}
+  - {id: research, mode: ask, n: تحقیق و نوآوری, ir: false, desc: نمونه‌سازی، IP, external: 'no'}
+  - {id: design, mode: auto, n: طراحی (UX/صنعتی), ir: false, desc: تجربهٔ کاربر, external: 'no'}
+  - {id: engineering, mode: auto, n: مهندسی / توسعهٔ نرم‌افزار, ir: false, desc: ساخت و تست, external: 'no'}
+  group: primary
+  std: APQC 2.0 + Porter (Technology Dev.)
+- id: marketing
+  n: ۳. بازاریابی
+  units:
+  - {id: brand, mode: gate, n: برند و ارتباطات, ir: false, desc: هویت، روابط عمومی, external: 'yes'}
+  - {id: growth, mode: gate, n: بازاریابی دیجیتال و رشد, ir: false, desc: سئو، تبلیغات، کمپین, external: 'yes'}
+  - {id: market_research, mode: auto, n: تحقیقات بازار, ir: false, desc: رقبا، مشتری, external: 'no'}
+  - {id: pricing, mode: gate, n: قیمت‌گذاری, ir: false, desc: مدل درآمد، تخفیف, external: 'yes'}
+  - {id: ir_ad_rules, mode: gate, n: 🇮🇷 مقررات تبلیغات و پیامک, ir: true, desc: 'تأیید محتوا — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  group: primary
+  std: APQC 3.0 + Porter (Marketing & Sales)
+- id: sales
+  n: ۴. فروش
+  units:
+  - {id: bizdev, mode: gate, n: توسعهٔ فروش / B2B, ir: false, desc: قرارداد مشتری, external: 'yes'}
+  - {id: salesops, mode: auto, n: عملیات فروش و CRM, ir: false, desc: قیف فروش، پیش‌بینی, external: 'no'}
+  - {id: channel, mode: gate, n: کانال و شرکا, ir: false, desc: نمایندگی، همکاری, external: 'yes'}
+  group: primary
+  std: APQC 3.0 + Porter
+- id: ops
+  n: ۵. عملیات و زنجیره تأمین
+  units:
+  - {id: procurement, mode: gate, n: خرید و تدارکات, ir: false, desc: انتخاب تأمین‌کننده، سفارش, external: 'yes'}
+  - {id: production, mode: auto, n: تولید / ارائهٔ خدمت, ir: false, desc: اجرای کار اصلی, external: 'no'}
+  - {id: logistics, mode: auto, n: انبار و لجستیک, ir: false, desc: حمل، موجودی, external: 'no'}
+  - {id: quality, mode: ask, n: کنترل کیفیت, ir: false, desc: ISO 9001, external: 'no'}
+  - {id: ir_standards, mode: gate, n: 🇮🇷 استاندارد ملی و نشان استاندارد, ir: true, desc: 'مجوز کالا — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_customs, mode: gate, n: 🇮🇷 گمرک و ثبت‌سفارش (سامانهٔ جامع تجارت), ir: true, desc: 'کوتاژ — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  group: primary
+  std: APQC 4.0 + SCOR + Porter (Inbound/Ops/Outbound)
+- id: service
+  n: ۶. خدمات مشتری
+  units:
+  - {id: support, mode: auto, n: پشتیبانی و تیکت, ir: false, desc: پاسخ به مشتری, external: 'no'}
+  - {id: success, mode: ask, n: موفقیت مشتری, ir: false, desc: نگهداشت، تمدید, external: 'no'}
+  - {id: complaints, mode: gate, n: رسیدگی به شکایات, ir: false, desc: ISO 10002, external: 'yes'}
+  group: primary
+  std: APQC 5.0–6.0 + Porter (Service)
+- id: hr
+  n: ۷. منابع انسانی
+  units:
+  - {id: recruit, mode: gate, n: جذب و استخدام, ir: false, desc: → recruitment.c4, external: 'yes'}
+  - {id: onboarding, mode: auto, n: ورود و آموزش, ir: false, desc: L&D, external: 'no'}
+  - {id: comp, mode: gate, n: حقوق، مزایا و پرداخت, ir: false, desc: payroll, external: 'yes'}
+  - {id: perf, mode: ask, n: ارزیابی عملکرد, ir: false, desc: بازخورد، ارتقا, external: 'no'}
+  - {id: employee_rel, mode: ask, n: روابط کار و فرهنگ, ir: false, desc: انضباط، رضایت, external: 'no'}
+  - {id: offboarding, mode: gate, n: خروج کارکنان, ir: false, desc: تسویه, external: 'yes'}
+  - {id: ir_tamin, mode: gate, n: 🇮🇷 بیمهٔ تأمین اجتماعی, ir: true, desc: 'لیست ماهانهٔ بیمه — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_labor_law, mode: gate, n: 🇮🇷 قانون کار و قرارداد کار, ir: true, desc: 'فرم قرارداد، تسویه — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_payroll_tax, mode: gate, n: 🇮🇷 مالیات حقوق, ir: true, desc: 'فهرست ماهانه — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_military, mode: ask, n: 🇮🇷 وضعیت نظام‌وظیفه کارکنان, ir: true, desc: 'بررسی مدارک — جزئیات حقوقی: پروژهٔ حق‌پرس', external: '?'}
+  group: support
+  std: APQC 7.0 + Porter (HR Mgmt)
+- id: tech
+  n: ۸. فناوری اطلاعات
+  units:
+  - {id: infra, mode: auto, n: زیرساخت و ابر, ir: false, desc: شبکه، سرور, external: 'no'}
+  - {id: apps, mode: auto, n: سامانه‌های داخلی (ERP/CRM), ir: false, desc: انتخاب و نگهداری, external: 'no'}
+  - {id: data, mode: auto, n: داده و هوش تجاری, ir: false, desc: گزارش، داشبورد, external: 'no'}
+  - {id: helpdesk, mode: auto, n: میز خدمت IT, ir: false, desc: پشتیبانی کارکنان, external: 'no'}
+  - {id: ir_data_localization, mode: gate, n: 🇮🇷 میزبانی داخلی و دامنهٔ .ir, ir: true, desc: 'ثبت دامنه، هاست — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_sanctions_tools, mode: ask, n: 🇮🇷 جایگزین ابزارهای تحریمی, ir: true, desc: 'فهرست ابزار مجاز — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'no'}
+  group: support
+  std: APQC 8.0 + ITIL 4
+- id: finance
+  n: ۹. مالی و حسابداری
+  units:
+  - {id: accounting, mode: auto, n: حسابداری عمومی, ir: false, desc: دفاتر، بستن ماه, external: 'no'}
+  - {id: ap_ar, mode: gate, n: پرداختنی / دریافتنی, ir: false, desc: فاکتور، وصول, external: 'yes'}
+  - {id: treasury, mode: gate, n: خزانه‌داری, ir: false, desc: نقدینگی، بانک, external: 'yes'}
+  - {id: fpa, mode: ask, n: بودجه و تحلیل مالی (FP&A), ir: false, desc: پیش‌بینی, external: 'no'}
+  - {id: tax, mode: gate, n: مالیات, ir: false, desc: اظهارنامه، برنامه‌ریزی مالیاتی, external: 'yes'}
+  - {id: audit_int, mode: ask, n: حسابرسی داخلی, ir: false, desc: COSO, external: 'no'}
+  - {id: investor_rel, mode: gate, n: روابط سرمایه‌گذار, ir: false, desc: گزارش به سهام‌دار, external: 'yes'}
+  - {id: ir_tax_portal, mode: gate, n: 🇮🇷 سامانهٔ مؤدیان و صورتحساب الکترونیک, ir: true, desc: 'ارسال فاکتور به سامانهٔ مؤدیان — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_vat, mode: gate, n: 🇮🇷 ارزش افزوده (فصلی), ir: true, desc: 'اظهارنامهٔ VAT — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_seasonal, mode: gate, n: 🇮🇷 گزارش معاملات فصلی, ir: true, desc: 'ماده ۱۶۹ — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_statutory_audit, mode: gate, n: 🇮🇷 حسابرس مستقل و بازرس قانونی, ir: true, desc: 'عضو جامعهٔ حسابداران رسمی — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_banking, mode: gate, n: 🇮🇷 بانک، چک صیادی، ارز, ir: true, desc: 'نقدینگی و محدودیت ارزی — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  group: support
+  std: APQC 9.0 + IFRS
+- id: assets
+  n: ۱۰. دارایی و امکانات
+  units:
+  - {id: facilities, mode: gate, n: ساختمان و امکانات, ir: false, desc: اجاره، نگهداری, external: 'yes'}
+  - {id: fixed_assets, mode: auto, n: دارایی ثابت, ir: false, desc: ثبت، استهلاک, external: 'no'}
+  group: support
+  std: APQC 10.0
+- id: risk
+  n: ۱۱. ریسک، انطباق و امنیت
+  units:
+  - {id: erm, mode: ask, n: مدیریت ریسک سازمانی, ir: false, desc: ثبت ریسک, external: 'no'}
+  - {id: compliance, mode: ask, n: انطباق و اخلاق, ir: false, desc: کدهای رفتاری, external: 'no'}
+  - {id: infosec, mode: gate, n: امنیت اطلاعات, ir: false, desc: ISO 27001, external: 'yes'}
+  - {id: privacy, mode: gate, n: حریم خصوصی داده, ir: false, desc: GDPR-style, external: 'yes'}
+  - {id: bcp, mode: ask, n: تداوم کسب‌وکار, ir: false, desc: ISO 22301, external: 'no'}
+  - {id: hse, mode: ask, n: ایمنی، بهداشت، محیط زیست, ir: false, desc: ISO 45001/14001, external: 'no'}
+  - {id: ir_sanctions, mode: ask, n: 🇮🇷 ریسک تحریم و ارز, ir: true, desc: 'ارزیابی — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'no'}
+  - {id: ir_fata, mode: gate, n: 🇮🇷 امنیت سایبری / الزامات افتا, ir: true, desc: 'ارزیابی امنیتی — جزئیات حقوقی: پروژهٔ حق‌پرس', external: '?'}
+  group: support
+  std: APQC 11.0 + COSO ERM + ISO 31000/27001
+- id: legal
+  n: ۱۲. حقوقی و روابط خارجی
+  units:
+  - {id: contracts, mode: gate, n: قراردادها, ir: false, desc: تنظیم و بازبینی, external: 'yes'}
+  - {id: corp_legal, mode: gate, n: امور شرکتی و ثبت, ir: false, desc: صورت‌جلسات, external: 'yes'}
+  - {id: ip, mode: gate, n: مالکیت فکری, ir: false, desc: علامت تجاری، پتنت, external: 'yes'}
+  - {id: litigation, mode: gate, n: دعاوی, ir: false, desc: وکالت, external: 'yes'}
+  - {id: gov_rel, mode: gate, n: روابط با دولت و نهادها, ir: false, desc: مجوزها, external: 'yes'}
+  - {id: csr, mode: gate, n: مسئولیت اجتماعی / ESG, ir: false, desc: گزارش پایداری, external: 'yes'}
+  - {id: ir_registration, mode: gate, n: 🇮🇷 ثبت شرکت (ایران‌من / ثبت شرکت‌ها), ir: true, desc: 'آگهی روزنامهٔ رسمی — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_enamad, mode: gate, n: 🇮🇷 اینماد و مجوزهای کسب‌وکار (درگاه مجوزها), ir: true, desc: 'مجوز فعالیت — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_trademark, mode: gate, n: 🇮🇷 علامت تجاری ایران, ir: true, desc: 'اظهارنامه — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_knowledge_based, mode: gate, n: 🇮🇷 دانش‌بنیان / پارک علم و فناوری, ir: true, desc: 'ارزیابی معاونت علمی — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  - {id: ir_chamber, mode: gate, n: 🇮🇷 کارت بازرگانی / اتاق اصناف, ir: true, desc: 'واردات/صادرات — جزئیات حقوقی: پروژهٔ حق‌پرس', external: 'yes'}
+  group: support
+  std: APQC 12.0
+- id: capability
+  n: ۱۳. توانمندی و بهبود سازمان
+  units:
+  - {id: process, mode: auto, n: مدیریت فرایند (BPM), ir: false, desc: 'این مخزن: .c4', external: 'no'}
+  - {id: knowledge, mode: auto, n: مدیریت دانش, ir: false, desc: مستندسازی, external: 'no'}
+  - {id: change, mode: ask, n: مدیریت تغییر, ir: false, desc: ADKAR, external: 'no'}
+  group: support
+  std: APQC 13.0 + Lean/ISO 9001
+flows:
+- [strategy, rnd, راهبرد → محصول]
+- [rnd, marketing, محصول آماده]
+- [marketing, sales, سرنخ]
+- [sales, ops, سفارش]
+- [ops, service, تحویل]
+- [service, rnd, بازخورد]
+- [sales, finance, فاکتور]
+- [hr, ops, نیرو]
+- [finance, strategy, گزارش مالی]
+- [risk, strategy, گزارش ریسک]
+- [legal, sales, قرارداد]
+- [tech, capability, داده و ابزار]

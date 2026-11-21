@@ -399,7 +399,8 @@ body.n8on .cvhint{display:none!important}
   </div>
   <div id="p-mind" class="page" hidden></div>
   <div id="p-proc" class="page" hidden></div>
-<script type="text/plain" id="orgglobal-c4">// چارت سازمانی جهانی + لایهٔ مکانی ایران — یک مدل واحد (SSOT) — 2026-11-13
+<script type="text/plain" id="orgglobal-c4">// ⚠ فایل ساخته‌شده — دستی ویرایش نکنید. منبع: c4-org/org-structure.yaml · ساخت: python tools/build_org_c4.py
+// چارت سازمانی جهانی + لایهٔ مکانی ایران — یک مدل واحد (SSOT) — 2026-11-13
 // منابع (از حافظه، نیاز به بررسی): APQC PCF Cross-Industry v7.x (۱۳ دسته)، Porter Value Chain 1985، COSO ERM 2017، ISO 37000/31000/27001/9001، ITIL 4، SCOR
 // لایهٔ ایران = همان مدل + عناصر با تگ #loc_ir؛ هیچ بخشی کپی نشده. انتخاب لایه: org-global.rules.yaml
 // رنگ: ask نارنجی · auto سبز · gate قرمز. هر قدم external: yes|no|? صریح دارد. محتوای حقوقی ایران: تأییدنشده → پروژهٔ حق‌پرس
@@ -416,7 +417,6 @@ specification {
   tag primary
   tag support
 }
-
 model {
   org = orgBox 'سازمان (نسخهٔ جهانی)' {
     description 'سلسله‌مراتب: بخش → واحد. اولیه = زنجیرهٔ ارزش اصلی، پشتیبان = بقیه'
@@ -699,6 +699,60 @@ model {
   }
 
   // ===== لایهٔ ایران (overlay): همان بخش‌ها گسترش می‌یابند =====
+  extend org.marketing {
+    ir_ad_rules = gateStep '🇮🇷 مقررات تبلیغات و پیامک' { #loc_ir #unverified
+      description 'تأیید محتوا — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.ops {
+    ir_standards = gateStep '🇮🇷 استاندارد ملی و نشان استاندارد' { #loc_ir #unverified
+      description 'مجوز کالا — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.ops {
+    ir_customs = gateStep '🇮🇷 گمرک و ثبت‌سفارش (سامانهٔ جامع تجارت)' { #loc_ir #unverified
+      description 'کوتاژ — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.hr {
+    ir_tamin = gateStep '🇮🇷 بیمهٔ تأمین اجتماعی' { #loc_ir #unverified
+      description 'لیست ماهانهٔ بیمه — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.hr {
+    ir_labor_law = gateStep '🇮🇷 قانون کار و قرارداد کار' { #loc_ir #unverified
+      description 'فرم قرارداد، تسویه — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.hr {
+    ir_payroll_tax = gateStep '🇮🇷 مالیات حقوق' { #loc_ir #unverified
+      description 'فهرست ماهانه — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.hr {
+    ir_military = askStep '🇮🇷 وضعیت نظام‌وظیفه کارکنان' { #loc_ir #unverified
+      description 'بررسی مدارک — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external '?' }
+    }
+  }
+  extend org.tech {
+    ir_data_localization = gateStep '🇮🇷 میزبانی داخلی و دامنهٔ .ir' { #loc_ir #unverified
+      description 'ثبت دامنه، هاست — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'yes' }
+    }
+  }
+  extend org.tech {
+    ir_sanctions_tools = askStep '🇮🇷 جایگزین ابزارهای تحریمی' { #loc_ir #unverified
+      description 'فهرست ابزار مجاز — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'no' }
+    }
+  }
   extend org.finance {
     ir_tax_portal = gateStep '🇮🇷 سامانهٔ مؤدیان و صورتحساب الکترونیک' { #loc_ir #unverified
       description 'ارسال فاکتور به سامانهٔ مؤدیان — جزئیات حقوقی: پروژهٔ حق‌پرس'
@@ -729,27 +783,15 @@ model {
       metadata { external 'yes' }
     }
   }
-  extend org.hr {
-    ir_tamin = gateStep '🇮🇷 بیمهٔ تأمین اجتماعی' { #loc_ir #unverified
-      description 'لیست ماهانهٔ بیمه — جزئیات حقوقی: پروژهٔ حق‌پرس'
-      metadata { external 'yes' }
+  extend org.risk {
+    ir_sanctions = askStep '🇮🇷 ریسک تحریم و ارز' { #loc_ir #unverified
+      description 'ارزیابی — جزئیات حقوقی: پروژهٔ حق‌پرس'
+      metadata { external 'no' }
     }
   }
-  extend org.hr {
-    ir_labor_law = gateStep '🇮🇷 قانون کار و قرارداد کار' { #loc_ir #unverified
-      description 'فرم قرارداد، تسویه — جزئیات حقوقی: پروژهٔ حق‌پرس'
-      metadata { external 'yes' }
-    }
-  }
-  extend org.hr {
-    ir_payroll_tax = gateStep '🇮🇷 مالیات حقوق' { #loc_ir #unverified
-      description 'فهرست ماهانه — جزئیات حقوقی: پروژهٔ حق‌پرس'
-      metadata { external 'yes' }
-    }
-  }
-  extend org.hr {
-    ir_military = askStep '🇮🇷 وضعیت نظام‌وظیفه کارکنان' { #loc_ir #unverified
-      description 'بررسی مدارک — جزئیات حقوقی: پروژهٔ حق‌پرس'
+  extend org.risk {
+    ir_fata = gateStep '🇮🇷 امنیت سایبری / الزامات افتا' { #loc_ir #unverified
+      description 'ارزیابی امنیتی — جزئیات حقوقی: پروژهٔ حق‌پرس'
       metadata { external '?' }
     }
   }
@@ -780,48 +822,6 @@ model {
   extend org.legal {
     ir_chamber = gateStep '🇮🇷 کارت بازرگانی / اتاق اصناف' { #loc_ir #unverified
       description 'واردات/صادرات — جزئیات حقوقی: پروژهٔ حق‌پرس'
-      metadata { external 'yes' }
-    }
-  }
-  extend org.tech {
-    ir_data_localization = gateStep '🇮🇷 میزبانی داخلی و دامنهٔ .ir' { #loc_ir #unverified
-      description 'ثبت دامنه، هاست — جزئیات حقوقی: پروژهٔ حق‌پرس'
-      metadata { external 'yes' }
-    }
-  }
-  extend org.tech {
-    ir_sanctions_tools = askStep '🇮🇷 جایگزین ابزارهای تحریمی' { #loc_ir #unverified
-      description 'فهرست ابزار مجاز — جزئیات حقوقی: پروژهٔ حق‌پرس'
-      metadata { external 'no' }
-    }
-  }
-  extend org.risk {
-    ir_sanctions = askStep '🇮🇷 ریسک تحریم و ارز' { #loc_ir #unverified
-      description 'ارزیابی — جزئیات حقوقی: پروژهٔ حق‌پرس'
-      metadata { external 'no' }
-    }
-  }
-  extend org.risk {
-    ir_fata = gateStep '🇮🇷 امنیت سایبری / الزامات افتا' { #loc_ir #unverified
-      description 'ارزیابی امنیتی — جزئیات حقوقی: پروژهٔ حق‌پرس'
-      metadata { external '?' }
-    }
-  }
-  extend org.ops {
-    ir_standards = gateStep '🇮🇷 استاندارد ملی و نشان استاندارد' { #loc_ir #unverified
-      description 'مجوز کالا — جزئیات حقوقی: پروژهٔ حق‌پرس'
-      metadata { external 'yes' }
-    }
-  }
-  extend org.ops {
-    ir_customs = gateStep '🇮🇷 گمرک و ثبت‌سفارش (سامانهٔ جامع تجارت)' { #loc_ir #unverified
-      description 'کوتاژ — جزئیات حقوقی: پروژهٔ حق‌پرس'
-      metadata { external 'yes' }
-    }
-  }
-  extend org.marketing {
-    ir_ad_rules = gateStep '🇮🇷 مقررات تبلیغات و پیامک' { #loc_ir #unverified
-      description 'تأیید محتوا — جزئیات حقوقی: پروژهٔ حق‌پرس'
       metadata { external 'yes' }
     }
   }
