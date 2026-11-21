@@ -16,7 +16,8 @@ def ok(expr, ans):
     except NameError as e: return None, f'پاسخ لازم است: {e.name}'
 
 def plan(case, ans):
-    agents = {a['id'] for a in yaml.safe_load((ROOT/'c4-org/org-agents.yaml').read_text(encoding='utf-8'))['agents']}
+    _ag = yaml.safe_load((ROOT/'c4-org/org-agents.yaml').read_text(encoding='utf-8'))['agents']; agents = {a['id'] for a in _ag}
+    global AGENT_M; AGENT_M = {a['id']: a.get('m') for a in _ag}
     tasks = {t['id']: t for t in case['tasks']}
     keep, skip, need, err = [], [], [], []
     for t in case['tasks']:
@@ -47,7 +48,8 @@ def plan(case, ans):
     status = 'needs_input' if need else ('error' if err else 'needs_input:approve_plan')
     return dict(case=case['case'], status=status, answers=ans,
                 steps=[dict(n=k + 1, id=i, task=tasks[i]['n'], agent=tasks[i]['agent'], mode=tasks[i]['mode'],
-                            difficulty=tasks[i].get('difficulty') or 'unknown', model=MODEL_BY_DIFF.get(tasks[i].get('difficulty'), 'Sonnet'), gate=tasks[i]['mode'] == 'gate') for k, i in enumerate(order)],
+                            difficulty=tasks[i].get('difficulty') or 'unknown', model=('Sonnet' if 'opus' in str(AGENT_M.get(tasks[i]['agent'], '')).lower() else AGENT_M.get(tasks[i]['agent']) or MODEL_BY_DIFF.get(tasks[i].get('difficulty'), 'Sonnet')),  # model stays on the agent; Opus only after separate approval (DECISIONS v2.0/v2.1)
+                             gate=tasks[i]['mode'] == 'gate') for k, i in enumerate(order)],
                 skipped=[dict(id=i, why=w) for i, w in skip], ask=[dict(id=i, why=w) for i, w in need],
                 gates=sum(tasks[i]['mode'] == 'gate' for i in order), est_usd=cost, cap_usd=cap, errors=err)
 

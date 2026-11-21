@@ -2071,7 +2071,7 @@
    "r": "h_hr",
    "k": "hr",
    "mode": "auto",
-   "m": "Sonnet",
+   "m": "Haiku",
    "ir": false,
    "s": [
     "onboarding-checklist",
@@ -2109,7 +2109,7 @@
    "r": "h_hr",
    "k": "hr",
    "mode": "gate",
-   "m": "Sonnet",
+   "m": "Haiku",
    "ir": false,
    "s": [
     "payroll",

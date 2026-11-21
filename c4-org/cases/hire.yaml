@@ -52,7 +52,7 @@ presets:
     intake: {why_now: "وقت مدیرعامل صرف کارهای روزمره می‌شود", success_90: "تقویم و ایمیل مدیرعامل مرتب؛ گزارش هفتگی فروش آماده", daily_tasks: "هماهنگی جلسات، پیگیری تیم‌ها، تهیهٔ گزارش و ارائه", must_skills: "مدیریت زمان، نوشتن فارسی و انگلیسی خوب، Excel/Sheets، ابزارهای هوش مصنوعی", nice_skills: "آشنایی با فروشگاه آنلاین، CRM، مقدمات داده", red_flags: "بی‌دقتی در نوشتن، نداشتن رازداری", experience: "میانی، ۲ تا ۴ سال", work_mode: "تهران، ترکیبی", pay_range: "۳۰ تا ۴۰ میلیون تومان + بیمه", ad_budget: "۰", start_by: "۳۰ روز", interviewers: "خود مدیرعامل، ۲ مرحله", work_test: "بله: یک گزارش کوتاه از دادهٔ فروش نمونه", referral_ok: "نه", military: "بله", confidential: "نام مشتری‌ها و عدد فروش"}
     answers: {role: "دستیار مدیرعامل", country: IR, city: "تهران، ترکیبی", seniority: mid, salary_toman: 35000000, ad_budget_toman: 0, deadline_days: 30, gender_any: "yes"}
 
-# difficulty: simple = قاعده‌محور/ساده → Haiku؛ medium = قضاوت یا نوشتن دقیق → Sonnet؛ hard = استدلال سنگین یا پرریسک/برگشت‌ناپذیر → Opus فقط با دلیل ثبت‌شده در why_hard.
+# difficulty: simple = قاعده‌محور/ساده → Haiku؛ medium = قضاوت یا نوشتن دقیق → Sonnet؛ hard = استدلال سنگین یا پرریسک/برگشت‌ناپذیر → Opus فقط با دلیل ثبت‌شده در why_hard و خیلی کم: هر کار Opus جدا با دلیل و برآورد هزینه به Siax نشان داده می‌شود و فقط با تأیید صریحش روی Opus می‌رود، وگرنه Sonnet (DECISIONS v2.0).
 # difficulty = سختی همین کار؛ مدل از آن می‌آید، نه از نقش ایجنت (simple=Haiku، medium=Sonnet، hard=Opus؛ نبود = Sonnet و در برنامه گفته می‌شود).
 # کارهای مجاز. when = شرط فعال شدن (روی پاسخ‌ها)؛ after = پیش‌نیاز؛ gate = تأیید انسان؛ est = برآورد هزینه (USD)
 tasks:
