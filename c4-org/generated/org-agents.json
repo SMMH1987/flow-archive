@@ -1,0 +1,2438 @@
+{
+ "cats": {
+  "strategy": [
+   "راهبرد و حاکمیت",
+   0
+  ],
+  "rnd": [
+   "تحقیق و توسعه / محصول",
+   0
+  ],
+  "marketing": [
+   "بازاریابی",
+   0
+  ],
+  "sales": [
+   "فروش",
+   0
+  ],
+  "ops": [
+   "عملیات و زنجیره تأمین",
+   0
+  ],
+  "service": [
+   "خدمات مشتری",
+   0
+  ],
+  "hr": [
+   "منابع انسانی",
+   0
+  ],
+  "tech": [
+   "فناوری اطلاعات",
+   0
+  ],
+  "finance": [
+   "مالی و حسابداری",
+   0
+  ],
+  "assets": [
+   "دارایی و امکانات",
+   0
+  ],
+  "risk": [
+   "ریسک، انطباق و امنیت",
+   0
+  ],
+  "legal": [
+   "حقوقی و روابط خارجی",
+   0
+  ],
+  "capability": [
+   "توانمندی و بهبود سازمان",
+   0
+  ]
+ },
+ "order": [
+  "strategy",
+  "rnd",
+  "marketing",
+  "sales",
+  "ops",
+  "service",
+  "hr",
+  "tech",
+  "finance",
+  "assets",
+  "risk",
+  "legal",
+  "capability"
+ ],
+ "agents": [
+  {
+   "id": "h_rnd",
+   "n": "سرپرست تحقیق و توسعه / محصول",
+   "r": "ceo",
+   "k": "rnd",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "division"
+  },
+  {
+   "id": "h_marketing",
+   "n": "سرپرست بازاریابی",
+   "r": "ceo",
+   "k": "marketing",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "division"
+  },
+  {
+   "id": "h_sales",
+   "n": "سرپرست فروش",
+   "r": "ceo",
+   "k": "sales",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "division"
+  },
+  {
+   "id": "h_ops",
+   "n": "سرپرست عملیات و زنجیره تأمین",
+   "r": "ceo",
+   "k": "ops",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "division"
+  },
+  {
+   "id": "h_service",
+   "n": "سرپرست خدمات مشتری",
+   "r": "ceo",
+   "k": "service",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "division"
+  },
+  {
+   "id": "h_hr",
+   "n": "سرپرست منابع انسانی",
+   "r": "ceo",
+   "k": "hr",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "division"
+  },
+  {
+   "id": "h_tech",
+   "n": "سرپرست فناوری اطلاعات",
+   "r": "ceo",
+   "k": "tech",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "division"
+  },
+  {
+   "id": "h_finance",
+   "n": "سرپرست مالی و حسابداری",
+   "r": "ceo",
+   "k": "finance",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "division"
+  },
+  {
+   "id": "h_assets",
+   "n": "سرپرست دارایی و امکانات",
+   "r": "ceo",
+   "k": "assets",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "division"
+  },
+  {
+   "id": "h_risk",
+   "n": "سرپرست ریسک، انطباق و امنیت",
+   "r": "ceo",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "division"
+  },
+  {
+   "id": "h_legal",
+   "n": "سرپرست حقوقی و روابط خارجی",
+   "r": "ceo",
+   "k": "legal",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "division"
+  },
+  {
+   "id": "h_capability",
+   "n": "سرپرست توانمندی و بهبود سازمان",
+   "r": "ceo",
+   "k": "capability",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "division"
+  },
+  {
+   "id": "board",
+   "n": "هیئت‌مدیره و کمیته‌ها",
+   "r": null,
+   "k": "strategy",
+   "mode": "gate",
+   "m": "Opus",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "ceo",
+   "n": "مدیرعامل / دفتر مدیرعامل",
+   "r": "board",
+   "k": "strategy",
+   "mode": "auto",
+   "m": "Opus",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "strategy_pmo",
+   "n": "برنامه‌ریزی راهبردی و PMO",
+   "r": "ceo",
+   "k": "strategy",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "corpdev",
+   "n": "توسعهٔ کسب‌وکار و M&A",
+   "r": "ceo",
+   "k": "strategy",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "product",
+   "n": "مدیریت محصول",
+   "r": "h_rnd",
+   "k": "rnd",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "research",
+   "n": "تحقیق و نوآوری",
+   "r": "h_rnd",
+   "k": "rnd",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "design",
+   "n": "طراحی (UX/صنعتی)",
+   "r": "h_rnd",
+   "k": "rnd",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "engineering",
+   "n": "مهندسی / توسعهٔ نرم‌افزار",
+   "r": "h_rnd",
+   "k": "rnd",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "brand",
+   "n": "برند و ارتباطات",
+   "r": "h_marketing",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "growth",
+   "n": "بازاریابی دیجیتال و رشد",
+   "r": "h_marketing",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "market_research",
+   "n": "تحقیقات بازار",
+   "r": "h_marketing",
+   "k": "marketing",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "pricing",
+   "n": "قیمت‌گذاری",
+   "r": "h_marketing",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "bizdev",
+   "n": "توسعهٔ فروش / B2B",
+   "r": "h_sales",
+   "k": "sales",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "salesops",
+   "n": "عملیات فروش و CRM",
+   "r": "h_sales",
+   "k": "sales",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "channel",
+   "n": "کانال و شرکا",
+   "r": "h_sales",
+   "k": "sales",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "procurement",
+   "n": "خرید و تدارکات",
+   "r": "h_ops",
+   "k": "ops",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "production",
+   "n": "تولید / ارائهٔ خدمت",
+   "r": "h_ops",
+   "k": "ops",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "logistics",
+   "n": "انبار و لجستیک",
+   "r": "h_ops",
+   "k": "ops",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "quality",
+   "n": "کنترل کیفیت",
+   "r": "h_ops",
+   "k": "ops",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "support",
+   "n": "پشتیبانی و تیکت",
+   "r": "h_service",
+   "k": "service",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "success",
+   "n": "موفقیت مشتری",
+   "r": "h_service",
+   "k": "service",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "complaints",
+   "n": "رسیدگی به شکایات",
+   "r": "h_service",
+   "k": "service",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "recruit",
+   "n": "جذب و استخدام",
+   "r": "h_hr",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "onboarding",
+   "n": "ورود و آموزش",
+   "r": "h_hr",
+   "k": "hr",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "comp",
+   "n": "حقوق، مزایا و پرداخت",
+   "r": "h_hr",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "perf",
+   "n": "ارزیابی عملکرد",
+   "r": "h_hr",
+   "k": "hr",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "employee_rel",
+   "n": "روابط کار و فرهنگ",
+   "r": "h_hr",
+   "k": "hr",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "offboarding",
+   "n": "خروج کارکنان",
+   "r": "h_hr",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "infra",
+   "n": "زیرساخت و ابر",
+   "r": "h_tech",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "apps",
+   "n": "سامانه‌های داخلی (ERP/CRM)",
+   "r": "h_tech",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "data",
+   "n": "داده و هوش تجاری",
+   "r": "h_tech",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "helpdesk",
+   "n": "میز خدمت IT",
+   "r": "h_tech",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "accounting",
+   "n": "حسابداری عمومی",
+   "r": "h_finance",
+   "k": "finance",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "ap_ar",
+   "n": "پرداختنی / دریافتنی",
+   "r": "h_finance",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "treasury",
+   "n": "خزانه‌داری",
+   "r": "h_finance",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "fpa",
+   "n": "بودجه و تحلیل مالی (FP&A)",
+   "r": "h_finance",
+   "k": "finance",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "tax",
+   "n": "مالیات",
+   "r": "h_finance",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "audit_int",
+   "n": "حسابرسی داخلی",
+   "r": "h_finance",
+   "k": "finance",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "investor_rel",
+   "n": "روابط سرمایه‌گذار",
+   "r": "h_finance",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "facilities",
+   "n": "ساختمان و امکانات",
+   "r": "h_assets",
+   "k": "assets",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "fixed_assets",
+   "n": "دارایی ثابت",
+   "r": "h_assets",
+   "k": "assets",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "erm",
+   "n": "مدیریت ریسک سازمانی",
+   "r": "h_risk",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "compliance",
+   "n": "انطباق و اخلاق",
+   "r": "h_risk",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "infosec",
+   "n": "امنیت اطلاعات",
+   "r": "h_risk",
+   "k": "risk",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "privacy",
+   "n": "حریم خصوصی داده",
+   "r": "h_risk",
+   "k": "risk",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "bcp",
+   "n": "تداوم کسب‌وکار",
+   "r": "h_risk",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "hse",
+   "n": "ایمنی، بهداشت، محیط زیست",
+   "r": "h_risk",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "contracts",
+   "n": "قراردادها",
+   "r": "h_legal",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "corp_legal",
+   "n": "امور شرکتی و ثبت",
+   "r": "h_legal",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "ip",
+   "n": "مالکیت فکری",
+   "r": "h_legal",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "litigation",
+   "n": "دعاوی",
+   "r": "h_legal",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "gov_rel",
+   "n": "روابط با دولت و نهادها",
+   "r": "h_legal",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "csr",
+   "n": "مسئولیت اجتماعی / ESG",
+   "r": "h_legal",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "process",
+   "n": "مدیریت فرایند (BPM)",
+   "r": "h_capability",
+   "k": "capability",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "knowledge",
+   "n": "مدیریت دانش",
+   "r": "h_capability",
+   "k": "capability",
+   "mode": "auto",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "change",
+   "n": "مدیریت تغییر",
+   "r": "h_capability",
+   "k": "capability",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": false
+  },
+  {
+   "id": "ir_tax_portal",
+   "n": "🇮🇷 سامانهٔ مؤدیان و صورتحساب الکترونیک",
+   "r": "h_finance",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_vat",
+   "n": "🇮🇷 ارزش افزوده (فصلی)",
+   "r": "h_finance",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_seasonal",
+   "n": "🇮🇷 گزارش معاملات فصلی",
+   "r": "h_finance",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_statutory_audit",
+   "n": "🇮🇷 حسابرس مستقل و بازرس قانونی",
+   "r": "h_finance",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_banking",
+   "n": "🇮🇷 بانک، چک صیادی، ارز",
+   "r": "h_finance",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_tamin",
+   "n": "🇮🇷 بیمهٔ تأمین اجتماعی",
+   "r": "h_hr",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_labor_law",
+   "n": "🇮🇷 قانون کار و قرارداد کار",
+   "r": "h_hr",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_payroll_tax",
+   "n": "🇮🇷 مالیات حقوق",
+   "r": "h_hr",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_military",
+   "n": "🇮🇷 وضعیت نظام‌وظیفه کارکنان",
+   "r": "h_hr",
+   "k": "hr",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_registration",
+   "n": "🇮🇷 ثبت شرکت (ایران‌من / ثبت شرکت‌ها)",
+   "r": "h_legal",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_enamad",
+   "n": "🇮🇷 اینماد و مجوزهای کسب‌وکار (درگاه مجوزها)",
+   "r": "h_legal",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_trademark",
+   "n": "🇮🇷 علامت تجاری ایران",
+   "r": "h_legal",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_knowledge_based",
+   "n": "🇮🇷 دانش‌بنیان / پارک علم و فناوری",
+   "r": "h_legal",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_chamber",
+   "n": "🇮🇷 کارت بازرگانی / اتاق اصناف",
+   "r": "h_legal",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_data_localization",
+   "n": "🇮🇷 میزبانی داخلی و دامنهٔ .ir",
+   "r": "h_tech",
+   "k": "tech",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_sanctions_tools",
+   "n": "🇮🇷 جایگزین ابزارهای تحریمی",
+   "r": "h_tech",
+   "k": "tech",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_sanctions",
+   "n": "🇮🇷 ریسک تحریم و ارز",
+   "r": "h_risk",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_fata",
+   "n": "🇮🇷 امنیت سایبری / الزامات افتا",
+   "r": "h_risk",
+   "k": "risk",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_standards",
+   "n": "🇮🇷 استاندارد ملی و نشان استاندارد",
+   "r": "h_ops",
+   "k": "ops",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_customs",
+   "n": "🇮🇷 گمرک و ثبت‌سفارش (سامانهٔ جامع تجارت)",
+   "r": "h_ops",
+   "k": "ops",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "ir_ad_rules",
+   "n": "🇮🇷 مقررات تبلیغات و پیامک",
+   "r": "h_marketing",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Sonnet",
+   "lvl": "dept",
+   "ir": true
+  },
+  {
+   "id": "audit_committee",
+   "n": "کمیتهٔ حسابرسی و ریسک",
+   "r": "board",
+   "k": "strategy",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Audit Lead",
+   "ir": false
+  },
+  {
+   "id": "board_secretary",
+   "n": "دبیر هیئت‌مدیره (صورت‌جلسه)",
+   "r": "board",
+   "k": "strategy",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Meeting Analyst",
+   "ir": false
+  },
+  {
+   "id": "chief_of_staff",
+   "n": "رئیس دفتر مدیرعامل",
+   "r": "ceo",
+   "k": "strategy",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Chief of Staff",
+   "ir": false
+  },
+  {
+   "id": "exec_brief",
+   "n": "خلاصه‌ساز گزارش مدیریتی",
+   "r": "ceo",
+   "k": "strategy",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Executive Summary Generator",
+   "ir": false
+  },
+  {
+   "id": "okr",
+   "n": "متخصص OKR",
+   "r": "strategy_pmo",
+   "k": "strategy",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "OKR Specialist",
+   "ir": false
+  },
+  {
+   "id": "portfolio_pm",
+   "n": "مدیر سبد پروژه",
+   "r": "strategy_pmo",
+   "k": "strategy",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Senior Project Manager",
+   "ir": false
+  },
+  {
+   "id": "north_star",
+   "n": "تحلیل‌گر شاخص اصلی",
+   "r": "strategy_pmo",
+   "k": "strategy",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "North Star Analyst",
+   "ir": false
+  },
+  {
+   "id": "biz_model",
+   "n": "تحلیل‌گر مدل کسب‌وکار",
+   "r": "corpdev",
+   "k": "strategy",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Business Model Analyst",
+   "ir": false
+  },
+  {
+   "id": "deal",
+   "n": "استراتژیست معامله",
+   "r": "corpdev",
+   "k": "strategy",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Deal Strategist",
+   "ir": false
+  },
+  {
+   "id": "valuation",
+   "n": "تحلیل‌گر ارزش‌گذاری",
+   "r": "corpdev",
+   "k": "strategy",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Fundamentals Analyst",
+   "ir": false
+  },
+  {
+   "id": "prd",
+   "n": "نویسندهٔ PRD",
+   "r": "product",
+   "k": "rnd",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "PRD Writer",
+   "ir": false
+  },
+  {
+   "id": "roadmap",
+   "n": "متخصص نقشهٔ راه",
+   "r": "product",
+   "k": "rnd",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Roadmap Specialist",
+   "ir": false
+  },
+  {
+   "id": "prioritize",
+   "n": "اولویت‌بندی",
+   "r": "product",
+   "k": "rnd",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Prioritization Specialist",
+   "ir": false
+  },
+  {
+   "id": "trend",
+   "n": "پژوهشگر روند",
+   "r": "research",
+   "k": "rnd",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Trend Researcher",
+   "ir": false
+  },
+  {
+   "id": "prototyper",
+   "n": "نمونه‌ساز سریع",
+   "r": "research",
+   "k": "rnd",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Rapid Prototyper",
+   "ir": false
+  },
+  {
+   "id": "experiment",
+   "n": "طراح آزمایش",
+   "r": "research",
+   "k": "rnd",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Experiment Designer",
+   "ir": false
+  },
+  {
+   "id": "ux_research",
+   "n": "پژوهشگر UX",
+   "r": "design",
+   "k": "rnd",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "UX Researcher",
+   "ir": false
+  },
+  {
+   "id": "ui",
+   "n": "طراح UI",
+   "r": "design",
+   "k": "rnd",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "UI Designer",
+   "ir": false
+  },
+  {
+   "id": "a11y",
+   "n": "ممیز دسترس‌پذیری",
+   "r": "design",
+   "k": "rnd",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Accessibility Auditor",
+   "ir": false
+  },
+  {
+   "id": "backend",
+   "n": "توسعه‌دهندهٔ بک‌اند",
+   "r": "engineering",
+   "k": "rnd",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Backend Architect",
+   "ir": false
+  },
+  {
+   "id": "frontend",
+   "n": "توسعه‌دهندهٔ فرانت",
+   "r": "engineering",
+   "k": "rnd",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Frontend Developer",
+   "ir": false
+  },
+  {
+   "id": "qa_test",
+   "n": "تست‌کننده",
+   "r": "engineering",
+   "k": "rnd",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "QA Specialist",
+   "ir": false
+  },
+  {
+   "id": "code_review",
+   "n": "بازبین کد",
+   "r": "engineering",
+   "k": "rnd",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Code Reviewer",
+   "ir": false
+  },
+  {
+   "id": "brand_guard",
+   "n": "نگهبان برند",
+   "r": "brand",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Brand Guardian",
+   "ir": false
+  },
+  {
+   "id": "pr_writer",
+   "n": "نویسندهٔ روابط عمومی",
+   "r": "brand",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Content Creator",
+   "ir": false
+  },
+  {
+   "id": "visual_story",
+   "n": "روایتگر تصویری",
+   "r": "brand",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Visual Storyteller",
+   "ir": false
+  },
+  {
+   "id": "seo",
+   "n": "متخصص سئو",
+   "r": "growth",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "SEO Specialist",
+   "ir": false
+  },
+  {
+   "id": "ppc",
+   "n": "کمپین تبلیغ کلیکی",
+   "r": "growth",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "PPC Campaign Strategist",
+   "ir": false
+  },
+  {
+   "id": "social",
+   "n": "استراتژیست شبکه‌های اجتماعی",
+   "r": "growth",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Social Media Strategist",
+   "ir": false
+  },
+  {
+   "id": "tracking",
+   "n": "اندازه‌گیری و ردیابی",
+   "r": "growth",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Tracking & Measurement Specialist",
+   "ir": false
+  },
+  {
+   "id": "competitor",
+   "n": "تحلیل‌گر رقبا",
+   "r": "market_research",
+   "k": "marketing",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Competitive Analyst",
+   "ir": false
+  },
+  {
+   "id": "market_size",
+   "n": "اندازهٔ بازار",
+   "r": "market_research",
+   "k": "marketing",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Market Sizing Analyst",
+   "ir": false
+  },
+  {
+   "id": "persona",
+   "n": "پرسونا",
+   "r": "market_research",
+   "k": "marketing",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Persona Specialist",
+   "ir": false
+  },
+  {
+   "id": "pricing_strat",
+   "n": "استراتژیست قیمت",
+   "r": "pricing",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Pricing Strategist",
+   "ir": false
+  },
+  {
+   "id": "discount_ctl",
+   "n": "کنترل تخفیف",
+   "r": "pricing",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "proposal",
+   "n": "پیشنهاددهنده",
+   "r": "bizdev",
+   "k": "sales",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Proposal Strategist",
+   "ir": false
+  },
+  {
+   "id": "outbound",
+   "n": "فروش بیرونی",
+   "r": "bizdev",
+   "k": "sales",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Outbound Strategist",
+   "ir": false
+  },
+  {
+   "id": "account",
+   "n": "مدیر حساب کلیدی",
+   "r": "bizdev",
+   "k": "sales",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Account Strategist",
+   "ir": false
+  },
+  {
+   "id": "pipeline",
+   "n": "تحلیل‌گر قیف",
+   "r": "salesops",
+   "k": "sales",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Pipeline Analyst",
+   "ir": false
+  },
+  {
+   "id": "crm_data",
+   "n": "استخراج دادهٔ فروش",
+   "r": "salesops",
+   "k": "sales",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Sales Data Extraction Agent",
+   "ir": false
+  },
+  {
+   "id": "sales_coach",
+   "n": "مربی فروش",
+   "r": "salesops",
+   "k": "sales",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Sales Coach",
+   "ir": false
+  },
+  {
+   "id": "partner_scout",
+   "n": "شکارچی شریک",
+   "r": "channel",
+   "k": "sales",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "battlecard",
+   "n": "کارت رقابتی شرکا",
+   "r": "channel",
+   "k": "sales",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Battlecard Writer",
+   "ir": false
+  },
+  {
+   "id": "supplier_eval",
+   "n": "ارزیاب تأمین‌کننده",
+   "r": "procurement",
+   "k": "ops",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Supply Chain Auditor",
+   "ir": false
+  },
+  {
+   "id": "rfq",
+   "n": "استعلام قیمت (RFQ)",
+   "r": "procurement",
+   "k": "ops",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "ops_planner",
+   "n": "برنامه‌ریز عملیات",
+   "r": "production",
+   "k": "ops",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Studio Operations",
+   "ir": false
+  },
+  {
+   "id": "workflow_opt",
+   "n": "بهینه‌ساز گردش کار",
+   "r": "production",
+   "k": "ops",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Workflow Optimizer",
+   "ir": false
+  },
+  {
+   "id": "dispatch",
+   "n": "اعزام و مسیر",
+   "r": "logistics",
+   "k": "ops",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "inventory",
+   "n": "موجودی انبار",
+   "r": "logistics",
+   "k": "ops",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Supply Chain Strategist",
+   "ir": false
+  },
+  {
+   "id": "qc_check",
+   "n": "بازرس کیفیت",
+   "r": "quality",
+   "k": "ops",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Reality Checker",
+   "ir": false
+  },
+  {
+   "id": "evidence",
+   "n": "جمع‌آوری شواهد",
+   "r": "quality",
+   "k": "ops",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Evidence Collector",
+   "ir": false
+  },
+  {
+   "id": "support_reply",
+   "n": "پاسخ‌گوی پشتیبانی",
+   "r": "support",
+   "k": "service",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Support Responder",
+   "ir": false
+  },
+  {
+   "id": "faq",
+   "n": "نویسندهٔ راهنما",
+   "r": "support",
+   "k": "service",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Technical Writer",
+   "ir": false
+  },
+  {
+   "id": "feedback",
+   "n": "ترکیب بازخورد",
+   "r": "success",
+   "k": "service",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Feedback Synthesizer",
+   "ir": false
+  },
+  {
+   "id": "sentiment",
+   "n": "تحلیل احساس",
+   "r": "success",
+   "k": "service",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Sentiment Analyst",
+   "ir": false
+  },
+  {
+   "id": "journey",
+   "n": "نقشهٔ سفر مشتری",
+   "r": "success",
+   "k": "service",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Journey Mapper",
+   "ir": false
+  },
+  {
+   "id": "complaint_triage",
+   "n": "دسته‌بندی شکایت",
+   "r": "complaints",
+   "k": "service",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "refund_gate",
+   "n": "پیشنهاد جبران/بازپرداخت",
+   "r": "complaints",
+   "k": "service",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "recruiter",
+   "n": "متخصص جذب",
+   "r": "recruit",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Recruitment Specialist",
+   "ir": false
+  },
+  {
+   "id": "screen",
+   "n": "غربال رزومه",
+   "r": "recruit",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "trainer",
+   "n": "طراح آموزش",
+   "r": "onboarding",
+   "k": "hr",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Corporate Training Designer",
+   "ir": false
+  },
+  {
+   "id": "onboard_guide",
+   "n": "راهنمای ورود",
+   "r": "onboarding",
+   "k": "hr",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "payroll",
+   "n": "محاسبهٔ حقوق",
+   "r": "comp",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "benefits",
+   "n": "مزایا",
+   "r": "comp",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "metrics_design",
+   "n": "طراح شاخص عملکرد",
+   "r": "perf",
+   "k": "hr",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Metrics Designer",
+   "ir": false
+  },
+  {
+   "id": "review_writer",
+   "n": "نویسندهٔ ارزیابی",
+   "r": "perf",
+   "k": "hr",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "culture",
+   "n": "تحلیل‌گر فرهنگ",
+   "r": "employee_rel",
+   "k": "hr",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Culture Analyst",
+   "ir": false
+  },
+  {
+   "id": "psych",
+   "n": "روان‌شناس سازمانی",
+   "r": "employee_rel",
+   "k": "hr",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Psychologist",
+   "ir": false
+  },
+  {
+   "id": "exit_interview",
+   "n": "مصاحبهٔ خروج",
+   "r": "offboarding",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "access_revoke",
+   "n": "قطع دسترسی‌ها",
+   "r": "offboarding",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "devops",
+   "n": "DevOps",
+   "r": "infra",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "DevOps Automator",
+   "ir": false
+  },
+  {
+   "id": "sre",
+   "n": "SRE",
+   "r": "infra",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "SRE (Site Reliability Engineer)",
+   "ir": false
+  },
+  {
+   "id": "cloud",
+   "n": "مهندس ابر",
+   "r": "infra",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Cloud Engineer",
+   "ir": false
+  },
+  {
+   "id": "erp_admin",
+   "n": "راهبر ERP/CRM",
+   "r": "apps",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Salesforce Architect",
+   "ir": false
+  },
+  {
+   "id": "integrations",
+   "n": "یکپارچه‌سازی و MCP",
+   "r": "apps",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "MCP Builder",
+   "ir": false
+  },
+  {
+   "id": "data_eng",
+   "n": "مهندس داده",
+   "r": "data",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Data Engineer",
+   "ir": false
+  },
+  {
+   "id": "sql_analyst",
+   "n": "تحلیل‌گر SQL",
+   "r": "data",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "SQL Analyst",
+   "ir": false
+  },
+  {
+   "id": "bi_report",
+   "n": "گزارش BI",
+   "r": "data",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Analytics Reporter",
+   "ir": false
+  },
+  {
+   "id": "it_support",
+   "n": "پشتیبان IT",
+   "r": "helpdesk",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Infrastructure Maintainer",
+   "ir": false
+  },
+  {
+   "id": "tool_eval",
+   "n": "ارزیاب ابزار",
+   "r": "helpdesk",
+   "k": "tech",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Tool Evaluator",
+   "ir": false
+  },
+  {
+   "id": "bookkeeper",
+   "n": "ثبت اسناد",
+   "r": "accounting",
+   "k": "finance",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Finance Tracker",
+   "ir": false
+  },
+  {
+   "id": "close",
+   "n": "بستن ماهانه",
+   "r": "accounting",
+   "k": "finance",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "ap",
+   "n": "پرداختنی‌ها",
+   "r": "ap_ar",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Accounts Payable Agent",
+   "ir": false
+  },
+  {
+   "id": "ar",
+   "n": "وصول مطالبات",
+   "r": "ap_ar",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "cash",
+   "n": "پیش‌بینی نقدینگی",
+   "r": "treasury",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "bank_rec",
+   "n": "تطبیق بانکی",
+   "r": "treasury",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "budget",
+   "n": "بودجه",
+   "r": "fpa",
+   "k": "finance",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "variance",
+   "n": "تحلیل انحراف",
+   "r": "fpa",
+   "k": "finance",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "tax_calc",
+   "n": "محاسبهٔ مالیات",
+   "r": "tax",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "tax_file",
+   "n": "آماده‌سازی اظهارنامه",
+   "r": "tax",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "internal_audit",
+   "n": "حسابرس داخلی",
+   "r": "audit_int",
+   "k": "finance",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Compliance Auditor",
+   "ir": false
+  },
+  {
+   "id": "controls",
+   "n": "آزمون کنترل‌ها",
+   "r": "audit_int",
+   "k": "finance",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Spec Compliance Analyst",
+   "ir": false
+  },
+  {
+   "id": "ir_report",
+   "n": "گزارش سرمایه‌گذار",
+   "r": "investor_rel",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Executive Summary Generator",
+   "ir": false
+  },
+  {
+   "id": "pitch",
+   "n": "پیچ سرمایه‌گذار",
+   "r": "investor_rel",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "facility_req",
+   "n": "درخواست‌های ساختمان",
+   "r": "facilities",
+   "k": "assets",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "asset_register",
+   "n": "دفتر دارایی و استهلاک",
+   "r": "fixed_assets",
+   "k": "assets",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "risk_analyst",
+   "n": "تحلیل‌گر ریسک",
+   "r": "erm",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Risk Analyst",
+   "ir": false
+  },
+  {
+   "id": "risk_mgr",
+   "n": "مدیر ریسک",
+   "r": "erm",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Risk Manager",
+   "ir": false
+  },
+  {
+   "id": "compliance_check",
+   "n": "بررسی انطباق",
+   "r": "compliance",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Legal Compliance Checker",
+   "ir": false
+  },
+  {
+   "id": "automation_gov",
+   "n": "حاکمیت اتوماسیون/AI",
+   "r": "compliance",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Automation Governance Architect",
+   "ir": false
+  },
+  {
+   "id": "sec_eng",
+   "n": "مهندس امنیت",
+   "r": "infosec",
+   "k": "risk",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Security Engineer",
+   "ir": false
+  },
+  {
+   "id": "threat",
+   "n": "تشخیص تهدید",
+   "r": "infosec",
+   "k": "risk",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Threat Detection Engineer",
+   "ir": false
+  },
+  {
+   "id": "incident",
+   "n": "فرمانده رخداد",
+   "r": "infosec",
+   "k": "risk",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Incident Response Commander",
+   "ir": false
+  },
+  {
+   "id": "dpo",
+   "n": "مسئول حفاظت داده",
+   "r": "privacy",
+   "k": "risk",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "identity",
+   "n": "هویت و اعتماد ایجنت‌ها",
+   "r": "privacy",
+   "k": "risk",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Agentic Identity & Trust Architect",
+   "ir": false
+  },
+  {
+   "id": "chaos",
+   "n": "آزمون آشوب",
+   "r": "bcp",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Chaos Agent",
+   "ir": false
+  },
+  {
+   "id": "backup_plan",
+   "n": "برنامهٔ بازیابی",
+   "r": "bcp",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "hse_check",
+   "n": "بازرس ایمنی",
+   "r": "hse",
+   "k": "risk",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "contract_draft",
+   "n": "پیش‌نویس قرارداد",
+   "r": "contracts",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Legal Specialist",
+   "ir": false
+  },
+  {
+   "id": "contract_review",
+   "n": "بازبین قرارداد",
+   "r": "contracts",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "corp_sec",
+   "n": "امور شرکتی",
+   "r": "corp_legal",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "ip_watch",
+   "n": "پایش مالکیت فکری",
+   "r": "ip",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "case_prep",
+   "n": "آماده‌سازی پرونده",
+   "r": "litigation",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "gov_liaison",
+   "n": "رابط نهادها",
+   "r": "gov_rel",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Government Digital Presales Consultant",
+   "ir": false
+  },
+  {
+   "id": "esg_report",
+   "n": "گزارش ESG",
+   "r": "csr",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "workflow_arch",
+   "n": "معمار گردش کار",
+   "r": "process",
+   "k": "capability",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Workflow Architect",
+   "ir": false
+  },
+  {
+   "id": "orchestrator",
+   "n": "هماهنگ‌کنندهٔ ایجنت‌ها",
+   "r": "process",
+   "k": "capability",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Agents Orchestrator",
+   "ir": false
+  },
+  {
+   "id": "doc_gen",
+   "n": "تولید مستند",
+   "r": "knowledge",
+   "k": "capability",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Document Generator",
+   "ir": false
+  },
+  {
+   "id": "kb_curator",
+   "n": "نگهدار پایگاه دانش",
+   "r": "knowledge",
+   "k": "capability",
+   "mode": "auto",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": false
+  },
+  {
+   "id": "change_coach",
+   "n": "مربی تغییر",
+   "r": "change",
+   "k": "capability",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Discovery Coach",
+   "ir": false
+  },
+  {
+   "id": "stakeholder",
+   "n": "تحلیل ذی‌نفعان",
+   "r": "change",
+   "k": "capability",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Stakeholder Analyst",
+   "ir": false
+  },
+  {
+   "id": "ir_moadian",
+   "n": "ارسال صورتحساب سامانهٔ مؤدیان",
+   "r": "ir_tax_portal",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": true
+  },
+  {
+   "id": "ir_vat_calc",
+   "n": "محاسبهٔ ارزش افزودهٔ فصلی",
+   "r": "ir_vat",
+   "k": "finance",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": true
+  },
+  {
+   "id": "ir_insurance_list",
+   "n": "تهیهٔ لیست بیمه",
+   "r": "ir_tamin",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": true
+  },
+  {
+   "id": "ir_labor_contract",
+   "n": "قرارداد کار طبق قانون کار",
+   "r": "ir_labor_law",
+   "k": "hr",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": true
+  },
+  {
+   "id": "ir_license",
+   "n": "پیگیری اینماد و مجوزها",
+   "r": "ir_enamad",
+   "k": "legal",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": true
+  },
+  {
+   "id": "ir_sms_check",
+   "n": "بررسی پیامک تبلیغاتی (لغو۱۱)",
+   "r": "ir_ad_rules",
+   "k": "marketing",
+   "mode": "gate",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": null,
+   "ir": true
+  },
+  {
+   "id": "ir_alt_tools",
+   "n": "جایگزین ابزار تحریمی",
+   "r": "ir_sanctions_tools",
+   "k": "tech",
+   "mode": "ask",
+   "m": "Haiku",
+   "lvl": "agent",
+   "ref": "Tool Evaluator",
+   "ir": true
+  }
+ ],
+ "workflows": [
+  {
+   "id": "launch_product",
+   "name": "🚀 عرضهٔ محصول جدید",
+   "steps": [
+    "market_size",
+    "persona",
+    "prd",
+    "prioritize",
+    "ui",
+    "backend",
+    "qa_test",
+    "pricing_strat",
+    "seo",
+    "brand_guard"
+   ]
+  },
+  {
+   "id": "hire",
+   "name": "👤 استخدام یک نفر",
+   "steps": [
+    "recruiter",
+    "screen",
+    "ir_labor_contract",
+    "onboard_guide",
+    "trainer"
+   ]
+  },
+  {
+   "id": "month_close",
+   "name": "📒 بستن حساب ماهانه",
+   "steps": [
+    "bookkeeper",
+    "bank_rec",
+    "ap",
+    "ar",
+    "ir_moadian",
+    "close",
+    "variance",
+    "exec_brief"
+   ]
+  },
+  {
+   "id": "complaint",
+   "name": "😠 شکایت مشتری",
+   "steps": [
+    "support_reply",
+    "complaint_triage",
+    "qc_check",
+    "refund_gate",
+    "feedback"
+   ]
+  },
+  {
+   "id": "campaign",
+   "name": "📣 کمپین بازاریابی",
+   "steps": [
+    "competitor",
+    "persona",
+    "social",
+    "ir_sms_check",
+    "ppc",
+    "tracking",
+    "bi_report"
+   ]
+  },
+  {
+   "id": "security_incident",
+   "name": "🛡️ رخداد امنیتی",
+   "steps": [
+    "threat",
+    "incident",
+    "sec_eng",
+    "dpo",
+    "compliance_check",
+    "exec_brief"
+   ]
+  }
+ ]
+}

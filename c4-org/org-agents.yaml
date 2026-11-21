@@ -1,0 +1,108 @@
+# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 1 — 2026-11-21 12:55 UTC (13:55 برلین)
+# ساختار: بخش (dept در org-global.c4) → دپارتمان (هر واحد در org-global.c4) → ایجنت‌های تخصصی (این فایل).
+# سرپرست هر دپارتمان = خود واحد در org-global.c4؛ ایجنت‌ها reportsTo همان واحدند. سرپرست بخش reportsTo مدیرعامل.
+# ref = نقش مشابه در کاتالوگ رسمی Paperclip (445 ایجنت، 16 شرکت؛ global-org/catalog-agents.json). «—» = نمونهٔ واقعی پیدا نشد (طراحی ما، تأییدنشده).
+# مدل پیش‌فرض: متخصص Haiku، سرپرست دپارتمان Sonnet، فقط مدیرعامل/هیئت Opus (هزینه: Opus ≈170× Haiku در کار ساده).
+# mode پیش‌فرض = mode همان واحد (ask/auto/gate). ایجنت بیرونی (external) بدون gate انسانی خطاست.
+# هیچ ایجنتی خودکار اجرا نمی‌شود؛ فقط ایجنت‌های ورک‌فلوی انتخاب‌شده فعال می‌شوند (پایین فایل).
+# قالب ایجنت: [id, نام فارسی, ref, model?, mode?]
+
+agents:
+  board:        [[audit_committee, کمیتهٔ حسابرسی و ریسک, Audit Lead], [board_secretary, دبیر هیئت‌مدیره (صورت‌جلسه), Meeting Analyst]]
+  ceo:          [[chief_of_staff, رئیس دفتر مدیرعامل, Chief of Staff], [exec_brief, خلاصه‌ساز گزارش مدیریتی, Executive Summary Generator]]
+  strategy_pmo: [[okr, متخصص OKR, OKR Specialist], [portfolio_pm, مدیر سبد پروژه, Senior Project Manager], [north_star, تحلیل‌گر شاخص اصلی, North Star Analyst]]
+  corpdev:      [[biz_model, تحلیل‌گر مدل کسب‌وکار, Business Model Analyst], [deal, استراتژیست معامله, Deal Strategist], [valuation, تحلیل‌گر ارزش‌گذاری, Fundamentals Analyst]]
+
+  product:      [[prd, نویسندهٔ PRD, PRD Writer], [roadmap, متخصص نقشهٔ راه, Roadmap Specialist], [prioritize, اولویت‌بندی, Prioritization Specialist]]
+  research:     [[trend, پژوهشگر روند, Trend Researcher], [prototyper, نمونه‌ساز سریع, Rapid Prototyper], [experiment, طراح آزمایش, Experiment Designer]]
+  design:       [[ux_research, پژوهشگر UX, UX Researcher], [ui, طراح UI, UI Designer], [a11y, ممیز دسترس‌پذیری, Accessibility Auditor]]
+  engineering:  [[backend, توسعه‌دهندهٔ بک‌اند, Backend Architect], [frontend, توسعه‌دهندهٔ فرانت, Frontend Developer], [qa_test, تست‌کننده, QA Specialist], [code_review, بازبین کد, Code Reviewer]]
+
+  brand:        [[brand_guard, نگهبان برند, Brand Guardian], [pr_writer, نویسندهٔ روابط عمومی, Content Creator], [visual_story, روایتگر تصویری, Visual Storyteller]]
+  growth:       [[seo, متخصص سئو, SEO Specialist], [ppc, کمپین تبلیغ کلیکی, PPC Campaign Strategist], [social, استراتژیست شبکه‌های اجتماعی, Social Media Strategist], [tracking, اندازه‌گیری و ردیابی, Tracking & Measurement Specialist]]
+  market_research: [[competitor, تحلیل‌گر رقبا, Competitive Analyst], [market_size, اندازهٔ بازار, Market Sizing Analyst], [persona, پرسونا, Persona Specialist]]
+  pricing:      [[pricing_strat, استراتژیست قیمت, Pricing Strategist], [discount_ctl, کنترل تخفیف, —, Haiku, gate]]
+
+  bizdev:       [[proposal, پیشنهاددهنده, Proposal Strategist], [outbound, فروش بیرونی, Outbound Strategist], [account, مدیر حساب کلیدی, Account Strategist]]
+  salesops:     [[pipeline, تحلیل‌گر قیف, Pipeline Analyst], [crm_data, استخراج دادهٔ فروش, Sales Data Extraction Agent], [sales_coach, مربی فروش, Sales Coach]]
+  channel:      [[partner_scout, شکارچی شریک, —], [battlecard, کارت رقابتی شرکا, Battlecard Writer]]
+
+  procurement:  [[supplier_eval, ارزیاب تأمین‌کننده, Supply Chain Auditor], [rfq, استعلام قیمت (RFQ), —, Haiku, gate]]
+  production:   [[ops_planner, برنامه‌ریز عملیات, Studio Operations], [workflow_opt, بهینه‌ساز گردش کار, Workflow Optimizer]]
+  logistics:    [[dispatch, اعزام و مسیر, —], [inventory, موجودی انبار, Supply Chain Strategist]]
+  quality:      [[qc_check, بازرس کیفیت, Reality Checker], [evidence, جمع‌آوری شواهد, Evidence Collector]]
+
+  support:      [[support_reply, پاسخ‌گوی پشتیبانی, Support Responder], [faq, نویسندهٔ راهنما, Technical Writer]]
+  success:      [[feedback, ترکیب بازخورد, Feedback Synthesizer], [sentiment, تحلیل احساس, Sentiment Analyst], [journey, نقشهٔ سفر مشتری, Journey Mapper]]
+  complaints:   [[complaint_triage, دسته‌بندی شکایت, —], [refund_gate, پیشنهاد جبران/بازپرداخت, —, Haiku, gate]]
+
+  recruit:      [[recruiter, متخصص جذب, Recruitment Specialist], [screen, غربال رزومه, —]]   # جزئیات: recruitment.c4
+  onboarding:   [[trainer, طراح آموزش, Corporate Training Designer], [onboard_guide, راهنمای ورود, —]]
+  comp:         [[payroll, محاسبهٔ حقوق, —, Haiku, gate], [benefits, مزایا, —]]
+  perf:         [[metrics_design, طراح شاخص عملکرد, Metrics Designer], [review_writer, نویسندهٔ ارزیابی, —]]
+  employee_rel: [[culture, تحلیل‌گر فرهنگ, Culture Analyst], [psych, روان‌شناس سازمانی, Psychologist]]
+  offboarding:  [[exit_interview, مصاحبهٔ خروج, —], [access_revoke, قطع دسترسی‌ها, —, Haiku, gate]]
+
+  infra:        [[devops, DevOps, DevOps Automator], [sre, SRE, SRE (Site Reliability Engineer)], [cloud, مهندس ابر, Cloud Engineer]]
+  apps:         [[erp_admin, راهبر ERP/CRM, Salesforce Architect], [integrations, یکپارچه‌سازی و MCP, MCP Builder]]
+  data:         [[data_eng, مهندس داده, Data Engineer], [sql_analyst, تحلیل‌گر SQL, SQL Analyst], [bi_report, گزارش BI, Analytics Reporter]]
+  helpdesk:     [[it_support, پشتیبان IT, Infrastructure Maintainer], [tool_eval, ارزیاب ابزار, Tool Evaluator]]
+
+  accounting:   [[bookkeeper, ثبت اسناد, Finance Tracker], [close, بستن ماهانه, —]]
+  ap_ar:        [[ap, پرداختنی‌ها, Accounts Payable Agent], [ar, وصول مطالبات, —]]
+  treasury:     [[cash, پیش‌بینی نقدینگی, —], [bank_rec, تطبیق بانکی, —]]
+  fpa:          [[budget, بودجه, —], [variance, تحلیل انحراف, —]]
+  tax:          [[tax_calc, محاسبهٔ مالیات, —], [tax_file, آماده‌سازی اظهارنامه, —, Haiku, gate]]
+  audit_int:    [[internal_audit, حسابرس داخلی, Compliance Auditor], [controls, آزمون کنترل‌ها, Spec Compliance Analyst]]
+  investor_rel: [[ir_report, گزارش سرمایه‌گذار, Executive Summary Generator], [pitch, پیچ سرمایه‌گذار, —]]   # skill: investor-pitch
+
+  facilities:   [[facility_req, درخواست‌های ساختمان, —]]
+  fixed_assets: [[asset_register, دفتر دارایی و استهلاک, —]]
+
+  erm:          [[risk_analyst, تحلیل‌گر ریسک, Risk Analyst], [risk_mgr, مدیر ریسک, Risk Manager]]
+  compliance:   [[compliance_check, بررسی انطباق, Legal Compliance Checker], [automation_gov, حاکمیت اتوماسیون/AI, Automation Governance Architect]]
+  infosec:      [[sec_eng, مهندس امنیت, Security Engineer], [threat, تشخیص تهدید, Threat Detection Engineer], [incident, فرمانده رخداد, Incident Response Commander]]
+  privacy:      [[dpo, مسئول حفاظت داده, —], [identity, هویت و اعتماد ایجنت‌ها, Agentic Identity & Trust Architect]]
+  bcp:          [[chaos, آزمون آشوب, Chaos Agent], [backup_plan, برنامهٔ بازیابی, —]]
+  hse:          [[hse_check, بازرس ایمنی, —]]
+
+  contracts:    [[contract_draft, پیش‌نویس قرارداد, Legal Specialist], [contract_review, بازبین قرارداد, —]]
+  corp_legal:   [[corp_sec, امور شرکتی, —]]
+  ip:           [[ip_watch, پایش مالکیت فکری, —]]
+  litigation:   [[case_prep, آماده‌سازی پرونده, —]]   # پیاده‌سازی: حق‌پرس (لینک، نه ادغام)
+  gov_rel:      [[gov_liaison, رابط نهادها, Government Digital Presales Consultant]]
+  csr:          [[esg_report, گزارش ESG, —]]
+
+  process:      [[workflow_arch, معمار گردش کار, Workflow Architect], [orchestrator, هماهنگ‌کنندهٔ ایجنت‌ها, Agents Orchestrator]]
+  knowledge:    [[doc_gen, تولید مستند, Document Generator], [kb_curator, نگهدار پایگاه دانش, —]]
+  change:       [[change_coach, مربی تغییر, Discovery Coach], [stakeholder, تحلیل ذی‌نفعان, Stakeholder Analyst]]
+
+  # 🇮🇷 لایهٔ ایران — فقط وقتی location=IR (org-global.rules.yaml). محتوای حقوقی: تأییدنشده → حق‌پرس
+  ir_tax_portal:  [[ir_moadian, ارسال صورتحساب سامانهٔ مؤدیان, —, Haiku, gate]]
+  ir_vat:         [[ir_vat_calc, محاسبهٔ ارزش افزودهٔ فصلی, —]]
+  ir_tamin:       [[ir_insurance_list, تهیهٔ لیست بیمه, —, Haiku, gate]]
+  ir_labor_law:   [[ir_labor_contract, قرارداد کار طبق قانون کار, —]]
+  ir_enamad:      [[ir_license, پیگیری اینماد و مجوزها, —]]
+  ir_ad_rules:    [[ir_sms_check, بررسی پیامک تبلیغاتی (لغو۱۱), —]]
+  ir_sanctions_tools: [[ir_alt_tools, جایگزین ابزار تحریمی, Tool Evaluator]]
+
+# ورک‌فلوها: فقط ایجنت‌های همین فهرست فعال می‌شوند، به همین ترتیب. هر فلش = تحویل کار (handoff).
+workflows:
+  - id: launch_product
+    name: 🚀 عرضهٔ محصول جدید
+    steps: [market_size, persona, prd, prioritize, ui, backend, qa_test, pricing_strat, seo, brand_guard]
+  - id: hire
+    name: 👤 استخدام یک نفر
+    steps: [recruiter, screen, ir_labor_contract, onboard_guide, trainer]
+  - id: month_close
+    name: 📒 بستن حساب ماهانه
+    steps: [bookkeeper, bank_rec, ap, ar, ir_moadian, close, variance, exec_brief]
+  - id: complaint
+    name: 😠 شکایت مشتری
+    steps: [support_reply, complaint_triage, qc_check, refund_gate, feedback]
+  - id: campaign
+    name: 📣 کمپین بازاریابی
+    steps: [competitor, persona, social, ir_sms_check, ppc, tracking, bi_report]
+  - id: security_incident
+    name: 🛡️ رخداد امنیتی
+    steps: [threat, incident, sec_eng, dpo, compliance_check, exec_brief]
