@@ -1,4 +1,4 @@
-# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 5 — 2026-11-21 16:30 برلین: + میز تحقیق داخلی (research_desk, source_verifier, improvement_proposer) و ورک‌فلو «تحقیق داخلی تا بهبود»
+# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 6 — 2026-11-21 17:30 برلین: + بهینه‌ساز هزینه و فرایند (cost_optimizer) با ۳ سناریوی کم/متوسط/حداکثر و ورک‌فلو «بهینه‌سازی هزینه با سه سناریو»؛ نسخه 5: میز تحقیق داخلی
 # ساختار: مدیریت ارشد (board → ceo → سرپرست‌های h_*) → بخش (div) → دپارتمان (unit = واحد در org-global.c4) → ایجنت.
 # محتوا از تحقیق ۴ پژوهشگر (research/paperclip/global-org/part-a..d.json، ۲۱ نوامبر) + کاتالوگ ۴۴۵ ایجنت Paperclip؛ هر ایجنت sources دارد.
 # سیاست مدل (تأیید Siax، 2026-11-21 12:54 UTC): فقط ceo روی Opus؛ سرپرست‌ها Sonnet؛ کار ساده مستقیم به کارگر Haiku؛ برنامه‌ریز پویا فقط یک بار در شروع فکر می‌کند.
@@ -1629,7 +1629,32 @@ agents:
   outputs: [h_capability, process_improver]
   skills: [bpmn, flow-rules-check]
   sources: ['https://www.omg.org/spec/BPMN/2.0.2/', 'Bruce Silver, BPMN Method and Style (2nd ed.)', 'catalog:agency-agents/Spec Compliance Analyst']
+- id: cost_optimizer
+  div: capability
+  unit: process
+  n: بهینه‌ساز هزینه و فرایند
+  en: Process & Cost Efficiency Optimizer
+  r: h_capability
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [هزینهٔ واقعی هر ایجنت و هر ورک‌فلو را با بودجه مقایسه می‌کند (اجرا، توکن، دلار، خطا), اتلاف را پیدا می‌کند (اجرای تکراری، مدل گران برای کار ساده، قدم بی‌اثر، دوباره‌کاری بعد از رد), برای هر ورک‌فلو سه سناریو می‌سازد - کم (حداقل هزینه)، متوسط (تعادل)، حداکثر (بیشترین کیفیت) - هر کدام با هزینهٔ ماهانه، ریسک کیفیت و قدم‌های حذف/ادغام‌شده, سناریو را فقط پیشنهاد می‌دهد؛ اعمال با تأیید انسان, یک ماه بعد هزینه و کیفیت واقعی را با برآورد مقایسه می‌کند]
+  inputs: [process_improver, retro_analyst, h_finance, agent_governor]
+  outputs: [h_capability, ceo, instruction_writer]
+  skills: [finops, model-routing, process-mining]
+  rules: [مدل CEO فقط Opus؛ سرپرست‌ها Sonnet؛ کار ساده Haiku (سیاست تأییدشده ۲۰۲۶-۱۱-۲۱), هیچ سناریویی gate انسانی یا قدم بیرونی بدون gate را حذف نمی‌کند, هر عدد با منبع: هزینهٔ واقعی Paperclip یا برآورد علامت‌دار]
+  sources: ['https://www.finops.org/wg/optimizing-genai-usage/', 'https://www.finops.org/insights/ai-model-selection/', 'https://www.splunk.com/en_us/blog/artificial-intelligence/reduce-agent-cost-by-model-routing.html', 'https://www.datadoghq.com/blog/how-datadog-saves-money-by-optimizing-ai-usage', 'https://docs.celonis.com/en/analysis---conformance-checker.html']
 workflows:
+- name: بهینه‌سازی هزینه با سه سناریو
+  dept: capability
+  steps:
+  - [cost_optimizer, جمع کردن هزینه و اجرای واقعی ۳۰ روز اخیر در برابر بودجه, auto]
+  - [process_improver, پیدا کردن گلوگاه و دوباره‌کاری در ورک‌فلو, auto]
+  - [cost_optimizer, ساختن سه سناریوی کم، متوسط و حداکثر با هزینه و ریسک, ask]
+  - [h_finance, بررسی برآورد هزینه, ask]
+  - [ceo, انتخاب یک سناریو یا رد, gate]
+  - [instruction_writer, اعمال سناریو در yaml و دستورالعمل‌ها, ask]
+  - [cost_optimizer, مقایسهٔ هزینهٔ واقعی با برآورد بعد از یک ماه, auto]
 - name: تحقیق داخلی تا بهبود
   dept: rnd
   steps:

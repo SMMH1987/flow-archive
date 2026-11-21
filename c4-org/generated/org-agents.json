@@ -4452,9 +4452,85 @@
    ],
    "lvl": "agent",
    "cc": null
+  },
+  {
+   "id": "cost_optimizer",
+   "n": "بهینه‌ساز هزینه و فرایند",
+   "t": "Process & Cost Efficiency Optimizer",
+   "tm": "مدیریت فرایند (BPM)",
+   "r": "h_capability",
+   "k": "capability",
+   "mode": "gate",
+   "m": "Sonnet",
+   "ir": false,
+   "s": [
+    "finops",
+    "model-routing",
+    "process-mining"
+   ],
+   "tasks": [
+    "هزینهٔ واقعی هر ایجنت و هر ورک‌فلو را با بودجه مقایسه می‌کند (اجرا، توکن، دلار، خطا)",
+    "اتلاف را پیدا می‌کند (اجرای تکراری، مدل گران برای کار ساده، قدم بی‌اثر، دوباره‌کاری بعد از رد)",
+    "برای هر ورک‌فلو سه سناریو می‌سازد - کم (حداقل هزینه)، متوسط (تعادل)، حداکثر (بیشترین کیفیت) - هر کدام با هزینهٔ ماهانه، ریسک کیفیت و قدم‌های حذف/ادغام‌شده",
+    "سناریو را فقط پیشنهاد می‌دهد؛ اعمال با تأیید انسان",
+    "یک ماه بعد هزینه و کیفیت واقعی را با برآورد مقایسه می‌کند"
+   ],
+   "inp": [
+    "process_improver",
+    "retro_analyst",
+    "h_finance",
+    "agent_governor"
+   ],
+   "outp": [
+    "h_capability",
+    "ceo",
+    "instruction_writer"
+   ],
+   "src": [
+    "https://www.finops.org/wg/optimizing-genai-usage/",
+    "https://www.finops.org/insights/ai-model-selection/",
+    "https://www.splunk.com/en_us/blog/artificial-intelligence/reduce-agent-cost-by-model-routing.html",
+    "https://www.datadoghq.com/blog/how-datadog-saves-money-by-optimizing-ai-usage",
+    "https://docs.celonis.com/en/analysis---conformance-checker.html"
+   ],
+   "lvl": "agent",
+   "cc": null
   }
  ],
  "workflows": [
+  {
+   "n": "بهینه‌سازی هزینه با سه سناریو",
+   "s": [
+    [
+     "cost_optimizer",
+     "جمع کردن هزینه و اجرای واقعی ۳۰ روز اخیر در برابر بودجه"
+    ],
+    [
+     "process_improver",
+     "پیدا کردن گلوگاه و دوباره‌کاری در ورک‌فلو"
+    ],
+    [
+     "cost_optimizer",
+     "ساختن سه سناریوی کم، متوسط و حداکثر با هزینه و ریسک"
+    ],
+    [
+     "h_finance",
+     "بررسی برآورد هزینه"
+    ],
+    [
+     "ceo",
+     "انتخاب یک سناریو یا رد"
+    ],
+    [
+     "instruction_writer",
+     "اعمال سناریو در yaml و دستورالعمل‌ها"
+    ],
+    [
+     "cost_optimizer",
+     "مقایسهٔ هزینهٔ واقعی با برآورد بعد از یک ماه"
+    ]
+   ]
+  },
   {
    "n": "تحقیق داخلی تا بهبود",
    "s": [
