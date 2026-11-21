@@ -4319,6 +4319,107 @@
    "cc": null
   },
   {
+   "id": "research_desk",
+   "n": "میز درخواست تحقیق",
+   "t": "Research Intake Desk",
+   "tm": "تحقیق و نوآوری",
+   "r": "h_rnd",
+   "k": "rnd",
+   "mode": "auto",
+   "m": "Haiku",
+   "ir": false,
+   "s": [
+    "research-brief"
+   ],
+   "tasks": [
+    "درخواست تحقیق هر ایجنت را می‌گیرد و سؤال، معیار موفقیت و مهلت را روشن می‌کند",
+    "تکراری بودن را با تحقیق‌های قبلی چک می‌کند و نتیجهٔ قبلی را برمی‌گرداند",
+    "سؤال روشن را به پژوهشگر مناسب می‌سپارد"
+   ],
+   "inp": [
+    "h_rnd",
+    "agent_governor",
+    "instruction_writer"
+   ],
+   "outp": [
+    "research_scout",
+    "market_researcher",
+    "user_researcher",
+    "wf_researcher"
+   ],
+   "src": [
+    "https://www.atlassian.com/agile/product-management/research-repository"
+   ],
+   "lvl": "agent",
+   "cc": null
+  },
+  {
+   "id": "source_verifier",
+   "n": "راستی‌آزمای منبع",
+   "t": "Source Verifier",
+   "tm": "تحقیق و نوآوری",
+   "r": "h_rnd",
+   "k": "rnd",
+   "mode": "auto",
+   "m": "Haiku",
+   "ir": false,
+   "s": [
+    "fact-check"
+   ],
+   "tasks": [
+    "هر ادعای تحقیق را با منبعش تطبیق می‌دهد",
+    "ادعای بی‌منبع را «تأییدنشده» علامت می‌زند",
+    "امتیاز اطمینان کل گزارش را می‌دهد"
+   ],
+   "inp": [
+    "research_scout",
+    "market_researcher",
+    "user_researcher",
+    "wf_researcher"
+   ],
+   "outp": [
+    "improvement_proposer"
+   ],
+   "src": [
+    "https://www.cebma.org/resources-and-tools/what-is-evidence-based-management/"
+   ],
+   "lvl": "agent",
+   "cc": null
+  },
+  {
+   "id": "improvement_proposer",
+   "n": "پیشنهاددهندهٔ بهبود",
+   "t": "Improvement Proposer",
+   "tm": "تحقیق و نوآوری",
+   "r": "h_rnd",
+   "k": "rnd",
+   "mode": "gate",
+   "m": "Sonnet",
+   "ir": false,
+   "s": [
+    "change-proposal"
+   ],
+   "tasks": [
+    "از نتیجهٔ تأییدشده یک پیشنهاد تغییر مشخص می‌سازد (در org-agents.yaml، دستورالعمل، skill یا ورک‌فلو)",
+    "اثر و هزینهٔ پیشنهاد را می‌نویسد",
+    "پیشنهاد را برای تأیید انسان می‌فرستد و بعد از تأیید به مالک تغییر می‌سپارد",
+    "یک ماه بعد اثر را می‌سنجد"
+   ],
+   "inp": [
+    "source_verifier"
+   ],
+   "outp": [
+    "instruction_writer",
+    "agent_governor",
+    "h_rnd"
+   ],
+   "src": [
+    "https://asq.org/quality-resources/pdca-cycle"
+   ],
+   "lvl": "agent",
+   "cc": null
+  },
+  {
    "id": "bpmn_validator",
    "n": "بازبین BPMN",
    "t": "BPMN Style Validator",
@@ -4354,6 +4455,39 @@
   }
  ],
  "workflows": [
+  {
+   "n": "تحقیق داخلی تا بهبود",
+   "s": [
+    [
+     "research_desk",
+     "گرفتن درخواست تحقیق از هر ایجنت و روشن کردن سؤال"
+    ],
+    [
+     "research_scout",
+     "تحقیق و جمع کردن منبع"
+    ],
+    [
+     "source_verifier",
+     "تطبیق هر ادعا با منبع"
+    ],
+    [
+     "improvement_proposer",
+     "پیشنهاد تغییر با اثر و هزینه"
+    ],
+    [
+     "board",
+     "تأیید یا رد پیشنهاد"
+    ],
+    [
+     "instruction_writer",
+     "اعمال تغییر در دستورالعمل یا yaml"
+    ],
+    [
+     "improvement_proposer",
+     "سنجش اثر بعد از یک ماه"
+    ]
+   ]
+  },
   {
    "n": "چرخهٔ برنامهٔ سالانه و OKR",
    "s": [

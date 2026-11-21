@@ -1,4 +1,4 @@
-# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 4 — 2026-11-21 16:20 برلین: + ایجنت نویسندهٔ دستورالعمل (instruction_writer)
+# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 5 — 2026-11-21 16:30 برلین: + میز تحقیق داخلی (research_desk, source_verifier, improvement_proposer) و ورک‌فلو «تحقیق داخلی تا بهبود»
 # ساختار: مدیریت ارشد (board → ceo → سرپرست‌های h_*) → بخش (div) → دپارتمان (unit = واحد در org-global.c4) → ایجنت.
 # محتوا از تحقیق ۴ پژوهشگر (research/paperclip/global-org/part-a..d.json، ۲۱ نوامبر) + کاتالوگ ۴۴۵ ایجنت Paperclip؛ هر ایجنت sources دارد.
 # سیاست مدل (تأیید Siax، 2026-11-21 12:54 UTC): فقط ceo روی Opus؛ سرپرست‌ها Sonnet؛ کار ساده مستقیم به کارگر Haiku؛ برنامه‌ریز پویا فقط یک بار در شروع فکر می‌کند.
@@ -1573,6 +1573,48 @@ agents:
   outputs: [h_capability, agent_governor]
   skills: [agent-instructions]
   sources: ['https://docs.paperclip.ing/guides/org/agents', 'https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices', 'https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf']
+- id: research_desk
+  div: rnd
+  unit: research
+  n: میز درخواست تحقیق
+  en: Research Intake Desk
+  r: h_rnd
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [درخواست تحقیق هر ایجنت را می‌گیرد و سؤال، معیار موفقیت و مهلت را روشن می‌کند, تکراری بودن را با تحقیق‌های قبلی چک می‌کند و نتیجهٔ قبلی را برمی‌گرداند, سؤال روشن را به پژوهشگر مناسب می‌سپارد]
+  inputs: [h_rnd, agent_governor, instruction_writer]
+  outputs: [research_scout, market_researcher, user_researcher, wf_researcher]
+  skills: [research-brief]
+  sources: ['https://www.atlassian.com/agile/product-management/research-repository']
+- id: source_verifier
+  div: rnd
+  unit: research
+  n: راستی‌آزمای منبع
+  en: Source Verifier
+  r: h_rnd
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [هر ادعای تحقیق را با منبعش تطبیق می‌دهد, ادعای بی‌منبع را «تأییدنشده» علامت می‌زند, امتیاز اطمینان کل گزارش را می‌دهد]
+  inputs: [research_scout, market_researcher, user_researcher, wf_researcher]
+  outputs: [improvement_proposer]
+  skills: [fact-check]
+  sources: ['https://www.cebma.org/resources-and-tools/what-is-evidence-based-management/']
+- id: improvement_proposer
+  div: rnd
+  unit: research
+  n: پیشنهاددهندهٔ بهبود
+  en: Improvement Proposer
+  r: h_rnd
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [از نتیجهٔ تأییدشده یک پیشنهاد تغییر مشخص می‌سازد (در org-agents.yaml، دستورالعمل، skill یا ورک‌فلو), اثر و هزینهٔ پیشنهاد را می‌نویسد, پیشنهاد را برای تأیید انسان می‌فرستد و بعد از تأیید به مالک تغییر می‌سپارد, یک ماه بعد اثر را می‌سنجد]
+  inputs: [source_verifier]
+  outputs: [instruction_writer, agent_governor, h_rnd]
+  skills: [change-proposal]
+  sources: ['https://asq.org/quality-resources/pdca-cycle']
 - id: bpmn_validator
   div: capability
   unit: process
@@ -1588,6 +1630,16 @@ agents:
   skills: [bpmn, flow-rules-check]
   sources: ['https://www.omg.org/spec/BPMN/2.0.2/', 'Bruce Silver, BPMN Method and Style (2nd ed.)', 'catalog:agency-agents/Spec Compliance Analyst']
 workflows:
+- name: تحقیق داخلی تا بهبود
+  dept: rnd
+  steps:
+  - [research_desk, گرفتن درخواست تحقیق از هر ایجنت و روشن کردن سؤال, auto]
+  - [research_scout, تحقیق و جمع کردن منبع, auto]
+  - [source_verifier, تطبیق هر ادعا با منبع, auto]
+  - [improvement_proposer, پیشنهاد تغییر با اثر و هزینه, ask]
+  - [board, تأیید یا رد پیشنهاد, gate]
+  - [instruction_writer, اعمال تغییر در دستورالعمل یا yaml, ask]
+  - [improvement_proposer, سنجش اثر بعد از یک ماه, auto]
 - name: چرخهٔ برنامهٔ سالانه و OKR
   dept: strategy
   steps:
