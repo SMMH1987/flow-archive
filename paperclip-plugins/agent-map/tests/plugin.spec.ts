@@ -288,3 +288,12 @@ describe("step 0: suggestions from the user's own past cases first", () => {
     expect(b.lines.find((x: any) => x.id === "why_now").cite).toMatch(/^از پروندهٔ /);
   });
 });
+
+describe("data hygiene", () => {
+  it("every agent responsibility, rule, input, output, skill and source is plain text (no [object Object])", () => {
+    const bad: string[] = [];
+    for (const a of DATA.org.agents as any[]) for (const f of ["tasks", "rules", "inputs", "outputs", "skills", "sources"]) (a[f] ?? []).forEach((v: unknown, i: number) => { if (typeof v !== "string") bad.push(`${a.id}.${f}[${i}]`); });
+    expect(bad).toEqual([]);
+    expect(buildInstructions((DATA.org.agents as any[]).find((a) => a.id === "intake_clarifier"), new Map((DATA.org.agents as any[]).map((a) => [a.id, a])))).not.toContain("[object Object]");
+  });
+});
