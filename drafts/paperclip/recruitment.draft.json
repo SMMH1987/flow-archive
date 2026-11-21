@@ -1,0 +1,196 @@
+{
+  "_generated": {
+    "by": "tools/c4_to_paperclip.py",
+    "version": "1.0",
+    "updated": "2026-11-21 13:30 Europe/Berlin",
+    "source": "c4-org/recruitment.c4",
+    "status": "draft — not imported"
+  },
+  "rootPath": "recruitment",
+  "manifest": {
+    "schemaVersion": 7,
+    "includes": {
+      "company": true,
+      "agents": true,
+      "projects": false,
+      "issues": false,
+      "skills": false
+    },
+    "company": {
+      "path": "COMPANY.md",
+      "name": "recruitment",
+      "requireBoardApprovalForNewAgents": true
+    },
+    "agents": [
+      {
+        "slug": "r1",
+        "name": "استراتژیست استخدام",
+        "path": "agents/r1/AGENTS.md",
+        "role": "worker",
+        "reportsToSlug": null,
+        "adapterType": "claude_local",
+        "adapterConfig": {
+          "model": "claude-haiku-5-5",
+          "maxTurnsPerRun": 12
+        },
+        "budgetMonthlyCents": 0,
+        "sourceSkills": [
+          "identify-assumptions-new",
+          "first-principles"
+        ]
+      },
+      {
+        "slug": "r2",
+        "name": "نویسندهٔ آگهی و برند کارفرما",
+        "path": "agents/r2/AGENTS.md",
+        "role": "worker",
+        "reportsToSlug": null,
+        "adapterType": "claude_local",
+        "adapterConfig": {
+          "model": "claude-haiku-5-5",
+          "maxTurnsPerRun": 12
+        },
+        "budgetMonthlyCents": 0,
+        "sourceSkills": [
+          "marketing-skills:copywriting",
+          "ui-brand"
+        ]
+      },
+      {
+        "slug": "r3",
+        "name": "مدیر انتشار و جذب",
+        "path": "agents/r3/AGENTS.md",
+        "role": "worker",
+        "reportsToSlug": null,
+        "adapterType": "claude_local",
+        "adapterConfig": {
+          "model": "claude-haiku-5-5",
+          "maxTurnsPerRun": 12
+        },
+        "budgetMonthlyCents": 0,
+        "sourceSkills": [
+          "marketing-skills:social",
+          "marketing-skills:analytics"
+        ]
+      },
+      {
+        "slug": "r4",
+        "name": "طراح پرسشنامهٔ پویا (بخش طراحی‌شده)",
+        "path": "agents/r4/AGENTS.md",
+        "role": "worker",
+        "reportsToSlug": null,
+        "adapterType": "claude_local",
+        "adapterConfig": {
+          "model": "claude-haiku-5-5",
+          "maxTurnsPerRun": 12
+        },
+        "budgetMonthlyCents": 0,
+        "sourceSkills": [
+          "grilling",
+          "fp-qmark-to-robot",
+          "agent-skills:frontend-ui-engineering",
+          "ui-before-after"
+        ]
+      },
+      {
+        "slug": "r5",
+        "name": "تحلیل‌گر غربال",
+        "path": "agents/r5/AGENTS.md",
+        "role": "worker",
+        "reportsToSlug": null,
+        "adapterType": "claude_local",
+        "adapterConfig": {
+          "model": "claude-haiku-5-5",
+          "maxTurnsPerRun": 12
+        },
+        "budgetMonthlyCents": 0,
+        "sourceSkills": [
+          "analytics-office:explore-my-data",
+          "marketing-skills:copywriting"
+        ]
+      },
+      {
+        "slug": "r6",
+        "name": "مصاحبه‌گر",
+        "path": "agents/r6/AGENTS.md",
+        "role": "worker",
+        "reportsToSlug": null,
+        "adapterType": "claude_local",
+        "adapterConfig": {
+          "model": "claude-haiku-5-5",
+          "maxTurnsPerRun": 12
+        },
+        "budgetMonthlyCents": 0,
+        "sourceSkills": [
+          "grilling"
+        ]
+      },
+      {
+        "slug": "r7",
+        "name": "ارزیاب KPI",
+        "path": "agents/r7/AGENTS.md",
+        "role": "worker",
+        "reportsToSlug": null,
+        "adapterType": "claude_local",
+        "adapterConfig": {
+          "model": "claude-haiku-5-5",
+          "maxTurnsPerRun": 12
+        },
+        "budgetMonthlyCents": 0,
+        "sourceSkills": [
+          "analytics-office:kpi-contract",
+          "analytics-office:review-my-dashboard"
+        ]
+      },
+      {
+        "slug": "r8",
+        "name": "حقوقی و آنبوردینگ",
+        "path": "agents/r8/AGENTS.md",
+        "role": "worker",
+        "reportsToSlug": null,
+        "adapterType": "claude_local",
+        "adapterConfig": {
+          "model": "claude-haiku-5-5",
+          "maxTurnsPerRun": 12
+        },
+        "budgetMonthlyCents": 0,
+        "sourceSkills": [
+          "anthropic-skills:docx"
+        ]
+      },
+      {
+        "slug": "r9",
+        "name": "مسیریاب پروژه‌ها (ارجاع به پروژه‌های خودت)",
+        "path": "agents/r9/AGENTS.md",
+        "role": "worker",
+        "reportsToSlug": null,
+        "adapterType": "claude_local",
+        "adapterConfig": {
+          "model": "claude-haiku-5-5",
+          "maxTurnsPerRun": 12
+        },
+        "budgetMonthlyCents": 0,
+        "sourceSkills": [
+          "first-principles",
+          "marketing-skills:copywriting",
+          "marketing-skills:social",
+          "grilling",
+          "anthropic-skills:docx",
+          "marketing-skills:sales-enablement"
+        ]
+      }
+    ]
+  },
+  "files": {
+    "COMPANY.md": "# recruitment\nساخته‌شده از c4-org/recruitment.c4 — ویرایش نکن؛ نقشه را عوض کن.\n",
+    "agents/r1/AGENTS.md": "# استراتژیست استخدام\nskillها: identify-assumptions-new, first-principles\n",
+    "agents/r2/AGENTS.md": "# نویسندهٔ آگهی و برند کارفرما\nskillها: marketing-skills:copywriting, ui-brand\n",
+    "agents/r3/AGENTS.md": "# مدیر انتشار و جذب\nskillها: marketing-skills:social, marketing-skills:analytics\n",
+    "agents/r4/AGENTS.md": "# طراح پرسشنامهٔ پویا (بخش طراحی‌شده)\nskillها: grilling, fp-qmark-to-robot, agent-skills:frontend-ui-engineering, ui-before-after\n",
+    "agents/r5/AGENTS.md": "# تحلیل‌گر غربال\nskillها: analytics-office:explore-my-data, marketing-skills:copywriting\n",
+    "agents/r6/AGENTS.md": "# مصاحبه‌گر\nskillها: grilling\n",
+    "agents/r7/AGENTS.md": "# ارزیاب KPI\nskillها: analytics-office:kpi-contract, analytics-office:review-my-dashboard\n",
+    "agents/r8/AGENTS.md": "# حقوقی و آنبوردینگ\nskillها: anthropic-skills:docx\n",
+    "agents/r9/AGENTS.md": "# مسیریاب پروژه‌ها (ارجاع به پروژه‌های خودت)\nskillها: first-principles, marketing-skills:copywriting, marketing-skills:social, grilling, anthropic-skills:docx, marketing-skills:sales-enablement\n"
+  }
+}
