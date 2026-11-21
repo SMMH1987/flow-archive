@@ -1,4 +1,4 @@
-# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 3 — 2026-11-21 12:55 UTC (13:55 برلین): + ۳ ایجنت طراح ورک‌فلو
+# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 4 — 2026-11-21 16:20 برلین: + ایجنت نویسندهٔ دستورالعمل (instruction_writer)
 # ساختار: مدیریت ارشد (board → ceo → سرپرست‌های h_*) → بخش (div) → دپارتمان (unit = واحد در org-global.c4) → ایجنت.
 # محتوا از تحقیق ۴ پژوهشگر (research/paperclip/global-org/part-a..d.json، ۲۱ نوامبر) + کاتالوگ ۴۴۵ ایجنت Paperclip؛ هر ایجنت sources دارد.
 # سیاست مدل (تأیید Siax، 2026-11-21 12:54 UTC): فقط ceo روی Opus؛ سرپرست‌ها Sonnet؛ کار ساده مستقیم به کارگر Haiku؛ برنامه‌ریز پویا فقط یک بار در شروع فکر می‌کند.
@@ -1559,6 +1559,20 @@ agents:
   outputs: [bpmn_validator, agent_governor]
   skills: [bpmn, likec4]
   sources: ['catalog:agency-agents/Agents Orchestrator']
+- id: instruction_writer
+  div: capability
+  unit: process
+  n: نویسندهٔ دستورالعمل ایجنت‌ها
+  en: Agent Instruction Writer
+  r: h_capability
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [برای هر نقش تازه یا تغییرکرده AGENTS.md کوتاه از روی org-agents.yaml می‌سازد, دستورالعمل‌های موجود را با قالب و قوانین می‌سنجد و ایراد گزارش می‌دهد, متن نهایی را برای تأیید انسان می‌فرستد و فقط بعد از تأیید وارد Paperclip می‌شود]
+  inputs: [wf_agent_mapper, h_capability, agent_governor]
+  outputs: [h_capability, agent_governor]
+  skills: [agent-instructions]
+  sources: ['https://docs.paperclip.ing/guides/org/agents', 'https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices', 'https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf']
 - id: bpmn_validator
   div: capability
   unit: process

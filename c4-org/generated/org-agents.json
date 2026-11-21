@@ -4284,6 +4284,41 @@
    "cc": null
   },
   {
+   "id": "instruction_writer",
+   "n": "نویسندهٔ دستورالعمل ایجنت‌ها",
+   "t": "Agent Instruction Writer",
+   "tm": "مدیریت فرایند (BPM)",
+   "r": "h_capability",
+   "k": "capability",
+   "mode": "gate",
+   "m": "Sonnet",
+   "ir": false,
+   "s": [
+    "agent-instructions"
+   ],
+   "tasks": [
+    "برای هر نقش تازه یا تغییرکرده AGENTS.md کوتاه از روی org-agents.yaml می‌سازد",
+    "دستورالعمل‌های موجود را با قالب و قوانین می‌سنجد و ایراد گزارش می‌دهد",
+    "متن نهایی را برای تأیید انسان می‌فرستد و فقط بعد از تأیید وارد Paperclip می‌شود"
+   ],
+   "inp": [
+    "wf_agent_mapper",
+    "h_capability",
+    "agent_governor"
+   ],
+   "outp": [
+    "h_capability",
+    "agent_governor"
+   ],
+   "src": [
+    "https://docs.paperclip.ing/guides/org/agents",
+    "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+    "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf"
+   ],
+   "lvl": "agent",
+   "cc": null
+  },
+  {
    "id": "bpmn_validator",
    "n": "بازبین BPMN",
    "t": "BPMN Style Validator",
