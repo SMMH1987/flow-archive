@@ -1,4 +1,4 @@
-# پروندهٔ «استخدام» — مدل برنامه‌ریز پویا (ایدهٔ CMMN + orchestrator) — نسخه 1 — 2026-11-21 13:05 UTC (14:05 برلین)
+# پروندهٔ «استخدام» — مدل برنامه‌ریز پویا (ایدهٔ CMMN + orchestrator) — نسخه 3 — 2026-11-21 18:10 برلین: هر سؤال پاسخ پیشنهادی با منبع (suggest/src، Siax ۱۷:۳۵ برلین)؛ نسخه 2: + قدم صفر intake (روشن کردن نیت، قاعدهٔ Siax «تو همه درخواست اول شفاف و کامل بشه نیت و درخواست»)
 # تأیید Siax 2026-11-21 12:54 UTC: کارهای مجاز + شرط در این فایل؛ برنامه‌ریز فقط از همین‌ها مسیر می‌چیند؛ Siax یک بار کل برنامه را تأیید می‌کند.
 # برنامه‌ریز ساخته‌نشده نمی‌سازد: هر کار باید id این فایل باشد. ایجنت‌ها از c4-org/org-agents.yaml.
 # اجرای آزمایشی: python tools/plan_case.py c4-org/cases/hire.yaml --answers '{"country":"IR",...}'
@@ -18,6 +18,38 @@ questionnaire:                # برنامه‌ریز فقط اینها را م�
   - {id: ad_budget_toman, q: "بودجهٔ آگهی پولی (تومان، ۰ = فقط رایگان)؟", example: 0}
   - {id: deadline_days, q: "تا چند روز دیگر؟", example: 30}
   - {id: gender_any, q: "برای کارجوی آقا در ایران بررسی نظام‌وظیفه لازم است؟", options: [yes, no]}
+
+# قدم صفر (هر پرونده): ایجنت intake_clarifier این سؤال‌ها را می‌پرسد. هر سؤال پیش‌فرض و «چرا» دارد؛ جواب خالی = پیش‌فرض (به‌عنوان «فرض» در خلاصه علامت می‌خورد).
+# هر سؤال یک پاسخ پیشنهادی بر پایهٔ استاندارد/نمونهٔ موفق دارد (suggest + src؛ بدون منبع = «بدون منبع»). شما فقط تأیید یا عوض می‌کنید.
+# سؤال با default خودکار فرض می‌شود؛ سؤال فقط با suggest باید صریح قبول شود.
+# فقط اگر جوابی مبهم بود سؤال تکمیلی (حداکثر ۳ دور). خروجی = خلاصهٔ نیت که Siax با تیک تأیید می‌کند؛ برنامه‌ریز فقط از روی خلاصهٔ تأییدشده تسک می‌سازد.
+# منابع: LinkedIn Hiring Manager Intake Form، Greenhouse، NVIDIA AI-Q Clarifier، IntentRL (research/paperclip/tests/HIRE-CEO-ASSISTANT-TEST.md)
+intake:
+  max_rounds: 3
+  questions:
+    - {id: why_now,      q: "چرا الان این نیرو لازم است؟ چه مشکلی را حل می‌کند؟", why: "نیت اصلی؛ همهٔ معیارها از این می‌آید", default: "", suggest: "یک جمله: چه کاری الان انجام نمی‌شود یا کند است و هزینه‌اش چیست", src: "LinkedIn Hiring Manager Intake Form (business need)"}
+    - {id: success_90,   q: "در ۹۰ روز اول چه دو نتیجه‌ای «موفق» حساب می‌شود؟", why: "معیار غربال و مصاحبه", default: "", suggest: "دو نتیجهٔ قابل‌اندازه‌گیری تا روز ۹۰", src: "Greenhouse: success in first 90 days · SHRM performance goals (SMART)"}
+    - {id: daily_tasks,  q: "سه کار اصلی روزانه؟", why: "شرح شغل", default: "", suggest: "۳ کار با فعل مشخص، به ترتیب زمان صرف‌شده", src: "SHRM: How to write a job description (essential functions)"}
+    - {id: must_skills,  q: "مهارت‌های ضروری؟", why: "فیلتر رزومه", default: "", suggest: "حداکثر ۵ مهارت که بدون آن‌ها کار انجام نمی‌شود", src: "Greenhouse: must-have vs nice-to-have · SHRM job description"}
+    - {id: nice_skills,  q: "مهارت‌های خوب‌است‌داشته‌باشد؟", why: "رتبه‌بندی", default: "ندارد", src: "Greenhouse: must-have vs nice-to-have"}
+    - {id: red_flags,    q: "خط قرمزها (رد فوری)؟", why: "جلوگیری از وقت تلف‌شده", default: "بی‌دقتی، نداشتن رازداری", src: "Greenhouse: knock-out criteria"}
+    - {id: experience,   q: "سطح و سابقه؟", why: "آزمون و حقوق", default: "میانی، ۲ تا ۴ سال", src: "LinkedIn Intake Form (level)"}
+    - {id: work_mode,    q: "حضوری، دورکار یا ترکیبی؟ کجا؟", why: "کانال آگهی", default: "تهران، ترکیبی", src: "LinkedIn Intake Form (location/remote)"}
+    - {id: pay_range,    q: "بازهٔ حقوق و مزایا؟", why: "آگهی و پیشنهاد", default: "", suggest: "بازه با میانهٔ بازار همین نقش و شهر (برنامه با مقایسهٔ حقوق بررسی می‌کند)", src: "SHRM: pay range transparency · بدون منبع بازار ایران (بررسی در قدم مقایسهٔ حقوق)"}
+    - {id: ad_budget,    q: "بودجهٔ آگهی پولی؟", why: "انتخاب کانال", default: "۰", src: "بدون منبع (تصمیم بودجهٔ شما)"}
+    - {id: start_by,     q: "تا کی باید شروع کند؟", why: "زمان‌بندی", default: "۳۰ روز", src: "LinkedIn Intake Form (timeline)"}
+    - {id: interviewers, q: "چه کسی مصاحبه می‌کند و چند مرحله؟", why: "برنامهٔ مصاحبه", default: "مدیر مستقیم، ۲ مرحله", src: "Google re:Work structured interviewing (هیئت مصاحبهٔ ثابت)"}
+    - {id: work_test,    q: "آزمون کاری لازم است؟ چه نوع؟", why: "ارزیابی واقعی", default: "بله، یک کار کوتاه واقعی", src: "Schmidt & Hunter 1998: work sample = پیش‌بین قوی عملکرد"}
+    - {id: referral_ok,  q: "نیروی داخلی یا معرفی آشنا در نظر هست؟", why: "مسیر معرفی", default: "نه", src: "SHRM: employee referral programs"}
+    - {id: military,     q: "بررسی نظام‌وظیفه برای آقایان؟", why: "قدم قانونی ایران", default: "بله", src: "قانون خدمت وظیفهٔ عمومی ایران (بدون بررسی حقوق‌دان)"}
+    - {id: confidential, q: "چه چیزی را نباید آگهی بگوید (محرمانه)؟", why: "انتشار امن", default: "نام مشتری‌ها و عدد فروش", src: "بدون منبع (سیاست داخلی)"}
+
+# پیش‌تنظیم‌ها: پاسخ آمادهٔ intake و پرسش‌نامه برای یک نقش (همه قابل تغییر قبل از تأیید)
+presets:
+  ceo_assistant:
+    name: "دستیار مدیرعامل (شرکت هوش مصنوعی و فروش آنلاین)"
+    intake: {why_now: "وقت مدیرعامل صرف کارهای روزمره می‌شود", success_90: "تقویم و ایمیل مدیرعامل مرتب؛ گزارش هفتگی فروش آماده", daily_tasks: "هماهنگی جلسات، پیگیری تیم‌ها، تهیهٔ گزارش و ارائه", must_skills: "مدیریت زمان، نوشتن فارسی و انگلیسی خوب، Excel/Sheets، ابزارهای هوش مصنوعی", nice_skills: "آشنایی با فروشگاه آنلاین، CRM، مقدمات داده", red_flags: "بی‌دقتی در نوشتن، نداشتن رازداری", experience: "میانی، ۲ تا ۴ سال", work_mode: "تهران، ترکیبی", pay_range: "۳۰ تا ۴۰ میلیون تومان + بیمه", ad_budget: "۰", start_by: "۳۰ روز", interviewers: "خود مدیرعامل، ۲ مرحله", work_test: "بله: یک گزارش کوتاه از دادهٔ فروش نمونه", referral_ok: "نه", military: "بله", confidential: "نام مشتری‌ها و عدد فروش"}
+    answers: {role: "دستیار مدیرعامل", country: IR, city: "تهران، ترکیبی", seniority: mid, salary_toman: 35000000, ad_budget_toman: 0, deadline_days: 30, gender_any: "yes"}
 
 # کارهای مجاز. when = شرط فعال شدن (روی پاسخ‌ها)؛ after = پیش‌نیاز؛ gate = تأیید انسان؛ est = برآورد هزینه (USD)
 tasks:

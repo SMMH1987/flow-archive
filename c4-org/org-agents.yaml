@@ -1,4 +1,4 @@
-# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 6.1 — 2026-11-21 17:25 برلین (اولویت و اثر حذف هر قدم): + بهینه‌ساز هزینه و فرایند (cost_optimizer) با ۳ سناریوی کم/متوسط/حداکثر و ورک‌فلو «بهینه‌سازی هزینه با سه سناریو»؛ نسخه 5: میز تحقیق داخلی
+# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 6.2 — 2026-11-21 17:50 برلین: + intake_clarifier (قدم صفر هر پرونده)؛ 6.1 اولویت و اثر حذف هر قدم: + بهینه‌ساز هزینه و فرایند (cost_optimizer) با ۳ سناریوی کم/متوسط/حداکثر و ورک‌فلو «بهینه‌سازی هزینه با سه سناریو»؛ نسخه 5: میز تحقیق داخلی
 # ساختار: مدیریت ارشد (board → ceo → سرپرست‌های h_*) → بخش (div) → دپارتمان (unit = واحد در org-global.c4) → ایجنت.
 # محتوا از تحقیق ۴ پژوهشگر (research/paperclip/global-org/part-a..d.json، ۲۱ نوامبر) + کاتالوگ ۴۴۵ ایجنت Paperclip؛ هر ایجنت sources دارد.
 # سیاست مدل (تأیید Siax، 2026-11-21 12:54 UTC): فقط ceo روی Opus؛ سرپرست‌ها Sonnet؛ کار ساده مستقیم به کارگر Haiku؛ برنامه‌ریز پویا فقط یک بار در شروع فکر می‌کند.
@@ -1644,6 +1644,21 @@ agents:
   skills: [finops, model-routing, process-mining]
   rules: [مدل CEO فقط Opus؛ سرپرست‌ها Sonnet؛ کار ساده Haiku (سیاست تأییدشده ۲۰۲۶-۱۱-۲۱), هیچ سناریویی gate انسانی یا قدم بیرونی بدون gate را حذف نمی‌کند, هر عدد با منبع: هزینهٔ واقعی Paperclip یا برآورد علامت‌دار]
   sources: ['https://www.finops.org/wg/optimizing-genai-usage/', 'https://www.finops.org/insights/ai-model-selection/', 'https://www.splunk.com/en_us/blog/artificial-intelligence/reduce-agent-cost-by-model-routing.html', 'https://www.datadoghq.com/blog/how-datadog-saves-money-by-optimizing-ai-usage', 'https://docs.celonis.com/en/analysis---conformance-checker.html']
+- id: intake_clarifier
+  div: capability
+  unit: process
+  n: روشن‌کنندهٔ نیت
+  en: Intake Clarifier
+  r: h_capability
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [قدم صفر هر پرونده: سؤال‌های ثابت intake پرونده را با پیش‌فرض و «چرا» می‌پرسد, فقط برای جواب مبهم سؤال تکمیلی می‌پرسد (حداکثر ۳ دور), خلاصهٔ نیت می‌سازد (نیت، معیار موفقیت، ضروری/غیرضروری، بودجه، مهلت، محدودیت‌ها، فرض‌ها), خلاصه را برای تیک تأیید انسان می‌فرستد؛ برنامه‌ریز فقط از خلاصهٔ تأییدشده تسک می‌سازد]
+  inputs: [ceo, h_hr]
+  outputs: [h_hr, cost_optimizer]
+  skills: [intake-interview]
+  rules: [سؤال تازه بیرون از فهرست پرونده فقط به‌صورت پیگیری جواب مبهم, هیچ جواب را حدس نمی‌زند؛ پیش‌فرض را «فرض» علامت می‌زند]
+  sources: ['https://docs.nvidia.com/aiq-blueprint/2.2.1/architecture/agents/clarifier.html', 'https://www.greenhouse.com/blog/how-to-source-top-talent-questions-to-ask-hiring-managers', 'https://arxiv.org/html/2602.03468v1']
 workflows:
 - name: بهینه‌سازی هزینه با سه سناریو
   dept: capability

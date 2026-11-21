@@ -4496,6 +4496,43 @@
    ],
    "lvl": "agent",
    "cc": null
+  },
+  {
+   "id": "intake_clarifier",
+   "n": "روشن‌کنندهٔ نیت",
+   "t": "Intake Clarifier",
+   "tm": "مدیریت فرایند (BPM)",
+   "r": "h_capability",
+   "k": "capability",
+   "mode": "gate",
+   "m": "Sonnet",
+   "ir": false,
+   "s": [
+    "intake-interview"
+   ],
+   "tasks": [
+    {
+     "قدم صفر هر پرونده": "سؤال‌های ثابت intake پرونده را با پیش‌فرض و «چرا» می‌پرسد"
+    },
+    "فقط برای جواب مبهم سؤال تکمیلی می‌پرسد (حداکثر ۳ دور)",
+    "خلاصهٔ نیت می‌سازد (نیت، معیار موفقیت، ضروری/غیرضروری، بودجه، مهلت، محدودیت‌ها، فرض‌ها)",
+    "خلاصه را برای تیک تأیید انسان می‌فرستد؛ برنامه‌ریز فقط از خلاصهٔ تأییدشده تسک می‌سازد"
+   ],
+   "inp": [
+    "ceo",
+    "h_hr"
+   ],
+   "outp": [
+    "h_hr",
+    "cost_optimizer"
+   ],
+   "src": [
+    "https://docs.nvidia.com/aiq-blueprint/2.2.1/architecture/agents/clarifier.html",
+    "https://www.greenhouse.com/blog/how-to-source-top-talent-questions-to-ask-hiring-managers",
+    "https://arxiv.org/html/2602.03468v1"
+   ],
+   "lvl": "agent",
+   "cc": null
   }
  ],
  "workflows": [
