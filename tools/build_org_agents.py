@@ -27,6 +27,10 @@ def build():
     src = yaml.safe_load(AG.read_text(encoding='utf-8'))
     err, out = [], [dict(id='board', n='هیئت‌مدیره', t='تصویب راهبرد، بودجه و تصمیم‌های بزرگ (انسان)', r=None, k='exec', mode='gate', m='—', lvl='board')]
     for a in src['agents']:
+        # list items must be plain text; an unquoted "x: y" inside [..] becomes a mapping and prints as [object Object]
+        for f in ('tasks', 'rules', 'inputs', 'outputs', 'skills', 'sources'):
+            for i, v in enumerate(a.get(f) or []):
+                if not isinstance(v, str): err.append(f"{a['id']}.{f}[{i}]: متن نیست (احتمالاً «: » بدون نقل‌قول) {v!r}")
         head = a['id'] == 'ceo' or a['id'].startswith('h_')
         if not head and a['unit'] not in units: err.append(f"{a['id']}: واحد ناشناخته {a['unit']}")
         t = (CSUITE.get(a['div'], '') + ' · ' if a['id'].startswith('h_') else '') + (a.get('en') or '')

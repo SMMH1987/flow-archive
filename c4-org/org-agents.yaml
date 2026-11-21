@@ -1642,7 +1642,7 @@ agents:
   inputs: [process_improver, retro_analyst, h_finance, agent_governor]
   outputs: [h_capability, ceo, instruction_writer]
   skills: [finops, model-routing, process-mining]
-  rules: [مدل CEO فقط Opus؛ سرپرست‌ها Sonnet؛ کار ساده Haiku (سیاست تأییدشده ۲۰۲۶-۱۱-۲۱), هیچ سناریویی gate انسانی یا قدم بیرونی بدون gate را حذف نمی‌کند, هر عدد با منبع: هزینهٔ واقعی Paperclip یا برآورد علامت‌دار]
+  rules: [مدل CEO فقط Opus؛ سرپرست‌ها Sonnet؛ کار ساده Haiku (سیاست تأییدشده ۲۰۲۶-۱۱-۲۱), هیچ سناریویی gate انسانی یا قدم بیرونی بدون gate را حذف نمی‌کند, هر عدد با منبع - هزینهٔ واقعی Paperclip یا برآورد علامت‌دار]
   sources: ['https://www.finops.org/wg/optimizing-genai-usage/', 'https://www.finops.org/insights/ai-model-selection/', 'https://www.splunk.com/en_us/blog/artificial-intelligence/reduce-agent-cost-by-model-routing.html', 'https://www.datadoghq.com/blog/how-datadog-saves-money-by-optimizing-ai-usage', 'https://docs.celonis.com/en/analysis---conformance-checker.html']
 - id: intake_clarifier
   div: capability
@@ -1653,7 +1653,7 @@ agents:
   mode: gate
   m: Sonnet
   ir: false
-  tasks: [قدم صفر هر پرونده: سؤال‌های ثابت intake پرونده را با پیش‌فرض و «چرا» می‌پرسد, فقط برای جواب مبهم سؤال تکمیلی می‌پرسد (حداکثر ۳ دور), خلاصهٔ نیت می‌سازد (نیت، معیار موفقیت، ضروری/غیرضروری، بودجه، مهلت، محدودیت‌ها، فرض‌ها), خلاصه را برای تیک تأیید انسان می‌فرستد؛ برنامه‌ریز فقط از خلاصهٔ تأییدشده تسک می‌سازد]
+  tasks: [قدم صفر هر پرونده - سؤال‌های ثابت intake پرونده را با پیش‌فرض و «چرا» می‌پرسد, فقط برای جواب مبهم سؤال تکمیلی می‌پرسد (حداکثر ۳ دور), خلاصهٔ نیت می‌سازد (نیت، معیار موفقیت، ضروری/غیرضروری، بودجه، مهلت، محدودیت‌ها، فرض‌ها), خلاصه را برای تیک تأیید انسان می‌فرستد؛ برنامه‌ریز فقط از خلاصهٔ تأییدشده تسک می‌سازد]
   inputs: [ceo, h_hr]
   outputs: [h_hr, cost_optimizer]
   skills: [intake-interview]
