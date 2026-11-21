@@ -25,7 +25,7 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 describe("manifest", () => {
   it("asks only for read + create-task + page/sidebar", () => {
     expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.6.2");
+    expect(manifest.version).toBe("0.6.3");
   });
 });
 
@@ -295,5 +295,25 @@ describe("data hygiene", () => {
     for (const a of DATA.org.agents as any[]) for (const f of ["tasks", "rules", "inputs", "outputs", "skills", "sources"]) (a[f] ?? []).forEach((v: unknown, i: number) => { if (typeof v !== "string") bad.push(`${a.id}.${f}[${i}]`); });
     expect(bad).toEqual([]);
     expect(buildInstructions((DATA.org.agents as any[]).find((a) => a.id === "intake_clarifier"), new Map((DATA.org.agents as any[]).map((a) => [a.id, a])))).not.toContain("[object Object]");
+  });
+});
+
+describe("real hire test fixes (2026-11-21)", () => {
+  const live = [{ ...base, id: "L1", name: "مدیر منابع انسانی", role: "manager", title: "", reportsTo: null, adapterConfig: {} }];
+  const ans = { country: "IR", seniority: "mid", ad_budget_toman: 0, gender_any: "yes" };
+  it("each subtask names its prerequisite tasks and asks for output in the last comment", async () => {
+    const h = await boot(live, ["issues.read"]);
+    await h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: ans, approved: true, ...OKI });
+    const iss = await h.ctx.issues.list({ companyId: "c1", limit: 100, offset: 0 } as any);
+    const ad = iss.find((i: any) => i.title.includes("متن آگهی"))!;
+    expect(ad.description).toContain("نوشتن شرح شغل"); expect(ad.description).toContain("کامنت آخر");
+    const jd = iss.find((i: any) => i.title.includes("نوشتن شرح شغل"))!;
+    expect(ad.description).toContain(jd.id);
+  });
+  it("templates with broken encoding are hidden", async () => {
+    const h = await boot();
+    await h.ctx.state.set({ scopeKind: "company", scopeId: "c1", stateKey: "templates" }, [{ caseId: "hire", name: "Ø§Ø³ØªØ®Ø¯Ø§Ù…", answers: {}, steps: 15, gates: 4, est_usd: 0.45, parentId: "p", at: "2026-11-21" }, { caseId: "hire", name: "استخدام یک نفر", answers: {}, steps: 15, gates: 4, est_usd: 0.45, parentId: "q", at: "2026-11-21" }]);
+    const t: any = await h.getData("templates", { companyId: "c1" });
+    expect(t.map((x: any) => x.parentId)).toEqual(["q"]);
   });
 });

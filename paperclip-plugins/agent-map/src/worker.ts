@@ -55,9 +55,12 @@ async function liveAgents(ctx: any, companyId: string) {
 }
 
 // The user's own past cases of this kind (plugin state only; reading Paperclip issues would need issues.read, not approved yet)
+// Real test 2026-11-21: a saved template came back with broken encoding (mojibake). Hide such entries instead of showing them.
+export const brokenText = (v: unknown) => /\uFFFD|Ã.|Ø[\u0080-\u00FF]|Ù[\u0080-\u00FF]/.test(JSON.stringify(v ?? ""));
+export const cleanTemplates = (t: Template[]) => t.filter((x) => x && typeof x.caseId === "string" && !brokenText(x));
 async function pastCases(ctx: any, companyId: string, caseId: string) {
   if (!companyId) return [];
-  const t = ((await ctx.state.get({ scopeKind: "company", scopeId: companyId, stateKey: "templates" })) as Template[] | null) ?? [];
+  const t = cleanTemplates(((await ctx.state.get({ scopeKind: "company", scopeId: companyId, stateKey: "templates" })) as Template[] | null) ?? []);
   return t.filter((x) => x.caseId === caseId && x.intake).slice(0, 3).map((x) => ({ at: x.at, intake: x.intake! }));
 }
 
@@ -97,7 +100,7 @@ const plugin = definePlugin({
     ctx.data.register("templates", async (params) => {
       const companyId = String(params?.companyId ?? "");
       if (!companyId) return [];
-      return ((await ctx.state.get({ scopeKind: "company", scopeId: companyId, stateKey: "templates" })) as Template[] | null) ?? [];
+      return cleanTemplates(((await ctx.state.get({ scopeKind: "company", scopeId: companyId, stateKey: "templates" })) as Template[] | null) ?? []);
     });
     ctx.data.register("instructions", async (params) => {
       const a = ORG_BY.get(String(params?.agentId ?? ""));
@@ -133,14 +136,14 @@ const plugin = definePlugin({
         const issue = await ctx.issues.create({
           companyId, parentId: parent.id, status: "backlog",
           title: `${s.n}. ${s.gate ? "🔒 " : ""}${s.task}`,
-          description: `مسئول: ${ORG_BY.get(s.agent)?.n ?? s.agent} · مدل ایجنت: ${s.model} · سختی کار: ${s.difficulty} · حالت: ${s.mode}${s.gate ? "\nقبل از هر قدم بیرونی تأیید انسان لازم است." : ""}${agentId ? "" : "\nایجنت این نقش در Paperclip پیدا نشد؛ تسک بدون مسئول ماند."}`,
+          description: `${s.after.length ? "ورودی‌های این کار (اول این‌ها را بخوان؛ خروجی هر کدام در توضیح/کامنت آخر همان تسک است):\n" + s.after.map((d) => { const p = plan.steps.find((x) => x.id === d); return `- تسک ${p?.n ?? "?"}. ${p?.task ?? d} (شناسه ${ids.get(d) ?? "?"})`; }).join("\n") + "\nخروجی خودت را در کامنت آخر همین تسک بنویس تا تسک بعدی آن را بخواند.\n\n" : "خروجی خودت را در کامنت آخر همین تسک بنویس تا تسک بعدی آن را بخواند.\n\n"}خلاصهٔ نیت پرونده در تسک اصلی (والد) است.\nمسئول: ${ORG_BY.get(s.agent)?.n ?? s.agent} · مدل ایجنت: ${s.model} · سختی کار: ${s.difficulty} · حالت: ${s.mode}${s.gate ? "\nقبل از هر قدم بیرونی تأیید انسان لازم است." : ""}${agentId ? "" : "\nایجنت این نقش در Paperclip پیدا نشد؛ تسک بدون مسئول ماند."}`,
           ...(agentId ? { assigneeAgentId: agentId } : {}),
           blockedByIssueIds: s.after.map((d) => ids.get(d)).filter((x): x is string => !!x),
         });
         ids.set(s.id, issue.id); created.push({ step: s.id, issueId: issue.id, assigned: !!agentId });
       }
       const key = { scopeKind: "company" as const, scopeId: companyId, stateKey: "templates" };
-      const old = ((await ctx.state.get(key)) as Template[] | null) ?? [];
+      const old = cleanTemplates(((await ctx.state.get(key)) as Template[] | null) ?? []); // saving also drops broken entries
       const t: Template = { caseId: c.case, name: c.name, answers: plan.answers, intake: Object.fromEntries(brief.lines.filter((l) => l.a).map((l) => [l.id, l.a])), steps: plan.steps.length, gates: plan.gates, est_usd: plan.est_usd, parentId: parent.id, at: new Date().toISOString() };
       await ctx.state.set(key, [t, ...old].slice(0, 20));
       return { parentId: parent.id, created, unmapped: [...new Set(unmapped)], plan, template: t };
