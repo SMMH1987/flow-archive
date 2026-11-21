@@ -1,4 +1,4 @@
-// v0.5.1 · 2026-11-21 20:05 Berlin. +canvas-height check (0.7.1). v0.5.0 · 2026-11-21 18:00 Berlin. +step 0 intent brief; idea 2 trace. Full page test: the real React UI (src/ui/index.tsx) + the real worker (test harness) in Chromium.
+// v0.6.0 · 2026-11-21 20:45 Berlin. +run view checks (0.8.0). v0.5.1 · 2026-11-21 20:05 Berlin. +canvas-height check (0.7.1). v0.5.0 · 2026-11-21 18:00 Berlin. +step 0 intent brief; idea 2 trace. Full page test: the real React UI (src/ui/index.tsx) + the real worker (test harness) in Chromium.
 // Run: npm run test:ui   — prints PASS/FAIL per check, exit 1 on failure. Build output goes to tests/.tmp (git-ignored).
 import esbuild from "esbuild"; import fs from "node:fs"; import { createRequire } from "node:module";
 const { chromium } = createRequire(import.meta.url)(process.env.PW || "playwright");
@@ -69,6 +69,11 @@ await H.ctx.issues.createComment(jd.id, "شرح شغل: دستیار مدیرع�
 await p.click(".amx-runs-rf"); await p.waitForTimeout(800);
 const runs = (await p.textContent(".amx-runs").catch(() => "")) || "";
 ok(runs.includes("شرح شغل: دستیار مدیرعامل") && runs.includes("انجام شد") && runs.includes("1 از 15") && runs.includes("1 پیام کوتاه دیگر پنهان است"), "0.7: each step shows its status and the agent's answer beside it");
+await p.selectOption("#mk-v", "run"); await p.waitForTimeout(700);
+ok(await p.$eval("#mk-in", (el) => !!el.querySelector("#amx-run-slot .amx-runs") && !el.querySelector("iframe")), "0.8: «اجرای پرونده» in «نما» shows the live case list inside the map (no iframe)");
+ok((await p.$$(".amx-runs")).length === 1, "0.8: live case list rendered once (moved, not duplicated)");
+await p.selectOption("#mk-v", "org"); await p.waitForTimeout(500);
+ok(!!(await p.$(".amx-runs")) && !(await p.$("#amx-run-slot")), "0.8: back to chart, case list returns below the map");
 await p.screenshot({ path: "tests/ui-e2e.png", fullPage: true });
 ok(errs.length === 0, "no page errors " + errs.join(" | "));
 await br.close(); console.log(fail ? `${fail} FAILED` : "ALL PASS"); process.exit(fail ? 1 : 0);

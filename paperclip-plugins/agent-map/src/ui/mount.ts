@@ -1,4 +1,4 @@
-// v0.3.1 · 2026-11-21 20:05 Berlin. +canvas height fits its content (Siax 18:54 UTC: endless empty canvas). v0.3.0: budget alerts (idea 4), CSV export (idea 8). Mounts the agent-map engine (generated from the hub artifact's «موکاپ افزونه» tab) into a host element.
+// v0.4.1 · 2026-11-21 20:50 Berlin. Popups (#in-bk, Ctrl+K) are appended to <body>, outside .amx: give them the colour tokens too (they were transparent). v0.4.0: live case slot for the «اجرای پرونده» view. v0.3.1 · 2026-11-21 20:05 Berlin. +canvas height fits its content (Siax 18:54 UTC: endless empty canvas). v0.3.0: budget alerts (idea 4), CSV export (idea 8). Mounts the agent-map engine (generated from the hub artifact's «موکاپ افزونه» tab) into a host element.
 // Pure DOM, no React, so the same code runs in the plugin and in the browser test (tests/engine.e2e.mjs).
 import ENGINE from "../generated/engine.json" with { type: "json" };
 import { overBudget } from "../shared/scenario.js";
@@ -6,8 +6,8 @@ import { overBudget } from "../shared/scenario.js";
 export type LiveAgent = { id: string; name: string; title: string | null; reportsTo: string | null; status: string; model: string | null; skills: string[]; spentMonthlyCents: number; budgetMonthlyCents: number; cat: string; orgId: string | null };
 export type OrgPayload = { org: { cats: unknown; order: string[]; agents: unknown[]; workflows: unknown[] } };
 
-const TOKENS = `.amx{--bg:#f7f5f2;--card:#fff;--fg:#1d2230;--muted:#606a7a;--line:#e0ddd6;--you:#b5446e;--boss:#5b3fd0;--chip:#f0ede7;--body:"Vazirmatn",Tahoma,sans-serif;font-family:var(--body);color:var(--fg);direction:rtl;line-height:1.7}
-@media (prefers-color-scheme:dark){.amx{--bg:#13161c;--card:#1b2029;--fg:#e8eaf0;--muted:#9ba4b4;--line:#2d3440;--you:#e47aa0;--boss:#a08bff;--chip:#242a34}}
+const TOKENS = `.amx,.in-bk,.ck{--bg:#f7f5f2;--card:#fff;--fg:#1d2230;--muted:#606a7a;--line:#e0ddd6;--you:#b5446e;--boss:#5b3fd0;--chip:#f0ede7;--body:"Vazirmatn",Tahoma,sans-serif;font-family:var(--body);color:var(--fg);direction:rtl;line-height:1.7}
+@media (prefers-color-scheme:dark){.amx,.in-bk,.ck{--bg:#13161c;--card:#1b2029;--fg:#e8eaf0;--muted:#9ba4b4;--line:#2d3440;--you:#e47aa0;--boss:#a08bff;--chip:#242a34}}
 .amx .amx-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 16px 0}.amx select{font:inherit;padding:3px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg)}
 .amx .am-view{height:calc(100vh - 220px);min-height:480px;max-height:none;cursor:grab}.amx .am-view{padding-top:64px}
 .amx .am-over{box-shadow:0 0 0 2.5px hsl(0 70% 52%)!important}.amx .amx-warn{color:hsl(0 70% 48%);font-weight:700}
@@ -39,7 +39,10 @@ export function mountEngine(host: HTMLElement, data: OrgPayload, live: LiveAgent
 <span class="am-muted" id="amx-live">${live.length} ایجنت در Paperclip · ${matched} با چارت جور شد</span><span id="mk-pre" hidden></span></div><div id="p-mock">${E.html}</div>`;
   (window as any).__amLive = (A: any[], st: any) => overlay(A, live, st.c);
   (window as any).__amWF = data.org.workflows;
-  const js = E.js.replace(HOOK, "window.__amLive&&window.__amLive(A,st);" + HOOK);
+  // 0.8.0: the hub's «▶ اجرای پرونده» view shows a frozen SMMA-2 copy in an iframe; inside Paperclip the live case list (CaseRuns) is rendered into this slot instead.
+  const RUN_IFRAME = /'\+?'?<div class="am-muted"[^']*?<\/div><iframe title="اجرای پرونده"[^']*?<\/iframe>'/;
+  let js = E.js.replace(HOOK, "window.__amLive&&window.__amLive(A,st);" + HOOK);
+  if (RUN_IFRAME.test(js)) js = js.replace(RUN_IFRAME, `'<div id="amx-run-slot"></div>'`);
   new Function(js)();
   // idea 4: budget alert — red ring on every card at >=80% of its monthly budget, count in the top bar
   const over = new Set<string>();

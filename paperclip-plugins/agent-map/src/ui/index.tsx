@@ -1,6 +1,7 @@
-// v0.5.0 · 2026-11-21 17:55 Berlin. +step 0 intent brief (intake) before the planner; v0.4 run trace; v0.3 templates + scenario. Agent Map page: full engine (chart, mind map, list, workflows, instructions, guard, Ctrl+K)
+// v0.6.0 · 2026-11-21 20:45 Berlin. +live cases inside the «اجرای پرونده» view (portal). v0.5.0 · 2026-11-21 17:55 Berlin. +step 0 intent brief (intake) before the planner; v0.4 run trace; v0.3 templates + scenario. Agent Map page: full engine (chart, mind map, list, workflows, instructions, guard, Ctrl+K)
 // + dynamic case planner. Tasks are created only after the human ticks "approve" (action approvePlan).
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useHostContext, usePluginAction, usePluginData, type PluginPageProps, type PluginSidebarProps } from "@paperclipai/plugin-sdk/ui";
 import { mountEngine, type LiveAgent, type OrgPayload } from "./mount.js";
 import type { Plan, CaseDef } from "../shared/planner.js";
@@ -160,8 +161,17 @@ export function AgentMapPage(_props: PluginPageProps) {
     if (!ref.current || !org.data) return;
     return mountEngine(ref.current, org.data, agents, host.companyPrefix ?? "Paperclip");
   }, [org.data, agents, host.companyPrefix]);
+  // 0.8.0: when the «▶ اجرای پرونده» view is chosen in «نما», the engine leaves #amx-run-slot; the live case list renders there, otherwise below the map.
+  const [slot, setSlot] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const find = () => setSlot((cur) => { const n = el.querySelector<HTMLElement>("#amx-run-slot"); return n === cur ? cur : n; });
+    const mo = new MutationObserver(find); mo.observe(el, { childList: true, subtree: true }); find();
+    return () => mo.disconnect();
+  }, [org.data]);
   if (org.error) return <div dir="rtl">خطا: {org.error.message}</div>;
-  return <div><div ref={ref}>{org.loading ? "در حال بارگذاری…" : null}</div>{host.companyId ? <CaseRuns companyId={host.companyId} /> : null}{org.data && host.companyId ? <Planner companyId={host.companyId} cases={org.data.cases} /> : null}{org.data ? <Scenario org={org.data} live={agents} /> : null}{org.data && host.companyId ? <Trace companyId={host.companyId} live={agents} org={org.data} /> : null}</div>;
+  const runs = host.companyId ? <CaseRuns companyId={host.companyId} /> : null;
+  return <div><div ref={ref}>{org.loading ? "در حال بارگذاری…" : null}</div>{slot && runs ? createPortal(runs, slot) : runs}{org.data && host.companyId ? <Planner companyId={host.companyId} cases={org.data.cases} /> : null}{org.data ? <Scenario org={org.data} live={agents} /> : null}{org.data && host.companyId ? <Trace companyId={host.companyId} live={agents} org={org.data} /> : null}</div>;
 }
 
 export function AgentMapSidebarLink(_props: PluginSidebarProps) {
