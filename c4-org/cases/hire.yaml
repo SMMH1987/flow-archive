@@ -1,0 +1,44 @@
+# پروندهٔ «استخدام» — مدل برنامه‌ریز پویا (ایدهٔ CMMN + orchestrator) — نسخه 1 — 2026-11-21 13:05 UTC (14:05 برلین)
+# تأیید Siax 2026-11-21 12:54 UTC: کارهای مجاز + شرط در این فایل؛ برنامه‌ریز فقط از همین‌ها مسیر می‌چیند؛ Siax یک بار کل برنامه را تأیید می‌کند.
+# برنامه‌ریز ساخته‌نشده نمی‌سازد: هر کار باید id این فایل باشد. ایجنت‌ها از c4-org/org-agents.yaml.
+# اجرای آزمایشی: python tools/plan_case.py c4-org/cases/hire.yaml --answers '{"country":"IR",...}'
+# محتوای حقوقی و کانال‌های ایران: تأییدنشده (حق‌پرس / بررسی منبع)
+
+case: hire
+name: استخدام یک نفر
+owner: h_hr
+budget_cap_usd: 1.00          # سقف هزینهٔ توکن کل پرونده (پیش‌فرض؛ قابل تغییر در پاسخ‌ها)
+
+questionnaire:                # برنامه‌ریز فقط اینها را می‌پرسد؛ پاسخ خالی = پرسش از Siax (needs_input)
+  - {id: role, q: "چه نقشی؟", example: "برنامه‌نویس وردپرس"}
+  - {id: country, q: "کشور محل کار؟", options: [IR, other], example: IR}
+  - {id: city, q: "شهر یا دورکار؟", example: تهران}
+  - {id: seniority, q: "سطح؟", options: [junior, mid, senior]}
+  - {id: salary_toman, q: "حقوق ماهانه (تومان)؟", example: 40000000}
+  - {id: ad_budget_toman, q: "بودجهٔ آگهی پولی (تومان، ۰ = فقط رایگان)؟", example: 0}
+  - {id: deadline_days, q: "تا چند روز دیگر؟", example: 30}
+  - {id: gender_any, q: "برای کارجوی آقا در ایران بررسی نظام‌وظیفه لازم است؟", options: [yes, no]}
+
+# کارهای مجاز. when = شرط فعال شدن (روی پاسخ‌ها)؛ after = پیش‌نیاز؛ gate = تأیید انسان؛ est = برآورد هزینه (USD)
+tasks:
+  - {id: need_brief,      n: "خلاصهٔ نیاز و معیار موفقیت",          agent: h_hr,                   mode: ask,  m: Sonnet, est: 0.08, after: []}
+  - {id: job_desc,        n: "نوشتن شرح شغل",                       agent: hr_recruiter,           mode: auto, m: Haiku,  est: 0.01, after: [need_brief]}
+  - {id: salary_check,    n: "مقایسهٔ حقوق با بازار و بودجه",        agent: hr_payroll_prep,        mode: auto, m: Haiku,  est: 0.01, after: [need_brief]}
+  - {id: ir_labor_terms,  n: "شرایط قرارداد طبق قانون کار ایران",    agent: hr_ir_labor_docs,       mode: auto, m: Haiku,  est: 0.01, after: [need_brief], when: "country == 'IR'"}
+  - {id: ad_text,         n: "نوشتن متن آگهی",                      agent: hr_recruiter,           mode: auto, m: Haiku,  est: 0.01, after: [job_desc, salary_check]}
+  - {id: channel_scout,   n: "پیدا کردن کانال‌های آگهی",            agent: hr_recruiter,           mode: auto, m: Haiku,  est: 0.02, after: [job_desc],
+     channels: {IR: [جابینجا, جاب‌ویژن, ایران‌تلنت, ای‌استخدام, دیوار, کانال‌های تلگرام تخصصی], other: [LinkedIn, Indeed, Wellfound]}}   # تأییدنشده
+  - {id: ad_free_publish, n: "انتشار آگهی در کانال‌های رایگان",      agent: hr_recruiter,           mode: gate, m: Haiku,  est: 0.01, after: [ad_text, channel_scout], external: yes}
+  - {id: ad_paid_publish, n: "خرید و انتشار آگهی پولی",              agent: hr_recruiter,           mode: gate, m: Haiku,  est: 0.01, after: [ad_text, channel_scout], external: yes, when: "ad_budget_toman > 0"}
+  - {id: referral,        n: "درخواست معرفی از شبکهٔ آشنایان",       agent: hr_recruiter,           mode: gate, m: Haiku,  est: 0.01, after: [ad_text], external: yes, when: "seniority == 'senior'"}
+  - {id: cv_screen,       n: "غربال رزومه‌ها با معیارها",            agent: hr_recruiter,           mode: auto, m: Haiku,  est: 0.05, after: [ad_free_publish]}
+  - {id: tech_test,       n: "طراحی و بررسی آزمون فنی",              agent: hr_recruiter,           mode: auto, m: Sonnet, est: 0.08, after: [cv_screen], when: "seniority != 'junior'"}
+  - {id: interview,       n: "دعوت و برگزاری مصاحبه",                agent: h_hr,                   mode: ask,  m: Sonnet, est: 0.06, after: [cv_screen]}
+  - {id: military_check,  n: "بررسی وضعیت نظام‌وظیفه",              agent: hr_ir_labor_docs,       mode: ask,  m: Haiku,  est: 0.01, after: [interview], when: "country == 'IR' and gender_any == 'yes'"}
+  - {id: offer,           n: "پیشنهاد کتبی حقوق و شرایط",            agent: h_hr,                   mode: gate, m: Sonnet, est: 0.06, after: [interview], external: yes}
+  - {id: contract,        n: "قرارداد کار",                          agent: hr_ir_labor_docs,       mode: gate, m: Haiku,  est: 0.01, after: [offer], external: yes}
+  - {id: tamin_register,  n: "ثبت در لیست بیمهٔ تأمین اجتماعی",      agent: hr_ir_statutory_filings,mode: gate, m: Haiku,  est: 0.01, after: [contract], external: yes, when: "country == 'IR'"}
+  - {id: onboarding,      n: "ورود، حساب‌ها و آموزش",                agent: hr_onboarding,          mode: auto, m: Haiku,  est: 0.02, after: [contract]}
+
+# الگوهای ذخیره‌شده: برنامهٔ تأییدشده و موفق اینجا اضافه می‌شود تا دفعهٔ بعد بدون برنامه‌ریزی دوباره استفاده شود
+templates: []
