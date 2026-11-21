@@ -1,19 +1,61 @@
 {
  "cats": {
-  "exec": "مدیریت ارشد (هیئت‌مدیره + مدیرعامل + C-suite)",
-  "strategy": "راهبرد و حاکمیت",
-  "rnd": "تحقیق و توسعه / محصول",
-  "marketing": "بازاریابی",
-  "sales": "فروش",
-  "ops": "عملیات و زنجیره تأمین",
-  "service": "خدمات مشتری",
-  "hr": "منابع انسانی",
-  "tech": "فناوری اطلاعات",
-  "finance": "مالی و حسابداری",
-  "assets": "دارایی و امکانات",
-  "risk": "ریسک، انطباق و امنیت",
-  "legal": "حقوقی و روابط خارجی",
-  "capability": "توانمندی و بهبود سازمان"
+  "exec": [
+   "مدیریت ارشد (هیئت‌مدیره + مدیرعامل + C-suite)",
+   45
+  ],
+  "strategy": [
+   "راهبرد و حاکمیت",
+   45
+  ],
+  "rnd": [
+   "تحقیق و توسعه / محصول",
+   230
+  ],
+  "marketing": [
+   "بازاریابی",
+   20
+  ],
+  "sales": [
+   "فروش",
+   330
+  ],
+  "ops": [
+   "عملیات و زنجیره تأمین",
+   70
+  ],
+  "service": [
+   "خدمات مشتری",
+   180
+  ],
+  "hr": [
+   "منابع انسانی",
+   285
+  ],
+  "tech": [
+   "فناوری اطلاعات",
+   205
+  ],
+  "finance": [
+   "مالی و حسابداری",
+   130
+  ],
+  "assets": [
+   "دارایی و امکانات",
+   100
+  ],
+  "risk": [
+   "ریسک، انطباق و امنیت",
+   355
+  ],
+  "legal": [
+   "حقوقی و روابط خارجی",
+   255
+  ],
+  "capability": [
+   "توانمندی و بهبود سازمان",
+   155
+  ]
  },
  "order": [
   "exec",
@@ -88,7 +130,8 @@
     "https://github.com/paperclipai/paperclip",
     "https://www.anthropic.com/research/building-effective-agents"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": null
   },
   {
    "id": "strat_analyst",
@@ -128,7 +171,8 @@
     "catalog:product-compass-consulting/Risk Analyst",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "okr_planner",
@@ -168,7 +212,8 @@
     "catalog:product-compass-consulting/North Star Analyst",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "pmo_tracker",
@@ -206,7 +251,8 @@
     "catalog:aeon-intelligence/CEO",
     "https://github.com/paperclipai/paperclip"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "exec_brief",
@@ -243,7 +289,8 @@
     "catalog:product-compass-consulting/Meeting Analyst",
     "catalog:aeon-intelligence/CEO"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "mna_scout",
@@ -278,7 +325,8 @@
     "catalog:clawteam-capital/Growth Analyst",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "deal_diligence",
@@ -317,7 +365,8 @@
     "catalog:clawteam-capital/Buffett Analyst",
     "catalog:clawteam-capital/CEO"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "h_rnd",
@@ -356,7 +405,8 @@
     "catalog:agency-agents/VP of Engineering",
     "catalog:product-compass-consulting/VP of Product Strategy"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": "rnd"
   },
   {
    "id": "product_manager",
@@ -398,7 +448,8 @@
     "https://arxiv.org/html/2308.00352v7",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "user_researcher",
@@ -434,7 +485,8 @@
     "catalog:agency-agents/Feedback Synthesizer",
     "catalog:product-compass-consulting/Experiment Designer"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "research_scout",
@@ -472,7 +524,8 @@
     "catalog:taches-creative/Research Lead",
     "catalog:agency-agents/Trend Researcher"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ip_analyst",
@@ -506,7 +559,8 @@
     "catalog:kdense-science-lab/Dr. Kwame Asante",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ux_designer",
@@ -543,7 +597,8 @@
     "catalog:agency-agents/UI Designer",
     "catalog:redoak-review/Design Reviewer"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "software_architect",
@@ -580,7 +635,8 @@
     "catalog:fullstack-forge/Architecture Lead",
     "https://arxiv.org/html/2308.00352v7"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "dev_engineer",
@@ -616,7 +672,8 @@
     "catalog:agentsys-engineering/Staff Engineer",
     "https://arxiv.org/html/2308.00352v7"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "qa_release",
@@ -654,7 +711,8 @@
     "catalog:gstack/Release Engineer",
     "catalog:agentsys-engineering/QA & Release Lead"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "h_marketing",
@@ -695,7 +753,8 @@
     "catalog:product-compass-consulting/Director of Go-to-Market",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": "marketing"
   },
   {
    "id": "market_researcher",
@@ -736,7 +795,8 @@
     "catalog:product-compass-consulting/Competitive Analyst",
     "catalog:product-compass-consulting/Battlecard Writer"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "brand_guardian",
@@ -773,7 +833,8 @@
     "catalog:agency-agents/Brand Guardian",
     "catalog:product-compass-consulting/Brand Specialist"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "content_creator",
@@ -812,7 +873,8 @@
     "catalog:product-compass-consulting/Marketing Strategist",
     "https://www.hubspot.com/company-news/spring-2025-spotlight-breeze-agents"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "seo_specialist",
@@ -847,7 +909,8 @@
     "catalog:agency-agents/AI Citation Strategist",
     "https://www.hubspot.com/company-news/spring-2025-spotlight-breeze-agents"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "paid_media",
@@ -884,7 +947,8 @@
     "catalog:agency-agents/Paid Social Strategist",
     "catalog:agency-agents/Ad Creative Strategist"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "marketing_analytics",
@@ -924,7 +988,8 @@
     "catalog:agency-agents/Analytics Reporter",
     "catalog:product-compass-consulting/Experimentation Analyst"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "pricing_strategist",
@@ -961,7 +1026,8 @@
     "catalog:product-compass-consulting/Pricing Strategist",
     "catalog:product-compass-consulting/Business Model Analyst"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ad_compliance_ir",
@@ -997,7 +1063,8 @@
     "catalog:agency-agents/Healthcare Marketing Compliance Specialist (الگوی نقش، نه محتوای ایران)",
     "https://www.entekhab.ir/fa/news/866838/ارسال-پیامک-تبلیغاتی-و-اطلاع-رسانی-بدون-اجازه-ممنوع-است (unverified: fetch failed)"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "h_sales",
@@ -1036,7 +1103,8 @@
     "catalog:agency-agents/VP of Sales",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": "sales"
   },
   {
    "id": "sdr_outbound",
@@ -1075,7 +1143,8 @@
     "https://salesforce.com/sales/ai-sales-agent/guide/?bc=OTH",
     "https://www.hubspot.com/company-news/spring-2025-spotlight-breeze-agents"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "solutions_engineer",
@@ -1110,7 +1179,8 @@
     "catalog:agency-agents/Sales Engineer",
     "catalog:agency-agents/Government Digital Presales Consultant"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "proposal_writer",
@@ -1147,7 +1217,8 @@
     "catalog:agency-agents/Proposal Strategist",
     "catalog:agency-agents/Deal Strategist"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "account_manager",
@@ -1182,7 +1253,8 @@
    "src": [
     "catalog:agency-agents/Account Strategist"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "crm_ops",
@@ -1218,7 +1290,8 @@
     "catalog:agency-agents/Sales Data Extraction Agent",
     "catalog:agency-agents/Data Consolidation Agent"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "pipeline_forecaster",
@@ -1254,7 +1327,8 @@
     "catalog:agency-agents/Sales Coach",
     "https://salesforce.com/sales/ai-sales-agent/guide/?bc=OTH"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "partner_manager",
@@ -1292,7 +1366,8 @@
     "https://www.ifm.eng.cam.ac.uk/research/dstools/value-chain-/",
     "unverified: no channel/partner role found in the 16 catalog templates"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "h_ops",
@@ -1334,7 +1409,8 @@
     "https://en.wikipedia.org/wiki/Supply_chain_operations_reference",
     "https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": "ops"
   },
   {
    "id": "ops_demand_planner",
@@ -1372,7 +1448,8 @@
     "catalog:agency-agents/Supply Chain Strategist",
     "https://en.wikipedia.org/wiki/Supply_chain_operations_reference"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ops_sourcing_buyer",
@@ -1411,7 +1488,8 @@
     "https://en.wikipedia.org/wiki/Supply_chain_operations_reference",
     "https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ops_supplier_followup",
@@ -1444,7 +1522,8 @@
    "src": [
     "https://learn.microsoft.com/en-us/dynamics365/supply-chain/procurement/supplier-com-agent-overview"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ops_production_scheduler",
@@ -1481,7 +1560,8 @@
     "https://en.wikipedia.org/wiki/Supply_chain_operations_reference",
     "catalog:agency-agents/Studio Operations"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ops_inventory_logistics",
@@ -1521,7 +1601,8 @@
     "https://en.wikipedia.org/wiki/Supply_chain_operations_reference",
     "https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ops_quality_inspector",
@@ -1562,7 +1643,8 @@
     "catalog:agency-agents/QA Director",
     "catalog:taches-creative/Quality Auditor"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ops_ir_standards",
@@ -1596,7 +1678,8 @@
    "src": [
     "global-org-current.json"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ops_ir_customs",
@@ -1632,7 +1715,8 @@
     "global-org-current.json",
     "https://www.zoomit.ir/tech-iran/422304-how-to-work-with-trading-website/"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "h_service",
@@ -1672,7 +1756,8 @@
     "https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf",
     "catalog:agency-agents/VP of Operations"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": "service"
   },
   {
    "id": "svc_triage_router",
@@ -1709,7 +1794,8 @@
     "https://www.salesforce.com/blog/agent-to-human-handoff/",
     "https://www.copc.com/copc-standards/for-csps/"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "svc_support_responder",
@@ -1746,7 +1832,8 @@
     "https://www.salesforce.com/blog/agent-to-human-handoff/",
     "https://www.klarna.com/international/press/klarna-ai-assistant-handles-two-thirds-of-customer-service-chats-in-its-first-month/"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "svc_knowledge_curator",
@@ -1780,7 +1867,8 @@
     "https://www.copc.com/copc-standards/for-csps/",
     "catalog:agency-agents/Document Generator"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "svc_success_manager",
@@ -1816,7 +1904,8 @@
     "catalog:product-compass-consulting/Journey Mapper",
     "https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "svc_complaint_handler",
@@ -1853,7 +1942,8 @@
     "https://www.iso.org/standard/71580.html",
     "https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "svc_voc_analyst",
@@ -1891,7 +1981,8 @@
     "catalog:product-compass-consulting/Sentiment Analyst",
     "catalog:agency-agents/Feedback Synthesizer"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "h_hr",
@@ -1930,7 +2021,8 @@
     "https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf",
     "https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": "hr"
   },
   {
    "id": "hr_recruiter",
@@ -1968,7 +2060,8 @@
     "https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3",
     "https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "hr_onboarding",
@@ -2005,7 +2098,8 @@
     "catalog:agency-agents/Corporate Training Designer",
     "https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "hr_payroll_prep",
@@ -2043,7 +2137,8 @@
     "https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/",
     "https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "hr_perf_partner",
@@ -2078,7 +2173,8 @@
     "https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/",
     "https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "hr_employee_relations",
@@ -2113,7 +2209,8 @@
     "https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/",
     "catalog:product-compass-consulting/Sentiment Analyst"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "hr_offboarding",
@@ -2149,7 +2246,8 @@
     "https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf",
     "https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "hr_ir_statutory_filings",
@@ -2181,7 +2279,8 @@
    "src": [
     "global-org-current.json"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "hr_ir_labor_docs",
@@ -2215,7 +2314,8 @@
    "src": [
     "global-org-current.json"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "h_tech",
@@ -2256,7 +2356,8 @@
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf",
     "https://itsm.tools/34-itil-4-management-practices/"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": "tech"
   },
   {
    "id": "tech_service_desk",
@@ -2293,7 +2394,8 @@
     "https://itsm.tools/34-itil-4-management-practices/",
     "https://servicenow.com/blogs/2025/meet-your-new-servicenow-ai-agents"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "tech_incident",
@@ -2332,7 +2434,8 @@
     "https://itsm.tools/34-itil-4-management-practices/",
     "https://servicenow.com/blogs/2025/meet-your-new-servicenow-ai-agents"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "tech_infra_ops",
@@ -2370,7 +2473,8 @@
     "catalog:fullstack-forge/Cloud Engineer",
     "https://itsm.tools/34-itil-4-management-practices/"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "tech_change",
@@ -2409,7 +2513,8 @@
     "https://itsm.tools/34-itil-4-management-practices/",
     "https://servicenow.com/blogs/2025/meet-your-new-servicenow-ai-agents"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "tech_apps",
@@ -2451,7 +2556,8 @@
     "https://itsm.tools/34-itil-4-management-practices/",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "tech_data",
@@ -2489,7 +2595,8 @@
     "catalog:agency-agents/Data Consolidation Agent",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "tech_ir_hosting",
@@ -2523,7 +2630,8 @@
    "src": [
     "unverified: جزئیات حقوقی در پروژهٔ حق‌پرس"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "tech_ir_tools",
@@ -2557,7 +2665,8 @@
    "src": [
     "unverified: جزئیات حقوقی در پروژهٔ حق‌پرس"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "h_finance",
@@ -2595,7 +2704,8 @@
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf",
     "https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": "finance"
   },
   {
    "id": "fin_gl_close",
@@ -2638,7 +2748,8 @@
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf",
     "https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "fin_payables",
@@ -2675,7 +2786,8 @@
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf",
     "https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "fin_receivables",
@@ -2710,7 +2822,8 @@
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf",
     "https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "fin_treasury",
@@ -2748,7 +2861,8 @@
     "https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html",
     "unverified: قواعد چک صیادی و ارز — پروژهٔ حق‌پرس"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "fin_fpa",
@@ -2786,7 +2900,8 @@
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf",
     "https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "fin_tax",
@@ -2820,7 +2935,8 @@
    "src": [
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "fin_ir_tax",
@@ -2857,7 +2973,8 @@
     "https://www.sepidarsystem.com/blog/taxpayer-work-folder (unverified: fetch failed)",
     "unverified: جزئیات حقوقی در پروژهٔ حق‌پرس"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "fin_controls",
@@ -2896,7 +3013,8 @@
     "https://www.ifac.org/knowledge-gateway/contributing-global-economy/discussion/revised-coso-framework-improved-additional",
     "https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "h_assets",
@@ -2933,7 +3051,8 @@
     "https://committee.iso.org/sites/tc251/home/projects/published/iso-55000.html",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": "assets"
   },
   {
    "id": "ast_space",
@@ -2968,7 +3087,8 @@
     "https://www.ifma.org/media/zzohpitv/11-core-competencies_oct2020.pdf",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ast_maintenance",
@@ -3002,7 +3122,8 @@
     "https://www.ifma.org/media/zzohpitv/11-core-competencies_oct2020.pdf",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ast_energy",
@@ -3033,7 +3154,8 @@
    "src": [
     "https://www.ifma.org/media/zzohpitv/11-core-competencies_oct2020.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ast_register",
@@ -3070,7 +3192,8 @@
     "https://www.ifrs.org/issued-standards/list-of-standards/ias-16-property-plant-and-equipment.html (unverified: not fetched)",
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ast_capex",
@@ -3106,7 +3229,8 @@
     "https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf",
     "https://committee.iso.org/sites/tc251/home/projects/published/iso-55000.html"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "h_risk",
@@ -3148,7 +3272,8 @@
     "https://www.apqc.org/resource-library/resource-listing/110-manage-enterprise-risk-compliance-remediation-and-0",
     "catalog:trail-of-bits-security/Chief Security Officer"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": "risk"
   },
   {
    "id": "risk_register",
@@ -3189,7 +3314,8 @@
     "catalog:product-compass-consulting/Risk Analyst",
     "catalog:clawteam-capital/Risk Manager"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "compliance_monitor",
@@ -3230,7 +3356,8 @@
     "catalog:agency-agents/Compliance Auditor",
     "catalog:agency-agents/Legal Compliance Checker"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "security_ops",
@@ -3274,7 +3401,8 @@
     "catalog:agency-agents/Threat Detection Engineer",
     "catalog:agency-agents/Incident Response Commander"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "privacy_officer",
@@ -3312,7 +3440,8 @@
     "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
     "catalog:product-compass-consulting/Legal Specialist"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "continuity_planner",
@@ -3351,7 +3480,8 @@
     "https://www.iso.org/news/ref2446.html",
     "https://www.hcltech.com/blogs/the-smart-evolution-of-grc-through-ai-agents"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "hse_officer",
@@ -3386,7 +3516,8 @@
    "src": [
     "https://www.iso.org/standard/63787.html"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ir_sanctions_screener",
@@ -3423,7 +3554,8 @@
    "src": [
     "https://ofac.treasury.gov/sanctions-programs-and-country-information/iran-sanctions"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ir_afta_assessor",
@@ -3457,7 +3589,8 @@
    "src": [
     "https://pd.iums.ac.ir/uploads/490/2024/May/13/الزامات_و_اقدامات_امنیتی_سایبری_1400.pdf"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "h_legal",
@@ -3498,7 +3631,8 @@
     "https://www.harvey.ai/blog/building-a-frontier-in-house-organization",
     "https://www.harvey.ai/blog/rebuilding-playbook-review-as-a-multi-agent-system"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": "legal"
   },
   {
    "id": "contract_reviewer",
@@ -3540,7 +3674,8 @@
     "https://www.harvey.ai/blog/building-a-frontier-in-house-organization",
     "catalog:product-compass-consulting/Legal Specialist"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "obligation_tracker",
@@ -3572,7 +3707,8 @@
    "src": [
     "https://www.harvey.ai/blog/building-a-frontier-in-house-organization"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "corp_secretary",
@@ -3605,7 +3741,8 @@
    "src": [
     "https://www.harvey.ai/blog/building-a-frontier-in-house-organization"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ip_counsel",
@@ -3640,7 +3777,8 @@
     "https://www.wipo.int/madrid/en/",
     "catalog:kdense-science-lab/Dr. Kwame Asante"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "disputes_counsel",
@@ -3676,7 +3814,8 @@
    "src": [
     "https://www.harvey.ai/blog/building-a-frontier-in-house-organization"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "public_affairs",
@@ -3709,7 +3848,8 @@
    "src": [
     "https://www.harvey.ai/blog/building-a-frontier-in-house-organization"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "esg_reporter",
@@ -3744,7 +3884,8 @@
    "src": [
     "https://www.globalreporting.org/standards/"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "ir_filings",
@@ -3783,7 +3924,8 @@
    "src": [
     "unverified: no official Iranian portal fetched"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "h_capability",
@@ -3821,7 +3963,8 @@
     "https://www.apqc.org/resource-library/resource-listing/130-develop-and-manage-business-capabilities-definitions-and-1",
     "https://www.softexpert.com/en/glossary/bpm-cbok/"
    ],
-   "lvl": "head"
+   "lvl": "head",
+   "cc": "capability"
   },
   {
    "id": "process_modeler",
@@ -3859,7 +4002,8 @@
     "catalog:agency-agents/Workflow Architect",
     "catalog:taches-creative/Workflow Designer"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "process_improver",
@@ -3894,7 +4038,8 @@
    "src": [
     "catalog:agency-agents/Workflow Optimizer"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "agent_governor",
@@ -3929,7 +4074,8 @@
     "https://www.harvey.ai/blog/building-a-frontier-in-house-organization",
     "catalog:agency-agents/Automation Governance Architect"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "kb_curator",
@@ -3963,7 +4109,8 @@
    "src": [
     "catalog:agency-agents/Document Generator"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "retro_analyst",
@@ -3996,7 +4143,8 @@
    "src": [
     "https://www.apqc.org/resource-library/resource-listing/130-develop-and-manage-business-capabilities-definitions-and-1"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "change_manager",
@@ -4031,7 +4179,8 @@
    "src": [
     "https://www.prosci.com/methodology/adkar"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   },
   {
    "id": "training_designer",
@@ -4064,7 +4213,8 @@
     "catalog:agency-agents/Corporate Training Designer",
     "https://www.prosci.com/methodology/adkar"
    ],
-   "lvl": "agent"
+   "lvl": "agent",
+   "cc": null
   }
  ],
  "workflows": [

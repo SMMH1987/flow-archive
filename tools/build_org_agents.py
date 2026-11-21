@@ -1,5 +1,5 @@
 """ساخت دادهٔ «سازمان جهانی + ایجنت‌ها» از c4-org/org-global.c4 + c4-org/org-agents.yaml
-نسخه 3 — 2026-11-21 12:55 UTC. خروجی فقط‌خواندنی؛ دستی ویرایش نشود.
+نسخه 4 — 2026-11-21 12:45 UTC (رنگ ثابت هر دپارتمان). خروجی فقط‌خواندنی؛ دستی ویرایش نشود.
   python tools/build_org_agents.py          → c4-org/generated/org-agents.json
   python tools/build_org_agents.py --check  → فقط بررسی (واحد/رئیس/ورک‌فلو/ارتباط ناشناخته)
 قاعده: هیئت‌مدیره، مدیرعامل و همهٔ سرپرست‌های h_* در دپارتمان «۰. مدیریت ارشد» (Executive Office / C-suite).
@@ -7,6 +7,10 @@
 import json, re, sys, pathlib, yaml
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 C4, AG, OUT = ROOT/'c4-org/org-global.c4', ROOT/'c4-org/org-agents.yaml', ROOT/'c4-org/generated/org-agents.json'
+# رنگ (hue) هر دپارتمان؛ سرپرست و همهٔ زیرمجموعه‌اش یک رنگ. استاندارد رسمی جهانی برای رنگ دپارتمان وجود ندارد؛
+# این قرارداد رایج است: مالی سبز، فناوری آبی، بازاریابی نارنجی، فروش قرمز، منابع انسانی بنفش، حقوقی بنفش‌تیره، ریسک قرمز تیره، مدیریت طلایی.
+HUE = {'exec': 45, 'strategy': 45, 'finance': 130, 'capability': 155, 'service': 180, 'tech': 205, 'rnd': 230, 'legal': 255,
+       'hr': 285, 'sales': 330, 'risk': 355, 'marketing': 20, 'ops': 70, 'assets': 100}
 CSUITE = {'rnd': 'CPO', 'marketing': 'CMO', 'sales': 'CRO', 'ops': 'COO', 'service': 'CCO', 'hr': 'CHRO', 'tech': 'CTO/CIO',
           'finance': 'CFO', 'assets': 'CAO', 'risk': 'CRO/CISO', 'legal': 'CLO', 'capability': 'CTrO'}
 
@@ -32,7 +36,7 @@ def build():
         out.append(dict(id=a['id'], n=a['n'], t=t, tm=None if head else units.get(a['unit'], {}).get('n'), r=a['r'],
                         k='exec' if head else a['div'], mode=a['mode'], m=a['m'], ir=a.get('ir', False), s=a.get('skills', []),
                         tasks=a.get('tasks', []), inp=a.get('inputs', []), outp=a.get('outputs', []), src=a.get('sources', []),
-                        lvl='head' if head else 'agent'))
+                        lvl='head' if head else 'agent', cc=a['div'] if a['id'].startswith('h_') else None))
     ids = {a['id'] for a in out}
     byunit = {}
     for a in out: byunit.setdefault(a.get('tm') and next((u for u in units if units[u]['n'] == a['tm']), None), a['id'])
@@ -48,7 +52,7 @@ def build():
             steps.append([aid, s[1]])
         wfs.append(dict(n=w['name'], s=steps))
     cats = {'exec': 'مدیریت ارشد (هیئت‌مدیره + مدیرعامل + C-suite)', **depts}
-    return dict(cats=cats, order=list(cats), agents=out, workflows=wfs, unverified=src.get('unverified', [])), err
+    return dict(cats={k: [v, HUE[k]] for k, v in cats.items()}, order=list(cats), agents=out, workflows=wfs, unverified=src.get('unverified', [])), err
 
 if __name__ == '__main__':
     data, err = build()
