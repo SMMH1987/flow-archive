@@ -66,6 +66,26 @@ function Scenario({ org, live }: { org: any; live: LiveAgent[] }) {
   );
 }
 
+type Tr = { agentId: string; runs: number; failed: number; last: { status: string; at: string | null; error: string | null }[]; inTok: number; cachedTok: number; outTok: number; usd: number; models: string[]; lastError: string | null };
+function Trace({ companyId, live, org }: { companyId: string; live: LiveAgent[]; org: any }) {
+  const t = usePluginData<{ ok: boolean; reason?: string; traces: Record<string, Tr> }>("traces", { companyId });
+  if (t.loading) return null;
+  const nm = (id: string) => { const l = live.find((x) => x.id === id); const o = l?.orgId ? org.org.agents.find((a: any) => a.id === l.orgId) : null; return o?.n ?? l?.name ?? id; };
+  const rows = Object.values(t.data?.traces ?? {}).sort((a, b) => b.usd - a.usd);
+  const k = (x: number) => (x >= 1000 ? (x / 1000).toFixed(1) + "k" : String(x));
+  return (
+    <section className="amx-tr" dir="rtl" style={{ padding: 16, display: "grid", gap: 8 }}>
+      <h3 style={{ margin: 0 }}>ردیابی اجرا (۳۰ روز اخیر)</h3>
+      <div className="am-muted">فقط خواندنی: اجراها و هزینهٔ واقعی هر ایجنت از Paperclip. چیزی تغییر نمی‌کند.</div>
+      {!t.data?.ok ? <div className="amx-tr-off">ردیابی در دسترس نیست: {t.data?.reason ?? t.error?.message}</div>
+        : !rows.length ? <div>هنوز اجرایی ثبت نشده.</div>
+        : <table style={{ borderCollapse: "collapse", fontSize: 13 }}><thead><tr><th>ایجنت</th><th>اجرا</th><th>خطا</th><th>توکن ورودی/کش/خروجی</th><th>$</th><th>مدل</th><th>آخرین اجراها</th><th>آخرین خطا</th></tr></thead><tbody>
+          {rows.map((r) => <tr key={r.agentId} data-agent={r.agentId}><td>{nm(r.agentId)}</td><td>{r.runs}</td><td style={{ color: r.failed ? "#c92a2a" : undefined }}>{r.failed}</td><td>{k(r.inTok)} / {k(r.cachedTok)} / {k(r.outTok)}</td><td>{r.usd.toFixed(2)}</td><td>{r.models.join("، ")}</td>
+            <td>{r.last.map((x, i) => <span key={i} title={(x.at ?? "") + " " + x.status} style={{ display: "inline-block", width: 10, height: 10, borderRadius: 5, margin: 1, background: /fail|error|timed_out|cancel/i.test(x.status) ? "#e03131" : /succe|done|complete/i.test(x.status) ? "#2f9e44" : "#adb5bd" }} />)}</td><td style={{ maxWidth: 260 }}>{r.lastError ?? "—"}</td></tr>)}
+        </tbody></table>}
+    </section>);
+}
+
 export function AgentMapPage(_props: PluginPageProps) {
   const host = useHostContext();
   const org = usePluginData<OrgPayload & { cases: Record<string, CaseDef> }>("org", {});
@@ -77,7 +97,7 @@ export function AgentMapPage(_props: PluginPageProps) {
     return mountEngine(ref.current, org.data, agents, host.companyPrefix ?? "Paperclip");
   }, [org.data, agents, host.companyPrefix]);
   if (org.error) return <div dir="rtl">خطا: {org.error.message}</div>;
-  return <div><div ref={ref}>{org.loading ? "در حال بارگذاری…" : null}</div>{org.data && host.companyId ? <Planner companyId={host.companyId} cases={org.data.cases} /> : null}{org.data ? <Scenario org={org.data} live={agents} /> : null}</div>;
+  return <div><div ref={ref}>{org.loading ? "در حال بارگذاری…" : null}</div>{org.data && host.companyId ? <Planner companyId={host.companyId} cases={org.data.cases} /> : null}{org.data ? <Scenario org={org.data} live={agents} /> : null}{org.data && host.companyId ? <Trace companyId={host.companyId} live={agents} org={org.data} /> : null}</div>;
 }
 
 export function AgentMapSidebarLink(_props: PluginSidebarProps) {

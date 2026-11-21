@@ -1,9 +1,10 @@
-// v0.3.0 · 2026-11-21 18:10 Berlin. Agent Map worker. +0.3: successful-plan templates (plugin state).
+// v0.4.0 · 2026-11-21 19:30 Berlin. Agent Map worker. +0.3 plan templates; +0.4 run trace (read-only).
 // Reads live agents (agents.read). Serves our org chart, workflows and cases (bundled from flow-archive, see tools/sync_data.py).
 // Creates tasks ONLY after a human approves a plan (issues.create), and only in "backlog" so no agent wakes up by itself.
 import { definePlugin, runWorker } from "@paperclipai/plugin-sdk";
 import { categorize, type CatKey } from "./shared/categories.js";
 import { planCase, type Answers, type CaseDef, type Plan } from "./shared/planner.js";
+import { aggregateTrace, RUNS_SQL, COSTS_SQL, type RunRow, type CostRow } from "./shared/trace.js";
 import { buildInstructions, type OrgAgent } from "./shared/instructions.js";
 import ORGDATA from "./generated/org.json" with { type: "json" };
 
@@ -66,6 +67,15 @@ const plugin = definePlugin({
       return { companyId, agents, loadedAt: new Date().toISOString() } satisfies AgentMapData;
     });
     ctx.data.register("org", async () => DATA);
+    // Idea 2 (Siax approved 2026-11-21 16:11 UTC): read-only run trace from heartbeat_runs + cost_events, last 30 days
+    ctx.data.register("traces", async (params) => {
+      const companyId = String((params as any)?.companyId ?? "");
+      if (!companyId) return { ok: false, reason: "no company", traces: {} };
+      try {
+        const [runs, costs] = await Promise.all([ctx.db.query<RunRow>(RUNS_SQL, [companyId]), ctx.db.query<CostRow>(COSTS_SQL, [companyId])]);
+        return { ok: true, traces: aggregateTrace(runs, costs) };
+      } catch (e) { return { ok: false, reason: (e as Error).message, traces: {} }; }
+    });
     // idea 5: approved plans are saved per company and can be reused without planning again
     ctx.data.register("templates", async (params) => {
       const companyId = String(params?.companyId ?? "");

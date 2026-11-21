@@ -1,4 +1,4 @@
-// v0.3.0 · 2026-11-21 18:30 Berlin. Full page test: the real React UI (src/ui/index.tsx) + the real worker (test harness) in Chromium.
+// v0.4.0 · 2026-11-21 19:40 Berlin. +idea 2 trace. Full page test: the real React UI (src/ui/index.tsx) + the real worker (test harness) in Chromium.
 // Run: npm run test:ui   — prints PASS/FAIL per check, exit 1 on failure. Build output goes to tests/.tmp (git-ignored).
 import esbuild from "esbuild"; import fs from "node:fs"; import { createRequire } from "node:module";
 const { chromium } = createRequire(import.meta.url)(process.env.PW || "playwright");
@@ -14,6 +14,10 @@ H.seed({ agents: [
   { ...base, id: "L3", name: "کارشناس جذب", role: "general", title: "", reportsTo: "L2", status: "error", adapterConfig: { model: "claude-haiku-5-5" }, budgetMonthlyCents: 500, spentMonthlyCents: 12 },
 ] });
 await plugin.definition.setup(H.ctx);
+// sample rows standing in for heartbeat_runs / cost_events (the harness DB returns nothing by itself)
+H.ctx.db.query = async (sql) => sql.includes("heartbeat_runs")
+  ? [{ agent_id: "L1", status: "succeeded", started_at: "2026-11-21T09:00:00Z", error: null }, { agent_id: "L3", status: "failed", started_at: "2026-11-21T10:00:00Z", error: "rate limit" }]
+  : [{ agent_id: "L1", input_tokens: 120000, cached_input_tokens: 80000, output_tokens: 9000, cost_cents: 81, model: "claude-opus-5-5" }, { agent_id: "L3", input_tokens: 900, cached_input_tokens: 0, output_tokens: 100, cost_cents: 1, model: "claude-haiku-5-5" }];
 const ui = await esbuild.build({ entryPoints: ["tests/ui-entry.tsx"], bundle: true, write: false, format: "iife", jsx: "automatic", alias: { "@paperclipai/plugin-sdk/ui": "./tests/sdk-ui-stub.js" }, define: { "process.env.NODE_ENV": '"production"' }, logLevel: "error" });
 const br = await chromium.launch(); const p = await br.newPage({ viewport: { width: 1400, height: 1000 }, acceptDownloads: true });
 const errs = []; p.on("pageerror", (e) => errs.push(e.message));
@@ -44,6 +48,9 @@ ok(sum0.startsWith("اکنون: 116 ایجنت"), "idea 1: scenario starts from 
 await p.uncheck('.amx-sc tr[data-dept="hr"] input[type=checkbox]'); await p.fill('.amx-sc tr[data-dept="marketing"] input[type=number]', "3"); await p.waitForTimeout(300);
 const sum1 = await p.textContent(".amx-sc-sum");
 ok(/سناریو: 11[0-9] ایجنت/.test(sum1) && sum1 !== sum0, "idea 1: HR off + 3 Haiku in marketing changes totals: " + sum1);
+const tr = await p.textContent(".amx-tr").catch(() => "");
+ok(tr.includes("مدیرعامل") && tr.includes("0.81") && tr.includes("120.0k") && tr.includes("rate limit"), "idea 2: trace table shows CEO $0.81, 120k tokens, recruiter error");
+ok((await p.$$('.amx-tr tr[data-agent]')).length === 2, "idea 2: one row per agent with runs or costs");
 await p.screenshot({ path: "tests/ui-e2e.png", fullPage: true });
 ok(errs.length === 0, "no page errors " + errs.join(" | "));
 await br.close(); console.log(fail ? `${fail} FAILED` : "ALL PASS"); process.exit(fail ? 1 : 0);

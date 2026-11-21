@@ -6,6 +6,7 @@ import plugin, { DATA, orgIdOf } from "../src/worker.js";
 import { categorize } from "../src/shared/categories.js";
 import { evalWhen, planCase } from "../src/shared/planner.js";
 import { buildInstructions } from "../src/shared/instructions.js";
+import { aggregateTrace, RUNS_SQL, COSTS_SQL } from "../src/shared/trace.js";
 import { scenario, overBudget, monthlyUsd } from "../src/shared/scenario.js";
 
 const IDS = new Set(DATA.org.agents.map((a) => a.id));
@@ -21,8 +22,8 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 
 describe("manifest", () => {
   it("asks only for read + create-task + page/sidebar", () => {
-    expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.3.0");
+    expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "database.namespace.read", "ui.page.register", "ui.sidebar.register"]);
+    expect(manifest.version).toBe("0.4.0");
   });
 });
 
@@ -178,5 +179,29 @@ describe("idea 1 + 4: scenario and budget alert", () => {
     expect(overBudget(400, 500)).toBe(true);
     expect(overBudget(399, 500)).toBe(false);
     expect(overBudget(10, 0)).toBe(false);
+  });
+});
+
+describe("idea 2: run trace (read-only)", () => {
+  it("aggregates runs and costs per agent, newest first, keeps last 5", () => {
+    const runs = [1, 2, 3, 4, 5, 6].map((i) => ({ agent_id: "A", status: i === 6 ? "failed" : "succeeded", started_at: `2026-11-2${i}T10:00:00Z`, finished_at: null, error: i === 6 ? "timeout" : null, issue_id: null }));
+    const costs = [{ agent_id: "A", input_tokens: "1000", cached_input_tokens: 500, output_tokens: 200, cost_cents: 81, model: "claude-opus-5-5" }, { agent_id: "B", input_tokens: 10, cached_input_tokens: 0, output_tokens: 5, cost_cents: "0.5", model: "claude-haiku-5-5" }];
+    const t = aggregateTrace(runs, costs);
+    expect(t.A).toMatchObject({ runs: 6, failed: 1, inTok: 1000, cachedTok: 500, outTok: 200, usd: 0.81, lastError: "timeout" });
+    expect(t.A.last.length).toBe(5); expect(t.A.last[0].status).toBe("failed");
+    expect(t.B.usd).toBe(0.01); expect(t.B.runs).toBe(0);
+  });
+  it("queries only read-only SELECTs on the two whitelisted tables", async () => {
+    for (const q of [RUNS_SQL, COSTS_SQL]) { expect(q.startsWith("SELECT")).toBe(true); expect(/insert|update|delete|drop/i.test(q)).toBe(false); }
+    expect(manifest.database?.coreReadTables).toEqual(["heartbeat_runs", "cost_events"]);
+    const h = await boot();
+    const r: any = await h.getData("traces", { companyId: "c1" });
+    expect(r.ok).toBe(true);
+    expect(h.dbQueries.length).toBe(2); expect(h.dbQueries[0].params).toEqual(["c1"]);
+  });
+  it("reports unavailable instead of crashing when the database read fails", async () => {
+    const h = await boot(); (h.ctx.db as any).query = async () => { throw new Error("column x does not exist"); };
+    const r: any = await h.getData("traces", { companyId: "c1" });
+    expect(r).toMatchObject({ ok: false, reason: "column x does not exist" });
   });
 });
