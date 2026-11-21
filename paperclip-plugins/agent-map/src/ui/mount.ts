@@ -1,4 +1,4 @@
-// v0.3.0 · 2026-11-21 18:15 Berlin. +budget alerts (idea 4), CSV export (idea 8). Mounts the agent-map engine (generated from the hub artifact's «موکاپ افزونه» tab) into a host element.
+// v0.3.1 · 2026-11-21 20:05 Berlin. +canvas height fits its content (Siax 18:54 UTC: endless empty canvas). v0.3.0: budget alerts (idea 4), CSV export (idea 8). Mounts the agent-map engine (generated from the hub artifact's «موکاپ افزونه» tab) into a host element.
 // Pure DOM, no React, so the same code runs in the plugin and in the browser test (tests/engine.e2e.mjs).
 import ENGINE from "../generated/engine.json" with { type: "json" };
 import { overBudget } from "../shared/scenario.js";
@@ -50,11 +50,19 @@ export function mountEngine(host: HTMLElement, data: OrgPayload, live: LiveAgent
   const inn = host.querySelector("#mk-in");
   const mark = () => inn?.querySelectorAll<HTMLElement>("[data-s]").forEach((c) => c.classList.toggle("am-over", over.has(c.dataset.s ?? "")));
   const mo = inn ? new MutationObserver(mark) : null; mo?.observe(inn!, { childList: true, subtree: true }); mark();
+  // 0.7.1 (Siax 2026-11-21 18:54 UTC «چرا صفحه انقدر بی پایان … وقتی خالی»): the canvas was a fixed viewport-high box (engine CSS
+  // `#p-mock .am-view{height:calc(100vh - 70px)}`), mostly empty when the chart is small or zoomed out. Now it is as tall as its content, capped at the viewport.
+  const view = host.querySelector<HTMLElement>("#mk-view");
+  const fit = () => { if (!view || !inn) return; const pad = 64 + 40, max = Math.max(320, window.innerHeight - 120);
+    view.style.minHeight = "0"; view.style.boxSizing = "border-box"; view.style.height = Math.round(Math.min(max, Math.max(240, (inn as HTMLElement).getBoundingClientRect().height + pad))) + "px"; };
+  const ro = inn && typeof ResizeObserver !== "undefined" ? new ResizeObserver(fit) : null; ro?.observe(inn!);
+  const zo = inn ? new MutationObserver(fit) : null; zo?.observe(inn!, { attributes: true, attributeFilter: ["style", "class"], childList: true });
+  window.addEventListener("resize", fit); fit();
   // idea 8: the export button really exports (CSV of the chart with live status)
   const ex = host.querySelector<HTMLButtonElement>("#mk-ex");
   const onEx = (e: Event) => { e.stopImmediatePropagation(); e.preventDefault(); const csv = toCsv(data, live); const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv" })); a.download = "agent-map.csv"; a.click(); (window as any).__amLastCsv = csv; };
   if (ex) { ex.textContent = "⤓ خروجی CSV"; ex.addEventListener("click", onEx, true); }
-  return () => { mo?.disconnect(); host.innerHTML = ""; delete (window as any).__amLive; };
+  return () => { mo?.disconnect(); ro?.disconnect(); zo?.disconnect(); window.removeEventListener("resize", fit); host.innerHTML = ""; delete (window as any).__amLive; };
 }
 
 export function toCsv(data: OrgPayload, live: LiveAgent[]): string {

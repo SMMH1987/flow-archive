@@ -1,4 +1,4 @@
-// v0.5.0 · 2026-11-21 18:00 Berlin. +step 0 intent brief; idea 2 trace. Full page test: the real React UI (src/ui/index.tsx) + the real worker (test harness) in Chromium.
+// v0.5.1 · 2026-11-21 20:05 Berlin. +canvas-height check (0.7.1). v0.5.0 · 2026-11-21 18:00 Berlin. +step 0 intent brief; idea 2 trace. Full page test: the real React UI (src/ui/index.tsx) + the real worker (test harness) in Chromium.
 // Run: npm run test:ui   — prints PASS/FAIL per check, exit 1 on failure. Build output goes to tests/.tmp (git-ignored).
 import esbuild from "esbuild"; import fs from "node:fs"; import { createRequire } from "node:module";
 const { chromium } = createRequire(import.meta.url)(process.env.PW || "playwright");
@@ -25,6 +25,8 @@ await p.exposeFunction("__getData", async (k, prm) => JSON.stringify(await H.get
 await p.exposeFunction("__action", async (k, prm) => { try { return JSON.stringify(await H.performAction(k, prm)); } catch (e) { return JSON.stringify({ __error: e.message }); } });
 await p.setContent(`<!doctype html><meta charset=utf8><body><div id=root></div><script>${ui.outputFiles[0].text}</script>`); await p.waitForTimeout(1500);
 let fail = 0; const ok = (c, m) => { console.log((c ? "PASS " : "FAIL ") + m); if (!c) fail++; };
+{ const h = await p.evaluate(() => { const v = document.querySelector("#mk-view"), i = document.querySelector("#mk-in"); return { v: v.getBoundingClientRect().height, i: i.getBoundingClientRect().height }; });
+  ok(h.v <= Math.max(240, h.i + 104) + 2 && h.v <= 1000 - 120 + 2, `0.7.1: canvas fits its content, no endless empty box (box ${Math.round(h.v)}px, chart ${Math.round(h.i)}px)`); }
 ok((await p.textContent("#amx-live")).includes("3 ایجنت در Paperclip · 3 با چارت جور شد"), "page mounted, 3 live agents matched");
 ok(((await p.textContent("#amx-warn").catch(() => "")) || "").includes("مدیرعامل"), "idea 4: budget alert for CEO at 84%");
 ok(await p.$eval('#mk-in [data-s="ceo"]', (c) => c.classList.contains("am-over")).catch(() => false), "idea 4: red ring on the CEO card");
