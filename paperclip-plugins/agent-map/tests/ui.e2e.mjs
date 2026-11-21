@@ -33,7 +33,7 @@ ok(csv.split("\n").length === 119 && csv.includes('"hr_recruiter","کارشنا�
 const fill = async (lab, v) => { const l = p.locator(".amx-q label", { hasText: lab }); const sel = l.locator("select"); if (await sel.count()) await sel.selectOption(v); else await l.locator("input").fill(v); };
 ok(((await p.textContent(".amx-pl")) || "").includes("برنامه بعد از تأیید خلاصهٔ نیت ساخته می‌شود"), "step 0: planner hidden until the intent brief is approved");
 ok(await p.isDisabled(".amx-brief-ok"), "step 0: brief tick disabled while 5 questions have no answer");
-ok((await p.$$(".amx-in label[data-q]")).length === 4, "step 0: asks at most 4 questions per turn (bank of 16, only missing ones)");
+ok((await p.$$(".amx-in label[data-q]")).length === 4, "step 0: asks at most 4 questions per turn (bank of 17, only missing ones)");
 ok(((await p.textContent(".amx-card")) || "").includes("تمام‌شده یعنی"), "step 0: 4-line intent card shown");
 ok(((await p.textContent(".amx-in")) || "").includes("منبع: SHRM"), "step 0: each question shows a suggested answer with its source");
 await p.check(".amx-in label.am-muted input"); await p.waitForTimeout(200);

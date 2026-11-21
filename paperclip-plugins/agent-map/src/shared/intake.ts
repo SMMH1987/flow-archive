@@ -42,7 +42,7 @@ export function buildBrief(def: IntakeDef | undefined, answers: Record<string, u
   const ready = missing.length === 0 && unclear.length === 0;
   const val = (id: string) => lines.find((l) => l.id === id)?.a || "—";
   // 4-line intent card: why · done means · not · for whom/where (laptop research, step 0 output 2)
-  const card = [`نیت: ${val("why_now")}`, `تمام‌شده یعنی: ${val("success_90")}`, `چه چیزی نه: ${val("red_flags")}؛ محرمانه: ${val("confidential")}`, `برای چه کسی/کجا: ${val("work_mode")} · مصاحبه: ${val("interviewers")}`];
+  const card = [`نیت: ${val("why_now")}`, `تمام‌شده یعنی: ${val("success_check")}`, `چه چیزی نه: ${val("red_flags")}؛ محرمانه: ${val("confidential")}`, `برای چه کسی/کجا: ${val("work_mode")} · مصاحبه: ${val("interviewers")}`];
   // ask only what is missing or unclear, at most 4 per turn (defaults are not asked again)
   const nextAsk = [...unclear, ...missing].slice(0, MAX_PER_TURN);
   const text = [`# خلاصهٔ نیت: ${title}`, "", ...card.map((c) => `**${c}**`), "", ...lines.map((l) => `- ${l.q} ${l.source === "missing" ? "**(بی‌جواب)**" : l.a}${l.source === "default" ? " _(فرض)_" : ""}${l.cite ? ` _(${l.cite})_` : ""}${l.unclear ? " **(مبهم)**" : ""}`),

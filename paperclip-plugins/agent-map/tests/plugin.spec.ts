@@ -222,17 +222,17 @@ describe("idea 2: run trace (read-only)", () => {
 describe("step 0: intent brief before any plan (Siax rule 2026-11-21)", () => {
   const live = [{ ...base, id: "L1", name: "مدیر منابع انسانی", role: "manager", title: "", reportsTo: null, adapterConfig: {} }];
   const ans = { country: "IR", seniority: "mid", ad_budget_toman: 0, gender_any: "yes" };
-  it("hire case has 16 intake questions, each with a why", () => {
+  it("hire case has 17 intake questions, each with a why", () => {
     const q = (hire as any).intake.questions;
-    expect(q).toHaveLength(16);
+    expect(q).toHaveLength(17);
     expect(q.every((x: any) => x.why && x.src)).toBe(true);
     expect(q.every((x: any) => x.default || x.suggest)).toBe(true);
   });
   it("empty answers use the default and are marked as assumptions; no default = missing", () => {
     const b = buildBrief((hire as any).intake, {}, "x");
     expect(b.ready).toBe(false);
-    expect(b.missing).toEqual(["why_now", "success_90", "daily_tasks", "must_skills", "pay_range"]);
-    expect(b.assumptions.length).toBe(11);
+    expect(b.missing).toEqual(["why_now", "success_check", "daily_tasks", "must_skills", "pay_range"]);
+    expect(b.assumptions.length).toBe(12);
   });
   it("vague answers are flagged for a follow-up question", () => {
     expect(unclearWhy("نمی‌دانم")).toBeTruthy(); expect(unclearWhy("شاید تهران؟")).toBeTruthy(); expect(unclearWhy("تهران")).toBeNull();
