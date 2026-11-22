@@ -2,3 +2,4 @@ dist
 node_modules
 .paperclip-sdk
 tests/.tmp/
+__pycache__/
