@@ -26,7 +26,7 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 describe("manifest", () => {
   it("asks only for read + create-task + status update (0.10, approved) + page/sidebar", () => {
     expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "issues.read", "issue.comments.read", "issues.update", "events.subscribe", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.10.0");
+    expect(manifest.version).toBe("0.10.1");
   });
 });
 
@@ -369,6 +369,8 @@ describe("0.10: auto status (agent answered → step done)", () => {
     expect(autoStatus(step, "پرونده: x", [{ body: long + " منتظر تأیید شما هستم", authorAgentId: "A" }]).status).toBeNull();
     expect(autoStatus(step, "پرونده: x", [{ body: long, authorAgentId: null, authorType: "user" }]).status).toBeNull();
     expect(autoStatus(step, "پرونده: x", [{ body: long, authorAgentId: "B" }]).why).toBe("answer from another agent");
+    expect(autoStatus(step, "پرونده: x", [{ body: long + " متأسفانه ورودی‌ها را ندارم", authorAgentId: "A" }]).status).toBeNull();
+    expect(autoStatus(step, "پرونده: x", [{ body: long + " I cannot access the brief", authorAgentId: "A" }]).status).toBeNull();
   });
   it("syncStatus closes answered steps of a real case and logs each change", async () => {
     const live = [{ ...base, id: "L1", name: "مدیر منابع انسانی", role: "manager", title: "", reportsTo: null, adapterConfig: {} }, { ...base, id: "L2", name: "کارشناس جذب", role: "general", title: "", reportsTo: "L1", adapterConfig: {} }];

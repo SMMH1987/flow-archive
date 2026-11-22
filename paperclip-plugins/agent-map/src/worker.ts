@@ -118,6 +118,15 @@ const plugin = definePlugin({
       const d = autoStatus(issue, parent?.title ?? null, (await ctx.issues.listComments(issueId, companyId)) as any);
       if (d.status !== "done") return { issueId, changed: false, why: d.why };
       await ctx.issues.update(issueId, { status: "done" } as any, companyId);
+      // 0.10.1: agents only have Read, so copy this answer into each step that waits on it
+      try {
+        const answer = String(d.answer ?? "").slice(0, 6000);
+        const sibs: any[] = answer ? await ctx.issues.list({ companyId, limit: 500, offset: 0 }) : [];
+        for (const k of sibs.filter((x) => x.parentId === issue.parentId && (x.blockedByIssueIds ?? x.blockedBy ?? []).map((y: any) => (typeof y === "string" ? y : y?.id)).includes(issueId))) {
+          const tag = `\n\n--- خروجی تسک ${issue.identifier ?? issueId} ---\n`;
+          if (!String(k.description ?? "").includes(tag)) await ctx.issues.update(k.id, { description: String(k.description ?? "") + tag + answer } as any, companyId);
+        }
+      } catch (err) { ctx.logger?.warn?.("answer copy failed", { issueId, err: (err as Error).message }); }
       const key = { scopeKind: "company" as const, scopeId: companyId, stateKey: "autoStatusLog" };
       const log = ((await ctx.state.get(key)) as any[] | null) ?? [];
       await ctx.state.set(key, [{ issueId, identifier: issue.identifier ?? null, from: issue.status, to: "done", at: new Date().toISOString() }, ...log].slice(0, 50));
@@ -196,7 +205,7 @@ const plugin = definePlugin({
         const issue = await ctx.issues.create({
           companyId, parentId: parent.id, status: "backlog",
           title: `${s.n}. ${s.gate ? "🔒 " : ""}${s.task}`,
-          description: `${s.after.length ? "ورودی‌های این کار (اول این‌ها را بخوان؛ خروجی هر کدام در توضیح/کامنت آخر همان تسک است):\n" + s.after.map((d) => { const p = plan.steps.find((x) => x.id === d); return `- تسک ${p?.n ?? "?"}. ${p?.task ?? d} (شناسه ${ids.get(d) ?? "?"})`; }).join("\n") + "\nخروجی خودت را در کامنت آخر همین تسک بنویس تا تسک بعدی آن را بخواند.\n\n" : "خروجی خودت را در کامنت آخر همین تسک بنویس تا تسک بعدی آن را بخواند.\n\n"}خلاصهٔ نیت پرونده در تسک اصلی (والد) است.\nمسئول: ${ORG_BY.get(s.agent)?.n ?? s.agent} · مدل ایجنت: ${s.model} · سختی کار: ${s.difficulty} · حالت: ${s.mode}${s.gate ? "\nقبل از هر قدم بیرونی تأیید انسان لازم است." : ""}${agentId ? "" : "\nایجنت این نقش در Paperclip پیدا نشد؛ تسک بدون مسئول ماند."}`,
+          description: `${s.after.length ? "ورودی‌های این کار (اول این‌ها را بخوان؛ خروجی هر کدام در توضیح/کامنت آخر همان تسک است):\n" + s.after.map((d) => { const p = plan.steps.find((x) => x.id === d); return `- تسک ${p?.n ?? "?"}. ${p?.task ?? d} (شناسه ${ids.get(d) ?? "?"})`; }).join("\n") + "\nخروجی خودت را در کامنت آخر همین تسک بنویس تا تسک بعدی آن را بخواند.\n\n" : "خروجی خودت را در کامنت آخر همین تسک بنویس تا تسک بعدی آن را بخواند.\n\n"}${c.intake ? "خلاصهٔ نیت پرونده:\n" + brief.text + "\n\n" : "خلاصهٔ نیت پرونده در تسک اصلی (والد) است.\n"}مسئول: ${ORG_BY.get(s.agent)?.n ?? s.agent} · مدل ایجنت: ${s.model} · سختی کار: ${s.difficulty} · حالت: ${s.mode}${s.gate ? "\nقبل از هر قدم بیرونی تأیید انسان لازم است." : ""}${agentId ? "" : "\nایجنت این نقش در Paperclip پیدا نشد؛ تسک بدون مسئول ماند."}`,
           ...(agentId ? { assigneeAgentId: agentId } : {}),
           blockedByIssueIds: s.after.map((d) => ids.get(d)).filter((x): x is string => !!x),
         });
