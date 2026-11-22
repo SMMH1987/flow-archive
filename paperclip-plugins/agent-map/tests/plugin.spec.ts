@@ -26,7 +26,7 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 describe("manifest", () => {
   it("asks only for read + create-task + status update (0.10, approved) + page/sidebar", () => {
     expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "issues.read", "issue.comments.read", "issues.update", "events.subscribe", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.10.2");
+    expect(manifest.version).toBe("0.11.0");
   });
 });
 

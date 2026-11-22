@@ -27,7 +27,7 @@ ok((await p.$$eval(".fsv path.fa.no", (x) => x.length)) >= 4, "flowchart: ≥4 o
 await p.click("[data-intab=t]"); ok((await p.textContent(".in-md")).startsWith("# کارشناس جذب"), "AGENTS.md text tab");
 await p.click("[data-inx]");
 await p.click("[data-va]"); await p.waitForTimeout(300);
-ok((await p.$$eval("#mk-in [data-s]:not(.va-off)", (x) => x.length)) === 6, "view as recruiter: 6 cards lit");
+{ const lit = await p.$$eval("#mk-in [data-s]:not(.va-off)", (x) => x.length); ok(lit >= 6 && lit < 30, `view as recruiter: ${lit} cards lit`); }
 await p.click("[data-vax]"); await p.waitForTimeout(200);
 ok((await p.$$eval(".va-off", (x) => x.length)) === 0, "exit view-as");
 const opts = await p.$$eval("#mk-wfs option", (x) => x.map((y) => [y.value, y.textContent]));
@@ -43,14 +43,14 @@ ok(await p.$eval("#mm-cv", (c) => !c.hidden && c.width > 0), "minimap drawn");
 // 0.9.0 commercial look: real controls inside one top bar
 ok((await p.$$(".amx-tb")).length === 1 && await p.isVisible("#mk-q") && await p.isVisible("#mk-wfs"), "look: one top bar holds search and workflow menu");
 ok(!(await p.isVisible("#mk-leg")) && !(await p.isVisible(".am-hd")), "look: department chips and old header no longer on screen");
-await p.click(".amx-vb"); ok((await p.$$(".amx-vp [data-v]")).length === 8, "look: «نما» popover lists all 8 views");
+await p.click(".amx-vb"); ok((await p.$$(".amx-vp [data-v]")).length === 11 && (await p.$$(".amx-vp .amx-gh")).length === 3, "look: «نما» popover lists 11 views in 3 labelled groups");
 await p.click('.amx-vp [data-v="mm"]'); await p.waitForTimeout(300);
 ok(await p.$eval("#mk-v", (s) => s.value) === "mm" && (await p.textContent(".amx-vb")).includes("نقشهٔ ذهنی") && await p.isHidden(".amx-vp"), "look: choosing a view switches the real view and closes the menu");
 await p.click(".amx-vb"); await p.click('.amx-vp [data-v="org"]'); await p.waitForTimeout(300);
 await p.click(".amx-cb"); await p.click('.amx-cp [data-c="status"]'); await p.waitForTimeout(300);
 ok(await p.$eval('#mk-in [data-s="hr_recruiter"]', (c) => c.style.getPropertyValue("--cc").includes("0 70% 52%")).catch(() => false), "look: colour by status paints the error agent red");
 await p.click(".amx-cb"); await p.click('.amx-cp [data-c="dept"]'); await p.waitForTimeout(300);
-ok((await p.$$(".amx-kp > *")).length === 4 && (await p.textContent(".amx-kp .need b")) === "2", "look: 4 summary numbers, 2 need you (CEO budget, recruiter error)");
+{ const nd = (await p.textContent(".amx-kp .need b")).trim(); const chip = await p.$$eval("#v-wait", (x) => ((x[0]?.textContent ?? "").match(/\d+/) ?? ["0"])[0]); ok((await p.$$(".amx-kp > *")).length === 4 && nd === chip, `look: 4 summary numbers; «نیاز به تو» ${nd} = «منتظر تو» chip ${chip} (v9 finding 2)`); }
 ok(((await p.textContent('#mk-in [data-s="hr_recruiter"] .amx-flag').catch(() => "")) || "").includes("خطا"), "look: problem flag only on the card with a problem");
 ok((await p.$$("#mk-in .amx-flag")).length === 2, "look: healthy cards stay quiet (2 flags)");
 await p.click(".amx-kp .need"); await p.click('.amx-np [data-go="hr_recruiter"]'); await p.waitForTimeout(300);

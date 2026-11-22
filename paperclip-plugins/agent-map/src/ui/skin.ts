@@ -25,6 +25,7 @@ export const SKIN_CSS = `
 .amx-pw{position:relative;display:inline-flex}
 .amx-pop{position:absolute;top:calc(100% + 6px);right:0;z-index:40;min-width:240px;max-width:min(340px,90vw);max-height:70vh;overflow:auto;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 40px -12px rgba(0,0,0,.45);padding:6px;display:grid;gap:1px}
 .amx-pop[hidden]{display:none}.amx-pop.l{right:auto;left:0}
+.amx-pop .amx-gh{font-size:11px;font-weight:700;color:var(--muted);padding:4px 8px 0}
 .amx-pop>button,.amx-pop .it{font:inherit;font-size:13px;text-align:start;border:0;background:none;color:var(--fg);border-radius:8px;padding:6px 8px;cursor:pointer;display:grid;grid-template-columns:22px 1fr;gap:0 8px;align-items:center}
 .amx-pop>button:hover,.amx-pop>button[aria-current=true]{background:var(--chip)}
 .amx-pop>button i{font-style:normal;grid-row:span 2;text-align:center;color:var(--muted)}.amx-pop>button small{color:var(--muted);font-size:11.5px}
@@ -82,9 +83,10 @@ export const SKIN_CSS = `
 
 `;
 
-const VDESC: Record<string, string> = { org: "چه کسی زیر دست کیست", mm: "دپارتمان‌ها و نقش‌ها، شاخه‌ای", ls: "جدول قابل مرتب‌کردن، با هزینه", wf: "مسیر کار با درگاه‌های تأیید", wv: "فلوچارت قدم‌به‌قدم", bl: "چه کسی در هر قدم چه می‌کند", px: "وضعیت ایجنت‌ها به شکل دفتر", run: "پرونده‌های زنده، هر قدم با جواب ایجنت" };
-const VNAME: Record<string, string> = { wf: "ورک‌فلو BPMN", wv: "ورک‌فلو عمودی", bl: "جدول نقش × قدم", px: "دفتر پیکسلی", run: "اجرای پرونده" };
+const VDESC: Record<string, string> = { org: "چه کسی زیر دست کیست", mm: "دپارتمان‌ها و نقش‌ها، شاخه‌ای", ls: "جدول قابل مرتب‌کردن، با هزینه", wf: "مسیر کار با درگاه‌های تأیید", wv: "فلوچارت قدم‌به‌قدم", bl: "چه کسی در هر قدم چه می‌کند", tl: "میلهٔ هر قدم و اسلایدر پخش دوباره", kb: "ستون‌ها بر اساس وضعیت قدم", hm: "هزینه نسبت به بودجه، رنگی", px: "وضعیت ایجنت‌ها به شکل دفتر", run: "پرونده‌های زنده، هر قدم با جواب ایجنت" };
+const VNAME: Record<string, string> = { wf: "ورک‌فلو BPMN", wv: "ورک‌فلو عمودی", bl: "جدول نقش × قدم", px: "دفتر پیکسلی", tl: "تایم‌لاین", kb: "کانبان", hm: "نقشهٔ حرارتی هزینه", run: "اجرای پرونده" };
 const GROUP_START = new Set(["wf", "run"]);
+const GH: Record<string, string> = { org: "سازمان", wf: "ورک‌فلو", run: "پرونده و هزینه" }; // 0.11.0: three labelled groups in «نما»
 const COLORS: Record<string, [string, string]> = { dept: ["دپارتمان", "رنگ هر دپارتمان"], status: ["وضعیت", "در حال کار، آماده، متوقف، خطا"], model: ["مدل", "Opus، Sonnet، Haiku"], cost: ["هزینه", "سهم مصرف از بودجهٔ ماه"] };
 const STC: Record<string, string> = { running: "hsl(150 55% 40%)", idle: "hsl(215 70% 55%)", error: "hsl(0 70% 52%)", paused: "hsl(220 8% 58%)" };
 
@@ -129,7 +131,7 @@ export function applySkin(host: HTMLElement, data: OrgPayload, live: LiveAgent[]
   const vp = tb.querySelector<HTMLElement>(".amx-vp")!, vb = tb.querySelector<HTMLButtonElement>(".amx-vb")!;
   const opts = vsel ? Array.from(vsel.options) : [];
   vp.innerHTML = opts.map((o, i) => { const t = o.text.trim(), ic = t.split(" ")[0], nm = VNAME[o.value] ?? t.slice(ic.length).replace(/\s*\(.*\)$/, "").trim();
-    return `${i && GROUP_START.has(o.value) ? "<hr>" : ""}<button type="button" role="menuitem" data-v="${o.value}"><i>${ic}</i>${nm}<small>${VDESC[o.value] ?? ""}</small></button>`; }).join("");
+    return `${i && GROUP_START.has(o.value) ? "<hr>" : ""}${(i === 0 || GROUP_START.has(o.value)) ? `<small class="amx-gh">${GH[i === 0 ? "org" : o.value] ?? ""}</small>` : ""}<button type="button" role="menuitem" data-v="${o.value}"><i>${ic}</i>${nm}<small>${VDESC[o.value] ?? ""}</small></button>`; }).join("");
   const vName = () => { const b = vp.querySelector<HTMLElement>(`[data-v="${vsel?.value}"]`); vp.querySelectorAll("[data-v]").forEach((x) => x.toggleAttribute("aria-current", x === b)); vb.textContent = "نما: " + (b ? b.childNodes[1].textContent!.trim() : "") + " ▾"; };
   vp.addEventListener("click", (e) => { const b = (e.target as HTMLElement).closest<HTMLElement>("[data-v]"); if (!b || !vsel) return; vsel.value = b.dataset.v!; vsel.dispatchEvent(new Event("change", { bubbles: true })); close(); vName(); });
   vsel?.addEventListener("change", vName); vName();
