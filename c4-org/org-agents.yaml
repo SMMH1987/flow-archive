@@ -1,0 +1,1906 @@
+# ایجنت‌های تخصصی هر دپارتمان — منبع واحد (SSOT) — نسخه 6.5 — 2026-11-21 19:05 برلین: مدل روی خود ایجنت می‌ماند و از سختی کار معمول او انتخاب می‌شود (DECISIONS v2.1؛ تغییر مدل برای هر تسک = بانک ایده ۵)؛ Opus فقط با تأیید جدا برای هر کار؛ hr_payroll_prep و hr_onboarding → Haiku مثل سرور ۱۰؛ 6.3 — 18:45: intake_clarifier به فایل اصلی ترجیحات ارجاع می‌دهد؛ 6.2 — 17:50: + intake_clarifier (قدم صفر هر پرونده)؛ 6.1 اولویت و اثر حذف هر قدم: + بهینه‌ساز هزینه و فرایند (cost_optimizer) با ۳ سناریوی کم/متوسط/حداکثر و ورک‌فلو «بهینه‌سازی هزینه با سه سناریو»؛ نسخه 5: میز تحقیق داخلی
+# ساختار: مدیریت ارشد (board → ceo → سرپرست‌های h_*) → بخش (div) → دپارتمان (unit = واحد در org-global.c4) → ایجنت.
+# محتوا از تحقیق ۴ پژوهشگر (research/paperclip/global-org/part-a..d.json، ۲۱ نوامبر) + کاتالوگ ۴۴۵ ایجنت Paperclip؛ هر ایجنت sources دارد.
+# سیاست مدل (تأیید Siax، 2026-11-21 12:54 UTC): فقط ceo روی Opus؛ سرپرست‌ها Sonnet؛ کار ساده مستقیم به کارگر Haiku؛ برنامه‌ریز پویا فقط یک بار در شروع فکر می‌کند.
+# inputs/outputs = ارتباط و تحویل کار بین ایجنت‌ها (خط‌های نازک چارت). workflows = فقط همین ایجنت‌ها به ترتیب فعال می‌شوند.
+# ساخت خروجی: python tools/build_org_agents.py  (--check فقط بررسی)
+agents:
+- id: ceo
+  div: strategy
+  unit: ceo
+  n: مدیرعامل
+  en: Chief Executive Officer
+  r: board
+  mode: ask
+  m: Opus
+  ir: false
+  tasks: [تبدیل راهبرد مصوب هیئت‌مدیره به اولویت‌های فصلی, تقسیم کار بین سرپرست بخش‌ها و پیگیری, ارسال تصمیم‌های پول‌دار یا برگشت‌ناپذیر به هیئت‌مدیره]
+  inputs: [board, exec_brief, okr_planner, deal_diligence, h_rnd, h_marketing, h_sales]
+  outputs: [board, h_rnd, h_marketing, h_sales, h_finance, h_ops, h_hr]
+  skills: [orchestration, delegation, decision-making]
+  sources: ['catalog:agency-agents/CEO', 'catalog:product-compass-consulting/CEO', 'https://github.com/paperclipai/paperclip', 'https://www.anthropic.com/research/building-effective-agents']
+- id: strat_analyst
+  div: strategy
+  unit: strategy_pmo
+  n: تحلیلگر راهبرد
+  en: Strategy Analyst
+  r: ceo
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: ['پایش محیط: PESTLE و پنج نیروی پورتر', گزینه‌های راهبردی با SWOT و انسوف, فرض‌های پرخطر و پیش‌مرگ (pre-mortem)]
+  inputs: [market_researcher, h_finance, h_risk]
+  outputs: [ceo, okr_planner, mna_scout]
+  skills: [pestle, porters-five-forces, swot, ansoff, pre-mortem]
+  sources: ['catalog:product-compass-consulting/Competitive Intel Analyst', 'catalog:taches-creative/Strategy Director', 'catalog:product-compass-consulting/Risk Analyst', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: okr_planner
+  div: strategy
+  unit: strategy_pmo
+  n: برنامه‌ریز OKR و بودجه
+  en: OKR & Annual Plan Planner
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [نوشتن OKR سالانه و فصلی برای هر بخش, هم‌ترازی OKR با بودجهٔ سالانه با مالی, پیش‌نویس برنامهٔ سالانه برای تصویب]
+  inputs: [strat_analyst, ceo, h_finance]
+  outputs: [ceo, pmo_tracker, h_rnd, h_marketing, h_sales, h_finance]
+  skills: [okr, annual-planning, north-star-metric]
+  sources: ['catalog:product-compass-consulting/OKR Specialist', 'catalog:product-compass-consulting/North Star Analyst', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: pmo_tracker
+  div: strategy
+  unit: strategy_pmo
+  n: ردیاب سبد پروژه
+  en: Portfolio & PMO Tracker
+  r: okr_planner
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [ثبت ابتکارها و پروژه‌ها در سبد, گزارش هفتگی پیشرفت OKR و هشدار تأخیر, یادآوری سررسیدها به صاحبان کار]
+  inputs: [okr_planner, h_rnd, h_marketing, h_sales, h_ops]
+  outputs: [exec_brief, ceo]
+  skills: [portfolio-tracking, status-report, heartbeat]
+  sources: ['catalog:product-compass-consulting/Sprint Manager', 'catalog:aeon-intelligence/CEO', 'https://github.com/paperclipai/paperclip']
+- id: exec_brief
+  div: strategy
+  unit: board
+  n: تهیه‌کنندهٔ گزارش مدیریتی
+  en: Executive & Board Brief Writer
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [خلاصهٔ هفتگی برای مدیرعامل, بستهٔ جلسهٔ هیئت‌مدیره و صورت‌جلسه, پیگیری مصوبات هیئت‌مدیره]
+  inputs: [pmo_tracker, h_finance, h_risk, deal_diligence]
+  outputs: [ceo, board]
+  skills: [executive-summary, board-pack, meeting-minutes]
+  sources: ['catalog:agency-agents/Executive Summary Generator', 'catalog:product-compass-consulting/Meeting Analyst', 'catalog:aeon-intelligence/CEO']
+- id: mna_scout
+  div: strategy
+  unit: corpdev
+  n: شناسایی فرصت M&A
+  en: M&A & Partnership Scout
+  r: ceo
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [شناسایی شرکت‌ها و فرصت‌های سرمایه‌گذاری, اندازهٔ بازار و غربال اولیهٔ اهداف, فهرست کوتاه برای بررسی دقیق]
+  inputs: [strat_analyst, market_researcher]
+  outputs: [deal_diligence, ceo]
+  skills: [deal-sourcing, market-sizing, screening]
+  sources: ['catalog:product-compass-consulting/Market Sizing Analyst', 'catalog:clawteam-capital/Growth Analyst', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: deal_diligence
+  div: strategy
+  unit: corpdev
+  n: تحلیلگر بررسی دقیق و ارزش‌گذاری
+  en: Due Diligence & Valuation Analyst
+  r: ceo
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [تحلیل مالی و ارزش‌گذاری هدف, چک‌لیست بررسی دقیق با حقوقی و ریسک, پیشنهاد معامله برای تصویب هیئت‌مدیره]
+  inputs: [mna_scout, h_finance, h_legal, h_risk]
+  outputs: [ceo, exec_brief, h_legal, h_finance]
+  skills: [due-diligence, valuation, fundamentals]
+  sources: ['catalog:clawteam-capital/Fundamentals Analyst', 'catalog:clawteam-capital/Buffett Analyst', 'catalog:clawteam-capital/CEO']
+- id: h_rnd
+  div: rnd
+  unit: h_rnd
+  n: مدیر تحقیق و توسعه / محصول
+  en: Head of R&D / Product
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [اولویت‌بندی نقشهٔ راه با OKR, تقسیم کار بین محصول، طراحی و مهندسی, تأیید انتشار نسخه‌های مهم]
+  inputs: [ceo, okr_planner, product_manager, qa_release]
+  outputs: [ceo, pmo_tracker, h_marketing, h_tech]
+  skills: [roadmap, prioritization, delegation]
+  sources: ['catalog:agency-agents/VP of Product', 'catalog:agency-agents/VP of Engineering', 'catalog:product-compass-consulting/VP of Product Strategy']
+- id: product_manager
+  div: rnd
+  unit: product
+  n: مدیر محصول
+  en: Product Manager
+  r: h_rnd
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [نوشتن PRD و داستان کاربر, نقشهٔ راه مبتنی بر نتیجه, اولویت‌بندی ویژگی‌ها با داده و بازخورد]
+  inputs: [user_researcher, market_researcher, h_service, h_sales]
+  outputs: [ux_designer, software_architect, h_rnd, content_creator]
+  skills: [prd, roadmap, prioritize-features, user-stories]
+  sources: ['catalog:agency-agents/Product Manager', 'catalog:product-compass-consulting/PRD Writer', 'catalog:product-compass-consulting/Roadmap Specialist', 'https://arxiv.org/html/2308.00352v7', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: user_researcher
+  div: rnd
+  unit: product
+  n: پژوهشگر کاربر
+  en: User Researcher
+  r: product_manager
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [طراحی مصاحبه و خلاصهٔ یافته‌ها, جمع‌بندی بازخورد مشتری از پشتیبانی و فروش, طراحی آزمایش کم‌هزینه برای فرض‌ها]
+  inputs: [h_service, account_manager, marketing_analytics]
+  outputs: [product_manager, ux_designer]
+  skills: [interview-script, feedback-synthesis, experiment-design]
+  sources: ['catalog:product-compass-consulting/User Researcher', 'catalog:agency-agents/Feedback Synthesizer', 'catalog:product-compass-consulting/Experiment Designer']
+- id: research_scout
+  div: rnd
+  unit: research
+  n: پژوهشگر فناوری و نوآوری
+  en: Technology & Innovation Scout
+  r: h_rnd
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [مرور مقاله‌ها و روندهای فناوری, امکان‌سنجی و نمونهٔ اولیهٔ ایده, گزارش کوتاه نوآوری برای مدیر]
+  inputs: [h_rnd, strat_analyst]
+  outputs: [h_rnd, product_manager, ip_analyst, software_architect]
+  skills: [literature-review, trend-research, feasibility, prototyping]
+  sources: ['catalog:kdense-science-lab/Dr. Simone Weber', 'catalog:taches-creative/Research Lead', 'catalog:agency-agents/Trend Researcher']
+- id: ip_analyst
+  div: rnd
+  unit: research
+  n: تحلیلگر مالکیت فکری
+  en: IP & Patent Analyst
+  r: h_rnd
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [جست‌وجوی پیشینهٔ ثبت اختراع, پیش‌نویس افشای اختراع, ارجاع ثبت به حقوقی با تأیید انسان]
+  inputs: [research_scout, software_architect]
+  outputs: [h_legal, h_rnd]
+  skills: [patent-search, prior-art, invention-disclosure]
+  sources: ['catalog:kdense-science-lab/Dr. Kwame Asante', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: ux_designer
+  div: rnd
+  unit: design
+  n: طراح تجربهٔ کاربر
+  en: UX/UI Designer
+  r: h_rnd
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [جریان کاربر و وایرفریم, سیستم طراحی و رابط, بازبینی دسترس‌پذیری]
+  inputs: [product_manager, user_researcher, brand_guardian]
+  outputs: [software_architect, dev_engineer, product_manager]
+  skills: [ux-architecture, ui-design, accessibility]
+  sources: ['catalog:agency-agents/UX Architect', 'catalog:agency-agents/UI Designer', 'catalog:redoak-review/Design Reviewer']
+- id: software_architect
+  div: rnd
+  unit: engineering
+  n: معمار نرم‌افزار
+  en: Software Architect
+  r: h_rnd
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [طراحی سیستم و رابط‌ها از روی PRD, شکستن کار به وظایف مهندسی, ثبت تصمیم‌های معماری]
+  inputs: [product_manager, ux_designer, h_tech]
+  outputs: [dev_engineer, qa_release, h_tech]
+  skills: [system-design, api-design, architecture-decision]
+  sources: ['catalog:agency-agents/Software Architect', 'catalog:fullstack-forge/Architecture Lead', 'https://arxiv.org/html/2308.00352v7']
+- id: dev_engineer
+  div: rnd
+  unit: engineering
+  n: مهندس توسعه
+  en: Software Engineer
+  r: software_architect
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [پیاده‌سازی با تست (TDD), بازبینی کد و رفع اشکال, تحویل شاخه برای QA]
+  inputs: [software_architect, ux_designer, qa_release]
+  outputs: [qa_release]
+  skills: [tdd, code-review, debugging]
+  sources: ['catalog:superpowers/Lead Engineer', 'catalog:gstack/Staff Engineer', 'catalog:agentsys-engineering/Staff Engineer', 'https://arxiv.org/html/2308.00352v7']
+- id: qa_release
+  div: rnd
+  unit: engineering
+  n: مهندس کیفیت و انتشار
+  en: QA & Release Engineer
+  r: h_rnd
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [تست خودکار و سناریوهای پذیرش, چک‌لیست انتشار و یادداشت نسخه, انتشار به محیط اصلی پس از تأیید انسان]
+  inputs: [dev_engineer, software_architect]
+  outputs: [h_rnd, h_tech, h_service, content_creator]
+  skills: [qa, release-checklist, changelog, canary]
+  sources: ['catalog:gstack/QA Engineer', 'catalog:gstack/Release Engineer', 'catalog:agentsys-engineering/QA & Release Lead']
+- id: h_marketing
+  div: marketing
+  unit: h_marketing
+  n: مدیر بازاریابی
+  en: Chief Marketing Officer
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [برنامهٔ بازاریابی و بودجهٔ کانال‌ها, جایگاه‌یابی و پیام اصلی, تأیید نهایی کمپین‌ها و قیمت]
+  inputs: [ceo, okr_planner, market_researcher, marketing_analytics, pricing_strategist]
+  outputs: [ceo, h_sales, h_rnd, h_finance]
+  skills: [marketing-strategy, positioning, budget-allocation]
+  sources: ['catalog:agency-agents/Chief Marketing Officer', 'catalog:product-compass-consulting/Director of Marketing', 'catalog:product-compass-consulting/Director of Go-to-Market', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: market_researcher
+  div: marketing
+  unit: market_research
+  n: پژوهشگر بازار و رقبا
+  en: Market & Competitive Researcher
+  r: h_marketing
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [اندازهٔ بازار و بخش‌بندی مشتری, پرسونا و نقشهٔ سفر مشتری, پایش رقبا و کارت نبرد فروش]
+  inputs: [marketing_analytics, h_service, crm_ops]
+  outputs: [h_marketing, product_manager, pricing_strategist, strat_analyst, h_sales]
+  skills: [market-sizing, personas, competitor-analysis, battlecards]
+  sources: ['catalog:product-compass-consulting/Market Sizing Analyst', 'catalog:product-compass-consulting/Persona Specialist', 'catalog:product-compass-consulting/Competitive Analyst', 'catalog:product-compass-consulting/Battlecard
+      Writer']
+- id: brand_guardian
+  div: marketing
+  unit: brand
+  n: نگهبان برند و روابط عمومی
+  en: Brand & PR Guardian
+  r: h_marketing
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [حفظ هویت و لحن برند, پیش‌نویس خبر و پاسخ رسانه, تأیید انسانی پیش از هر انتشار بیرونی]
+  inputs: [content_creator, h_marketing, h_legal]
+  outputs: [content_creator, paid_media, ux_designer, h_legal]
+  skills: [brand-guidelines, press-release, tone-of-voice]
+  sources: ['catalog:agency-agents/Brand Guardian', 'catalog:product-compass-consulting/Brand Specialist']
+- id: content_creator
+  div: marketing
+  unit: growth
+  n: تولیدکنندهٔ محتوا
+  en: Content Creator
+  r: h_marketing
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [نوشتن وبلاگ، شبکهٔ اجتماعی و ایمیل, تبدیل یادداشت نسخه به محتوای معرفی, تقویم محتوا]
+  inputs: [product_manager, qa_release, market_researcher, seo_specialist]
+  outputs: [brand_guardian, ad_compliance_ir, seo_specialist]
+  skills: [copywriting, social-media, content-calendar]
+  sources: ['catalog:agency-agents/Content Creator', 'catalog:agency-agents/Social Media Strategist', 'catalog:product-compass-consulting/Marketing Strategist', 'https://www.hubspot.com/company-news/spring-2025-spotlight-breeze-agents']
+- id: seo_specialist
+  div: marketing
+  unit: growth
+  n: متخصص سئو
+  en: SEO Specialist
+  r: h_marketing
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [کلیدواژه و بهینه‌سازی صفحه, توضیحات متا و لینک داخلی, گزارش رتبه و ترافیک ارگانیک]
+  inputs: [content_creator, marketing_analytics]
+  outputs: [content_creator, marketing_analytics]
+  skills: [seo, keyword-research, on-page]
+  sources: ['catalog:agency-agents/SEO Specialist', 'catalog:agency-agents/AI Citation Strategist', 'https://www.hubspot.com/company-news/spring-2025-spotlight-breeze-agents']
+- id: paid_media
+  div: marketing
+  unit: growth
+  n: مدیر تبلیغات پولی
+  en: Paid Media Strategist
+  r: h_marketing
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [طراحی کمپین جست‌وجو و اجتماعی, پیشنهاد بودجه و پیشنهاد قیمت, هزینه فقط با تأیید انسان]
+  inputs: [brand_guardian, ad_compliance_ir, marketing_analytics]
+  outputs: [marketing_analytics, h_finance]
+  skills: [ppc, paid-social, ad-creative, budget-pacing]
+  sources: ['catalog:agency-agents/PPC Campaign Strategist', 'catalog:agency-agents/Paid Social Strategist', 'catalog:agency-agents/Ad Creative Strategist']
+- id: marketing_analytics
+  div: marketing
+  unit: growth
+  n: تحلیلگر بازاریابی و اندازه‌گیری
+  en: Marketing Analytics & Measurement
+  r: h_marketing
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [ردیابی تبدیل و برچسب‌گذاری, داشبورد قیف و بازده کانال, تحویل سرنخ واجد شرایط به فروش]
+  inputs: [paid_media, seo_specialist, crm_ops]
+  outputs: [h_marketing, sdr_outbound, crm_ops, user_researcher, paid_media]
+  skills: [tracking, attribution, ab-test-analysis, lead-scoring]
+  sources: ['catalog:agency-agents/Tracking & Measurement Specialist', 'catalog:agency-agents/Analytics Reporter', 'catalog:product-compass-consulting/Experimentation Analyst']
+- id: pricing_strategist
+  div: marketing
+  unit: pricing
+  n: راهبرد قیمت‌گذاری
+  en: Pricing Strategist
+  r: h_marketing
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [مدل درآمد و بسته‌بندی, سیاست تخفیف و سقف آن, تحلیل اثر قیمت با مالی پیش از تأیید]
+  inputs: [market_researcher, h_finance, pipeline_forecaster]
+  outputs: [h_marketing, proposal_writer, h_finance, h_sales]
+  skills: [pricing-strategy, monetization, discount-policy]
+  sources: ['catalog:product-compass-consulting/Pricing Strategist', 'catalog:product-compass-consulting/Business Model Analyst']
+- id: ad_compliance_ir
+  div: marketing
+  unit: ir_ad_rules
+  n: کنترل مقررات تبلیغات و پیامک (ایران)
+  en: Iran Ad & SMS Compliance Checker
+  r: h_marketing
+  mode: gate
+  m: Sonnet
+  ir: true
+  tasks: [بررسی متن تبلیغ با قوانین تبلیغات ایران, کنترل رضایت و لغو اشتراک در پیامک انبوه, ارجاع موارد مبهم به حقوقی (پروژهٔ حق‌پرس)]
+  inputs: [content_creator, paid_media, brand_guardian]
+  outputs: [paid_media, content_creator, h_legal]
+  skills: [ad-compliance, sms-consent, iran-regulation]
+  sources: ['catalog:agency-agents/Healthcare Marketing Compliance Specialist (الگوی نقش، نه محتوای ایران)', 'https://www.entekhab.ir/fa/news/866838/ارسال-پیامک-تبلیغاتی-و-اطلاع-رسانی-بدون-اجازه-ممنوع-است
+      (unverified: fetch failed)']
+- id: h_sales
+  div: sales
+  unit: h_sales
+  n: مدیر فروش
+  en: Head of Sales
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [هدف فروش و سهمیه از OKR, بازبینی هفتگی قیف و پیش‌بینی, تأیید تخفیف و قرارداد بزرگ]
+  inputs: [ceo, okr_planner, pipeline_forecaster, proposal_writer, partner_manager]
+  outputs: [ceo, h_finance, h_marketing, h_rnd]
+  skills: [sales-strategy, forecast-review, deal-approval]
+  sources: ['catalog:agency-agents/VP of Sales', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: sdr_outbound
+  div: sales
+  unit: bizdev
+  n: نمایندهٔ توسعهٔ فروش (SDR)
+  en: Sales Development Rep
+  r: h_sales
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [پژوهش حساب‌های هدف و تماس اولیه, واجد شرایط کردن سرنخ (BANT/MEDDIC), تنظیم جلسه برای فروشندهٔ انسانی]
+  inputs: [marketing_analytics, market_researcher, crm_ops]
+  outputs: [solutions_engineer, account_manager, crm_ops]
+  skills: [prospecting, outreach, lead-qualification, discovery]
+  sources: ['catalog:agency-agents/Outbound Strategist', 'catalog:agency-agents/Discovery Coach', 'https://salesforce.com/sales/ai-sales-agent/guide/?bc=OTH', 'https://www.hubspot.com/company-news/spring-2025-spotlight-breeze-agents']
+- id: solutions_engineer
+  div: sales
+  unit: bizdev
+  n: مهندس پیش‌فروش
+  en: Solutions / Sales Engineer
+  r: h_sales
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [نمایش محصول و پاسخ فنی, پاسخ به استعلام و RFP فنی, انتقال نیاز تازهٔ مشتری به محصول]
+  inputs: [sdr_outbound, product_manager, software_architect]
+  outputs: [proposal_writer, product_manager]
+  skills: [demo, rfp-technical, solution-design]
+  sources: ['catalog:agency-agents/Sales Engineer', 'catalog:agency-agents/Government Digital Presales Consultant']
+- id: proposal_writer
+  div: sales
+  unit: bizdev
+  n: نویسندهٔ پیشنهاد و قرارداد
+  en: Proposal & Deal Strategist
+  r: h_sales
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [پیش‌نویس پیشنهاد و قیمت, راهبرد مذاکره و نقشهٔ تصمیم‌گیران, ارسال قرارداد پس از تأیید حقوقی و مدیر]
+  inputs: [solutions_engineer, pricing_strategist, account_manager]
+  outputs: [h_legal, h_sales, h_finance, crm_ops]
+  skills: [proposal-writing, deal-strategy, negotiation]
+  sources: ['catalog:agency-agents/Proposal Strategist', 'catalog:agency-agents/Deal Strategist']
+- id: account_manager
+  div: sales
+  unit: bizdev
+  n: مدیر حساب کلیدی
+  en: Key Account Manager
+  r: h_sales
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [برنامهٔ حساب و فرصت فروش بیشتر, تمدید قرارداد, انتقال بازخورد مشتری]
+  inputs: [sdr_outbound, h_service, crm_ops]
+  outputs: [proposal_writer, user_researcher, h_service]
+  skills: [account-planning, upsell, renewals]
+  sources: ['catalog:agency-agents/Account Strategist']
+- id: crm_ops
+  div: sales
+  unit: salesops
+  n: مسئول دادهٔ CRM
+  en: CRM Data Operator
+  r: h_sales
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [به‌روز نگه‌داشتن رکوردها و مراحل, حذف تکراری و تکمیل داده, گزارش روزانهٔ فعالیت]
+  inputs: [sdr_outbound, proposal_writer, marketing_analytics]
+  outputs: [pipeline_forecaster, marketing_analytics, market_researcher]
+  skills: [crm-hygiene, data-extraction, dedupe]
+  sources: ['catalog:agency-agents/Sales Data Extraction Agent', 'catalog:agency-agents/Data Consolidation Agent']
+- id: pipeline_forecaster
+  div: sales
+  unit: salesops
+  n: تحلیلگر قیف و پیش‌بینی
+  en: Pipeline & Forecast Analyst
+  r: h_sales
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [تحلیل سلامت قیف و ریسک معامله, پیش‌بینی درآمد هفتگی, مربیگری فروشنده از روی داده]
+  inputs: [crm_ops]
+  outputs: [h_sales, h_finance, pricing_strategist, exec_brief]
+  skills: [pipeline-analysis, forecasting, sales-coaching]
+  sources: ['catalog:agency-agents/Pipeline Analyst', 'catalog:agency-agents/Sales Coach', 'https://salesforce.com/sales/ai-sales-agent/guide/?bc=OTH']
+- id: partner_manager
+  div: sales
+  unit: channel
+  n: مدیر کانال و شرکا
+  en: Channel & Partner Manager
+  r: h_sales
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [شناسایی و ارزیابی نماینده و شریک, برنامهٔ کمیسیون و آموزش شریک, امضای توافق فقط با تأیید انسان]
+  inputs: [h_sales, market_researcher, mna_scout]
+  outputs: [h_legal, h_finance, crm_ops, h_sales]
+  skills: [partner-recruitment, channel-programs, co-selling]
+  sources: ['https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf', 'https://www.ifm.eng.cam.ac.uk/research/dstools/value-chain-/', 'unverified: no channel/partner
+      role found in the 16 catalog templates']
+- id: h_ops
+  div: ops
+  unit: h_ops
+  n: مدیر عملیات و زنجیره تأمین
+  en: Head of Operations & Supply Chain
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [برنامهٔ ماهانهٔ تأمین، تولید و تحویل را می‌چیند, بین نیاز فروش و ظرفیت تصمیم می‌گیرد, کار را بین عامل‌ها پخش و گلوگاه‌ها را پیگیری می‌کند, گزارش شاخص‌ها (تحویل به‌موقع، موجودی، کیفیت) به مدیرعامل]
+  inputs: [h_sales, h_finance, ops_demand_planner, ops_quality_inspector]
+  outputs: [ops_demand_planner, ops_sourcing_buyer, ops_production_scheduler, h_finance, ceo]
+  skills: [s&op, scor-plan, prioritisation, kpi-review]
+  sources: ['catalog:agency-agents/VP of Operations', 'https://en.wikipedia.org/wiki/Supply_chain_operations_reference', 'https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf']
+- id: ops_demand_planner
+  div: ops
+  unit: production
+  n: برنامه‌ریز تقاضا و ظرفیت
+  en: Demand & Capacity Planner
+  r: h_ops
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [پیش‌بینی تقاضا از سفارش‌ها و قیف فروش, مقایسهٔ تقاضا با ظرفیت و موجودی, پیشنهاد نیاز خرید و برنامهٔ تولید]
+  inputs: [h_sales, ops_inventory_logistics, h_ops]
+  outputs: [h_ops, ops_sourcing_buyer, ops_production_scheduler, h_finance]
+  skills: [demand-forecast, capacity-planning, mrp, scor-plan]
+  sources: ['catalog:agency-agents/Supply Chain Strategist', 'https://en.wikipedia.org/wiki/Supply_chain_operations_reference']
+- id: ops_sourcing_buyer
+  div: ops
+  unit: procurement
+  n: کارشناس خرید و انتخاب تأمین‌کننده
+  en: Sourcing & Purchasing Agent
+  r: h_ops
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [استعلام و مقایسهٔ پیشنهاد تأمین‌کننده‌ها, پیش‌نویس سفارش خرید برای تأیید انسانی, ارزیابی دوره‌ای تأمین‌کننده]
+  inputs: [ops_demand_planner, ops_quality_inspector, ops_supplier_followup]
+  outputs: [ops_supplier_followup, h_finance, h_legal, ops_ir_customs]
+  skills: [rfq, supplier-evaluation, po-drafting, scor-source]
+  sources: ['catalog:agency-agents/Supply Chain Strategist', 'https://en.wikipedia.org/wiki/Supply_chain_operations_reference', 'https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf']
+- id: ops_supplier_followup
+  div: ops
+  unit: procurement
+  n: پیگیر سفارش تأمین‌کننده
+  en: Supplier Communications Agent
+  r: ops_sourcing_buyer
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [یادآوری تأیید سفارش و تاریخ تحویل به تأمین‌کننده, خواندن پاسخ تأمین‌کننده و استخراج تغییرات, هشدار تأخیر به خرید و لجستیک]
+  inputs: [ops_sourcing_buyer]
+  outputs: [ops_sourcing_buyer, ops_inventory_logistics, ops_demand_planner]
+  skills: [email-followup, po-tracking, extraction]
+  sources: ['https://learn.microsoft.com/en-us/dynamics365/supply-chain/procurement/supplier-com-agent-overview']
+- id: ops_production_scheduler
+  div: ops
+  unit: production
+  n: زمان‌بند تولید / ارائهٔ خدمت
+  en: Production Scheduler
+  r: h_ops
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [تبدیل برنامهٔ تولید به دستور کار روزانه, پیگیری پیشرفت و ثبت توقف‌ها, اعلام آماده‌بودن محصول به کیفیت]
+  inputs: [ops_demand_planner, ops_inventory_logistics, h_assets]
+  outputs: [ops_quality_inspector, ops_inventory_logistics, h_ops, h_assets]
+  skills: [work-orders, scheduling, scor-transform]
+  sources: ['https://en.wikipedia.org/wiki/Supply_chain_operations_reference', 'catalog:agency-agents/Studio Operations']
+- id: ops_inventory_logistics
+  div: ops
+  unit: logistics
+  n: کارشناس انبار و حمل
+  en: Inventory & Logistics Agent
+  r: h_ops
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [کنترل موجودی و نقطهٔ سفارش, رزرو حمل و صدور برگهٔ ارسال, پیگیری مرجوعی کالا]
+  inputs: [ops_production_scheduler, ops_supplier_followup, ops_quality_inspector, ops_ir_customs, h_sales]
+  outputs: [ops_demand_planner, h_service, h_finance]
+  skills: [inventory-control, shipping, returns, scor-fulfill, scor-return]
+  sources: ['https://en.wikipedia.org/wiki/Supply_chain_operations_reference', 'https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf']
+- id: ops_quality_inspector
+  div: ops
+  unit: quality
+  n: کنترل کیفیت و عدم انطباق
+  en: Quality Control Agent
+  r: h_ops
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [بازرسی ورودی و نهایی طبق معیار پذیرش, ثبت عدم انطباق و پیشنهاد اقدام اصلاحی, تحلیل علت ریشه‌ای شکایت‌های کیفی]
+  inputs: [ops_production_scheduler, ops_sourcing_buyer, svc_complaint_handler]
+  outputs: [ops_inventory_logistics, ops_sourcing_buyer, h_ops, h_rnd, h_capability, ops_ir_standards]
+  skills: [iso-9001, inspection, ncr-capa, root-cause]
+  sources: ['https://www.iso.org/standard/62085.html', 'catalog:agency-agents/QA Director', 'catalog:taches-creative/Quality Auditor']
+- id: ops_ir_standards
+  div: ops
+  unit: ir_standards
+  n: کارشناس استاندارد ملی
+  en: Iran National Standards Agent
+  r: h_ops
+  mode: gate
+  m: Sonnet
+  ir: true
+  tasks: [تشخیص کالاهای مشمول استاندارد اجباری, آماده‌کردن پروندهٔ نشان استاندارد برای تأیید, پیگیری تمدید پروانه‌ها]
+  inputs: [ops_quality_inspector, h_rnd]
+  outputs: [h_ops, h_legal, ops_ir_customs]
+  skills: [iranian-standards, permit-filing, document-prep]
+  sources: [global-org-current.json]
+- id: ops_ir_customs
+  div: ops
+  unit: ir_customs
+  n: کارشناس گمرک و ثبت‌سفارش
+  en: Iran Customs & Order Registration Agent
+  r: h_ops
+  mode: gate
+  m: Sonnet
+  ir: true
+  tasks: [پیش‌نویس ثبت‌سفارش در سامانهٔ جامع تجارت, آماده‌کردن مدارک ترخیص و پیگیری کوتاژ, هماهنگی پرداخت عوارض با مالی]
+  inputs: [ops_sourcing_buyer, ops_ir_standards]
+  outputs: [ops_inventory_logistics, h_finance, h_legal, h_ops]
+  skills: [ntsw, customs-clearance, import-docs]
+  sources: [global-org-current.json, 'https://www.zoomit.ir/tech-iran/422304-how-to-work-with-trading-website/']
+- id: h_service
+  div: service
+  unit: h_service
+  n: مدیر خدمات مشتری
+  en: Head of Customer Service
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [تعیین سطح خدمت (زمان پاسخ، حل در اولین تماس), تصمیم دربارهٔ قواعد ارجاع به انسان, بازبینی هفتگی کیفیت پاسخ عامل‌ها و انسان‌ها, گزارش تجربهٔ مشتری به مدیرعامل]
+  inputs: [svc_voc_analyst, svc_complaint_handler, h_sales]
+  outputs: [svc_triage_router, svc_success_manager, h_capability, ceo]
+  skills: [sla-design, copc, escalation-policy, ai-governance]
+  sources: ['https://www.copc.com/copc-standards/for-csps/', 'https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf', 'catalog:agency-agents/VP of Operations']
+- id: svc_triage_router
+  div: service
+  unit: support
+  n: دسته‌بند و مسیریاب تیکت
+  en: Ticket Triage & Router
+  r: h_service
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [دسته‌بندی هر درخواست (سؤال، مشکل، شکایت، درخواست), تعیین فوریت و احساس مشتری, فرستادن به عامل درست یا انسان]
+  inputs: [h_service, h_sales, ops_inventory_logistics]
+  outputs: [svc_support_responder, svc_complaint_handler, svc_success_manager, h_tech]
+  skills: [intent-classification, sentiment, routing]
+  sources: ['https://www.salesforce.com/blog/agent-to-human-handoff/', 'https://www.copc.com/copc-standards/for-csps/']
+- id: svc_support_responder
+  div: service
+  unit: support
+  n: پاسخ‌گوی پشتیبانی
+  en: Support Responder
+  r: svc_triage_router
+  mode: ask
+  m: Haiku
+  ir: false
+  tasks: [پاسخ از روی پایگاه دانش, پیگیری سفارش و وضعیت ارسال, ارجاع به انسان با خلاصهٔ کامل، اگر مطمئن نیست یا مشتری بخواهد]
+  inputs: [svc_triage_router, svc_knowledge_curator, ops_inventory_logistics]
+  outputs: [svc_knowledge_curator, svc_voc_analyst, h_service]
+  skills: [kb-answering, order-status, human-handoff]
+  sources: ['catalog:agency-agents/Support Responder', 'https://www.salesforce.com/blog/agent-to-human-handoff/', 'https://www.klarna.com/international/press/klarna-ai-assistant-handles-two-thirds-of-customer-service-chats-in-its-first-month/']
+- id: svc_knowledge_curator
+  div: service
+  unit: support
+  n: نگهدارندهٔ پایگاه دانش
+  en: Knowledge Base Curator
+  r: h_service
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [نوشتن و به‌روزکردن مقاله از تیکت‌های تکراری, حذف پاسخ‌های کهنه پس از تغییر محصول, انتشار عمومی فقط پس از تأیید انسان]
+  inputs: [svc_support_responder, svc_voc_analyst, h_rnd]
+  outputs: [svc_support_responder, h_marketing]
+  skills: [knowledge-management, technical-writing]
+  sources: ['https://www.copc.com/copc-standards/for-csps/', 'catalog:agency-agents/Document Generator']
+- id: svc_success_manager
+  div: service
+  unit: success
+  n: مدیر موفقیت مشتری
+  en: Customer Success Agent
+  r: h_service
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [پایش سلامت حساب مشتری و هشدار ریزش, برنامهٔ آموزش و راه‌اندازی مشتری تازه, آماده‌کردن تمدید و فرصت فروش بیشتر برای فروش]
+  inputs: [svc_triage_router, svc_voc_analyst, h_sales]
+  outputs: [h_sales, svc_voc_analyst, h_service]
+  skills: [health-score, churn-risk, renewal-prep]
+  sources: ['catalog:product-compass-consulting/Journey Mapper', 'https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf']
+- id: svc_complaint_handler
+  div: service
+  unit: complaints
+  n: رسیدگی‌کنندهٔ شکایت
+  en: Complaints Handler
+  r: h_service
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [ثبت، تأیید دریافت و پیگیری شکایت تا بسته‌شدن, بررسی علت با کیفیت یا مالی, پیشنهاد جبران (بازپرداخت، تعویض) برای تأیید انسان]
+  inputs: [svc_triage_router, ops_quality_inspector]
+  outputs: [ops_quality_inspector, h_finance, h_legal, svc_voc_analyst, h_service]
+  skills: [iso-10002, case-management, remedy-proposal]
+  sources: ['https://www.iso.org/standard/71580.html', 'https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf']
+- id: svc_voc_analyst
+  div: service
+  unit: success
+  n: تحلیل‌گر صدای مشتری
+  en: Voice-of-Customer Analyst
+  r: h_service
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [جمع‌بندی بازخورد، نظرسنجی و تیکت‌ها, کشف الگوهای نارضایتی و درخواست‌های تکراری, گزارش ماهانه به محصول و بازاریابی]
+  inputs: [svc_support_responder, svc_complaint_handler, svc_success_manager]
+  outputs: [h_rnd, h_marketing, h_service, svc_knowledge_curator, svc_success_manager]
+  skills: [sentiment-analysis, feedback-synthesis, csat-nps]
+  sources: ['catalog:product-compass-consulting/Sentiment Analyst', 'catalog:agency-agents/Feedback Synthesizer']
+- id: h_hr
+  div: hr
+  unit: h_hr
+  n: مدیر منابع انسانی
+  en: Head of People (HR)
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [برنامهٔ نیروی انسانی سالانه با مدیرعامل و مالی, تصمیم دربارهٔ اولویت استخدام و بودجهٔ حقوق, نظارت بر اینکه هیچ تصمیم استخدام، ارتقا یا اخراج بدون انسان گرفته نشود]
+  inputs: [h_finance, h_capability, hr_perf_partner, hr_employee_relations]
+  outputs: [hr_recruiter, hr_payroll_prep, h_finance, ceo]
+  skills: [workforce-planning, policy, ai-act-compliance]
+  sources: ['https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/', 'https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf',
+    'https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3']
+- id: hr_recruiter
+  div: hr
+  unit: recruit
+  n: کارشناس جذب
+  en: Recruitment Agent
+  r: h_hr
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [نوشتن آگهی و انتشار پس از تأیید, غربال رزومه با معیار شفاف و فهرست کوتاه برای انسان, زمان‌بندی مصاحبه و یادآوری به داوطلب]
+  inputs: [h_hr, h_capability]
+  outputs: [hr_ir_labor_docs, hr_onboarding, h_legal]
+  skills: [job-ads, screening, interview-scheduling, fair-hiring]
+  sources: ['catalog:agency-agents/Recruitment Specialist', 'https://www.paradox.ai/products/scheduling', 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3', 'https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/']
+- id: hr_onboarding
+  div: hr
+  unit: onboarding
+  n: هماهنگ‌کنندهٔ ورود و آموزش
+  en: Onboarding & Learning Coordinator
+  r: h_hr
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [چک‌لیست روز اول (حساب‌ها، تجهیزات، معرفی), مسیر آموزشی هر نقش, پیگیری تکمیل دوره‌ها]
+  inputs: [hr_recruiter, hr_ir_labor_docs, h_capability]
+  outputs: [h_tech, h_assets, hr_payroll_prep, hr_perf_partner]
+  skills: [onboarding-checklist, l&d, training-design]
+  sources: ['catalog:agency-agents/Corporate Training Designer', 'https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/']
+- id: hr_payroll_prep
+  div: hr
+  unit: comp
+  n: آماده‌کنندهٔ حقوق و مزایا
+  en: Payroll & Benefits Preparer
+  r: h_hr
+  mode: gate
+  m: Haiku
+  ir: false
+  tasks: [محاسبهٔ پیش‌نویس حقوق از کارکرد و مزایا, کنترل اختلاف با ماه قبل, ارسال فهرست پرداخت به مالی پس از تأیید]
+  inputs: [hr_onboarding, hr_offboarding, hr_perf_partner, h_finance]
+  outputs: [h_finance, hr_ir_statutory_filings, h_hr]
+  skills: [payroll, benefits, variance-check]
+  sources: ['catalog:agency-agents/Accounts Payable Agent', 'https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/', 'https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf']
+- id: hr_perf_partner
+  div: hr
+  unit: perf
+  n: کارشناس ارزیابی عملکرد
+  en: Performance Review Partner
+  r: h_hr
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [برگزاری چرخهٔ ارزیابی و جمع‌آوری بازخورد, پیش‌نویس خلاصهٔ عملکرد برای مدیر, پیشنهاد ارتقا یا افزایش حقوق فقط برای تصمیم انسان]
+  inputs: [hr_onboarding, h_hr]
+  outputs: [hr_payroll_prep, h_capability, h_hr]
+  skills: [performance-cycle, feedback-synthesis, talent-review]
+  sources: ['https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/', 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3']
+- id: hr_employee_relations
+  div: hr
+  unit: employee_rel
+  n: کارشناس روابط کار و فرهنگ
+  en: Employee Relations & Culture Agent
+  r: h_hr
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [نظرسنجی رضایت و تحلیل نتایج, ثبت و پیگیری شکایت کارکنان, پیش‌نویس روند انضباطی برای تصمیم انسان]
+  inputs: [h_hr, hr_perf_partner]
+  outputs: [h_hr, h_legal, h_capability]
+  skills: [engagement-survey, grievance, policy]
+  sources: ['https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/', 'catalog:product-compass-consulting/Sentiment Analyst']
+- id: hr_offboarding
+  div: hr
+  unit: offboarding
+  n: هماهنگ‌کنندهٔ خروج و تسویه
+  en: Offboarding Coordinator
+  r: h_hr
+  mode: gate
+  m: Haiku
+  ir: false
+  tasks: [چک‌لیست خروج (بستن دسترسی، تحویل دارایی), محاسبهٔ پیش‌نویس تسویه, مصاحبهٔ خروج و ثبت دلیل ترک]
+  inputs: [h_hr, hr_ir_labor_docs]
+  outputs: [h_tech, h_assets, hr_payroll_prep, hr_employee_relations]
+  skills: [offboarding-checklist, access-revocation, exit-interview]
+  sources: ['https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/319842/apqc_pcf_ver_6.1.1-final.pdf', 'https://www.cipd.org/uk/the-people-profession/the-profession-map/explore-the-profession-map/specialist-knowledge/']
+- id: hr_ir_statutory_filings
+  div: hr
+  unit: ir_tamin
+  n: کارشناس لیست بیمه و مالیات حقوق
+  en: Iran Social Security & Payroll Tax Filer
+  r: h_hr
+  mode: gate
+  m: Sonnet
+  ir: true
+  tasks: [تهیهٔ لیست ماهانهٔ بیمهٔ تأمین اجتماعی, تهیهٔ فهرست ماهانهٔ مالیات حقوق, ارسال فقط پس از تأیید انسان و هماهنگی پرداخت با مالی]
+  inputs: [hr_payroll_prep]
+  outputs: [h_finance, h_hr]
+  skills: [tamin-list, payroll-tax, monthly-filing]
+  sources: [global-org-current.json]
+- id: hr_ir_labor_docs
+  div: hr
+  unit: ir_labor_law
+  n: کارشناس قرارداد کار و مدارک
+  en: Iran Labor Contract & Documents Agent
+  r: h_hr
+  mode: gate
+  m: Sonnet
+  ir: true
+  tasks: [پیش‌نویس قرارداد کار از فرم استاندارد, بررسی کارت پایان خدمت یا معافیت داوطلب, پیش‌نویس برگهٔ تسویه طبق قانون کار]
+  inputs: [hr_recruiter, hr_offboarding]
+  outputs: [hr_onboarding, hr_offboarding, h_legal]
+  skills: [labor-law, contract-drafting, document-check]
+  sources: [global-org-current.json]
+- id: h_tech
+  div: tech
+  unit: h_tech
+  n: مدیر فناوری اطلاعات
+  en: Head of IT (CIO)
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [اولویت‌بندی پروژه‌ها و بودجهٔ IT, تأیید تغییرات پرریسک و انتخاب ابزار, گزارش سطح خدمت به مدیرعامل]
+  inputs: [tech_incident, tech_change, tech_apps, tech_ir_tools, h_finance]
+  outputs: [ceo, h_finance, h_risk, strategy_pmo]
+  skills: [it-strategy, portfolio, vendor-selection, sla-governance]
+  sources: ['catalog:fullstack-forge/CTO', 'catalog:agency-agents/VP of Engineering', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf', 'https://itsm.tools/34-itil-4-management-practices/']
+- id: tech_service_desk
+  div: tech
+  unit: helpdesk
+  n: میز خدمت
+  en: Service Desk Agent
+  r: h_tech
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [دریافت و دسته‌بندی تیکت کارکنان, پاسخ از پایگاه دانش و درخواست‌های استاندارد (رمز، دسترسی), ارجاع حادثه به tech_incident]
+  inputs: [h_hr, h_assets]
+  outputs: [tech_incident, tech_apps, h_capability]
+  skills: [service-desk, ticket-triage, request-fulfilment, knowledge-base]
+  sources: ['catalog:agency-agents/Support Responder', 'https://itsm.tools/34-itil-4-management-practices/', 'https://servicenow.com/blogs/2025/meet-your-new-servicenow-ai-agents']
+- id: tech_incident
+  div: tech
+  unit: infra
+  n: حادثه و مشکل
+  en: Incident & Problem Manager
+  r: h_tech
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [رفع سریع حادثه و اطلاع‌رسانی, تحلیل علت ریشه‌ای و گزارش پس از حادثه, ثبت راه‌حل در پایگاه دانش]
+  inputs: [tech_service_desk, tech_infra_ops]
+  outputs: [tech_change, h_tech, h_risk, h_capability]
+  skills: [incident-management, problem-management, rca, post-incident-review]
+  sources: ['catalog:fullstack-forge/SRE Engineer', 'catalog:agency-agents/SRE (Site Reliability Engineer)', 'https://itsm.tools/34-itil-4-management-practices/', 'https://servicenow.com/blogs/2025/meet-your-new-servicenow-ai-agents']
+- id: tech_infra_ops
+  div: tech
+  unit: infra
+  n: عملیات زیرساخت و ابر
+  en: Infrastructure & Cloud Operator
+  r: h_tech
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [پایش سرور، شبکه و ابر, پشتیبان‌گیری و وصله‌های روتین, گزارش ظرفیت و هزینهٔ ابر]
+  inputs: [tech_change, tech_ir_hosting]
+  outputs: [tech_incident, h_finance, fin_fpa]
+  skills: [monitoring, backup, patching, capacity, iac]
+  sources: ['catalog:agency-agents/Infrastructure Maintainer', 'catalog:fullstack-forge/Cloud Engineer', 'https://itsm.tools/34-itil-4-management-practices/']
+- id: tech_change
+  div: tech
+  unit: infra
+  n: تغییر و انتشار
+  en: Change & Release Manager
+  r: h_tech
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [تهیهٔ طرح تغییر، تست و بازگشت, ارزیابی اثر و گرفتن تأیید انسانی, اجرای انتشار در پنجرهٔ مجاز]
+  inputs: [tech_incident, tech_apps, h_rnd]
+  outputs: [tech_infra_ops, tech_service_desk, h_risk]
+  skills: [change-enablement, release, deployment, rollback-plan]
+  sources: ['catalog:agency-agents/DevOps Automator', 'catalog:fullstack-forge/DevOps Engineer', 'https://itsm.tools/34-itil-4-management-practices/', 'https://servicenow.com/blogs/2025/meet-your-new-servicenow-ai-agents']
+- id: tech_apps
+  div: tech
+  unit: apps
+  n: سامانه‌های داخلی ERP/CRM
+  en: Business Applications Admin
+  r: h_tech
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [پیکربندی و یکپارچه‌سازی ERP/CRM, فهرست نرم‌افزار و مجوزها (ITAM نرم‌افزار), نیازسنجی و مقایسهٔ ابزار جدید]
+  inputs: [tech_service_desk, h_finance, h_sales, tech_ir_tools]
+  outputs: [tech_change, tech_data, fin_payables, h_tech]
+  skills: [erp, crm, integration, license-management, business-analysis]
+  sources: ['catalog:agency-agents/Salesforce Architect', 'catalog:agency-agents/Workflow Architect', 'https://itsm.tools/34-itil-4-management-practices/', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: tech_data
+  div: tech
+  unit: data
+  n: داده و هوش تجاری
+  en: Data & BI Engineer
+  r: h_tech
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [ساخت و نگهداری خط لولهٔ داده, داشبورد و گزارش برای دپارتمان‌ها, کنترل کیفیت داده]
+  inputs: [tech_apps, fin_gl_close]
+  outputs: [fin_fpa, strategy_pmo, h_marketing, h_sales]
+  skills: [data-engineering, bi-dashboards, sql, data-quality]
+  sources: ['catalog:fullstack-forge/Data Engineer', 'catalog:agency-agents/Analytics Reporter', 'catalog:agency-agents/Data Consolidation Agent', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: tech_ir_hosting
+  div: tech
+  unit: ir_data_localization
+  n: میزبانی داخلی و دامنهٔ .ir
+  en: Iran Hosting & .ir Domain Agent
+  r: h_tech
+  mode: gate
+  m: Sonnet
+  ir: true
+  tasks: [ثبت و تمدید دامنهٔ .ir, انتخاب و قرارداد هاست/دیتاسنتر داخلی, نگهداری فهرست داده‌هایی که باید داخل کشور بماند]
+  inputs: [h_legal, h_risk]
+  outputs: [tech_infra_ops, fin_payables, h_legal]
+  skills: [domain-registration, local-hosting, data-residency]
+  sources: ['unverified: جزئیات حقوقی در پروژهٔ حق‌پرس']
+- id: tech_ir_tools
+  div: tech
+  unit: ir_sanctions_tools
+  n: جایگزین ابزارهای تحریمی
+  en: Sanctions-safe Tooling Agent
+  r: h_tech
+  mode: ask
+  m: Sonnet
+  ir: true
+  tasks: [نگهداری فهرست ابزار مجاز و جایگزین داخلی, بررسی ریسک قطع سرویس خارجی, پیشنهاد مهاجرت به h_tech]
+  inputs: [h_risk, tech_apps]
+  outputs: [tech_apps, h_tech, h_risk]
+  skills: [tool-inventory, vendor-risk, migration-planning]
+  sources: ['unverified: جزئیات حقوقی در پروژهٔ حق‌پرس']
+- id: h_finance
+  div: finance
+  unit: h_finance
+  n: مدیر مالی (CFO)
+  en: Head of Finance (CFO)
+  r: ceo
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [تأیید پرداخت‌های بزرگ و صورت‌های مالی, گزارش به سهام‌دار و هیئت‌مدیره (واحد investor_rel), تصمیم دربارهٔ بودجه و نقدینگی]
+  inputs: [fin_gl_close, fin_fpa, fin_treasury, fin_controls]
+  outputs: [ceo, board, strategy_pmo]
+  skills: [finance-leadership, capital-allocation, investor-reporting, approval-matrix]
+  sources: ['catalog:agency-agents/Finance Tracker', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf', 'https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html']
+- id: fin_gl_close
+  div: finance
+  unit: accounting
+  n: دفترکل و بستن ماه
+  en: GL & Close Accountant
+  r: h_finance
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [ثبت اسناد و مغایرت‌گیری حساب‌ها, بستن ماه و تهیهٔ صورت‌های مالی, تلفیق شرکت‌ها و ارزها]
+  inputs: [fin_payables, fin_receivables, fin_treasury, ast_register, h_hr]
+  outputs: [fin_fpa, fin_tax, fin_controls, h_finance, tech_data]
+  skills: [record-to-report, reconciliation, month-end-close, consolidation]
+  sources: ['catalog:agency-agents/Data Consolidation Agent', 'catalog:agency-agents/Finance Tracker', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf',
+    'https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html']
+- id: fin_payables
+  div: finance
+  unit: ap_ar
+  n: پرداختنی‌ها
+  en: Accounts Payable Agent
+  r: h_finance
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [دریافت فاکتور و تطبیق سه‌طرفه با سفارش و رسید, کشف فاکتور تکراری, پیشنهاد فهرست پرداخت برای تأیید]
+  inputs: [procurement, ast_maintenance, tech_apps, tech_ir_hosting]
+  outputs: [fin_treasury, fin_gl_close]
+  skills: [procure-to-pay, 3-way-match, duplicate-detection, payment-proposal]
+  sources: ['catalog:agency-agents/Accounts Payable Agent', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf', 'https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html']
+- id: fin_receivables
+  div: finance
+  unit: ap_ar
+  n: دریافتنی‌ها و وصول
+  en: Billing & Collections Agent
+  r: h_finance
+  mode: ask
+  m: Haiku
+  ir: false
+  tasks: [صدور فاکتور فروش, یادآوری وصول و پیگیری معوقات, تطبیق واریزها با فاکتور]
+  inputs: [salesops, fin_treasury]
+  outputs: [fin_gl_close, fin_ir_tax, h_sales]
+  skills: [order-to-cash, invoicing, dunning, cash-application]
+  sources: ['https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf', 'https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html']
+- id: fin_treasury
+  div: finance
+  unit: treasury
+  n: خزانه‌داری و بانک
+  en: Treasury & Banking Agent
+  r: h_finance
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [گزارش روزانهٔ نقدینگی و پیش‌بینی وجه نقد, اجرای پرداخت تأییدشده, چک صیادی، ارز و محدودیت‌های بانکی (ایران)]
+  inputs: [fin_payables, fin_receivables, fin_fpa]
+  outputs: [fin_gl_close, h_finance, fin_receivables]
+  skills: [cash-forecast, bank-reconciliation, fx, payments]
+  sources: ['https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf', 'https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html',
+    'unverified: قواعد چک صیادی و ارز — پروژهٔ حق‌پرس']
+- id: fin_fpa
+  div: finance
+  unit: fpa
+  n: بودجه و تحلیل مالی
+  en: FP&A Analyst
+  r: h_finance
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [تهیهٔ بودجه و پیش‌بینی غلتان, تحلیل انحراف بودجه, پیش‌نویس گزارش سرمایه‌گذار برای CFO]
+  inputs: [fin_gl_close, tech_data, tech_infra_ops, ast_capex, strategy_pmo]
+  outputs: [h_finance, fin_treasury, strategy_pmo]
+  skills: [budgeting, forecasting, variance-analysis, scenario-planning]
+  sources: ['catalog:kdense-science-lab/Dr. Liam O''Connor', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf', 'https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html']
+- id: fin_tax
+  div: finance
+  unit: tax
+  n: مالیات عملکرد و برنامه‌ریزی
+  en: Corporate Tax Analyst
+  r: h_finance
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [محاسبهٔ ذخیرهٔ مالیات عملکرد, برنامه‌ریزی مالیاتی و قیمت‌گذاری انتقالی, تهیهٔ اظهارنامهٔ سالانه برای تأیید]
+  inputs: [fin_gl_close, fin_ir_tax]
+  outputs: [h_finance, fin_gl_close, h_legal]
+  skills: [income-tax, tax-provision, transfer-pricing]
+  sources: ['https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: fin_ir_tax
+  div: finance
+  unit: ir_tax_portal
+  n: سامانهٔ مؤدیان، ارزش افزوده و فصلی
+  en: Iran Tax Filings Agent
+  r: fin_tax
+  mode: gate
+  m: Sonnet
+  ir: true
+  tasks: [ارسال صورتحساب الکترونیک به سامانهٔ مؤدیان و پیگیری کارپوشه, اظهارنامهٔ فصلی ارزش افزوده, گزارش معاملات فصلی (ماده ۱۶۹)]
+  inputs: [fin_receivables, fin_payables, fin_gl_close]
+  outputs: [fin_tax, fin_gl_close, h_legal]
+  skills: [e-invoicing, vat-return, seasonal-report, moadian]
+  sources: ['https://www.sepidarsystem.com/blog/taxpayer-work-folder (unverified: fetch failed)', 'unverified: جزئیات حقوقی در پروژهٔ حق‌پرس']
+- id: fin_controls
+  div: finance
+  unit: audit_int
+  n: کنترل داخلی و حسابرسی
+  en: Internal Controls & Audit Agent
+  r: h_finance
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [پایش پیوستهٔ تراکنش‌ها در برابر سیاست‌ها, آزمون کنترل‌ها بر پایهٔ COSO, آماده‌سازی مدارک برای حسابرس مستقل و بازرس قانونی]
+  inputs: [fin_gl_close, fin_payables, fin_treasury]
+  outputs: [h_finance, board, h_risk]
+  skills: [continuous-controls, coso, sod-check, audit-evidence]
+  sources: ['catalog:agency-agents/Compliance Auditor', 'catalog:agency-agents/Evidence Collector', 'https://www.ifac.org/knowledge-gateway/contributing-global-economy/discussion/revised-coso-framework-improved-additional',
+    'https://www.workday.com/en-us/perspectives/ai/ai-agents-finance-top-use-cases.html']
+- id: h_assets
+  div: assets
+  unit: h_assets
+  n: مدیر دارایی و امکانات
+  en: Head of Assets & Facilities
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [راهبرد فضا و دارایی, تأیید سرمایه‌گذاری و فروش دارایی تا سقف مجاز, هماهنگی با مالی و ایمنی]
+  inputs: [ast_space, ast_capex, ast_maintenance]
+  outputs: [ceo, h_finance, h_risk]
+  skills: [facility-strategy, asset-lifecycle, capex-governance]
+  sources: ['https://www.ifma.org/media/zzohpitv/11-core-competencies_oct2020.pdf', 'https://committee.iso.org/sites/tc251/home/projects/published/iso-55000.html', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: ast_space
+  div: assets
+  unit: facilities
+  n: فضا و اجاره
+  en: Space & Lease Manager
+  r: h_assets
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [پیگیری قراردادهای اجاره و سررسید تمدید, برنامه‌ریزی فضا و جانمایی کارکنان, پیش‌نویس مذاکره برای تأیید]
+  inputs: [h_hr, h_assets]
+  outputs: [h_legal, fin_payables, h_assets]
+  skills: [lease-management, space-planning, occupancy]
+  sources: ['https://www.ifma.org/media/zzohpitv/11-core-competencies_oct2020.pdf', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: ast_maintenance
+  div: assets
+  unit: facilities
+  n: نگهداری و دستور کار
+  en: Maintenance Planner
+  r: h_assets
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [برنامهٔ نگهداری پیشگیرانه, ثبت و پیگیری دستور کار پیمانکار, گزارش خرابی تکراری]
+  inputs: [tech_service_desk, ast_register]
+  outputs: [procurement, fin_payables, h_risk]
+  skills: [preventive-maintenance, work-orders, contractor-sla]
+  sources: ['https://www.ifma.org/media/zzohpitv/11-core-competencies_oct2020.pdf', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: ast_energy
+  div: assets
+  unit: facilities
+  n: انرژی و پایداری ساختمان
+  en: Energy & Sustainability Analyst
+  r: h_assets
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [جمع‌آوری قبوض و داده‌های کنتور, گزارش مصرف و پیشنهاد صرفه‌جویی, دادهٔ پایداری برای گزارش ESG]
+  inputs: [ast_maintenance, fin_payables]
+  outputs: [csr, h_assets]
+  skills: [energy-tracking, sustainability-reporting]
+  sources: ['https://www.ifma.org/media/zzohpitv/11-core-competencies_oct2020.pdf']
+- id: ast_register
+  div: assets
+  unit: fixed_assets
+  n: ثبت دارایی و استهلاک
+  en: Fixed Asset Register Agent
+  r: h_assets
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [ثبت و برچسب‌گذاری دارایی (شامل سخت‌افزار IT), محاسبهٔ ماهانهٔ استهلاک, شمارش دوره‌ای و مغایرت]
+  inputs: [ast_capex, fin_payables, tech_service_desk]
+  outputs: [fin_gl_close, ast_maintenance, fin_controls]
+  skills: [asset-register, depreciation, physical-count]
+  sources: ['https://committee.iso.org/sites/tc251/home/projects/published/iso-55000.html', 'https://www.ifrs.org/issued-standards/list-of-standards/ias-16-property-plant-and-equipment.html (unverified:
+      not fetched)', 'https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf']
+- id: ast_capex
+  div: assets
+  unit: fixed_assets
+  n: سرمایه‌گذاری و واگذاری دارایی
+  en: Capex & Disposal Analyst
+  r: h_assets
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [ارزیابی درخواست خرید دارایی سرمایه‌ای, برنامهٔ جایگزینی در پایان عمر, واگذاری یا اسقاط با تأیید انسانی]
+  inputs: [h_assets, tech_apps, ast_maintenance]
+  outputs: [fin_fpa, procurement, ast_register, h_finance]
+  skills: [capex-evaluation, lifecycle-planning, disposal]
+  sources: ['https://dspace.uevora.pt/rdpc/bitstream/10174/20829/1/APQC_K03785_PCF_Cross_Industry_v6_July2012.pdf', 'https://committee.iso.org/sites/tc251/home/projects/published/iso-55000.html']
+- id: h_risk
+  div: risk
+  unit: h_risk
+  n: مدیر ریسک، انطباق و امنیت
+  en: Chief Risk & Compliance Officer
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [تعیین اشتها و حد تحمل ریسک, اولویت‌بندی ریسک‌ها و ارجاع به مالک, گزارش فصلی ریسک به مدیرعامل و هیئت‌مدیره]
+  inputs: [risk_register, compliance_monitor, security_ops, privacy_officer, continuity_planner, hse_officer, ir_sanctions_screener, ir_afta_assessor]
+  outputs: [h_strategy, h_finance, h_legal]
+  skills: [risk-appetite, governance, board-reporting]
+  sources: ['https://www.coso.org/_files/ugd/3059fc_61ea5985b03c4293960642fdce408eaa.pdf', 'https://www.iso.org/iso-31000-risk-management.html', 'https://www.apqc.org/resource-library/resource-listing/110-manage-enterprise-risk-compliance-remediation-and-0',
+    'catalog:trail-of-bits-security/Chief Security Officer']
+- id: risk_register
+  div: risk
+  unit: erm
+  n: ثبت و ارزیابی ریسک
+  en: Enterprise Risk Analyst
+  r: h_risk
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [نگهداری ثبت ریسک (احتمال × اثر), پیش‌مرگ‌نگری (pre-mortem) برای پروژه‌های تازه, پایش شاخص‌های ریسک کلیدی (KRI)]
+  inputs: [h_strategy, h_rnd, compliance_monitor, security_ops, ir_sanctions_screener, hse_officer]
+  outputs: [h_risk, continuity_planner, h_finance]
+  skills: [risk-register, pre-mortem, kri, iso31000]
+  sources: ['https://www.iso.org/iso-31000-risk-management.html', 'https://www.coso.org/_files/ugd/3059fc_61ea5985b03c4293960642fdce408eaa.pdf', 'catalog:product-compass-consulting/Risk Analyst', 'catalog:clawteam-capital/Risk
+      Manager']
+- id: compliance_monitor
+  div: risk
+  unit: compliance
+  n: پایش انطباق و اخلاق
+  en: Compliance Monitor
+  r: h_risk
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [رصد قوانین و مقررات تازه و نگاشت به سیاست‌ها, آزمون دوره‌ای کنترل‌ها و جمع‌آوری شواهد, دسته‌بندی گزارش‌های تخلف و کد رفتاری]
+  inputs: [h_legal, h_hr, process_modeler]
+  outputs: [h_risk, risk_register, training_designer, h_legal]
+  skills: [regulatory-horizon-scan, control-testing, code-of-conduct, iso37301]
+  sources: ['https://www.iso.org/standard/75080.html', 'https://www.hcltech.com/blogs/the-smart-evolution-of-grc-through-ai-agents', 'https://www.harvey.ai/blog/building-a-frontier-in-house-organization',
+    'catalog:agency-agents/Compliance Auditor', 'catalog:agency-agents/Legal Compliance Checker']
+- id: security_ops
+  div: risk
+  unit: infosec
+  n: عملیات امنیت اطلاعات
+  en: Security Operations Lead
+  r: h_risk
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [نگهداری سامانهٔ مدیریت امنیت (ISO 27001) و نگاشت به NIST CSF, شناسایی تهدید و آسیب‌پذیری، از جمله زنجیرهٔ تأمین نرم‌افزار, فرماندهی پاسخ به حادثه؛ اقدام مهارکننده با تأیید انسان]
+  inputs: [h_tech, ir_afta_assessor]
+  outputs: [h_risk, privacy_officer, continuity_planner, risk_register, h_tech, retro_analyst]
+  skills: [isms, nist-csf, threat-detection, incident-response, supply-chain-audit]
+  sources: ['https://www.iso.org/standard/27001', 'https://www.nist.gov/news-events/news/2024/02/nist-releases-version-20-landmark-cybersecurity-framework', 'catalog:trail-of-bits-security/Chief Security
+      Officer', 'catalog:trail-of-bits-security/Supply Chain Auditor', 'catalog:agency-agents/Threat Detection Engineer', 'catalog:agency-agents/Incident Response Commander']
+- id: privacy_officer
+  div: risk
+  unit: privacy
+  n: حریم خصوصی داده
+  en: Data Privacy Officer
+  r: h_risk
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [ارزیابی اثر حریم خصوصی (DPIA) برای پردازش‌های تازه, نگهداری فهرست پردازش داده و پاسخ به درخواست صاحبان داده, ارزیابی نشت داده و پیش‌نویس اطلاع‌رسانی (انتشار با تأیید)]
+  inputs: [security_ops, h_marketing, h_rnd, h_hr]
+  outputs: [h_risk, contract_reviewer, h_legal]
+  skills: [dpia, ropa, dsar, breach-notification]
+  sources: ['https://eur-lex.europa.eu/eli/reg/2016/679/oj', 'catalog:product-compass-consulting/Legal Specialist']
+- id: continuity_planner
+  div: risk
+  unit: bcp
+  n: تداوم کسب‌وکار
+  en: Business Continuity Planner
+  r: h_risk
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [تحلیل اثر کسب‌وکار (BIA) و تعیین RTO/RPO, نگهداری طرح‌های تداوم و بازیابی, برگزاری تمرین سناریو و ثبت نتایج]
+  inputs: [risk_register, security_ops, h_ops, h_tech]
+  outputs: [h_risk, h_ops, h_tech, retro_analyst]
+  skills: [bia, bcp, dr-testing, iso22301]
+  sources: ['https://www.iso.org/news/ref2446.html', 'https://www.hcltech.com/blogs/the-smart-evolution-of-grc-through-ai-agents']
+- id: hse_officer
+  div: risk
+  unit: hse
+  n: ایمنی، بهداشت و محیط زیست
+  en: HSE Officer
+  r: h_risk
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [شناسایی خطر و ارزیابی ریسک محیط کار, ثبت و پیگیری رویدادها و شبه‌حادثه‌ها, پایش جنبه‌های زیست‌محیطی برای گزارش ESG]
+  inputs: [h_ops, h_assets, h_hr]
+  outputs: [h_risk, risk_register, esg_reporter]
+  skills: [iso45001, iso14001, incident-log]
+  sources: ['https://www.iso.org/standard/63787.html']
+- id: ir_sanctions_screener
+  div: risk
+  unit: ir_sanctions
+  n: غربال تحریم و ریسک ارزی
+  en: Sanctions & FX Risk Screener
+  r: h_risk
+  mode: ask
+  m: Sonnet
+  ir: true
+  tasks: [غربال طرف‌های تجاری و مسیر پرداخت در برابر فهرست‌های تحریم, ارزیابی ریسک نرخ و انتقال ارز برای معامله, ارجاع موارد مشکوک به انسان؛ بدون تصمیم خودکار]
+  inputs: [h_sales, h_ops, h_finance, contract_reviewer]
+  outputs: [risk_register, h_risk, h_finance, contract_reviewer]
+  skills: [sanctions-screening, fx-risk, kyc]
+  sources: ['https://ofac.treasury.gov/sanctions-programs-and-country-information/iran-sanctions']
+- id: ir_afta_assessor
+  div: risk
+  unit: ir_fata
+  n: الزامات افتا
+  en: AFTA Cyber Compliance Assessor
+  r: h_risk
+  mode: gate
+  m: Sonnet
+  ir: true
+  tasks: [نگاشت الزامات امنیتی افتا به کنترل‌های ISO 27001, آماده‌سازی مدارک ارزیابی امنیتی محصول/سامانه, پیگیری یافته‌ها تا رفع]
+  inputs: [security_ops, h_tech]
+  outputs: [security_ops, h_risk, ir_filings]
+  skills: [afta, security-assessment, control-mapping]
+  sources: ['https://pd.iums.ac.ir/uploads/490/2024/May/13/الزامات_و_اقدامات_امنیتی_سایبری_1400.pdf']
+- id: h_legal
+  div: legal
+  unit: h_legal
+  n: مدیر حقوقی و روابط خارجی
+  en: General Counsel
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [دریافت و مسیریابی درخواست‌های حقوقی بر اساس نوع و ریسک, تأیید نهایی اقدام‌های حقوقی و ارجاع به وکیل بیرونی, تعیین سیاست و playbook قراردادی]
+  inputs: [contract_reviewer, obligation_tracker, corp_secretary, ip_counsel, disputes_counsel, public_affairs, esg_reporter, ir_filings]
+  outputs: [ceo, h_risk, h_finance]
+  skills: [legal-intake, triage, playbook-owner]
+  sources: ['https://www.harvey.ai/blog/building-a-frontier-in-house-organization', 'https://www.harvey.ai/blog/rebuilding-playbook-review-as-a-multi-agent-system']
+- id: contract_reviewer
+  div: legal
+  unit: contracts
+  n: بازبینی قرارداد
+  en: Contract Reviewer
+  r: h_legal
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [بازبینی قرارداد بر پایهٔ playbook (هر بند یک قاعده), پیش‌نویس اصلاحیه با تغییرات ردگیری‌شده و دلیل, علامت‌گذاری بندهای پرریسک برای وکیل انسانی]
+  inputs: [h_sales, h_ops, h_hr, privacy_officer, ir_sanctions_screener]
+  outputs: [h_legal, obligation_tracker, risk_register, h_finance, ir_sanctions_screener]
+  skills: [playbook-review, redlining, nda, msa]
+  sources: ['https://www.harvey.ai/blog/rebuilding-playbook-review-as-a-multi-agent-system', 'https://www.harvey.ai/blog/building-a-frontier-in-house-organization', 'catalog:product-compass-consulting/Legal
+      Specialist']
+- id: obligation_tracker
+  div: legal
+  unit: contracts
+  n: پیگیری تعهدات قراردادی
+  en: Obligation Tracker
+  r: contract_reviewer
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [استخراج تعهد، مالک و سررسید از قرارداد امضاشده, یادآوری تمدید، فسخ و مهلت‌ها به مالک]
+  inputs: [contract_reviewer]
+  outputs: [h_sales, h_finance, h_ops, h_legal]
+  skills: [obligation-extraction, renewal-alerts]
+  sources: ['https://www.harvey.ai/blog/building-a-frontier-in-house-organization']
+- id: corp_secretary
+  div: legal
+  unit: corp_legal
+  n: دبیرخانهٔ شرکتی
+  en: Corporate Secretary
+  r: h_legal
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [پیش‌نویس صورت‌جلسهٔ هیئت‌مدیره و مجمع, نگهداری دفتر سهام، اساسنامه و اختیارات امضا, تقویم الزامات شرکتی و ارسال به ثبت (از طریق ir_filings در ایران)]
+  inputs: [h_strategy, h_finance]
+  outputs: [h_legal, ir_filings, kb_curator]
+  skills: [board-minutes, entity-management, signing-authority]
+  sources: ['https://www.harvey.ai/blog/building-a-frontier-in-house-organization']
+- id: ip_counsel
+  div: legal
+  unit: ip
+  n: مالکیت فکری
+  en: IP Counsel
+  r: h_legal
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [جست‌وجوی سابقهٔ علامت و پتنت پیش از نام‌گذاری/انتشار, پیش‌نویس اظهارنامه و پایش نقض, ثبت بین‌المللی (مادرید) با تأیید]
+  inputs: [h_marketing, h_rnd]
+  outputs: [h_legal, ir_filings, h_marketing]
+  skills: [trademark-search, patent-landscape, madrid-filing]
+  sources: ['https://www.wipo.int/madrid/en/', 'catalog:kdense-science-lab/Dr. Kwame Asante']
+- id: disputes_counsel
+  div: legal
+  unit: litigation
+  n: دعاوی و اختلافات
+  en: Disputes Counsel
+  r: h_legal
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: ['تشکیل پرونده: زمان‌بندی، شواهد، مهلت‌ها', آماده‌سازی بستهٔ ارجاع به وکیل بیرونی, نگه‌داشت قانونی (legal hold) اسناد]
+  inputs: [h_service, h_sales, obligation_tracker, security_ops]
+  outputs: [h_legal, h_finance, risk_register]
+  skills: [case-prep, legal-hold, outside-counsel]
+  sources: ['https://www.harvey.ai/blog/building-a-frontier-in-house-organization']
+- id: public_affairs
+  div: legal
+  unit: gov_rel
+  n: روابط با دولت و نهادها
+  en: Government Affairs Officer
+  r: h_legal
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [پایش سیاست‌ها و پیش‌نویس‌های قانونی مرتبط, مکاتبه با نهادها و پیگیری مجوزهای غیرایرانی, هماهنگی بازدید و استعلام نهادهای ناظر]
+  inputs: [compliance_monitor, h_strategy]
+  outputs: [h_legal, compliance_monitor, ir_filings]
+  skills: [policy-monitoring, licensing, regulator-liaison]
+  sources: ['https://www.harvey.ai/blog/building-a-frontier-in-house-organization']
+- id: esg_reporter
+  div: legal
+  unit: csr
+  n: گزارش پایداری و ESG
+  en: ESG Reporter
+  r: h_legal
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [گردآوری دادهٔ زیست‌محیطی، اجتماعی و حاکمیتی, پیش‌نویس گزارش پایداری بر پایهٔ GRI, انتشار فقط پس از تأیید]
+  inputs: [hse_officer, h_hr, h_finance, h_ops]
+  outputs: [h_legal, h_marketing, h_strategy]
+  skills: [gri, esg-data, sustainability-report]
+  sources: ['https://www.globalreporting.org/standards/']
+- id: ir_filings
+  div: legal
+  unit: ir_registration
+  n: پرونده‌ها و مجوزهای ایران
+  en: Iran Registrations & Permits Filer
+  r: h_legal
+  mode: gate
+  m: Sonnet
+  ir: true
+  tasks: [ثبت تغییرات شرکت و آگهی روزنامهٔ رسمی, اینماد، درگاه مجوزها و کارت بازرگانی, اظهارنامهٔ علامت تجاری ایران و پروندهٔ دانش‌بنیان, جزئیات حقوقی از پروژهٔ حق‌پرس؛ هر ارسال با تأیید انسان]
+  inputs: [corp_secretary, ip_counsel, public_affairs, ir_afta_assessor]
+  outputs: [h_legal, kb_curator, h_finance]
+  skills: [iran-registry, enamad, trademark-ir, knowledge-based, chamber-card]
+  sources: ['unverified: no official Iranian portal fetched']
+- id: h_capability
+  div: capability
+  unit: h_capability
+  n: مدیر توانمندی و بهبود سازمان
+  en: Head of Organisational Capability
+  r: ceo
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [اولویت‌بندی سبد بهبود و تغییر, حاکمیت بر نقش، مجوز و بودجهٔ عامل‌ها در Paperclip, گزارش بلوغ فرایند به مدیرعامل]
+  inputs: [process_modeler, process_improver, agent_governor, kb_curator, retro_analyst, change_manager, training_designer]
+  outputs: [ceo, h_strategy, h_hr]
+  skills: [portfolio, capability-maturity]
+  sources: ['https://www.apqc.org/resource-library/resource-listing/130-develop-and-manage-business-capabilities-definitions-and-1', 'https://www.softexpert.com/en/glossary/bpm-cbok/']
+- id: process_modeler
+  div: capability
+  unit: process
+  n: مدل‌سازی فرایند
+  en: Process Modeler
+  r: h_capability
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [نگهداری مدل فرایند در c4-org (LikeC4) و نگاشت به APQC, استخراج جریان کار از مستندات و کد برای بازبینی انسان]
+  inputs: [process_improver, change_manager, h_rnd, h_tech]
+  outputs: [compliance_monitor, kb_curator, change_manager]
+  skills: [likec4, bpmn, apqc-pcf]
+  sources: ['https://www.apqc.org/resource-library/resource-listing/130-develop-and-manage-business-capabilities-definitions-and-1', 'https://www.softexpert.com/en/glossary/bpm-cbok/', 'catalog:agency-agents/Workflow
+      Architect', 'catalog:taches-creative/Workflow Designer']
+- id: process_improver
+  div: capability
+  unit: process
+  n: بهبود فرایند
+  en: Process Improvement Analyst
+  r: h_capability
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [سنجش زمان چرخه، گلوگاه و دوباره‌کاری, پیشنهاد بهبود و برآورد اثر, پیگیری شاخص‌ها پس از اجرا]
+  inputs: [retro_analyst, h_ops, h_service]
+  outputs: [process_modeler, change_manager, h_capability]
+  skills: [lean, process-mining, kpi]
+  sources: ['catalog:agency-agents/Workflow Optimizer']
+- id: agent_governor
+  div: capability
+  unit: process
+  n: حاکمیت عامل‌ها
+  en: Agent Governance Architect
+  r: h_capability
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [بازبینی مجوز، حالت (auto/ask/gate) و بودجهٔ هر عامل, پایش اجرای عامل‌ها و ارجاع استثنا به مالک, هماهنگی با امنیت برای دسترسی‌ها]
+  inputs: [h_tech, security_ops]
+  outputs: [h_capability, security_ops, h_finance]
+  skills: [agent-permissions, budget-guardrails, run-monitoring]
+  sources: ['https://www.harvey.ai/blog/building-a-frontier-in-house-organization', 'catalog:agency-agents/Automation Governance Architect']
+- id: kb_curator
+  div: capability
+  unit: knowledge
+  n: نگهداری پایگاه دانش
+  en: Knowledge Base Curator
+  r: h_capability
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [ثبت و برچسب‌زنی سند، حذف تکراری‌ها, علامت‌گذاری مستندات کهنه برای مالک]
+  inputs: [process_modeler, retro_analyst, corp_secretary, ir_filings, training_designer]
+  outputs: [h_capability]
+  skills: [docs, taxonomy, staleness-check]
+  sources: ['catalog:agency-agents/Document Generator']
+- id: retro_analyst
+  div: capability
+  unit: knowledge
+  n: درس‌آموخته‌ها
+  en: Lessons-Learned Analyst
+  r: h_capability
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [تحلیل پس از حادثه/پروژه بدون سرزنش, تبدیل یافته‌ها به اقدام بهبود و دانش]
+  inputs: [security_ops, continuity_planner, h_rnd, h_service]
+  outputs: [process_improver, kb_curator]
+  skills: [postmortem, root-cause]
+  sources: ['https://www.apqc.org/resource-library/resource-listing/130-develop-and-manage-business-capabilities-definitions-and-1']
+- id: change_manager
+  div: capability
+  unit: change
+  n: مدیریت تغییر
+  en: Change Manager
+  r: h_capability
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [تحلیل اثر تغییر بر گروه‌ها و نقش‌ها, 'طرح ADKAR: آگاهی، تمایل، دانش، توانایی، تثبیت', پایش پذیرش و مقاومت]
+  inputs: [process_improver, process_modeler, h_strategy]
+  outputs: [training_designer, h_hr, process_modeler, h_capability]
+  skills: [adkar, stakeholder-impact, adoption-metrics]
+  sources: ['https://www.prosci.com/methodology/adkar']
+- id: training_designer
+  div: capability
+  unit: change
+  n: طراحی آموزش
+  en: Training Designer
+  r: change_manager
+  mode: ask
+  m: Sonnet
+  ir: false
+  tasks: [ساخت راهنما و دورهٔ کوتاه برای فرایند تازه, آزمون دانش و گزارش آمادگی]
+  inputs: [change_manager, compliance_monitor]
+  outputs: [h_hr, kb_curator, change_manager]
+  skills: [instructional-design, enablement]
+  sources: ['catalog:agency-agents/Corporate Training Designer', 'https://www.prosci.com/methodology/adkar']
+- id: wf_researcher
+  div: capability
+  unit: process
+  n: پژوهشگر ورک‌فلو
+  en: Workflow Researcher
+  r: h_capability
+  mode: auto
+  m: Sonnet
+  ir: false
+  tasks: [جمع‌آوری الگوی جهانی هر ورک‌فلو از APQC، SCOR و ITIL, افزودن نسخهٔ ایران با منبع رسمی یا علامت «تأییدنشده», ثبت در c4-org/workflow-catalog.yaml]
+  inputs: [h_capability, process_improver]
+  outputs: [process_modeler, wf_agent_mapper]
+  skills: [apqc-pcf, deep-research, bpmn]
+  sources: ['https://www.apqc.org/process-frameworks', 'catalog:agency-agents/Trend Researcher']
+- id: wf_agent_mapper
+  div: capability
+  unit: process
+  n: نگاشت قدم به ایجنت
+  en: Workflow-to-Agent Mapper
+  r: h_capability
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [هر قدم ورک‌فلو را به یک ایجنت org-agents.yaml وصل می‌کند (Lane), ایجنت کم یا تکراری را گزارش می‌دهد]
+  inputs: [wf_researcher, process_modeler]
+  outputs: [bpmn_validator, agent_governor]
+  skills: [bpmn, likec4]
+  sources: ['catalog:agency-agents/Agents Orchestrator']
+- id: instruction_writer
+  div: capability
+  unit: process
+  n: نویسندهٔ دستورالعمل ایجنت‌ها
+  en: Agent Instruction Writer
+  r: h_capability
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [برای هر نقش تازه یا تغییرکرده AGENTS.md کوتاه از روی org-agents.yaml می‌سازد, دستورالعمل‌های موجود را با قالب و قوانین می‌سنجد و ایراد گزارش می‌دهد, متن نهایی را برای تأیید انسان می‌فرستد و فقط بعد از تأیید وارد Paperclip می‌شود]
+  inputs: [wf_agent_mapper, h_capability, agent_governor]
+  outputs: [h_capability, agent_governor]
+  skills: [agent-instructions]
+  sources: ['https://docs.paperclip.ing/guides/org/agents', 'https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices', 'https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf']
+- id: research_desk
+  div: rnd
+  unit: research
+  n: میز درخواست تحقیق
+  en: Research Intake Desk
+  r: h_rnd
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [درخواست تحقیق هر ایجنت را می‌گیرد و سؤال، معیار موفقیت و مهلت را روشن می‌کند, تکراری بودن را با تحقیق‌های قبلی چک می‌کند و نتیجهٔ قبلی را برمی‌گرداند, سؤال روشن را به پژوهشگر مناسب می‌سپارد]
+  inputs: [h_rnd, agent_governor, instruction_writer]
+  outputs: [research_scout, market_researcher, user_researcher, wf_researcher]
+  skills: [research-brief]
+  sources: ['https://www.atlassian.com/agile/product-management/research-repository']
+- id: source_verifier
+  div: rnd
+  unit: research
+  n: راستی‌آزمای منبع
+  en: Source Verifier
+  r: h_rnd
+  mode: auto
+  m: Haiku
+  ir: false
+  tasks: [هر ادعای تحقیق را با منبعش تطبیق می‌دهد, ادعای بی‌منبع را «تأییدنشده» علامت می‌زند, امتیاز اطمینان کل گزارش را می‌دهد]
+  inputs: [research_scout, market_researcher, user_researcher, wf_researcher]
+  outputs: [improvement_proposer]
+  skills: [fact-check]
+  sources: ['https://www.cebma.org/resources-and-tools/what-is-evidence-based-management/']
+- id: improvement_proposer
+  div: rnd
+  unit: research
+  n: پیشنهاددهندهٔ بهبود
+  en: Improvement Proposer
+  r: h_rnd
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [از نتیجهٔ تأییدشده یک پیشنهاد تغییر مشخص می‌سازد (در org-agents.yaml، دستورالعمل، skill یا ورک‌فلو), اثر و هزینهٔ پیشنهاد را می‌نویسد, پیشنهاد را برای تأیید انسان می‌فرستد و بعد از تأیید به مالک تغییر می‌سپارد, یک ماه بعد اثر را می‌سنجد]
+  inputs: [source_verifier]
+  outputs: [instruction_writer, agent_governor, h_rnd]
+  skills: [change-proposal]
+  sources: ['https://asq.org/quality-resources/pdca-cycle']
+- id: bpmn_validator
+  div: capability
+  unit: process
+  n: بازبین BPMN
+  en: BPMN Style Validator
+  r: h_capability
+  mode: ask
+  m: Haiku
+  ir: false
+  tasks: [بررسی ۱۰ قاعدهٔ docs/STANDARD-BPMN.md (فعل+مفعول، gate بیرونی، مالک، End), فقط گزارش؛ تغییر نمی‌دهد]
+  inputs: [wf_agent_mapper, process_modeler]
+  outputs: [h_capability, process_improver]
+  skills: [bpmn, flow-rules-check]
+  sources: ['https://www.omg.org/spec/BPMN/2.0.2/', 'Bruce Silver, BPMN Method and Style (2nd ed.)', 'catalog:agency-agents/Spec Compliance Analyst']
+- id: cost_optimizer
+  div: capability
+  unit: process
+  n: بهینه‌ساز هزینه و فرایند
+  en: Process & Cost Efficiency Optimizer
+  r: h_capability
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [هزینهٔ واقعی هر ایجنت و هر ورک‌فلو را با بودجه مقایسه می‌کند (اجرا، توکن، دلار، خطا), اتلاف را پیدا می‌کند (اجرای تکراری، مدل گران برای کار ساده، قدم بی‌اثر، دوباره‌کاری بعد از رد), به هر قدم اولویت می‌دهد (باید، بهتر است، می‌شود، حذف‌شدنی) و برای هر قدم می‌نویسد اگر حذف شود چه صرفه‌جویی و چه چیزی از دست می‌رود؛ قدم قانونی و تأیید انسانی همیشه «باید» است, برای هر ورک‌فلو سه سناریو می‌سازد - کم (حداقل هزینه)، متوسط (تعادل)، حداکثر (بیشترین کیفیت) - هر کدام با هزینهٔ ماهانه، ریسک کیفیت و قدم‌های حذف/ادغام‌شده, سناریو را فقط پیشنهاد می‌دهد؛ اعمال با تأیید انسان, یک ماه بعد هزینه و کیفیت واقعی را با برآورد مقایسه می‌کند]
+  inputs: [process_improver, retro_analyst, h_finance, agent_governor]
+  outputs: [h_capability, ceo, instruction_writer]
+  skills: [finops, model-routing, process-mining]
+  rules: [مدل CEO فقط Opus؛ سرپرست‌ها Sonnet؛ کار ساده Haiku (سیاست تأییدشده ۲۰۲۶-۱۱-۲۱), هیچ سناریویی gate انسانی یا قدم بیرونی بدون gate را حذف نمی‌کند, هر عدد با منبع - هزینهٔ واقعی Paperclip یا برآورد علامت‌دار]
+  sources: ['https://www.finops.org/wg/optimizing-genai-usage/', 'https://www.finops.org/insights/ai-model-selection/', 'https://www.splunk.com/en_us/blog/artificial-intelligence/reduce-agent-cost-by-model-routing.html', 'https://www.datadoghq.com/blog/how-datadog-saves-money-by-optimizing-ai-usage', 'https://docs.celonis.com/en/analysis---conformance-checker.html']
+- id: intake_clarifier
+  div: capability
+  unit: process
+  n: روشن‌کنندهٔ نیت
+  en: Intake Clarifier
+  r: h_capability
+  mode: gate
+  m: Sonnet
+  ir: false
+  tasks: [قدم صفر هر پرونده - سؤال‌های ثابت intake پرونده را با پیش‌فرض و «چرا» می‌پرسد, فقط برای جواب مبهم سؤال تکمیلی می‌پرسد (حداکثر ۳ دور), خلاصهٔ نیت می‌سازد (نیت، معیار موفقیت، ضروری/غیرضروری، بودجه، مهلت، محدودیت‌ها، فرض‌ها), خلاصه را برای تیک تأیید انسان می‌فرستد؛ برنامه‌ریز فقط از خلاصهٔ تأییدشده تسک می‌سازد]
+  inputs: [ceo, h_hr]
+  outputs: [h_hr, cost_optimizer]
+  skills: [intake-interview]
+  rules: [ترجیحات فقط از فایل اصلی PREFERENCES.md (لپ‌تاپ D:\AI\Claude-Ai 1\Code\PREFERENCES.md، کپی /mnt/project-files/interop/PREFERENCES.md)؛ جوابی که آنجاست پرسیده نمی‌شود, سؤال تازه بیرون از فهرست پرونده فقط به‌صورت پیگیری جواب مبهم, هیچ جواب را حدس نمی‌زند؛ پیش‌فرض را «فرض» علامت می‌زند]
+  sources: ['https://docs.nvidia.com/aiq-blueprint/2.2.1/architecture/agents/clarifier.html', 'https://www.greenhouse.com/blog/how-to-source-top-talent-questions-to-ask-hiring-managers', 'https://arxiv.org/html/2602.03468v1']
+workflows:
+- name: بهینه‌سازی هزینه با سه سناریو
+  dept: capability
+  steps:
+  - [cost_optimizer, جمع کردن هزینه و اجرای واقعی ۳۰ روز اخیر در برابر بودجه, auto]
+  - [process_improver, پیدا کردن گلوگاه و دوباره‌کاری در ورک‌فلو, auto]
+  - [cost_optimizer, ساختن سه سناریوی کم، متوسط و حداکثر با هزینه و ریسک, ask]
+  - [h_finance, بررسی برآورد هزینه, ask]
+  - [ceo, انتخاب یک سناریو یا رد, gate]
+  - [instruction_writer, اعمال سناریو در yaml و دستورالعمل‌ها, ask]
+  - [cost_optimizer, مقایسهٔ هزینهٔ واقعی با برآورد بعد از یک ماه, auto]
+- name: تحقیق داخلی تا بهبود
+  dept: rnd
+  steps:
+  - [research_desk, گرفتن درخواست تحقیق از هر ایجنت و روشن کردن سؤال, auto]
+  - [research_scout, تحقیق و جمع کردن منبع, auto]
+  - [source_verifier, تطبیق هر ادعا با منبع, auto]
+  - [improvement_proposer, پیشنهاد تغییر با اثر و هزینه, ask]
+  - [board, تأیید یا رد پیشنهاد, gate]
+  - [instruction_writer, اعمال تغییر در دستورالعمل یا yaml, ask]
+  - [improvement_proposer, سنجش اثر بعد از یک ماه, auto]
+- name: چرخهٔ برنامهٔ سالانه و OKR
+  dept: strategy
+  steps:
+  - [strat_analyst, تحلیل محیط و گزینه‌های راهبردی, auto]
+  - [ceo, انتخاب اولویت‌ها, ask]
+  - [okr_planner, نوشتن OKR بخش‌ها, ask]
+  - [h_finance, هم‌ترازی با بودجه, ask]
+  - [board, تصویب برنامه و بودجه, gate]
+  - [pmo_tracker, ثبت ابتکارها و پایش هفتگی, auto]
+  - [exec_brief, گزارش فصلی به هیئت‌مدیره, ask]
+- name: خرید یا سرمایه‌گذاری در یک شرکت
+  dept: strategy
+  steps:
+  - [mna_scout, غربال و فهرست کوتاه, auto]
+  - [deal_diligence, بررسی دقیق و ارزش‌گذاری, ask]
+  - [h_legal, بررسی حقوقی, ask]
+  - [h_finance, تأمین مالی, ask]
+  - [ceo, پیشنهاد نهایی, ask]
+  - [board, تصویب معامله, gate]
+- name: از ایده تا انتشار و معرفی ویژگی
+  dept: rnd
+  steps:
+  - [user_researcher, جمع‌بندی بازخورد مشتری, auto]
+  - [product_manager, نوشتن PRD, ask]
+  - [ux_designer, طراحی جریان و رابط, auto]
+  - [software_architect, طراحی سیستم و وظایف, ask]
+  - [dev_engineer, پیاده‌سازی و تست, auto]
+  - [qa_release, تست پذیرش و انتشار, gate]
+  - [content_creator, محتوای معرفی ویژگی, ask]
+  - [h_service, آماده‌سازی پشتیبانی, ask]
+- name: اجرای کمپین تا تحویل سرنخ به فروش
+  dept: marketing
+  steps:
+  - [market_researcher, انتخاب بخش هدف و پیام, auto]
+  - [content_creator, تولید محتوا و آگهی, ask]
+  - [brand_guardian, بررسی برند, gate]
+  - [ad_compliance_ir, بررسی مقررات تبلیغ و پیامک, gate]
+  - [paid_media, راه‌اندازی کمپین با بودجهٔ مصوب, gate]
+  - [marketing_analytics, اندازه‌گیری و امتیاز سرنخ, auto]
+  - [sdr_outbound, پیگیری سرنخ واجد شرایط, ask]
+- name: از سرنخ تا قرارداد و تحویل
+  dept: sales
+  steps:
+  - [sdr_outbound, واجد شرایط کردن و جلسه, ask]
+  - [solutions_engineer, دمو و پاسخ فنی, ask]
+  - [pricing_strategist, تأیید قیمت/تخفیف خارج از سیاست, gate]
+  - [proposal_writer, پیشنهاد و پیش‌نویس قرارداد, gate]
+  - [h_legal, بررسی قرارداد, ask]
+  - [h_sales, امضا و تأیید نهایی, gate]
+  - [crm_ops, ثبت برد در CRM, auto]
+  - [h_finance, صدور فاکتور, ask]
+  - [h_service, شروع آنبوردینگ مشتری, ask]
+- name: پیش‌بینی فروش برای بودجه و هیئت‌مدیره
+  dept: sales
+  steps:
+  - [crm_ops, پاک‌سازی دادهٔ قیف, auto]
+  - [pipeline_forecaster, پیش‌بینی هفتگی و ریسک معامله, auto]
+  - [h_sales, بازبینی و اصلاح, ask]
+  - [h_finance, به‌روزرسانی پیش‌بینی نقدینگی, ask]
+  - [exec_brief, درج در گزارش مدیریتی, ask]
+- name: خرید کالای وارداتی تا رسیدن به انبار
+  dept: ops
+  steps:
+  - [ops_demand_planner, نیاز خرید را از پیش‌بینی تقاضا می‌سازد, ask]
+  - [ops_sourcing_buyer, استعلام و پیش‌نویس سفارش خرید, gate]
+  - [h_finance, تأیید بودجه و پرداخت, gate]
+  - [ops_ir_customs, ثبت‌سفارش در سامانهٔ جامع تجارت و مدارک ترخیص, gate]
+  - [ops_supplier_followup, پیگیری تأیید و زمان ارسال از تأمین‌کننده, auto]
+  - [ops_quality_inspector, بازرسی کالای ورودی, ask]
+  - [ops_inventory_logistics, ورود به انبار و به‌روزکردن موجودی, auto]
+- name: شکایت کیفی مشتری تا جبران و اقدام اصلاحی
+  dept: service
+  steps:
+  - [svc_triage_router, تشخیص شکایت و فوریت, auto]
+  - [svc_complaint_handler, ثبت و تأیید دریافت به مشتری, auto]
+  - [ops_quality_inspector, تحلیل علت ریشه‌ای, ask]
+  - [svc_complaint_handler, پیشنهاد جبران (بازپرداخت یا تعویض), gate]
+  - [h_finance, اجرای بازپرداخت, gate]
+  - [ops_inventory_logistics, ارسال کالای جایگزین یا دریافت مرجوعی, auto]
+  - [svc_voc_analyst, ثبت در گزارش صدای مشتری و ارسال به محصول, auto]
+- name: فرصت تمدید از سلامت حساب
+  dept: service
+  steps:
+  - [svc_voc_analyst, کشف نشانهٔ رضایت یا ریزش, auto]
+  - [svc_success_manager, آماده‌کردن پروندهٔ تمدید, ask]
+  - [h_sales, پیشنهاد قیمت و قرارداد تمدید, gate]
+- name: استخدام تا اولین حقوق
+  dept: hr
+  steps:
+  - [h_hr, تأیید نیاز استخدام و بودجه, ask]
+  - [hr_recruiter, آگهی، غربال و فهرست کوتاه, gate]
+  - [hr_ir_labor_docs, بررسی مدارک و پیش‌نویس قرارداد, gate]
+  - [h_legal, بازبینی قرارداد غیرعادی, gate]
+  - [hr_onboarding, چک‌لیست ورود و مسیر آموزش, auto]
+  - [h_tech, ساخت حساب‌ها و دسترسی‌ها, auto]
+  - [hr_payroll_prep, افزودن به حقوق ماه, gate]
+  - [hr_ir_statutory_filings, افزودن به لیست بیمه و مالیات, gate]
+  - [h_finance, پرداخت حقوق و حق بیمه, gate]
+- name: خروج کارمند
+  dept: hr
+  steps:
+  - [hr_offboarding, باز کردن پروندهٔ خروج و چک‌لیست, auto]
+  - [h_tech, بستن دسترسی‌ها در روز آخر, auto]
+  - [h_assets, تحویل‌گرفتن تجهیزات, auto]
+  - [hr_ir_labor_docs, پیش‌نویس برگهٔ تسویه, gate]
+  - [hr_payroll_prep, محاسبهٔ تسویهٔ مالی, gate]
+  - [h_finance, پرداخت تسویه, gate]
+- name: حادثهٔ سرور تا تغییر اصلاحی
+  dept: tech
+  steps:
+  - [tech_infra_ops, هشدار پایش و ثبت حادثه, auto]
+  - [tech_incident, رفع موقت و تحلیل علت, ask]
+  - [tech_change, طرح تغییر و بازگشت, gate]
+  - [h_risk, بررسی اثر امنیتی, ask]
+  - [tech_infra_ops, اجرای تغییر تأییدشده و پایش, auto]
+  - [tech_incident, گزارش پس از حادثه به h_tech, ask]
+- name: جایگزینی ابزار خارجی قطع‌شده (ایران)
+  dept: tech
+  steps:
+  - [tech_ir_tools, شناسایی ابزار پرریسک و جایگزین, ask]
+  - [h_risk, ارزیابی ریسک تحریم, ask]
+  - [tech_apps, آزمون و یکپارچه‌سازی جایگزین, ask]
+  - [fin_payables, پرداخت اشتراک جدید, gate]
+  - [tech_change, مهاجرت در پنجرهٔ مجاز, gate]
+- name: خرید تا پرداخت
+  dept: finance
+  steps:
+  - [procurement, صدور سفارش خرید, ask]
+  - [fin_payables, تطبیق سه‌طرفهٔ فاکتور, auto]
+  - [fin_payables, پیشنهاد فهرست پرداخت, gate]
+  - [h_finance, تأیید پرداخت, gate]
+  - [fin_treasury, اجرای پرداخت بانکی, gate]
+  - [fin_gl_close, ثبت و مغایرت‌گیری, auto]
+- name: فروش تا ارسال به سامانهٔ مؤدیان
+  dept: finance
+  steps:
+  - [salesops, ثبت سفارش فروش, auto]
+  - [fin_receivables, صدور فاکتور, ask]
+  - [fin_ir_tax, ارسال صورتحساب الکترونیک, gate]
+  - [fin_treasury, تطبیق واریز, auto]
+  - [fin_ir_tax, اظهارنامهٔ فصلی VAT, gate]
+  - [fin_controls, کنترل نمونه‌ای, ask]
+- name: خرید لپ‌تاپ تا استهلاک
+  dept: assets
+  steps:
+  - [tech_service_desk, درخواست تجهیزات کارمند جدید, auto]
+  - [ast_capex, بررسی بودجه و سقف سرمایه‌ای, gate]
+  - [procurement, خرید از تأمین‌کننده, ask]
+  - [fin_payables, پرداخت فاکتور, gate]
+  - [ast_register, ثبت، برچسب و شروع استهلاک, auto]
+  - [fin_gl_close, ثبت سند استهلاک ماهانه, auto]
+- name: تمدید اجارهٔ دفتر
+  dept: assets
+  steps:
+  - [ast_space, هشدار سررسید و تحلیل فضا, ask]
+  - [fin_fpa, اثر بودجه‌ای, ask]
+  - [h_legal, بازبینی قرارداد, gate]
+  - [h_assets, تصمیم تمدید, gate]
+  - [fin_payables, ثبت پرداخت‌های دوره‌ای, auto]
+- name: حادثهٔ امنیتی با نشت داده
+  dept: risk
+  steps:
+  - [security_ops, شناسایی و مهار حادثه, gate]
+  - [privacy_officer, ارزیابی نشت و پیش‌نویس اطلاع‌رسانی, gate]
+  - [contract_reviewer, بررسی تعهدات تأمین‌کننده/مشتری, gate]
+  - [continuity_planner, فعال‌سازی طرح بازیابی, ask]
+  - [h_risk, تصمیم و گزارش به مدیرعامل, ask]
+  - [retro_analyst, درس‌آموخته و اقدام بهبود, auto]
+- name: طرف تجاری خارجی تازه
+  dept: risk
+  steps:
+  - [h_sales, درخواست همکاری با طرف خارجی, ask]
+  - [ir_sanctions_screener, غربال تحریم و ریسک ارز, ask]
+  - [risk_register, ثبت ریسک و KRI, ask]
+  - [contract_reviewer, افزودن بند تحریم و پرداخت, gate]
+  - [h_finance, تأیید مسیر پرداخت, gate]
+- name: قرارداد فروش تا امضا
+  dept: legal
+  steps:
+  - [h_sales, ارسال پیش‌نویس مشتری, auto]
+  - [h_legal, پذیرش و مسیریابی بر اساس ریسک, ask]
+  - [contract_reviewer, بازبینی با playbook و اصلاحیه, gate]
+  - [privacy_officer, بررسی بند داده (در صورت نیاز), gate]
+  - [h_finance, تأیید شرایط مالی, gate]
+  - [h_legal, تأیید نهایی امضا, gate]
+  - [obligation_tracker, ثبت تعهدات و یادآورها, auto]
+- name: نام و علامت محصول تازه
+  dept: legal
+  steps:
+  - [h_marketing, پیشنهاد نام, ask]
+  - [ip_counsel, جست‌وجوی سابقه و ارزیابی, gate]
+  - [ir_filings, اظهارنامهٔ علامت تجاری ایران, gate]
+  - [ip_counsel, ثبت مادرید (در صورت نیاز), gate]
+  - [kb_curator, بایگانی گواهی‌ها, auto]
+- name: بازطراحی یک فرایند
+  dept: capability
+  steps:
+  - [process_improver, یافتن گلوگاه و پیشنهاد بهبود, ask]
+  - [process_modeler, به‌روزرسانی مدل در c4-org, auto]
+  - [compliance_monitor, بررسی اثر انطباقی, ask]
+  - [h_capability, تأیید اجرا, ask]
+  - [change_manager, طرح ADKAR, ask]
+  - [training_designer, ساخت آموزش, ask]
+  - [h_hr, اجرای آموزش برای کارکنان, ask]
+  - [kb_curator, انتشار مستند داخلی, auto]
+- name: افزودن عامل تازه به سازمان
+  dept: capability
+  steps:
+  - [h_capability, درخواست نقش تازه, ask]
+  - [agent_governor, تعیین حالت، مجوز و بودجه, ask]
+  - [security_ops, بازبینی دسترسی‌ها, gate]
+  - [h_finance, تأیید بودجه, gate]
+  - [process_modeler, افزودن به نمودار سازمان, auto]
+unverified: ['قوانین پیامک تبلیغاتی ایران (رضایت، لغو، نهاد ناظر): صفحه‌های خبری پیدا شد ولی خوانده نشد؛ جزئیات باید از پروژهٔ حق‌پرس تأیید شود', سطح ۳ APQC برای ۱.۰ تا ۳.۰ خوانده نشد؛ نگاشت عامل‌ها فقط
+    تا سطح ۲ است, نقش کانال/شریک در کاتالوگ ۱۶ قالب پیدا نشد؛ partner_manager طراحی خودمان است, ارتقای سرپرست‌ها (h_rnd، h_marketing، h_sales) از Sonnet به Opus طبق قاعدهٔ این کار است، نه نمودار فعلی, اثربخشی
+    واقعی این تیم‌ها در شرکت‌های بزرگ از منبع مستقل تأیید نشده, 'ISO 9001:2015 page not fetched; a newer ISO 9001 revision may exist by 2026.', 'ntsw.ir (سامانهٔ جامع تجارت) process, کوتاژ steps and customs
+    details: not fetched (zoomit/sepidar blocked).', 'Iran units (ir_standards, ir_tamin, ir_payroll_tax, ir_labor_law, ir_military): duties taken only from global-org-current.json descriptions; no official
+    Iranian source fetched.', 'ITIL 4 incident/service-desk practice: Axelos page returned no content; not used as a source.', 'Catalog roles mostly have one-line descriptions only; fit is judged by name/title,
+    not by their full prompts.', 'Model choice (Opus heads vs current Sonnet heads in the chart) follows the brief, not a cost test.', IAS 16 (استهلاک) فقط از نتیجهٔ جستجو؛ صفحه fetch نشد, 'جزئیات سامانهٔ
+    مؤدیان، کارپوشه و مهلت‌ها: صفحهٔ sepidarsystem در دسترس نبود؛ به پروژهٔ حق‌پرس ارجاع شود', 'قواعد چک صیادی، ارز، دامنهٔ .ir و ابزارهای تحریمی: بررسی نشده', تطبیق نقش‌های catalog با کار مالی/IT فقط بر
+    اساس نام و توضیح کوتاه در catalog است, نقش‌های دپارتمان assets در catalog نمونه‌ای ندارند, 'All Iran legal/permit content (ir_filings, ir_afta_assessor, ir_sanctions_screener): no official Iranian source
+    fetched; details deferred to Haqpors project.', 'AFTA requirements: only a university-hosted PDF found by search; not read, not official.', 'ISO 31000, ISO 27001, ISO 45001, GDPR, GRI, WIPO Madrid,
+    OFAC URLs not fetched.', APQC PCF 11.0/13.0 level-2 groups not verified (pages blocked)., BPM CBOK knowledge areas not verified., catalog roles have empty/short descriptions in catalog-agents.json;
+    fit judged from title only.]

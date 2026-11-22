@@ -1,0 +1,95 @@
+# کاتالوگ ورک‌فلوهای رایج جهان و ایران — منبع واحد فهرست (برای پیاده‌سازی) — نسخه 1 — 2026-11-21 12:58 UTC (13:58 برلین)
+# قالب: [id, نام فارسی, نام رایج انگلیسی, دپارتمان مالک, کد APQC, محرک, نتیجهٔ پایانی, وضعیت]
+# وضعیت: done = در org-agents.yaml قدم‌به‌قدم طراحی شده · todo = باید طراحی شود
+# منبع جهانی: APQC PCF Cross-Industry 7.x (apqc.org/process-frameworks)، ITIL 4، SCOR — نام‌های end-to-end رایج (O2C, P2P, R2R, H2R) از ادبیات ERP (SAP/Oracle)
+# منبع ایران: هیچ‌کدام از منبع رسمی باز نشده → همه «تأییدنشده»؛ جزئیات حقوقی با پروژهٔ حق‌پرس (لینک، نه ادغام)
+# طراحی هر ورک‌فلو: طبق docs/STANDARD-BPMN.md و STANDARD-PROCESS-BUILD.md (ایجنت‌ها: wf_researcher → process_modeler → wf_agent_mapper → bpmn_validator → Siax)
+
+global:
+  # راهبرد و حاکمیت
+  - [annual_plan, برنامهٔ سالانه و OKR, Strategy-to-Plan, strategy, "1.0", آغاز سال مالی, برنامهٔ مصوب, done]
+  - [board_meeting, جلسهٔ هیئت‌مدیره, Board Cycle, exec, "1.3", تقویم فصلی, صورت‌جلسهٔ امضاشده, todo]
+  - [m_and_a, خرید یا ادغام شرکت, M&A Deal, strategy, "1.2", فرصت جدید, قرارداد یا رد, done]
+  - [project_intake, ورود پروژهٔ جدید به سبد, Portfolio Intake, strategy, "1.4", درخواست پروژه, تصویب/رد, todo]
+  # محصول
+  - [idea_to_market, از ایده تا عرضه, Idea-to-Market, rnd, "2.0", ایدهٔ تأییدشده, ویژگی منتشر شد, done]
+  - [release, انتشار نسخه, Release Management, tech, "2.3", نسخهٔ آماده, نسخه در تولید, todo]
+  - [bug_fix, رفع باگ, Issue-to-Fix, rnd, "2.3", گزارش باگ, اصلاح منتشر شد, todo]
+  # بازاریابی و فروش
+  - [campaign_to_lead, کمپین تا سرنخ, Campaign-to-Lead, marketing, "3.3", تقویم کمپین, سرنخ تحویل فروش, done]
+  - [content_publish, تولید و انتشار محتوا, Content Approval, marketing, "3.3", برنامهٔ محتوا, پست منتشر شد, todo]
+  - [pricing_change, تغییر قیمت یا تخفیف, Price Change, marketing, "3.4", درخواست تغییر, قیمت جدید فعال, todo]
+  - [lead_to_order, سرنخ تا قرارداد, Lead-to-Order, sales, "3.5", سرنخ واجد شرایط, قرارداد امضا شد, done]
+  - [quote_to_cash, پیش‌فاکتور تا وصول, Quote-to-Cash, sales, "3.5+9.2", درخواست قیمت, پول وصول شد, todo]
+  - [sales_forecast, پیش‌بینی فروش, Sales Forecast, sales, "3.5", پایان ماه, پیش‌بینی مصوب, done]
+  - [partner_onboard, جذب شریک فروش, Partner Onboarding, sales, "3.5", شریک جدید, قرارداد همکاری, todo]
+  # عملیات و تأمین
+  - [procure_to_pay, خرید تا پرداخت, Procure-to-Pay (P2P), finance, "4.2+9.2", درخواست خرید, پرداخت به تأمین‌کننده, done]
+  - [import_goods, خرید وارداتی تا انبار, Import-to-Warehouse, ops, "4.2", سفارش خارجی, کالا در انبار, done]
+  - [order_to_cash, سفارش تا وصول, Order-to-Cash (O2C), ops, "4.5+9.2", سفارش مشتری, ارسال و وصول, todo]
+  - [plan_to_produce, برنامه تا تولید, Plan-to-Produce, ops, "4.3", پیش‌بینی تقاضا, محصول آماده, todo]
+  - [returns, مرجوعی کالا, Return Merchandise (RMA), ops, "4.5", درخواست مرجوعی, بازپرداخت یا تعویض, todo]
+  - [inventory_count, انبارگردانی, Cycle Count, ops, "4.4", تقویم ماهانه, اختلاف ثبت شد, todo]
+  - [supplier_onboard, ثبت تأمین‌کنندهٔ جدید, Vendor Onboarding, ops, "4.2", تأمین‌کنندهٔ جدید, تأمین‌کنندهٔ تأییدشده, todo]
+  # خدمات مشتری
+  - [complaint, شکایت تا جبران, Complaint-to-Resolution, service, "5.0", ثبت شکایت, شکایت بسته شد, done]
+  - [ticket, تیکت پشتیبانی, Issue-to-Resolution, service, "5.0", تیکت جدید, تیکت بسته شد, todo]
+  - [renewal, تمدید مشتری, Renewal, service, "5.0", ۹۰ روز تا پایان قرارداد, تمدید یا ریزش, done]
+  - [customer_onboard, ورود مشتری جدید (KYC), Customer Onboarding, service, "5.0", قرارداد امضا شد, مشتری فعال, todo]
+  # منابع انسانی
+  - [hire_to_pay, استخدام تا اولین حقوق, Hire-to-Pay, hr, "7.2", درخواست نیرو, اولین حقوق پرداخت شد, done]
+  - [offboard, خروج کارمند, Offboarding, hr, "7.6", استعفا یا اخراج, تسویه و قطع دسترسی, done]
+  - [payroll, حقوق ماهانه, Payroll, hr, "7.5", پایان ماه, حقوق پرداخت شد, todo]
+  - [leave, درخواست مرخصی, Leave Request, hr, "7.5", درخواست کارمند, تأیید/رد, todo]
+  - [perf_review, ارزیابی عملکرد, Performance Review, hr, "7.3", دورهٔ ارزیابی, نمرهٔ نهایی, todo]
+  - [training, آموزش کارکنان, Learning Cycle, hr, "7.3", نیاز آموزشی, دوره تمام شد, todo]
+  - [expense, هزینهٔ کارمند (تنخواه), Expense Report, finance, "9.2", رسید هزینه, بازپرداخت, todo]
+  # فناوری
+  - [incident, حادثهٔ سرور, Incident-to-Resolution (ITIL), tech, "8.0", هشدار, سرویس برگشت + درس‌آموخته, done]
+  - [request_fulfill, درخواست دسترسی یا ابزار, Request-to-Fulfill (ITIL), tech, "8.0", درخواست کارمند, دسترسی داده شد, todo]
+  - [change_mgmt, تغییر در سیستم, Change Enablement (ITIL), tech, "8.0", درخواست تغییر, تغییر اعمال شد, todo]
+  - [backup_restore, پشتیبان‌گیری و آزمون بازیابی, Backup & Restore Test, tech, "8.0", زمان‌بندی, بازیابی آزموده شد, todo]
+  # مالی
+  - [sale_to_tax, فروش تا سامانهٔ مؤدیان, Sale-to-E-Invoice, finance, "9.2", فروش ثبت شد, صورتحساب پذیرفته شد, done]
+  - [record_to_report, بستن ماهانه تا گزارش, Record-to-Report (R2R), finance, "9.1", پایان ماه, صورت‌های مالی, todo]
+  - [budget_cycle, بودجه و پیش‌بینی, Budget-to-Forecast, finance, "9.1", آغاز دورهٔ بودجه, بودجهٔ مصوب, todo]
+  - [investor_report, گزارش سرمایه‌گذار, Investor Reporting, finance, "9.9", پایان فصل, گزارش ارسال شد, todo]
+  # دارایی
+  - [acquire_to_retire, خرید دارایی تا استهلاک, Acquire-to-Retire, assets, "10.0", خرید دارایی, دارایی کنار گذاشته شد, done]
+  - [lease_renewal, تمدید اجاره, Lease Renewal, assets, "10.0", ۹۰ روز به پایان, قرارداد تمدید, done]
+  # ریسک و امنیت
+  - [security_incident, حادثهٔ امنیتی و نشت داده, Breach Response, risk, "11.0", کشف نشت, اطلاع‌رسانی و بستن, done]
+  - [dsar, درخواست داده از طرف کاربر, Data Subject Request (GDPR), risk, "11.0", درخواست کاربر, پاسخ در مهلت, todo]
+  - [risk_review, بازبینی ریسک فصلی, Risk Review (ERM), risk, "11.1", تقویم فصلی, ثبت ریسک به‌روز, todo]
+  - [bcp_test, آزمون تداوم کسب‌وکار, BCP Test, risk, "11.3", تقویم سالانه, گزارش آزمون, todo]
+  # حقوقی
+  - [contract_to_sign, قرارداد تا امضا, Contract Lifecycle, legal, "12.0", درخواست قرارداد, امضا و بایگانی, done]
+  - [new_counterparty, طرف تجاری خارجی جدید, Counterparty Due Diligence, legal, "12.0", طرف جدید, تأیید/رد, done]
+  - [trademark, نام و علامت تجاری, Trademark Filing, legal, "12.2", نام جدید, علامت ثبت شد, done]
+  - [policy_update, به‌روزرسانی سیاست داخلی, Policy Management, legal, "12.0", تغییر قانون, سیاست ابلاغ شد, todo]
+  # توانمندی
+  - [process_redesign, بازطراحی فرایند, Process Improvement, capability, "13.0", مشکل یا KPI بد, فرایند جدید جاری, done]
+  - [new_agent, افزودن ایجنت تازه, Agent Onboarding, capability, "13.0", نیاز جدید, ایجنت فعال (متوقف تا تأیید), done]
+  - [workflow_design, طراحی ورک‌فلوی جدید, BPMN Design Cycle, capability, "13.0", ورک‌فلوی todo, ورک‌فلوی تأییدشده, todo]
+
+iran:   # همه «تأییدنشده» — نیاز به منبع رسمی و بازبینی حق‌پرس
+  - [ir_moadian, صدور صورتحساب الکترونیک در سامانهٔ مؤدیان, Moadian e-invoice, finance, "9.2", هر فروش, صورتحساب پذیرفته شد, done]
+  - [ir_vat, اظهارنامهٔ ارزش افزودهٔ فصلی, VAT return, finance, "9.2", پایان فصل, اظهارنامه ثبت و پرداخت, todo]
+  - [ir_seasonal, گزارش معاملات فصلی, Seasonal trade report, finance, "9.2", پایان فصل, گزارش ثبت شد, todo]
+  - [ir_annual_tax, اظهارنامهٔ عملکرد سالانه (تا پایان تیر), Annual corporate tax return, finance, "9.2", پایان سال مالی, اظهارنامه ثبت شد, todo]
+  - [ir_tamin_list, لیست ماهانهٔ بیمهٔ تأمین اجتماعی, Monthly social security list, hr, "7.5", پایان ماه, لیست و پرداخت, todo]
+  - [ir_payroll_tax, مالیات حقوق ماهانه, Payroll tax, hr, "7.5", پایان ماه, فهرست و پرداخت, todo]
+  - [ir_labor_contract, قرارداد کار و تسویه طبق قانون کار, Labor contract & settlement, hr, "7.2", استخدام یا خروج, قرارداد/تسویه‌نامه, todo]
+  - [ir_agm, مجمع عمومی سالیانه و آگهی روزنامهٔ رسمی, Annual general meeting, legal, "12.0", پس از صورت‌های مالی, صورت‌جلسه ثبت شد, todo]
+  - [ir_changes, ثبت تغییرات شرکت, Company changes registration, legal, "12.0", تغییر مدیر/سرمایه/نشانی, آگهی منتشر شد, todo]
+  - [ir_enamad, اخذ و تمدید اینماد, eNamad trust seal, legal, "12.0", راه‌اندازی یا تمدید, نماد فعال, todo]
+  - [ir_license, مجوز کسب‌وکار در درگاه ملی مجوزها, Business license, legal, "12.0", فعالیت جدید, مجوز صادر شد, todo]
+  - [ir_trademark, ثبت علامت تجاری ایران, IR trademark, legal, "12.2", نام جدید, گواهی ثبت, todo]
+  - [ir_sayad, صدور و تأیید چک صیادی, Sayad cheque, finance, "9.4", پرداخت با چک, چک ثبت/تأیید شد, todo]
+  - [ir_customs, ثبت سفارش و ترخیص گمرک (سامانهٔ جامع تجارت), Import order & customs, ops, "4.2", خرید خارجی, کالا ترخیص شد, todo]
+  - [ir_commerce_card, صدور و تمدید کارت بازرگانی, Commerce card, legal, "12.0", نیاز به واردات/صادرات, کارت معتبر, todo]
+  - [ir_sms_ads, ارسال پیامک تبلیغاتی مجاز, Promotional SMS compliance, marketing, "3.3", کمپین پیامکی, ارسال با لغو۱۱, todo]
+  - [ir_knowledge_based, ارزیابی دانش‌بنیان, Knowledge-based company assessment, legal, "12.0", درخواست, تأییدیه, todo]
+  - [ir_setad, شرکت در مناقصهٔ دولتی (ستاد), Government tender (Setad), sales, "3.5", آگهی مناقصه, برنده/بازنده, todo]
+  - [ir_tool_replace, جایگزینی ابزار خارجی قطع‌شده, Sanctioned tool replacement, tech, "8.0", قطع سرویس, ابزار جایگزین فعال, done]
+  - [ir_data_local, میزبانی داخلی داده و دامنهٔ .ir, Data localization, tech, "8.0", سرویس جدید, میزبانی داخلی, todo]
