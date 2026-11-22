@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { createTestHarness } from "@paperclipai/plugin-sdk/testing";
 import manifest from "../src/manifest.js";
-import plugin, { DATA, orgIdOf, brokenText } from "../src/worker.js";
+import plugin, { DATA, orgIdOf, brokenText, withPrefs } from "../src/worker.js";
 import { categorize } from "../src/shared/categories.js";
 import { evalWhen, planCase } from "../src/shared/planner.js";
 import { buildInstructions } from "../src/shared/instructions.js";
@@ -26,7 +26,7 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 describe("manifest", () => {
   it("asks only for read + create-task + status update (0.10, approved) + page/sidebar", () => {
     expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "issues.read", "issue.comments.read", "issues.update", "events.subscribe", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.11.0");
+    expect(manifest.version).toBe("0.12.0");
   });
 });
 
@@ -401,5 +401,18 @@ describe("0.10.2 mojibake guard", () => {
   it("drops cp1256-read UTF-8 text but keeps real Persian", () => {
     expect(brokenText({ why_now: "ظˆظ‚طھ ظ…ط¯غŒط±" })).toBe(true);
     expect(brokenText({ why_now: "وقت مدیرعامل صرف کارهای ظریف و خطیر نشود؛ ضوابط و طرح" })).toBe(false);
+  });
+});
+
+describe("0.12.0 preferences profile in step descriptions", () => {
+  it("adds the PREFS block once and replaces it on refresh", () => {
+    const a = withPrefs("کار قدم", "salary: 30M");
+    expect(a.startsWith("<!-- prefs:start -->")).toBe(true);
+    expect(a).toContain("salary: 30M");
+    const b = withPrefs(a, "salary: 35M");
+    expect(b.match(/prefs:start/g)?.length).toBe(1);
+    expect(b).toContain("salary: 35M");
+    expect(b).not.toContain("30M");
+    expect(withPrefs(b, null)).toBe("کار قدم");
   });
 });

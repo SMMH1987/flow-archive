@@ -59,6 +59,20 @@ async function liveAgents(ctx: any, companyId: string) {
 // Real test 2026-11-21: a saved template came back with broken encoding (mojibake). Hide such entries instead of showing them.
 export const brokenText = (v: unknown) => { const t = JSON.stringify(v ?? ""); return /\uFFFD|Ã.|Ø[\u0080-\u00FF]|Ù[\u0080-\u00FF]|\?{3,}/.test(t) || /[\u00C0-\u00FF]{3,}/.test(t) || (t.match(/[\u0637\u0638\u06CC][\u00A0-\u00FF\u0152\u0153\u0192\u02C6\u06BE\u2013-\u2030\u2039\u203A\u20AC\u2122]/g) ?? []).length >= 3; }; // 0.10.2: UTF-8 read as cp1256, e.g. «ظˆظ‚طھ»
 export const cleanTemplates = (t: Template[]) => t.filter((x) => x && typeof x.caseId === "string" && !brokenText(x));
+
+// 0.12.0 (Siax 2026-11-22 «بساز»): the person's preferences profile lives in ONE Paperclip issue titled «PREFS: <name>».
+// Agents only have Read, so the plugin copies it into each step's description between fixed markers (inside Paperclip, no script).
+export const PREFS_A = "<!-- prefs:start -->", PREFS_B = "<!-- prefs:end -->";
+export function withPrefs(desc: string, prefs: string | null): string {
+  const base = String(desc ?? "").replace(new RegExp(PREFS_A + "[\\s\\S]*?" + PREFS_B + "\\n*", "g"), "");
+  if (!prefs) return base;
+  return `${PREFS_A}\nترجیحات صاحب کار (اول این را بخوان؛ هر سؤال یا نکتهٔ گنگ را با همین جواب بده و فرضت را در جوابت بنویس؛ اگر MISSING بود پیش‌فرض استاندارد بگذار و ادامه بده، فقط قدم 🔒 منتظر بماند):\n${prefs.slice(0, 4000)}\n${PREFS_B}\n\n` + base;
+}
+async function prefsOf(ctx: any, companyId: string): Promise<string | null> {
+  const all: any[] = await ctx.issues.list({ companyId, limit: 500, offset: 0 });
+  const p = all.find((i) => String(i.title ?? "").startsWith("PREFS:"));
+  return p ? String(p.description ?? "") : null;
+}
 async function pastCases(ctx: any, companyId: string, caseId: string) {
   if (!companyId) return [];
   const t = cleanTemplates(((await ctx.state.get({ scopeKind: "company", scopeId: companyId, stateKey: "templates" })) as Template[] | null) ?? []);
@@ -148,6 +162,21 @@ const plugin = definePlugin({
       for (const k of all.filter((i: any) => cases.has(i.parentId))) out.push(await closeIfAnswered(k.id, companyId));
       return { checked: out.length, changed: out.filter((x) => x?.changed).length };
     });
+    // 0.12.0: copy the current PREFS issue into every open step of every case (existing cases like SMMA-35)
+    ctx.actions.register("refreshPrefs", async (params) => {
+      const companyId = String(params?.companyId ?? "");
+      if (!companyId) throw new Error("companyId لازم است");
+      const prefs = await prefsOf(ctx, companyId);
+      if (!prefs) return { updated: 0, why: "no PREFS issue" };
+      const all = await ctx.issues.list({ companyId, limit: 500, offset: 0 });
+      const cases = new Set(all.filter((i: any) => !i.parentId && String(i.title).startsWith("پرونده:")).map((i: any) => i.id));
+      let n = 0;
+      for (const k of all.filter((i: any) => cases.has(i.parentId) && !["done", "cancelled"].includes(i.status))) {
+        const d = withPrefs(String((k as any).description ?? ""), prefs);
+        if (d !== String((k as any).description ?? "")) { await ctx.issues.update(k.id, { description: d } as any, companyId); n++; }
+      }
+      return { updated: n };
+    });
     ctx.data.register("autoStatusLog", async (params) => ((await ctx.state.get({ scopeKind: "company", scopeId: String(params?.companyId ?? ""), stateKey: "autoStatusLog" })) as any[] | null) ?? []);
     // Step 0 (Siax rule 2026-11-21): intent brief from the case's fixed intake questions
     ctx.data.register("brief", async (params) => {
@@ -192,6 +221,7 @@ const plugin = definePlugin({
       const plan: Plan = planCase(c, (params?.answers ?? {}) as Answers, ORG_IDS, (params?.opusOk ?? []) as string[], ORG_MODEL);
       if (plan.status !== "needs_input:approve_plan") throw new Error("برنامه آماده نیست: " + [...plan.errors, ...plan.ask.map((x) => x.why)].join("؛ "));
       const live = await liveAgents(ctx, companyId);
+      const prefs = await prefsOf(ctx, companyId);
       const map = new Map<string, string>();
       for (const a of live) { const o = orgIdOf(a); if (o && !map.has(o)) map.set(o, a.id); }
       const parent = await ctx.issues.create({
@@ -205,7 +235,7 @@ const plugin = definePlugin({
         const issue = await ctx.issues.create({
           companyId, parentId: parent.id, status: "backlog",
           title: `${s.n}. ${s.gate ? "🔒 " : ""}${s.task}`,
-          description: `${s.after.length ? "ورودی‌های این کار (اول این‌ها را بخوان؛ خروجی هر کدام در توضیح/کامنت آخر همان تسک است):\n" + s.after.map((d) => { const p = plan.steps.find((x) => x.id === d); return `- تسک ${p?.n ?? "?"}. ${p?.task ?? d} (شناسه ${ids.get(d) ?? "?"})`; }).join("\n") + "\nخروجی خودت را به‌عنوان جواب نهایی بنویس؛ Paperclip جواب نهایی‌ات را خودکار کامنت همین تسک می‌کند (ابزار کامنت لازم نیست) و تسک بعدی آن را می‌خواند.\n\n" : "خروجی خودت را به‌عنوان جواب نهایی بنویس؛ Paperclip جواب نهایی‌ات را خودکار کامنت همین تسک می‌کند (ابزار کامنت لازم نیست) و تسک بعدی آن را می‌خواند.\n\n"}${c.intake ? "خلاصهٔ نیت پرونده:\n" + brief.text + "\n\n" : "خلاصهٔ نیت پرونده در تسک اصلی (والد) است.\n"}مسئول: ${ORG_BY.get(s.agent)?.n ?? s.agent} · مدل ایجنت: ${s.model} · سختی کار: ${s.difficulty} · حالت: ${s.mode}${s.gate ? "\nقبل از هر قدم بیرونی تأیید انسان لازم است." : ""}${agentId ? "" : "\nایجنت این نقش در Paperclip پیدا نشد؛ تسک بدون مسئول ماند."}`,
+          description: withPrefs(`${s.after.length ? "ورودی‌های این کار (اول این‌ها را بخوان؛ خروجی هر کدام در توضیح/کامنت آخر همان تسک است):\n" + s.after.map((d) => { const p = plan.steps.find((x) => x.id === d); return `- تسک ${p?.n ?? "?"}. ${p?.task ?? d} (شناسه ${ids.get(d) ?? "?"})`; }).join("\n") + "\nخروجی خودت را به‌عنوان جواب نهایی بنویس؛ Paperclip جواب نهایی‌ات را خودکار کامنت همین تسک می‌کند (ابزار کامنت لازم نیست) و تسک بعدی آن را می‌خواند.\n\n" : "خروجی خودت را به‌عنوان جواب نهایی بنویس؛ Paperclip جواب نهایی‌ات را خودکار کامنت همین تسک می‌کند (ابزار کامنت لازم نیست) و تسک بعدی آن را می‌خواند.\n\n"}${c.intake ? "خلاصهٔ نیت پرونده:\n" + brief.text + "\n\n" : "خلاصهٔ نیت پرونده در تسک اصلی (والد) است.\n"}مسئول: ${ORG_BY.get(s.agent)?.n ?? s.agent} · مدل ایجنت: ${s.model} · سختی کار: ${s.difficulty} · حالت: ${s.mode}${s.gate ? "\nقبل از هر قدم بیرونی تأیید انسان لازم است." : ""}${agentId ? "" : "\nایجنت این نقش در Paperclip پیدا نشد؛ تسک بدون مسئول ماند."}`, prefs),
           ...(agentId ? { assigneeAgentId: agentId } : {}),
           blockedByIssueIds: s.after.map((d) => ids.get(d)).filter((x): x is string => !!x),
         });
