@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { createTestHarness } from "@paperclipai/plugin-sdk/testing";
 import manifest from "../src/manifest.js";
-import plugin, { DATA, orgIdOf } from "../src/worker.js";
+import plugin, { DATA, orgIdOf, brokenText } from "../src/worker.js";
 import { categorize } from "../src/shared/categories.js";
 import { evalWhen, planCase } from "../src/shared/planner.js";
 import { buildInstructions } from "../src/shared/instructions.js";
@@ -26,7 +26,7 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 describe("manifest", () => {
   it("asks only for read + create-task + status update (0.10, approved) + page/sidebar", () => {
     expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "issues.read", "issue.comments.read", "issues.update", "events.subscribe", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.10.1");
+    expect(manifest.version).toBe("0.10.2");
   });
 });
 
@@ -394,5 +394,12 @@ describe("0.10: auto status (agent answered → step done)", () => {
     h.seed({ issueComments: [{ id: "cm2", companyId: "c1", issueId: jd.id, authorType: "agent", authorAgentId: jd.assigneeAgentId, authorUserId: null, body: long, createdAt: new Date(), updatedAt: new Date() }] } as any);
     await h.emit("issue.comment.created", { issueId: jd.id, commentId: "cm2" }, { companyId: "c1", actorType: "agent", entityId: "cm2", entityType: "issue_comment" });
     expect((await h.ctx.issues.get(jd.id, "c1"))?.status).toBe("done");
+  });
+});
+
+describe("0.10.2 mojibake guard", () => {
+  it("drops cp1256-read UTF-8 text but keeps real Persian", () => {
+    expect(brokenText({ why_now: "ظˆظ‚طھ ظ…ط¯غŒط±" })).toBe(true);
+    expect(brokenText({ why_now: "وقت مدیرعامل صرف کارهای ظریف و خطیر نشود؛ ضوابط و طرح" })).toBe(false);
   });
 });
