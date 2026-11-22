@@ -61,3 +61,6 @@
 | اجرا | موتور Camunda | n8n / Paperclip |
 | خروجی `.bpmn` | — | بعداً با اسکریپت تولید می‌شود، فقط‌خواندنی (تأییدنشده که لازم باشد) |
 پیشنهاد: منبع واحد همان c4/yaml بماند و BPMN فقط قاعدهٔ نگارش باشد. تصمیمش با Siax است.
+
+## پیوند به امکانات رسمی Paperclip (نسخهٔ ۲۲ نوامبر ۲۰۲۶، ۰۷:۳۰ برلین)
+منبع واحد: `/mnt/project-files/research/paperclip/plugins/NATIVE-FEATURES-REFERENCE.md` (فقط پیوند، بدون کپی). هر ایجنت یا ورک‌فلوی تازه از ۵ قاعدهٔ آن پیروی می‌کند: جای ایجنت با `reportsTo` و `metadata.orgId`؛ قدم بیرونی با Decision/Approval رسمی؛ پایان با `paperclip_finish` یا `paperclip_block`؛ هزینه همراه توکن؛ بودجهٔ رسمی فقط ماهانه است.
