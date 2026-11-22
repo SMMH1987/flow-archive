@@ -1,4 +1,4 @@
-// v0.7.0 · 2026-11-21 21:55 Berlin. Commercial look: page wrapper .amx-page, case list like a CI run page (one line per step, answer on click), colours from tokens. v0.6.0 · 2026-11-21 20:45 Berlin. +live cases inside the «اجرای پرونده» view (portal). v0.5.0 · 2026-11-21 17:55 Berlin. +step 0 intent brief (intake) before the planner; v0.4 run trace; v0.3 templates + scenario. Agent Map page: full engine (chart, mind map, list, workflows, instructions, guard, Ctrl+K)
+// v0.8.0 · 2026-11-22 07:15 Berlin. +«تصمیم‌ها و قانون‌ها» section (from DECISIONS.md, trial), +«ثبت وضعیت از روی جواب‌ها» button and the auto-status note in the case list. v0.7.0 · 2026-11-21 21:55 Berlin. Commercial look: page wrapper .amx-page, case list like a CI run page (one line per step, answer on click), colours from tokens. v0.6.0 · 2026-11-21 20:45 Berlin. +live cases inside the «اجرای پرونده» view (portal). v0.5.0 · 2026-11-21 17:55 Berlin. +step 0 intent brief (intake) before the planner; v0.4 run trace; v0.3 templates + scenario. Agent Map page: full engine (chart, mind map, list, workflows, instructions, guard, Ctrl+K)
 // + dynamic case planner. Tasks are created only after the human ticks "approve" (action approvePlan).
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -118,18 +118,46 @@ function Trace({ companyId, live, org }: { companyId: string; live: LiveAgent[];
     </section>);
 }
 
+type Decision = { date: string; title: string; who: string | null; status: "active" | "replaced" | "unconfirmed"; note: string; kind: "rule" | "decision"; body: string };
+const DST: Record<string, [string, string, string]> = { active: ["جاری", "#2f9e44", "✓"], replaced: ["حذف یا جایگزین شد", "#868e96", "×"], unconfirmed: ["تأیید ثبت نشده", "#f08c00", "!"] };
+function Decisions({ data }: { data: { source: string; version: string; items: Decision[] } | null | undefined }) {
+  const [q, setQ] = useState("");
+  const [f, setF] = useState<"all" | "active" | "replaced" | "unconfirmed">("all");
+  if (!data?.items?.length) return null;
+  const n = (k: string) => data.items.filter((d) => d.status === k).length;
+  const rows = data.items.filter((d) => (f === "all" || d.status === f) && (!q || (d.title + " " + d.body + " " + (d.who ?? "")).includes(q)));
+  return (
+    <section className="amx-dec" dir="rtl">
+      <div className="amx-sh"><h3>تصمیم‌ها و قانون‌ها</h3><span className="amx-trial">آزمایشی، منتظر تأیید</span><span className="am-muted">{data.version}</span><span className="sp" />
+        <input className="amx-dec-q" placeholder="جستجو در تصمیم‌ها" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+      <div className="amx-dec-f" role="tablist">{([["all", "همه", data.items.length], ["active", "جاری", n("active")], ["unconfirmed", "تأیید ثبت نشده", n("unconfirmed")], ["replaced", "حذف‌شده", n("replaced")]] as const).map(([k, l, c]) =>
+        <button key={k} type="button" role="tab" aria-selected={f === k} className={"amx-b" + (f === k ? " on" : "")} data-f={k} onClick={() => setF(k)}>{l} {c}</button>)}</div>
+      <div className="amx-case">{rows.map((d, i) => { const st = DST[d.status]; return (
+        <details key={i} className={"amx-step amx-d-" + d.status} data-dec={d.status}>
+          <summary><span className="ic" style={{ color: st[1] }}>{st[2]}</span><span className="tt">{d.kind === "rule" && !d.title.startsWith("قانون") ? "قانون · " : ""}{d.title}</span><span className="who">{d.who ?? d.date}</span><span className="chip" style={{ color: st[1], borderColor: st[1] }}>{st[0]}</span></summary>
+          <div className="amx-ans">{d.note ? <div className="am-muted">{d.note}</div> : null}{d.body || <span className="am-muted">توضیح بیشتری ثبت نشده.</span>}<div className="am-muted">تاریخ: {d.date} · منبع: {data.source}</div></div>
+        </details>); })}
+        {!rows.length && <div className="am-muted" style={{ padding: 12 }}>چیزی پیدا نشد.</div>}</div>
+      <div className="am-muted">فقط نمایش؛ تنها خانهٔ این تصمیم‌ها فایل DECISIONS.md است و این فهرست هنگام ساخت افزونه از آن کپی می‌شود.</div>
+    </section>);
+}
+
 type RunStep = { id: string; identifier: string | null; title: string; status: string; agent: string | null; answer: { body: string; by: string; at: string; count: number } | null; older: { body: string; at: string }[]; hidden: number };
 const ST: Record<string, [string, string]> = { backlog: ["در صف", "#868e96"], todo: ["آماده", "#1c7ed6"], in_progress: ["در حال کار", "#f08c00"], in_review: ["بازبینی", "#7048e8"], blocked: ["گیر کرده", "#e03131"], done: ["انجام شد", "#2f9e44"], cancelled: ["لغو", "#868e96"] };
 const ICON: Record<string, string> = { done: "✓", in_progress: "●", in_review: "◐", blocked: "!", todo: "○", backlog: "○", cancelled: "×" };
 function CaseRuns({ companyId }: { companyId: string }) {
   const r = usePluginData<{ cases: { id: string; identifier: string | null; title: string; status: string; steps: RunStep[] }[] }>("caseRuns", { companyId });
   const [open, setOpen] = useState<Record<string, boolean>>({});
+  const sync = usePluginAction("syncStatus");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
   if (r.loading) return null;
   if (r.error) return <section className="amx-runs" dir="rtl">پاسخ مراحل در دسترس نیست: {r.error.message}</section>;
   const cs = r.data?.cases ?? [];
   return (
     <section className="amx-runs" dir="rtl">
-      <div className="amx-sh"><h3>پرونده‌ها</h3><span className="am-muted">هر قدم یک خط؛ برای دیدن جواب ایجنت رویش بزن</span><span className="sp" /><button type="button" className="amx-b amx-runs-rf" onClick={() => r.refresh()}>⟳ تازه‌سازی</button></div>
+      <div className="amx-sh"><h3>پرونده‌ها</h3><span className="am-muted">هر قدم یک خط؛ برای دیدن جواب ایجنت رویش بزن</span><span className="sp" /><button type="button" className="amx-b amx-runs-sync" disabled={busy} onClick={async () => { setBusy(true); try { const x: any = await sync({ companyId }); setMsg(`${x.changed} قدم از ${x.checked} «انجام شد» ثبت شد`); r.refresh(); } catch (e) { setMsg("ثبت نشد: " + (e as Error).message); } finally { setBusy(false); } }}>✓ ثبت وضعیت از روی جواب‌ها</button><button type="button" className="amx-b amx-runs-rf" onClick={() => r.refresh()}>⟳ تازه‌سازی</button></div>
+      <div className="am-muted amx-runs-note">{msg || "وقتی ایجنت جواب کاملش را بگذارد، قدم خودکار «انجام شد» می‌شود. قدم‌های 🔒 همیشه منتظر تأیید تو می‌مانند."}</div>
       {!cs.length && <div className="am-muted">هنوز پرونده‌ای ساخته نشده.</div>}
       {cs.map((c) => { const done = c.steps.filter((s) => s.status === "done").length; const pct = c.steps.length ? Math.round((100 * done) / c.steps.length) : 0; return (
         <div key={c.id} data-case={c.id} className="amx-case">
@@ -151,7 +179,7 @@ function CaseRuns({ companyId }: { companyId: string }) {
 
 export function AgentMapPage(_props: PluginPageProps) {
   const host = useHostContext();
-  const org = usePluginData<OrgPayload & { cases: Record<string, CaseDef> }>("org", {});
+  const org = usePluginData<OrgPayload & { cases: Record<string, CaseDef>; decisions?: { source: string; version: string; items: Decision[] } | null }>("org", {});
   const live = usePluginData<{ agents: LiveAgent[] }>("agents", { companyId: host.companyId ?? "" });
   const ref = useRef<HTMLDivElement>(null);
   const agents = useMemo(() => live.data?.agents ?? [], [live.data]);
@@ -169,7 +197,7 @@ export function AgentMapPage(_props: PluginPageProps) {
   }, [org.data]);
   if (org.error) return <div dir="rtl">خطا: {org.error.message}</div>;
   const runs = host.companyId ? <CaseRuns companyId={host.companyId} /> : null;
-  return <div className="amx-page" dir="rtl"><div ref={ref}>{org.loading ? "در حال بارگذاری…" : null}</div>{slot && runs ? createPortal(runs, slot) : runs}{org.data && host.companyId ? <Planner companyId={host.companyId} cases={org.data.cases} /> : null}{org.data ? <Scenario org={org.data} live={agents} /> : null}{org.data && host.companyId ? <Trace companyId={host.companyId} live={agents} org={org.data} /> : null}</div>;
+  return <div className="amx-page" dir="rtl"><div ref={ref}>{org.loading ? "در حال بارگذاری…" : null}</div>{slot && runs ? createPortal(runs, slot) : runs}{org.data ? <Decisions data={org.data.decisions} /> : null}{org.data && host.companyId ? <Planner companyId={host.companyId} cases={org.data.cases} /> : null}{org.data ? <Scenario org={org.data} live={agents} /> : null}{org.data && host.companyId ? <Trace companyId={host.companyId} live={agents} org={org.data} /> : null}</div>;
 }
 
 export function AgentMapSidebarLink(_props: PluginSidebarProps) {

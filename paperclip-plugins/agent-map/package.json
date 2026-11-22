@@ -1,6 +1,6 @@
 {
   "name": "agent-map",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "type": "module",
   "private": true,
   "description": "Live org chart and semantic mind map of agents",

@@ -67,6 +67,9 @@ export const SKIN_CSS = `
 .amx-page pre{background:var(--chip)!important;color:var(--fg)}
 .amx-sh{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}.amx-sh .sp{flex:1}
 .amx-runs{display:grid;gap:10px}
+.amx-dec{display:grid;gap:10px}.amx-dec-f{display:flex;flex-wrap:wrap;gap:6px}.amx-dec-f .amx-b.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.amx-dec-q{min-width:180px}.amx-trial{font-size:11.5px;border:1px dashed var(--warn,#f08c00);color:var(--warn,#f08c00);border-radius:999px;padding:0 8px}
+.amx-d-replaced .tt{text-decoration:line-through;color:var(--muted)}
 .amx-case{border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .amx-ch{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:8px 12px;background:var(--chip)}.amx-ch .bar{flex:1 1 120px;height:5px;border-radius:9px;background:var(--line);overflow:hidden;min-width:80px}.amx-ch .bar i{display:block;height:100%;background:#2f9e44}
 .amx-step{border-top:1px solid var(--line)}

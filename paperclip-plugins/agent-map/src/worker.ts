@@ -1,4 +1,4 @@
-// v0.5.0 · 2026-11-21 17:55 Berlin. Agent Map worker. +0.5 step 0 intent brief (intake) before any plan; +0.4 run trace (off until DB permission); +0.3 plan templates.
+// v0.6.0 · 2026-11-22 07:10 Berlin. +auto status: a case step becomes done when its agent posted the answer (issues.update + events.subscribe, Siax «تایید» 06:47). v0.5.0 · 2026-11-21 17:55 Berlin. Agent Map worker. +0.5 step 0 intent brief (intake) before any plan; +0.4 run trace (off until DB permission); +0.3 plan templates.
 // Reads live agents (agents.read). Serves our org chart, workflows and cases (bundled from flow-archive, see tools/sync_data.py).
 // Creates tasks ONLY after a human approves a plan (issues.create), and only in "backlog" so no agent wakes up by itself.
 import manifest from "./manifest.js";
@@ -7,6 +7,7 @@ import { categorize, type CatKey } from "./shared/categories.js";
 import { planCase, type Answers, type CaseDef, type Plan } from "./shared/planner.js";
 import { aggregateTrace, RUNS_SQL, COSTS_SQL, type RunRow, type CostRow } from "./shared/trace.js";
 import { buildBrief } from "./shared/intake.js";
+import { autoStatus } from "./shared/autostatus.js";
 import { buildInstructions, type OrgAgent } from "./shared/instructions.js";
 import ORGDATA from "./generated/org.json" with { type: "json" };
 
@@ -108,6 +109,37 @@ const plugin = definePlugin({
       }
       return { cases };
     });
+    // 0.10 auto status (Siax «تایید» 2026-11-22 06:47 Berlin). The agents cannot set status (no Bash), so the plugin does it.
+    // Only case steps, never 🔒 gates, only open → done. Each change is logged in plugin state (last 50) so it can be checked.
+    const closeIfAnswered = async (issueId: string, companyId: string) => {
+      const issue: any = await ctx.issues.get(issueId, companyId);
+      if (!issue?.parentId) return null;
+      const parent: any = await ctx.issues.get(issue.parentId, companyId);
+      const d = autoStatus(issue, parent?.title ?? null, (await ctx.issues.listComments(issueId, companyId)) as any);
+      if (d.status !== "done") return { issueId, changed: false, why: d.why };
+      await ctx.issues.update(issueId, { status: "done" } as any, companyId);
+      const key = { scopeKind: "company" as const, scopeId: companyId, stateKey: "autoStatusLog" };
+      const log = ((await ctx.state.get(key)) as any[] | null) ?? [];
+      await ctx.state.set(key, [{ issueId, identifier: issue.identifier ?? null, from: issue.status, to: "done", at: new Date().toISOString() }, ...log].slice(0, 50));
+      return { issueId, changed: true, why: d.why };
+    };
+    ctx.events.on("issue.comment.created", async (e) => {
+      const p: any = e.payload ?? {};
+      const issueId = String(p.issueId ?? p.comment?.issueId ?? (e.entityType === "issue" ? e.entityId : "") ?? "");
+      if (!issueId || (e.actorType && e.actorType !== "agent")) return;
+      try { await closeIfAnswered(issueId, e.companyId); } catch (err) { ctx.logger?.warn?.("auto status failed", { issueId, err: (err as Error).message }); }
+    });
+    // one button for steps that were answered before this version (e.g. SMMA-19..33)
+    ctx.actions.register("syncStatus", async (params) => {
+      const companyId = String(params?.companyId ?? "");
+      if (!companyId) throw new Error("companyId لازم است");
+      const all = await ctx.issues.list({ companyId, limit: 500, offset: 0 });
+      const cases = new Set(all.filter((i: any) => !i.parentId && String(i.title).startsWith("پرونده:")).map((i: any) => i.id));
+      const out = [];
+      for (const k of all.filter((i: any) => cases.has(i.parentId))) out.push(await closeIfAnswered(k.id, companyId));
+      return { checked: out.length, changed: out.filter((x) => x?.changed).length };
+    });
+    ctx.data.register("autoStatusLog", async (params) => ((await ctx.state.get({ scopeKind: "company", scopeId: String(params?.companyId ?? ""), stateKey: "autoStatusLog" })) as any[] | null) ?? []);
     // Step 0 (Siax rule 2026-11-21): intent brief from the case's fixed intake questions
     ctx.data.register("brief", async (params) => {
       const c = DATA.cases[String((params as any)?.caseId ?? "")];

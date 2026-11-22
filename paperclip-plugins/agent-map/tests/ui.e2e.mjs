@@ -1,4 +1,4 @@
-// v0.7.0 · 2026-11-21 21:45 Berlin. CSV now lives in the ⋯ menu (0.9.0 look). v0.6.0 · 2026-11-21 20:45 Berlin. +run view checks (0.8.0). v0.5.1 · 2026-11-21 20:05 Berlin. +canvas-height check (0.7.1). v0.5.0 · 2026-11-21 18:00 Berlin. +step 0 intent brief; idea 2 trace. Full page test: the real React UI (src/ui/index.tsx) + the real worker (test harness) in Chromium.
+// v0.8.0 · 2026-11-22 07:20 Berlin. +«تصمیم‌ها» section and «ثبت وضعیت از روی جواب‌ها» checks (0.10.0). v0.7.0 · 2026-11-21 21:45 Berlin. CSV now lives in the ⋯ menu (0.9.0 look). v0.6.0 · 2026-11-21 20:45 Berlin. +run view checks (0.8.0). v0.5.1 · 2026-11-21 20:05 Berlin. +canvas-height check (0.7.1). v0.5.0 · 2026-11-21 18:00 Berlin. +step 0 intent brief; idea 2 trace. Full page test: the real React UI (src/ui/index.tsx) + the real worker (test harness) in Chromium.
 // Run: npm run test:ui   — prints PASS/FAIL per check, exit 1 on failure. Build output goes to tests/.tmp (git-ignored).
 import esbuild from "esbuild"; import fs from "node:fs"; import { createRequire } from "node:module";
 const { chromium } = createRequire(import.meta.url)(process.env.PW || "playwright");
@@ -74,6 +74,24 @@ ok(await p.$eval("#mk-in", (el) => !!el.querySelector("#amx-run-slot .amx-runs")
 ok((await p.$$(".amx-runs")).length === 1, "0.8: live case list rendered once (moved, not duplicated)");
 await p.selectOption("#mk-v", "org"); await p.waitForTimeout(500);
 ok(!!(await p.$(".amx-runs")) && !(await p.$("#amx-run-slot")), "0.8: back to chart, case list returns below the map");
+// 0.10.0: decisions from DECISIONS.md, read-only, with filters and search
+const decN = (await p.$$(".amx-dec [data-dec]")).length;
+ok(decN >= 12 && (await p.textContent(".amx-dec")).includes("آزمایشی، منتظر تأیید"), `0.10: «تصمیم‌ها و قانون‌ها» lists ${decN} decisions, labelled trial`);
+await p.click('.amx-dec-f [data-f="replaced"]'); await p.waitForTimeout(200);
+const rep = await p.$$eval(".amx-dec [data-dec]", (r) => r.map((x) => x.getAttribute("data-dec") + "|" + x.textContent));
+ok(rep.length >= 2 && rep.every((r) => r.startsWith("replaced")) && rep.some((r) => r.includes("heartbeat")), "0.10: filter «حذف‌شده» shows the removed heartbeat rule");
+await p.click('.amx-dec-f [data-f="all"]'); await p.fill(".amx-dec-q", "Railway"); await p.waitForTimeout(200);
+{ const t = await p.$$eval(".amx-dec [data-dec]", (r) => r.map((x) => x.textContent)); ok(t.length >= 1 && t.length < decN && t.every((x) => x.includes("Railway")) && t[0].includes("قالب‌های Railway"), "0.10: search narrows the list (" + t.length + ")"); }
+await p.fill(".amx-dec-q", ""); await p.click('.amx-dec [data-dec="active"] summary'); await p.waitForTimeout(200);
+ok(await p.$eval('.amx-dec [data-dec="active"]', (d) => d.open && d.querySelector(".amx-ans").textContent.length > 30), "0.10: clicking a decision opens its full text");
+await (await p.$(".amx-dec")).screenshot({ path: "tests/decisions-e2e.png" });
+// 0.10.0: a step whose agent posted the answer is marked done by one click (and by the comment event on the server)
+const st1 = (await H.ctx.issues.list({ companyId: "c1", limit: 100, offset: 0 })).find((i) => /^1\./.test(i.title));
+if (!st1.assigneeAgentId) await H.ctx.issues.update(st1.id, { assigneeAgentId: "L2" }, "c1");
+H.seed({ issueComments: [{ id: "e2e-a1", companyId: "c1", issueId: st1.id, authorType: "agent", authorAgentId: st1.assigneeAgentId ?? "L2", authorUserId: null, body: "خروجی کامل قدم اول. ".repeat(12), createdAt: new Date(), updatedAt: new Date() }] });
+await p.click(".amx-runs-sync"); await p.waitForTimeout(900);
+const note = await p.textContent(".amx-runs-note");
+ok(note.includes("1 قدم از 15") && (await H.ctx.issues.get(st1.id, "c1")).status === "done" && (await p.textContent(".amx-runs")).includes("2 از 15"), "0.10: «ثبت وضعیت از روی جواب‌ها» closes the answered step: " + note);
 await p.screenshot({ path: "tests/ui-e2e.png", fullPage: true });
 ok(errs.length === 0, "no page errors " + errs.join(" | "));
 await br.close(); console.log(fail ? `${fail} FAILED` : "ALL PASS"); process.exit(fail ? 1 : 0);

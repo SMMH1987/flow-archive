@@ -9,6 +9,7 @@ import { buildInstructions } from "../src/shared/instructions.js";
 import { buildBrief, unclearWhy } from "../src/shared/intake.js";
 import { aggregateTrace, RUNS_SQL, COSTS_SQL } from "../src/shared/trace.js";
 import { scenario, overBudget, monthlyUsd } from "../src/shared/scenario.js";
+import { autoStatus } from "../src/shared/autostatus.js";
 
 const IDS = new Set(DATA.org.agents.map((a) => a.id));
 const hire = DATA.cases.hire;
@@ -23,9 +24,9 @@ async function boot(agents: any[] = [], extra: string[] = []) {
 }
 
 describe("manifest", () => {
-  it("asks only for read + create-task + page/sidebar", () => {
-    expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "issues.read", "issue.comments.read", "ui.page.register", "ui.sidebar.register"]);
-    expect(manifest.version).toBe("0.9.0");
+  it("asks only for read + create-task + status update (0.10, approved) + page/sidebar", () => {
+    expect(manifest.capabilities).toEqual(["agents.read", "issues.create", "plugin.state.read", "plugin.state.write", "issues.read", "issue.comments.read", "issues.update", "events.subscribe", "ui.page.register", "ui.sidebar.register"]);
+    expect(manifest.version).toBe("0.10.0");
   });
 });
 
@@ -347,7 +348,49 @@ describe("0.7: case steps with their answers (read-only)", () => {
     expect(s2.answer.count).toBe(2); expect(s2.older[0].body.startsWith("پیش‌نویس اول")).toBe(true); expect(s2.hidden).toBe(1);
     expect(steps.filter((s: any) => s.answer).length).toBe(1);
   });
-  it("only reads (no create/update capability added for this)", () => {
-    expect(manifest.capabilities.filter((c) => /update|write|comments.create/.test(c))).toEqual(["plugin.state.write"]);
+  it("writes nothing except state and step status (no comment creation)", () => {
+    expect(manifest.capabilities.filter((c) => /update|write|comments.create/.test(c))).toEqual(["plugin.state.write", "issues.update"]);
+  });
+});
+
+describe("0.10: auto status (agent answered → step done)", () => {
+  const long = "خروجی کامل ایجنت. ".repeat(12);
+  const step = { id: "s1", title: "2. نوشتن شرح شغل", status: "todo", parentId: "p", assigneeAgentId: "A" };
+  it("closes an open case step when its agent posted a full answer", () => {
+    expect(autoStatus(step, "پرونده: استخدام", [{ body: long, authorAgentId: "A", createdAt: "2" }]).status).toBe("done");
+  });
+  it("leaves gates, other parents, closed steps, short notes, questions and human comments alone", () => {
+    expect(autoStatus({ ...step, title: "7. 🔒 انتشار آگهی" }, "پرونده: x", [{ body: long, authorAgentId: "A" }]).why).toBe("human gate");
+    expect(autoStatus(step, "کار دیگر", [{ body: long, authorAgentId: "A" }]).status).toBeNull();
+    expect(autoStatus({ ...step, status: "blocked" }, "پرونده: x", [{ body: long, authorAgentId: "A" }]).status).toBeNull();
+    expect(autoStatus({ ...step, status: "done" }, "پرونده: x", [{ body: long, authorAgentId: "A" }]).status).toBeNull();
+    expect(autoStatus(step, "پرونده: x", [{ body: "کوتاه", authorAgentId: "A" }]).status).toBeNull();
+    expect(autoStatus(step, "پرونده: x", [{ body: long + "\nحقوق پیشنهادی چقدر باشد؟", authorAgentId: "A" }]).status).toBeNull();
+    expect(autoStatus(step, "پرونده: x", [{ body: long + " منتظر تأیید شما هستم", authorAgentId: "A" }]).status).toBeNull();
+    expect(autoStatus(step, "پرونده: x", [{ body: long, authorAgentId: null, authorType: "user" }]).status).toBeNull();
+    expect(autoStatus(step, "پرونده: x", [{ body: long, authorAgentId: "B" }]).why).toBe("answer from another agent");
+  });
+  it("syncStatus closes answered steps of a real case and logs each change", async () => {
+    const live = [{ ...base, id: "L1", name: "مدیر منابع انسانی", role: "manager", title: "", reportsTo: null, adapterConfig: {} }, { ...base, id: "L2", name: "کارشناس جذب", role: "general", title: "", reportsTo: "L1", adapterConfig: {} }];
+    const h = await boot(live, ["issue.comments.create"]);
+    await h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: { country: "IR", seniority: "mid", ad_budget_toman: 0, gender_any: "yes" }, approved: true, ...OKI });
+    const iss = await h.ctx.issues.list({ companyId: "c1", limit: 100, offset: 0 } as any);
+    const jd: any = iss.find((i: any) => i.title.includes("نوشتن شرح شغل"))!;
+    h.seed({ issueComments: [{ id: "cm1", companyId: "c1", issueId: jd.id, authorType: "agent", authorAgentId: jd.assigneeAgentId, authorUserId: null, body: long, createdAt: new Date(), updatedAt: new Date() }] } as any);
+    const r: any = await h.performAction("syncStatus", { companyId: "c1" });
+    expect(r).toEqual({ checked: 15, changed: 1 });
+    expect((await h.ctx.issues.get(jd.id, "c1"))?.status).toBe("done");
+    const log: any = await h.getData("autoStatusLog", { companyId: "c1" });
+    expect(log[0]).toMatchObject({ issueId: jd.id, to: "done" });
+    expect(iss.filter((i: any) => i.title.includes("🔒")).every((i: any) => i.status === "backlog")).toBe(true);
+  });
+  it("the comment event closes the step by itself", async () => {
+    const live = [{ ...base, id: "L2", name: "کارشناس جذب", role: "general", title: "", reportsTo: null, adapterConfig: {} }];
+    const h = await boot(live);
+    await h.performAction("approvePlan", { companyId: "c1", caseId: "hire", answers: { country: "IR", seniority: "mid", ad_budget_toman: 0, gender_any: "yes" }, approved: true, ...OKI });
+    const jd: any = (await h.ctx.issues.list({ companyId: "c1", limit: 100, offset: 0 } as any)).find((i: any) => i.title.includes("نوشتن شرح شغل"))!;
+    h.seed({ issueComments: [{ id: "cm2", companyId: "c1", issueId: jd.id, authorType: "agent", authorAgentId: jd.assigneeAgentId, authorUserId: null, body: long, createdAt: new Date(), updatedAt: new Date() }] } as any);
+    await h.emit("issue.comment.created", { issueId: jd.id, commentId: "cm2" }, { companyId: "c1", actorType: "agent", entityId: "cm2", entityType: "issue_comment" });
+    expect((await h.ctx.issues.get(jd.id, "c1"))?.status).toBe("done");
   });
 });
