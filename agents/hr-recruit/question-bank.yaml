@@ -1,0 +1,40 @@
+# Hiring question bank (SSOT). The engine sends fixed questions itself = 0 LLM tokens.
+# The LLM only scores against `rubric` and writes up to `followups_max` follow-ups.
+# Layers: common (every role) -> role (rules.yaml `role`) -> level. A new role = a new key under roles.
+# Good follow-ups the LLM wrote and the manager approved -> appended here with source: learned (bank grows).
+# Method: structured interview + behavioural/situational questions (STAR). Source: Google re:Work "structured interviewing" (unverified).
+policy:
+  fixed_per_stage: 3        # fixed questions, sent verbatim by the engine
+  followups_max: 1          # LLM follow-ups per stage (token budget)
+  answer_max_chars: 600     # trim the applicant's answer before sending to the LLM
+  score: "1-5 per question against rubric; LLM returns only {id: score, note<=15 words}"
+
+common:
+  screen:
+    - {id: c-hours, ask: "چند ساعت در هفته آزادی؟", type: number}
+    - {id: c-salary, ask: "حقوق مورد انتظارت چقدر است؟", type: text}
+    - {id: c-start, ask: "از کِی می‌توانی شروع کنی؟", type: date}
+  interview:
+    - {id: c-why, ask: "چرا این کار را می‌خواهی؟", rubric: "5 = reason tied to the job; 1 = generic"}
+    - {id: c-mistake, ask: "یک اشتباه کاری‌ات و کاری که بعدش کردی را بگو.", rubric: "5 = owns it + concrete fix (STAR)"}
+  survey:
+    - {id: c-nps, ask: "از ۱ تا ۵ به این فرایند نمره بده و اگر پیشنهادی داری بنویس.", type: text}
+
+roles:
+  assistant:          # دستیار اداری
+    knockout: ["کمتر از ۶ ماه سابقهٔ کار اداری", "نداشتن امکان حضور در تهران"]
+    interview:
+      - {id: a-busy, ask: "یک روز کاری شلوغ را که مدیریت کردی تعریف کن.", rubric: "5 = prioritises + tells the manager"}
+      - {id: a-excel, ask: "با اکسل چه کارهایی کرده‌ای؟", rubric: "5 = formulas/pivot with a real example"}
+      - {id: a-two, ask: "اگر دو کار فوری هم‌زمان برسد، چه می‌کنی؟", rubric: "5 = asks for priority, does not guess"}
+  Python:
+    interview:
+      - {id: p-debug, ask: "آخرین باگ سختی که پیدا کردی چه بود و چطور پیدایش کردی؟", rubric: "5 = method, not luck"}
+  SEO:
+    interview:
+      - {id: s-case, ask: "یک صفحه را که رتبه‌اش را بالا بردی مثال بزن؛ چه کردی و چه عددی عوض شد؟", rubric: "5 = numbers + cause"}
+
+levels:
+  senior:
+    interview:
+      - {id: l-lead, ask: "یک بار که کسی را راهنمایی یا هدایت کردی تعریف کن.", rubric: "5 = concrete result for the other person"}
