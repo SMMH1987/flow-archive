@@ -5,4 +5,4 @@
 - زیرساخت: runs-on: — · domains: — · jobs: —
 
 ## قواعد کار
-—
+- 🔒 هر `docker exec` روی `paperclip-lab_app` (سرور ۱۰) فقط با `-u node` (Siax 2026-11-22). با root، فایل‌های لاگین Claude مال root می‌شوند و لاگین خراب می‌شود. رفع: `chown -R node:node /paperclip`.
