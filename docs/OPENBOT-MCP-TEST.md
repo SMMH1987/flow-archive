@@ -55,3 +55,13 @@ OpenBot یک API رسمی لوکال برای خودکارسازی دارد: `/v
 ## v0.4 · 2026-11-23 17:56 (برلین)
 - با «تأیید» Siax (16:53 UTC)، A پاک شد: `/opt/openbot-mcp/a` و کش Playwright. فقط B روی VM 103 مانده است (`/opt/openbot-mcp/b`).
 - سند رسمی: `docs/automation.md` («Local scripts API») در مخزن OpenBot. مسیرهای B را تأیید می‌کند. ساختن ایجنت یا روتین در API نیست (خطای 400). برای همین `create_agent` و `edit_workflow` در B پیام را با `send_message` به Research Desk می‌فرستند و آن ایجنت با ابزارهای داخلی `openbot.*` می‌سازد.
+
+## v0.5 · 2026-11-23 18:03 (برلین) — ساختن با spec (بدون چت دستی)
+- ابزار تازه در B: `build_from_spec(spec)`؛ spec = `{name, model, instructions, workflow_steps?}`.
+- `build_from_spec` spec را برای Research Desk می‌فرستد. Research Desk با ابزارهای `openbot.*` ایجنت را می‌سازد.
+- بعد B ساخته‌شدن را از جدول `projection_agents` در `openbot.db` چک می‌کند. اتصال فقط‌خواندنی است (`mode=ro`) و چیزی در DB نوشته نمی‌شود.
+- ابزار `db_agents` همهٔ ایجنت‌ها را نشان می‌دهد، حتی آن‌هایی که Local scripts خاموش دارند.
+- تست: «تست سازنده» با `claude-haiku-5-5` ساخته و تأیید شد: `verified: true`، شناسه `agent-e3fbe2d9…`. این ایجنت مانده است؛ Siax می‌تواند حذفش کند.
+- هزینه: دو رکورد آخر مصرف ≈ $0.0033 (≈25k توکن ورودی که بیشترش cache است + 305 توکن خروجی). جدا کردن دقیق هزینهٔ یک ساخت **تأییدنشده** است.
+- «کارشناس جذب» بعد از روشن شدن Local scripts در `list_agents` آمد و تست مستقیم cv405 جواب «مرحلهٔ 1 از 8» داد.
+- نسخهٔ قبلی سرور: `/opt/openbot-mcp/b/server.py.bak`.
