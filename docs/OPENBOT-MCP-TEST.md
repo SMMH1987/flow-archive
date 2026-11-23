@@ -115,3 +115,11 @@ OpenBot یک API رسمی لوکال برای خودکارسازی دارد: `/v
 | با آپدیت OpenBot | سالم | سالم | پچ پاک می‌شود ← دوباره `patch_asar_v2.py` |
 
 *راه ۲ پشت تأیید حذف راه ۱ قفل شد.
+
+## v1.0 · 2026-11-23 18:40 (برلین) — پچ v3: دسترسی به همهٔ متدهای سرویس
+
+- درِ عمومی تازه: `GET /v1/call` (فهرست متدها) و `POST /v1/call/{method}` با بدنهٔ `{args:[...]}`. هر متد AgentService را صدا می‌زند: ایجنت، روتین، حافظه، کانال، صف، تسک، MCP، analytics، runtime و پیام‌ها.
+- مسدود (عمداً): هر متدی که نامش sign، credential، apikey، login، connectProvider، secret یا token دارد. اجرای این متدها خطای 404 برمی‌گرداند.
+- ابزارهای MCP تازه: `list_methods` و `call_method`. لاگ‌ها مثل قبل از ابزار `errors` می‌آیند (فایل‌های لاگ + journal + `openbot logs`).
+- تست شد: `getStatus` ✓، `getRuntimeSnapshot` ✓، `listMcpServers` ✓، `workingAgents` ✓، `signOutProvider` ← مسدود ✓. اگر متدی آرگومان لازم دارد و نفرستی، خطای 400 با پیام می‌گیری.
+- نصب: `patch_asar_v3.py` در `/opt/openbot-backup-20261123-170823/`. برگشت: `revert.sh`.
