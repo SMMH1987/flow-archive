@@ -96,3 +96,22 @@ OpenBot یک API رسمی لوکال برای خودکارسازی دارد: `/v
 - ⚠ هر آپدیت OpenBot وصله را پاک می‌کند. دوباره اعمال: `sudo python3 /opt/openbot-backup-20261123-170823/patch_asar.py /opt/OpenBot/app/resources/app.asar /tmp/a.asar` ← جایگزینی ← `systemctl restart openbot`. اگر assert شکست = کد عوض شده، وصله نکن.
 - نکته: avatarHue فقط یکی از 0,30,55,100,150,185,215,245,280,320.
 - هنوز نه: ویرایش instructions، ورک‌فلو، حذف از راه ۳؛ مقایسهٔ یکسان سه راه.
+
+## v0.9 · 2026-11-23 18:40 (برلین) — پچ کامل راه ۳ + بنچ یکسان
+
+پچ v2 (`/opt/openbot-backup-20261123-170823/patch_asar_v2.py`، روی همان app.asar اصلی بک‌آپ‌شده؛ برگشت: `revert.sh`). مسیرهای تازهٔ Local scripts API:
+`PATCH /v1/agents/{id}` (name، description=دستورالعمل، model) · `DELETE /v1/agents/{id}` · `GET|POST /v1/agents/{id}/routines` · `DELETE /v1/agents/{id}/routines/{rid}`.
+ابزارهای MCP تازه: `update_agent_direct`، `delete_agent_direct`، `list_routines_direct`، `create_routine_direct`، `delete_routine_direct`.
+
+| عمل | راه ۱ Research Desk | راه ۲ skill | راه ۳ پچ v2 |
+|-|-|-|-|
+| ساخت ایجنت Haiku | ✓ 12.1s | اجرا نشد* | ✓ 0.09s |
+| ویرایش دستورالعمل | ✓ 15.0s | — | ✓ 0.02s |
+| ورک‌فلوی ۳ قدمی وصل به ایجنت | ✓ 12.1s | — | ✓ 0.02s (routine) |
+| تغییر نام | ✓ 9.1s | — | ✓ 0.01s |
+| حذف | ⏸ تأیید انسانی در اپ | — | ✓ 0.69s (ایجنت باید بیکار باشد) |
+| خواندن نتیجه از DB | ✓ | — | ✓ |
+| هزینه | ≈$0.008 (توکن‌های زیاد ولی بیشترش کش) | — | 0 توکن، $0 |
+| با آپدیت OpenBot | سالم | سالم | پچ پاک می‌شود ← دوباره `patch_asar_v2.py` |
+
+*راه ۲ پشت تأیید حذف راه ۱ قفل شد.
