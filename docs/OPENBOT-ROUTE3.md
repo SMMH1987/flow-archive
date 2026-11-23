@@ -29,6 +29,10 @@
 | دیدن خطاها | ابزار MCP به نام `errors` (لاگ برنامه + journal + `openbot logs`، با حذف رازها) |
 
 ## ۳. نصب دوبارهٔ پچ بعد از آپدیت
+- **خودکار (از ۲۰۲۶-۱۱-۲۳):** واحد systemd به نام `openbot-repatch.path` تغییر `app.asar` را می‌بیند و `/opt/openbot-repatch/openbot-repatch.sh` را اجرا می‌کند. اگر نشانهٔ پچ پیدا نشود ← از فایل پشتیبان می‌گیرد، پچ v4 را می‌زند، ری‌استارت می‌کند و `/v1/call` را تست می‌کند. اگر پچ جا نیفتد ← به فایل دست نمی‌زند و خطا را ثبت می‌کند.
+- لاگ: `/var/log/openbot-repatch.log`. هشدار تلگرام فقط وقتی کار می‌کند که `TG_TOKEN` و `TG_CHAT` در `/etc/default/openbot-repatch` باشند (فعلاً خالی است).
+- برگرداندن: `sudo bash /opt/openbot-repatch/uninstall.sh`
+- دستی:
 ```bash
 ssh ubuntu@192.168.88.254
 B=/opt/openbot-backup-20261123-170823
