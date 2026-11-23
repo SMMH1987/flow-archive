@@ -51,3 +51,7 @@ OpenBot یک API رسمی لوکال برای خودکارسازی دارد: `/v
 
 **توصیه:** B بماند. A حذف شود (فقط بعد از «بله»ی Siax):
 `sudo rm -rf /opt/openbot-mcp/a /var/lib/openbot/.cache/ms-playwright ~/.cache/ms-playwright`
+
+## v0.4 · 2026-11-23 17:56 (برلین)
+- با «تأیید» Siax (16:53 UTC)، A پاک شد: `/opt/openbot-mcp/a` و کش Playwright. فقط B روی VM 103 مانده است (`/opt/openbot-mcp/b`).
+- سند رسمی: `docs/automation.md` («Local scripts API») در مخزن OpenBot. مسیرهای B را تأیید می‌کند. ساختن ایجنت یا روتین در API نیست (خطای 400). برای همین `create_agent` و `edit_workflow` در B پیام را با `send_message` به Research Desk می‌فرستند و آن ایجنت با ابزارهای داخلی `openbot.*` می‌سازد.
