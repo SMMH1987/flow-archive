@@ -87,3 +87,12 @@ OpenBot یک API رسمی لوکال برای خودکارسازی دارد: `/v
   - در کد، مسیر داخلی `/v1/agents/profile/save` پیدا شد؛ یعنی مسیری برای ساختن ایجنت در خود برنامه وجود دارد، ولی فقط برای خود اپ است و در Local scripts باز نیست.
   - پچ کردن این‌ها را لازم دارد: نصب node، باز کردن asar، ویرایش، بسته‌بندی دوباره و ری‌استارت `openbot.service`. ری‌استارت چت تلگرام را قطع می‌کند و توکن API را عوض می‌کند. هر آپدیت هم پچ را پاک می‌کند.
   - تا «بله»ی Siax برای ری‌استارت، انجام نشد.
+
+## v0.8 · 2026-11-23 18:15 (برلین) — راه ۳ انجام شد (با «بله ری‌استارت» Siax)
+- بکاپ: `/opt/openbot-backup-20261123-170823/` (app.asar اصلی، sha256 `0f598e69…`) + `revert.sh` (برگرداندن + ری‌استارت) + `patch_asar.py`.
+- وصله: در `out/main/index.js` داخل app.asar، گزینهٔ `createAgent` به AutomationServer داده شد و `POST /v1/agents` به Local scripts اضافه شد (همان `service.createAgent` داخلی). بدون node؛ asar با پایتون باز/بسته شد و integrity فایل دوباره حساب شد.
+- نتیجه: ری‌استارت ✓، `openbot status` = online ✓. ساخت «تست مستقیم موقت» (agent-44cc8ce8…) در 0.1 ثانیه، بدون توکن برای ساخت.
+- ابزار تازهٔ B: `create_agent_direct(name, instructions, model)`؛ instructions = پیام اول ایجنت.
+- ⚠ هر آپدیت OpenBot وصله را پاک می‌کند. دوباره اعمال: `sudo python3 /opt/openbot-backup-20261123-170823/patch_asar.py /opt/OpenBot/app/resources/app.asar /tmp/a.asar` ← جایگزینی ← `systemctl restart openbot`. اگر assert شکست = کد عوض شده، وصله نکن.
+- نکته: avatarHue فقط یکی از 0,30,55,100,150,185,215,245,280,320.
+- هنوز نه: ویرایش instructions، ورک‌فلو، حذف از راه ۳؛ مقایسهٔ یکسان سه راه.
