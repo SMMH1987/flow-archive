@@ -30,3 +30,24 @@ OpenBot یک API رسمی لوکال برای خودکارسازی دارد: `/v
 
 ## حذف
 `sudo rm -rf /opt/openbot-mcp ~/.cache/ms-playwright`
+
+---
+
+## نتیجهٔ نهایی — v0.3 · 2026-11-23 17:58 (برلین)
+
+پیش‌شرط: Siax «Local scripts» را در Agent settings → Permissions برای Telegram Orchestrator و Research Desk روشن کرد.
+
+| تست | A (وب/Playwright) | B (API رسمی محلی /v1) |
+|-|-|-|
+| کار می‌کند؟ | ✗ ورود دو بار شکست خورد (timeout در Playwright) ← تست نشد | ✓ |
+| ۱. Orchestrator ← claude-haiku-5-5 | — | ✓ `set_agent_model` در کمتر از ۱ ثانیه |
+| ۲. ساخت «کارشناس جذب» (Haiku) | — | ✓ از راه Research Desk ساخته شد (Siax در اپ دید). در `list_agents` نمی‌آید، چون API فقط ایجنت‌هایی را نشان می‌دهد که Local scripts دارند |
+| ۳. ارسال cv405 و خواندن جواب | — | نیمه ✓ ارسال انجام شد و وضعیت `completed` آمد؛ اما API متن جواب را برنمی‌گرداند (`answer: null`) ← جواب را باید در اپ یا تلگرام دید |
+| کار لازم از Siax | ورود با ایمیل و کد (شکننده) | یک بار روشن کردن Local scripts برای هر ایجنت |
+| ریسک شکستن | بالا: selectorها حدسی‌اند و UI عوض می‌شود | کم: همان API که CLI رسمی هم استفاده می‌کند |
+| توکن در هر فراخوان | ≈ ۰ (توکن مدل فقط وقتی ایجنت کار می‌کند) | ≈ ۰ (همین‌طور) |
+
+باگ‌هایی که در B رفع شد: وضعیت `starting` در حلقهٔ انتظار نبود؛ و `wait=true` به ۱ ثانیه تبدیل می‌شد (باید عدد ثانیه باشد).
+
+**توصیه:** B بماند. A حذف شود (فقط بعد از «بله»ی Siax):
+`sudo rm -rf /opt/openbot-mcp/a /var/lib/openbot/.cache/ms-playwright ~/.cache/ms-playwright`
